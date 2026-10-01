@@ -908,8 +908,51 @@
         }
       });
 
-      // Google Translate Language Switcher (Always EN -> Target Language)
-      window.setLanguage = function(langCode) {
+      // Language detection & Google Translate controller (Strictly EN -> Target Language)
+      function detectUserLanguage() {
+        // 1. Check if user already made an explicit manual choice
+        const savedChoice = localStorage.getItem('unisport_user_selected_lang');
+        if (savedChoice && ['en', 'nl', 'pt', 'fr', 'de'].includes(savedChoice)) {
+          return savedChoice;
+        }
+
+        // 2. Detect from browser locales / region
+        try {
+          const navLangs = (navigator.languages && navigator.languages.length) ? navigator.languages : [navigator.language || navigator.userLanguage || ''];
+          for (const loc of navLangs) {
+            if (!loc) continue;
+            const code = loc.toLowerCase().trim();
+            if (code.startsWith('pt')) return 'pt';
+            if (code.startsWith('nl')) return 'nl';
+            if (code.startsWith('fr')) return 'fr';
+            if (code.startsWith('de')) return 'de';
+            if (code.startsWith('en')) return 'en';
+          }
+        } catch (e) {
+          return 'en';
+        }
+
+        // 3. Fallback if region is not supported or not detectable
+        return 'en';
+      }
+
+      window.detectUserLanguage = detectUserLanguage;
+      const currentLang = detectUserLanguage();
+
+      // Set cookie immediately so Google Translate initializes with correct target
+      if (currentLang !== 'en') {
+        document.cookie = `googtrans=/en/${currentLang}; path=/;`;
+        document.cookie = `googtrans=/en/${currentLang}; domain=${window.location.hostname}; path=/;`;
+      } else {
+        document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; domain=" + window.location.hostname + "; path=/;";
+      }
+
+      window.setLanguage = function(langCode, isManual = true) {
+        if (isManual) {
+          localStorage.setItem('unisport_user_selected_lang', langCode);
+        }
+
         document.querySelectorAll('.lang-btn').forEach(btn => {
           btn.classList.toggle('active', btn.getAttribute('data-lang') === langCode);
         });
@@ -937,19 +980,15 @@
         }
       };
 
-      // Check current translation cookie on load
-      const match = document.cookie.match(/googtrans=\/en\/([a-z]{2})/);
-      if (match && match[1]) {
-        const activeLang = match[1];
-        document.querySelectorAll('.lang-btn').forEach(b => {
-          b.classList.toggle('active', b.getAttribute('data-lang') === activeLang);
-        });
-      }
+      // Set active language button state
+      document.querySelectorAll('.lang-btn').forEach(b => {
+        b.classList.toggle('active', b.getAttribute('data-lang') === currentLang);
+      });
 
       document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           const lang = btn.getAttribute('data-lang');
-          window.setLanguage(lang);
+          window.setLanguage(lang, true);
         });
       });
     });
@@ -964,6 +1003,27 @@
         includedLanguages: 'en,nl,pt,fr,de',
         autoDisplay: false
       }, 'google_translate_element');
+
+      // Verify combo synchronization if auto-detected language is not EN
+      if (typeof window.detectUserLanguage === 'function') {
+        const lang = window.detectUserLanguage();
+        if (lang && lang !== 'en') {
+          let attempts = 0;
+          const syncInterval = setInterval(() => {
+            attempts++;
+            const combo = document.querySelector('.goog-te-combo');
+            if (combo) {
+              clearInterval(syncInterval);
+              if (combo.value !== lang) {
+                combo.value = lang;
+                combo.dispatchEvent(new Event('change'));
+              }
+            } else if (attempts > 25) {
+              clearInterval(syncInterval);
+            }
+          }, 150);
+        }
+      }
     }
   </script>
   <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
