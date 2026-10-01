@@ -77,12 +77,27 @@
       color: #FFFFFF;
     }
 
-    /* Language Selector Styles */
-    .lang-btn.active {
-      background-color: #FFFFFF;
-      color: #18181B;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
-      font-weight: 700;
+    /* Modern Language Dropdown */
+    .lang-dropdown-menu {
+      opacity: 0;
+      transform: translateY(-8px) scale(0.96);
+      pointer-events: none;
+      transition: opacity 0.15s ease, transform 0.15s ease;
+    }
+    .lang-dropdown-menu.open {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+    .lang-option {
+      transition: all 0.12s ease;
+    }
+    .lang-option.active {
+      background-color: #2563EB !important;
+      color: #FFFFFF !important;
+    }
+    .lang-option.active span {
+      color: #FFFFFF !important;
     }
 
     /* Clean Google Translate UI override */
@@ -119,16 +134,58 @@
         </span>
       </div>
 
-      <!-- Right: Language Selector + Fontys Logo -->
+      <!-- Right: Modern Language Selector Dropdown + Fontys Logo -->
       <div class="flex items-center space-x-3 sm:space-x-5">
         
-        <!-- Minimal Language Selector (EN, NL, PT, FR, DE) -->
-        <div class="flex items-center space-x-0.5 text-xs font-semibold text-zinc-500 bg-zinc-100 p-1 rounded-xl border border-zinc-200" id="lang-selector-group">
-          <button type="button" class="lang-btn active px-2 py-1 rounded-lg transition" data-lang="en">EN</button>
-          <button type="button" class="lang-btn px-2 py-1 rounded-lg transition hover:text-zinc-900" data-lang="nl">NL</button>
-          <button type="button" class="lang-btn px-2 py-1 rounded-lg transition hover:text-zinc-900" data-lang="pt">PT</button>
-          <button type="button" class="lang-btn px-2 py-1 rounded-lg transition hover:text-zinc-900" data-lang="fr">FR</button>
-          <button type="button" class="lang-btn px-2 py-1 rounded-lg transition hover:text-zinc-900" data-lang="de">DE</button>
+        <!-- Modern Language Dropdown Pill -->
+        <div class="relative" id="lang-dropdown-wrapper">
+          <button type="button" id="lang-dropdown-trigger" class="flex items-center space-x-2 px-3.5 py-1.5 rounded-full border border-zinc-300 hover:border-zinc-400 bg-white shadow-xs text-xs font-bold text-zinc-800 transition focus:outline-none cursor-pointer">
+            <i data-lucide="globe" class="w-3.5 h-3.5 text-zinc-500"></i>
+            <span id="current-lang-label" class="tracking-wider uppercase font-bold">EN</span>
+            <i data-lucide="chevron-down" id="lang-chevron" class="w-3.5 h-3.5 text-zinc-400 transition-transform duration-200"></i>
+          </button>
+
+          <!-- Dropdown Menu Card -->
+          <div id="lang-dropdown-menu" class="lang-dropdown-menu absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-zinc-200 overflow-hidden z-50">
+            <div class="p-1.5 space-y-0.5" id="lang-options-list">
+              <button type="button" class="lang-option w-full px-3 py-2 rounded-xl flex items-center space-x-3 text-left text-xs font-bold text-zinc-800 hover:bg-zinc-100 cursor-pointer" data-lang="pt">
+                <span class="text-base leading-none">🇵🇹</span>
+                <span class="tracking-wide">PORTUGUÊS</span>
+              </button>
+              <button type="button" class="lang-option w-full px-3 py-2 rounded-xl flex items-center space-x-3 text-left text-xs font-bold text-zinc-800 hover:bg-zinc-100 cursor-pointer active" data-lang="en">
+                <span class="text-base leading-none">🇬🇧</span>
+                <span class="tracking-wide">ENGLISH</span>
+              </button>
+              <button type="button" class="lang-option w-full px-3 py-2 rounded-xl flex items-center space-x-3 text-left text-xs font-bold text-zinc-800 hover:bg-zinc-100 cursor-pointer" data-lang="es">
+                <span class="text-base leading-none">🇪🇸</span>
+                <span class="tracking-wide">ESPAÑOL</span>
+              </button>
+              <button type="button" class="lang-option w-full px-3 py-2 rounded-xl flex items-center space-x-3 text-left text-xs font-bold text-zinc-800 hover:bg-zinc-100 cursor-pointer" data-lang="fr">
+                <span class="text-base leading-none">🇫🇷</span>
+                <span class="tracking-wide">FRANÇAIS</span>
+              </button>
+              <button type="button" class="lang-option w-full px-3 py-2 rounded-xl flex items-center space-x-3 text-left text-xs font-bold text-zinc-800 hover:bg-zinc-100 cursor-pointer" data-lang="nl">
+                <span class="text-base leading-none">🇳🇱</span>
+                <span class="tracking-wide">NEDERLANDS</span>
+              </button>
+              <button type="button" class="lang-option w-full px-3 py-2 rounded-xl flex items-center space-x-3 text-left text-xs font-bold text-zinc-800 hover:bg-zinc-100 cursor-pointer" data-lang="de">
+                <span class="text-base leading-none">🇩🇪</span>
+                <span class="tracking-wide">DEUTSCH</span>
+              </button>
+              <button type="button" class="lang-option w-full px-3 py-2 rounded-xl flex items-center space-x-3 text-left text-xs font-bold text-zinc-800 hover:bg-zinc-100 cursor-pointer" data-lang="it">
+                <span class="text-base leading-none">🇮🇹</span>
+                <span class="tracking-wide">ITALIANO</span>
+              </button>
+            </div>
+            
+            <!-- Footer: Traduzido por Google -->
+            <div class="border-t border-zinc-100 px-4 py-2.5 flex items-center justify-between text-[11px] text-zinc-400 bg-zinc-50/50 select-none">
+              <span class="font-normal text-zinc-400">Traduzido por</span>
+              <span class="font-bold tracking-tight text-xs inline-flex items-center">
+                <span class="text-[#4285F4]">G</span><span class="text-[#EA4335]">o</span><span class="text-[#FBBC05]">o</span><span class="text-[#4285F4]">g</span><span class="text-[#34A853]">l</span><span class="text-[#EA4335]">e</span>
+              </span>
+            </div>
+          </div>
         </div>
 
         <a href="https://www.fontys.nl/" target="_blank" rel="noopener noreferrer" title="Fontys University of Applied Sciences" class="hover:opacity-80 transition-opacity hidden sm:block">
@@ -908,12 +965,42 @@
         }
       });
 
-      // Country to Language Mapping
+      // Modern Language Dropdown Toggle & Outside Click
+      const dropdownTrigger = document.getElementById('lang-dropdown-trigger');
+      const dropdownMenu = document.getElementById('lang-dropdown-menu');
+      const dropdownChevron = document.getElementById('lang-chevron');
+      const currentLangLabel = document.getElementById('current-lang-label');
+
+      function toggleDropdown(show) {
+        if (!dropdownMenu) return;
+        const isOpen = show !== undefined ? show : !dropdownMenu.classList.contains('open');
+        dropdownMenu.classList.toggle('open', isOpen);
+        if (dropdownChevron) {
+          dropdownChevron.style.transform = isOpen ? 'rotate(180deg)' : 'rotate(0deg)';
+        }
+      }
+
+      if (dropdownTrigger && dropdownMenu) {
+        dropdownTrigger.addEventListener('click', (e) => {
+          e.stopPropagation();
+          toggleDropdown();
+        });
+
+        document.addEventListener('click', (e) => {
+          if (!document.getElementById('lang-dropdown-wrapper')?.contains(e.target)) {
+            toggleDropdown(false);
+          }
+        });
+      }
+
+      // Country to Language Mapping (PT, EN, ES, FR, NL, DE, IT)
       const countryToLang = {
         'PT': 'pt', 'BR': 'pt', 'AO': 'pt', 'MZ': 'pt', 'CV': 'pt', 'GW': 'pt', 'ST': 'pt', 'TL': 'pt', 'MO': 'pt',
         'FR': 'fr', 'MC': 'fr', 'SN': 'fr', 'CI': 'fr', 'ML': 'fr', 'CD': 'fr', 'CG': 'fr', 'GA': 'fr', 'GN': 'fr', 'TG': 'fr', 'BJ': 'fr', 'NE': 'fr', 'BF': 'fr', 'MG': 'fr', 'CM': 'fr', 'DZ': 'fr', 'MA': 'fr', 'TN': 'fr',
         'NL': 'nl', 'SR': 'nl', 'CW': 'nl', 'AW': 'nl', 'SX': 'nl',
-        'DE': 'de', 'AT': 'de', 'LI': 'de'
+        'DE': 'de', 'AT': 'de', 'LI': 'de',
+        'ES': 'es', 'MX': 'es', 'AR': 'es', 'CO': 'es', 'CL': 'es', 'PE': 'es', 'VE': 'es', 'EC': 'es', 'GT': 'es', 'CU': 'es', 'BO': 'es', 'DO': 'es', 'HN': 'es', 'PY': 'es', 'SV': 'es', 'NI': 'es', 'CR': 'es', 'PA': 'es', 'UY': 'es',
+        'IT': 'it', 'SM': 'it', 'VA': 'it'
       };
 
       // Set cookie helper across current domain and root domain
@@ -938,7 +1025,7 @@
       // Fast synchronous locale detection
       function getSyncLanguage() {
         const savedChoice = localStorage.getItem('unisport_user_selected_lang');
-        if (savedChoice && ['en', 'nl', 'pt', 'fr', 'de'].includes(savedChoice)) {
+        if (savedChoice && ['en', 'nl', 'pt', 'fr', 'de', 'es', 'it'].includes(savedChoice)) {
           return savedChoice;
         }
         try {
@@ -947,9 +1034,11 @@
             if (!loc) continue;
             const code = loc.toLowerCase().trim();
             if (code.startsWith('pt')) return 'pt';
-            if (code.startsWith('nl')) return 'nl';
+            if (code.startsWith('es')) return 'es';
             if (code.startsWith('fr')) return 'fr';
+            if (code.startsWith('nl')) return 'nl';
             if (code.startsWith('de')) return 'de';
+            if (code.startsWith('it')) return 'it';
             if (code.startsWith('en')) return 'en';
           }
         } catch (e) {}
@@ -959,7 +1048,7 @@
       // Async IP-based Geolocation detection (supports VPNs & physical countries)
       async function detectGeoLanguage() {
         const manual = localStorage.getItem('unisport_user_selected_lang');
-        if (manual && ['en', 'nl', 'pt', 'fr', 'de'].includes(manual)) {
+        if (manual && ['en', 'nl', 'pt', 'fr', 'de', 'es', 'it'].includes(manual)) {
           return manual;
         }
 
@@ -975,7 +1064,7 @@
             }
             if (country === 'CH') {
               const bl = (navigator.language || '').toLowerCase();
-              return bl.startsWith('fr') ? 'fr' : (bl.startsWith('it') ? 'en' : 'de');
+              return bl.startsWith('fr') ? 'fr' : (bl.startsWith('it') ? 'it' : (bl.startsWith('de') ? 'de' : 'en'));
             }
             if (country === 'LU') {
               const bl = (navigator.language || '').toLowerCase();
@@ -1001,10 +1090,17 @@
           localStorage.setItem('unisport_user_selected_lang', langCode);
         }
 
-        document.querySelectorAll('.lang-btn').forEach(btn => {
+        // Update trigger button label
+        if (currentLangLabel) {
+          currentLangLabel.textContent = langCode.toUpperCase();
+        }
+
+        // Highlight active option in dropdown
+        document.querySelectorAll('.lang-option').forEach(btn => {
           btn.classList.toggle('active', btn.getAttribute('data-lang') === langCode);
         });
 
+        toggleDropdown(false);
         setTransCookie(langCode);
 
         let attempts = 0;
@@ -1037,7 +1133,8 @@
       // Initial synchronous setup
       const initialSyncLang = getSyncLanguage();
       setTransCookie(initialSyncLang);
-      document.querySelectorAll('.lang-btn').forEach(b => {
+      if (currentLangLabel) currentLangLabel.textContent = initialSyncLang.toUpperCase();
+      document.querySelectorAll('.lang-option').forEach(b => {
         b.classList.toggle('active', b.getAttribute('data-lang') === initialSyncLang);
       });
 
@@ -1048,9 +1145,10 @@
         }
       });
 
-      // Language buttons event listeners
-      document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
+      // Language options click listeners
+      document.querySelectorAll('.lang-option').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
           const lang = btn.getAttribute('data-lang');
           window.setLanguage(lang, true);
         });
@@ -1064,13 +1162,13 @@
     function googleTranslateElementInit() {
       new google.translate.TranslateElement({
         pageLanguage: 'en',
-        includedLanguages: 'en,nl,pt,fr,de',
+        includedLanguages: 'en,nl,pt,fr,de,es,it',
         autoDisplay: false
       }, 'google_translate_element');
 
       setTimeout(() => {
-        const activeBtn = document.querySelector('.lang-btn.active');
-        const lang = activeBtn ? activeBtn.getAttribute('data-lang') : 'en';
+        const activeOption = document.querySelector('.lang-option.active');
+        const lang = activeOption ? activeOption.getAttribute('data-lang') : 'en';
         if (lang && lang !== 'en' && typeof window.setLanguage === 'function') {
           window.setLanguage(lang, false);
         }
