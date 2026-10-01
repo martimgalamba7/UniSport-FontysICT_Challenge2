@@ -152,13 +152,13 @@
                 <span class="text-base leading-none">🇵🇹</span>
                 <span class="tracking-wide">PORTUGUÊS</span>
               </button>
-              <button type="button" class="lang-option w-full px-3 py-2 rounded-xl flex items-center space-x-3 text-left text-xs font-bold text-zinc-800 hover:bg-zinc-100 cursor-pointer active" data-lang="en">
-                <span class="text-base leading-none">🇬🇧</span>
-                <span class="tracking-wide">ENGLISH</span>
-              </button>
               <button type="button" class="lang-option w-full px-3 py-2 rounded-xl flex items-center space-x-3 text-left text-xs font-bold text-zinc-800 hover:bg-zinc-100 cursor-pointer" data-lang="es">
                 <span class="text-base leading-none">🇪🇸</span>
                 <span class="tracking-wide">ESPAÑOL</span>
+              </button>
+              <button type="button" class="lang-option w-full px-3 py-2 rounded-xl flex items-center space-x-3 text-left text-xs font-bold text-zinc-800 hover:bg-zinc-100 cursor-pointer active" data-lang="en">
+                <span class="text-base leading-none">🇬🇧</span>
+                <span class="tracking-wide">ENGLISH</span>
               </button>
               <button type="button" class="lang-option w-full px-3 py-2 rounded-xl flex items-center space-x-3 text-left text-xs font-bold text-zinc-800 hover:bg-zinc-100 cursor-pointer" data-lang="fr">
                 <span class="text-base leading-none">🇫🇷</span>
@@ -172,9 +172,17 @@
                 <span class="text-base leading-none">🇩🇪</span>
                 <span class="tracking-wide">DEUTSCH</span>
               </button>
-              <button type="button" class="lang-option w-full px-3 py-2 rounded-xl flex items-center space-x-3 text-left text-xs font-bold text-zinc-800 hover:bg-zinc-100 cursor-pointer" data-lang="it">
-                <span class="text-base leading-none">🇮🇹</span>
-                <span class="tracking-wide">ITALIANO</span>
+              <button type="button" class="lang-option w-full px-3 py-2 rounded-xl flex items-center space-x-3 text-left text-xs font-bold text-zinc-800 hover:bg-zinc-100 cursor-pointer" data-lang="ar">
+                <span class="text-base leading-none">🇸🇦</span>
+                <span class="tracking-wide">ARABIC</span>
+              </button>
+              <button type="button" class="lang-option w-full px-3 py-2 rounded-xl flex items-center space-x-3 text-left text-xs font-bold text-zinc-800 hover:bg-zinc-100 cursor-pointer" data-lang="ru">
+                <span class="text-base leading-none">🇷🇺</span>
+                <span class="tracking-wide">РУССКИЙ</span>
+              </button>
+              <button type="button" class="lang-option w-full px-3 py-2 rounded-xl flex items-center space-x-3 text-left text-xs font-bold text-zinc-800 hover:bg-zinc-100 cursor-pointer" data-lang="zh-CN">
+                <span class="text-base leading-none">🇨🇳</span>
+                <span class="tracking-wide">中文</span>
               </button>
             </div>
             
@@ -993,15 +1001,27 @@
         });
       }
 
-      // Country to Language Mapping (PT, EN, ES, FR, NL, DE, IT)
+      // Country to Language Mapping (PT, ES, EN, FR, NL, DE, AR, RU, ZH-CN)
       const countryToLang = {
+        // Portuguese
         'PT': 'pt', 'BR': 'pt', 'AO': 'pt', 'MZ': 'pt', 'CV': 'pt', 'GW': 'pt', 'ST': 'pt', 'TL': 'pt', 'MO': 'pt',
-        'FR': 'fr', 'MC': 'fr', 'SN': 'fr', 'CI': 'fr', 'ML': 'fr', 'CD': 'fr', 'CG': 'fr', 'GA': 'fr', 'GN': 'fr', 'TG': 'fr', 'BJ': 'fr', 'NE': 'fr', 'BF': 'fr', 'MG': 'fr', 'CM': 'fr', 'DZ': 'fr', 'MA': 'fr', 'TN': 'fr',
-        'NL': 'nl', 'SR': 'nl', 'CW': 'nl', 'AW': 'nl', 'SX': 'nl',
-        'DE': 'de', 'AT': 'de', 'LI': 'de',
+        // Spanish
         'ES': 'es', 'MX': 'es', 'AR': 'es', 'CO': 'es', 'CL': 'es', 'PE': 'es', 'VE': 'es', 'EC': 'es', 'GT': 'es', 'CU': 'es', 'BO': 'es', 'DO': 'es', 'HN': 'es', 'PY': 'es', 'SV': 'es', 'NI': 'es', 'CR': 'es', 'PA': 'es', 'UY': 'es',
-        'IT': 'it', 'SM': 'it', 'VA': 'it'
+        // French
+        'FR': 'fr', 'MC': 'fr', 'SN': 'fr', 'CI': 'fr', 'ML': 'fr', 'CD': 'fr', 'CG': 'fr', 'GA': 'fr', 'GN': 'fr', 'TG': 'fr', 'BJ': 'fr', 'NE': 'fr', 'BF': 'fr', 'MG': 'fr', 'CM': 'fr',
+        // Dutch
+        'NL': 'nl', 'SR': 'nl', 'CW': 'nl', 'AW': 'nl', 'SX': 'nl',
+        // German
+        'DE': 'de', 'AT': 'de', 'LI': 'de',
+        // Arabic
+        'SA': 'ar', 'AE': 'ar', 'EG': 'ar', 'IQ': 'ar', 'JO': 'ar', 'KW': 'ar', 'LB': 'ar', 'OM': 'ar', 'QA': 'ar', 'SY': 'ar', 'YE': 'ar', 'BH': 'ar', 'LY': 'ar', 'SD': 'ar', 'DZ': 'ar', 'MA': 'ar', 'TN': 'ar',
+        // Russian
+        'RU': 'ru', 'BY': 'ru', 'KZ': 'ru', 'KG': 'ru',
+        // Chinese
+        'CN': 'zh-CN', 'TW': 'zh-CN', 'HK': 'zh-CN', 'SG': 'zh-CN'
       };
+
+      const supportedLangs = ['pt', 'es', 'en', 'fr', 'nl', 'de', 'ar', 'ru', 'zh-CN'];
 
       // Set cookie helper across current domain and root domain
       function setTransCookie(langCode) {
@@ -1025,7 +1045,7 @@
       // Fast synchronous locale detection
       function getSyncLanguage() {
         const savedChoice = localStorage.getItem('unisport_user_selected_lang');
-        if (savedChoice && ['en', 'nl', 'pt', 'fr', 'de', 'es', 'it'].includes(savedChoice)) {
+        if (savedChoice && supportedLangs.includes(savedChoice)) {
           return savedChoice;
         }
         try {
@@ -1038,7 +1058,9 @@
             if (code.startsWith('fr')) return 'fr';
             if (code.startsWith('nl')) return 'nl';
             if (code.startsWith('de')) return 'de';
-            if (code.startsWith('it')) return 'it';
+            if (code.startsWith('ar')) return 'ar';
+            if (code.startsWith('ru')) return 'ru';
+            if (code.startsWith('zh')) return 'zh-CN';
             if (code.startsWith('en')) return 'en';
           }
         } catch (e) {}
@@ -1048,7 +1070,7 @@
       // Async IP-based Geolocation detection (supports VPNs & physical countries)
       async function detectGeoLanguage() {
         const manual = localStorage.getItem('unisport_user_selected_lang');
-        if (manual && ['en', 'nl', 'pt', 'fr', 'de', 'es', 'it'].includes(manual)) {
+        if (manual && supportedLangs.includes(manual)) {
           return manual;
         }
 
@@ -1064,7 +1086,7 @@
             }
             if (country === 'CH') {
               const bl = (navigator.language || '').toLowerCase();
-              return bl.startsWith('fr') ? 'fr' : (bl.startsWith('it') ? 'it' : (bl.startsWith('de') ? 'de' : 'en'));
+              return bl.startsWith('fr') ? 'fr' : (bl.startsWith('it') ? 'en' : (bl.startsWith('de') ? 'de' : 'en'));
             }
             if (country === 'LU') {
               const bl = (navigator.language || '').toLowerCase();
@@ -1085,6 +1107,12 @@
         return getSyncLanguage();
       }
 
+      function formatLangBadge(code) {
+        if (!code) return 'EN';
+        if (code === 'zh-CN') return 'ZH';
+        return code.toUpperCase();
+      }
+
       window.setLanguage = function(langCode, isManual = true) {
         if (isManual) {
           localStorage.setItem('unisport_user_selected_lang', langCode);
@@ -1092,7 +1120,7 @@
 
         // Update trigger button label
         if (currentLangLabel) {
-          currentLangLabel.textContent = langCode.toUpperCase();
+          currentLangLabel.textContent = formatLangBadge(langCode);
         }
 
         // Highlight active option in dropdown
@@ -1133,7 +1161,7 @@
       // Initial synchronous setup
       const initialSyncLang = getSyncLanguage();
       setTransCookie(initialSyncLang);
-      if (currentLangLabel) currentLangLabel.textContent = initialSyncLang.toUpperCase();
+      if (currentLangLabel) currentLangLabel.textContent = formatLangBadge(initialSyncLang);
       document.querySelectorAll('.lang-option').forEach(b => {
         b.classList.toggle('active', b.getAttribute('data-lang') === initialSyncLang);
       });
@@ -1162,7 +1190,7 @@
     function googleTranslateElementInit() {
       new google.translate.TranslateElement({
         pageLanguage: 'en',
-        includedLanguages: 'en,nl,pt,fr,de,es,it',
+        includedLanguages: 'pt,es,en,fr,nl,de,ar,ru,zh-CN',
         autoDisplay: false
       }, 'google_translate_element');
 
