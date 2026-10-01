@@ -1,0 +1,10 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Node / Vercel build caches
+node_modules/
+.vercel
+.env
+.env.local
+*.log

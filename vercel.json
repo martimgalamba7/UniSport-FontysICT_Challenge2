@@ -1,0 +1,51 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "routes": [
+    {
+      "src": "/challenge2/survey/assets/(.*)",
+      "dest": "/UniSport_ResearchSurvey/assets/$1"
+    },
+    {
+      "src": "/challenge2/unisportapp/assets/(.*)",
+      "dest": "/UniSport_App/assets/$1"
+    },
+    {
+      "src": "/assets/(.*)",
+      "dest": "/UniSport_ResearchSurvey/assets/$1"
+    },
+    {
+      "src": "/challenge2/survey",
+      "dest": "/UniSport_ResearchSurvey/index.html"
+    },
+    {
+      "src": "/challenge2/survey/(.*)",
+      "dest": "/UniSport_ResearchSurvey/index.html"
+    },
+    {
+      "src": "/challenge2/unisportapp",
+      "dest": "/UniSport_App/index.html"
+    },
+    {
+      "src": "/challenge2/unisportapp/(.*)",
+      "dest": "/UniSport_App/index.html"
+    },
+    {
+      "src": "/survey",
+      "dest": "/UniSport_ResearchSurvey/index.html"
+    },
+    {
+      "src": "/unisportapp",
+      "dest": "/UniSport_App/index.html"
+    },
+    {
+      "src": "/challenge2",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/",
+      "dest": "/index.html"
+    }
+  ]
+}

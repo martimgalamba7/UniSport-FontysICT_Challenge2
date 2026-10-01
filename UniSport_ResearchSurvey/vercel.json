@@ -1,0 +1,31 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [
+    {
+      "source": "/assets/(.*)",
+      "destination": "/assets/$1"
+    },
+    {
+      "source": "/challenge2/survey",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/challenge2_sportscommunity/survey",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/challenge2/:path*",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/survey",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
