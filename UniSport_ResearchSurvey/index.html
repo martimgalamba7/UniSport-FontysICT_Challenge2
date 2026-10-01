@@ -1008,19 +1008,30 @@
         setTransCookie(langCode);
 
         let attempts = 0;
-        const triggerCombo = () => {
+        const maxAttempts = 35;
+        const syncInterval = setInterval(() => {
+          attempts++;
           const select = document.querySelector('.goog-te-combo');
           if (select) {
-            if (select.value !== langCode) {
+            if (langCode === 'en') {
+              select.value = '';
+              select.dispatchEvent(new Event('change', { bubbles: true }));
+            } else {
               select.value = langCode;
               select.dispatchEvent(new Event('change', { bubbles: true }));
             }
-          } else if (attempts < 25) {
-            attempts++;
-            setTimeout(triggerCombo, 150);
+
+            const isTranslated = document.documentElement.classList.contains('translated-ltr') ||
+                                 document.documentElement.classList.contains('translated-rtl') ||
+                                 document.body.classList.contains('translated-ltr');
+
+            if ((langCode !== 'en' && isTranslated) || (langCode === 'en' && !isTranslated) || attempts >= maxAttempts) {
+              clearInterval(syncInterval);
+            }
+          } else if (attempts >= maxAttempts) {
+            clearInterval(syncInterval);
           }
-        };
-        triggerCombo();
+        }, 150);
       };
 
       // Initial synchronous setup
@@ -1056,6 +1067,14 @@
         includedLanguages: 'en,nl,pt,fr,de',
         autoDisplay: false
       }, 'google_translate_element');
+
+      setTimeout(() => {
+        const activeBtn = document.querySelector('.lang-btn.active');
+        const lang = activeBtn ? activeBtn.getAttribute('data-lang') : 'en';
+        if (lang && lang !== 'en' && typeof window.setLanguage === 'function') {
+          window.setLanguage(lang, false);
+        }
+      }, 250);
     }
   </script>
   <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
