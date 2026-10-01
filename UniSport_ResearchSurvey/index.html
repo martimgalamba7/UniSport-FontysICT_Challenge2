@@ -637,8 +637,8 @@
 
   <!-- ================= SCRIPT CONTROLLER ================= -->
   <script>
-    // Google Sheets Apps Script Webhook URL (configured in background)
-    const GOOGLE_SHEET_WEBAPP_URL = localStorage.getItem('unisport_sheets_url') || 'https://script.google.com/macros/s/AKfycbw6e3qg4Z2cQ9xYV6b3vR9V_UniSport/exec';
+    // Google Sheets Apps Script Webhook URL (connected to UniSport_Survey_DB)
+    const GOOGLE_SHEET_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzqQQK3FfSHxbeP2lW-cf1ql26hnBr7Hp9o4owwUC0l8XXEy0Plg8VHqPoR14LGanol6Q/exec';
 
     document.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons();
