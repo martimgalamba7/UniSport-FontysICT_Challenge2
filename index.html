@@ -7,57 +7,45 @@
   
   <!-- Inter Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="bg-slate-950 text-white min-h-screen flex flex-col items-center justify-center relative overflow-hidden font-sans select-none p-6">
-
-  <!-- Watermark Logo Background (Subtle) -->
-  <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-5">
-    <img src="/assets/logoUniSport.png" alt="" class="w-[500px] h-[500px] object-contain" onerror="this.src='./assets/logoUniSport.png';" />
-  </div>
+<body class="bg-white text-slate-900 min-h-screen flex flex-col items-center justify-center font-sans select-none p-6">
 
   <!-- Center Content -->
-  <main class="relative z-10 max-w-sm w-full text-center space-y-8">
+  <main class="max-w-xs w-full text-center space-y-8">
     
     <!-- Logo & Title -->
-    <div class="space-y-4 flex flex-col items-center">
-      <div class="w-24 h-24 rounded-3xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center p-3 shadow-2xl backdrop-blur-sm">
-        <img src="/assets/logoUniSport.png" alt="UniSport Logo" class="h-full w-full object-contain" onerror="this.src='./assets/logoUniSport.png';" />
-      </div>
+    <div class="space-y-3 flex flex-col items-center">
+      <img src="/assets/logoUniSport.png" alt="UniSport Logo" class="h-20 w-auto object-contain" onerror="this.src='./assets/logoUniSport.png';" />
 
       <div>
-        <h1 class="text-3xl font-black tracking-tight text-white">
+        <h1 class="text-3xl font-black tracking-tight text-slate-900">
           Uni<span class="text-orange-500">Sport</span>
         </h1>
-        <p class="text-xs text-slate-400 font-medium mt-1">Fontys ICT • Semester 1, Block 2</p>
+        <p class="text-xs text-slate-500 font-medium mt-0.5">Fontys ICT • Semester 1, Block 2</p>
       </div>
     </div>
 
-    <!-- 2 Simple Clean Links -->
+    <!-- 2 Clean Text Links -->
     <div class="space-y-3 pt-2">
       
       <!-- Survey Link -->
-      <a href="/challenge2/survey" class="w-full py-4 px-6 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm transition-all duration-200 shadow-lg shadow-indigo-600/30 flex items-center justify-between group">
-        <span>📝 Research Survey</span>
+      <a href="/challenge2/survey" class="w-full py-3.5 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm transition-all duration-200 shadow-sm flex items-center justify-between group">
+        <span>Research Survey</span>
         <span class="text-indigo-200 group-hover:translate-x-1 transition-transform">&rarr;</span>
       </a>
 
       <!-- App Link -->
-      <a href="/challenge2/unisportapp" class="w-full py-4 px-6 rounded-2xl bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white font-semibold text-sm border border-slate-800 hover:border-slate-700 transition-all duration-200 flex items-center justify-between group">
-        <span>⚽ UniSport App</span>
-        <span class="text-slate-500 group-hover:text-white group-hover:translate-x-1 transition-all">&rarr;</span>
+      <a href="/challenge2/unisportapp" class="w-full py-3.5 px-5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-sm border border-slate-200 transition-all duration-200 flex items-center justify-between group">
+        <span>UniSport App</span>
+        <span class="text-slate-400 group-hover:text-slate-700 group-hover:translate-x-1 transition-transform">&rarr;</span>
       </a>
 
-    </div>
-
-    <!-- Footer note -->
-    <div class="pt-4 text-[11px] text-slate-600">
-      Fontys University of Applied Sciences
     </div>
 
   </main>
