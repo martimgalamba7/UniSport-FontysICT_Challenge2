@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -14,25 +14,28 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="bg-white text-slate-900 min-h-screen flex flex-col items-center justify-center font-sans select-none p-6">
+<body class="bg-white text-slate-900 min-h-screen flex flex-col justify-between items-center font-sans select-none p-6">
+
+  <!-- Top Header / Fontys Logo -->
+  <header class="w-full max-w-sm flex items-center justify-between py-2">
+    <span class="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
+      Challenge 2
+    </span>
+    <img src="/assets/logoFontys.png" alt="Fontys Logo" class="h-7 w-auto object-contain" onerror="this.src='./assets/logoFontys.png';" />
+  </header>
 
   <!-- Center Content -->
-  <main class="max-w-xs w-full text-center space-y-8">
+  <main class="max-w-xs w-full text-center space-y-7 my-auto">
     
-    <!-- Logo & Title -->
-    <div class="space-y-3 flex flex-col items-center">
-      <img src="/assets/logoUniSport.png" alt="UniSport Logo" class="h-20 w-auto object-contain" onerror="this.src='./assets/logoUniSport.png';" />
-
-      <div>
-        <h1 class="text-3xl font-black tracking-tight text-slate-900">
-          Uni<span class="text-orange-500">Sport</span>
-        </h1>
-        <p class="text-xs text-slate-500 font-medium mt-0.5">Fontys ICT • Semester 1, Block 2</p>
-      </div>
+    <!-- UniSport Logo & Letters (No text) -->
+    <div class="space-y-3.5 flex flex-col items-center">
+      <img src="/assets/logoUniSport.png" alt="UniSport Icon" class="h-20 w-auto object-contain" onerror="this.src='./assets/logoUniSport.png';" />
+      <img src="/assets/lettersUniSport.png" alt="UniSport" class="h-7 w-auto object-contain" onerror="this.src='./assets/lettersUniSport.png';" />
+      <p class="text-xs text-slate-400 font-medium">Sports Community Platform</p>
     </div>
 
-    <!-- 2 Clean Text Links -->
-    <div class="space-y-3 pt-2">
+    <!-- 2 Clean Action Links -->
+    <div class="space-y-3 pt-1">
       
       <!-- Survey Link -->
       <a href="/challenge2/survey" class="w-full py-3.5 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm transition-all duration-200 shadow-sm flex items-center justify-between group">
@@ -49,6 +52,12 @@
     </div>
 
   </main>
+
+  <!-- Clean Footer with Name and Fontys ICT -->
+  <footer class="w-full max-w-sm py-4 border-t border-slate-100 text-center text-xs text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-1">
+    <span>Martim Ferreira Galamba</span>
+    <span class="font-medium text-slate-500">Fontys ICT</span>
+  </footer>
 
 </body>
 </html>
