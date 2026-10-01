@@ -14,49 +14,58 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="bg-white text-slate-900 min-h-screen flex flex-col justify-between items-center font-sans select-none p-6">
+<body class="bg-white text-slate-900 min-h-screen flex flex-col justify-between font-sans select-none px-8 sm:px-16 lg:px-24 xl:px-32 py-8">
 
-  <!-- Top Header / Fontys Logo -->
-  <header class="w-full max-w-sm flex items-center justify-between py-2">
-    <span class="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
-      Challenge 2
-    </span>
-    <img src="/assets/logoFontys.png" alt="Fontys Logo" class="h-7 w-auto object-contain" onerror="this.src='./assets/logoFontys.png';" />
+  <!-- Full-Width Top Header -->
+  <header class="w-full flex items-center justify-between border-b border-slate-100 pb-6">
+    <div class="flex items-center space-x-3">
+      <span class="text-xs sm:text-sm font-bold tracking-widest text-slate-400 uppercase">
+        Fontys ICT
+      </span>
+      <span class="text-slate-300">•</span>
+      <span class="text-xs sm:text-sm font-semibold text-slate-500">
+        Challenge 2: Sports Community
+      </span>
+    </div>
+    
+    <img src="/assets/logoFontys.png" alt="Fontys" class="h-9 sm:h-11 w-auto object-contain" onerror="this.src='./assets/logoFontys.png';" />
   </header>
 
-  <!-- Center Content -->
-  <main class="max-w-xs w-full text-center space-y-7 my-auto">
+  <!-- Full Responsive Main Hub Area -->
+  <main class="w-full flex-grow flex flex-col items-center justify-center py-12 md:py-16 space-y-10 md:space-y-14">
     
-    <!-- UniSport Logo & Letters (No text) -->
-    <div class="space-y-3.5 flex flex-col items-center">
-      <img src="/assets/logoUniSport.png" alt="UniSport Icon" class="h-20 w-auto object-contain" onerror="this.src='./assets/logoUniSport.png';" />
-      <img src="/assets/lettersUniSport.png" alt="UniSport" class="h-7 w-auto object-contain" onerror="this.src='./assets/lettersUniSport.png';" />
-      <p class="text-xs text-slate-400 font-medium">Sports Community Platform</p>
+    <!-- Large Scaled UniSport Brand -->
+    <div class="space-y-5 flex flex-col items-center text-center">
+      <img src="/assets/logoUniSport.png" alt="UniSport Icon" class="h-28 sm:h-36 md:h-44 lg:h-52 w-auto object-contain transition-transform duration-300 hover:scale-105" onerror="this.src='./assets/logoUniSport.png';" />
+      <img src="/assets/lettersUniSport.png" alt="UniSport" class="h-10 sm:h-12 md:h-16 w-auto object-contain" onerror="this.src='./assets/lettersUniSport.png';" />
+      <p class="text-sm sm:text-base md:text-lg text-slate-500 font-medium tracking-wide">
+        Sports Community Platform
+      </p>
     </div>
 
-    <!-- 2 Clean Action Links -->
-    <div class="space-y-3 pt-1">
+    <!-- Responsive Action Cards (Side-by-side on desktop, stacked on mobile) -->
+    <div class="w-full max-w-2xl lg:max-w-3xl grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 pt-2">
       
-      <!-- Survey Link -->
-      <a href="/challenge2/survey" class="w-full py-3.5 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm transition-all duration-200 shadow-sm flex items-center justify-between group">
+      <!-- Research Survey Card -->
+      <a href="/challenge2/survey" class="w-full py-5 px-6 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-base sm:text-lg transition-all duration-200 shadow-md shadow-indigo-500/20 hover:shadow-xl hover:shadow-indigo-500/30 hover:-translate-y-0.5 flex items-center justify-between group">
         <span>Research Survey</span>
-        <span class="text-indigo-200 group-hover:translate-x-1 transition-transform">&rarr;</span>
+        <span class="text-indigo-200 text-xl group-hover:translate-x-1.5 transition-transform">&rarr;</span>
       </a>
 
-      <!-- App Link -->
-      <a href="/challenge2/unisportapp" class="w-full py-3.5 px-5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-sm border border-slate-200 transition-all duration-200 flex items-center justify-between group">
+      <!-- UniSport App Card -->
+      <a href="/challenge2/unisportapp" class="w-full py-5 px-6 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-900 font-bold text-base sm:text-lg border border-slate-200 transition-all duration-200 hover:border-slate-300 hover:-translate-y-0.5 flex items-center justify-between group">
         <span>UniSport App</span>
-        <span class="text-slate-400 group-hover:text-slate-700 group-hover:translate-x-1 transition-transform">&rarr;</span>
+        <span class="text-slate-400 group-hover:text-slate-800 text-xl group-hover:translate-x-1.5 transition-transform">&rarr;</span>
       </a>
 
     </div>
 
   </main>
 
-  <!-- Clean Footer with Name and Fontys ICT -->
-  <footer class="w-full max-w-sm py-4 border-t border-slate-100 text-center text-xs text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-1">
-    <span>Martim Ferreira Galamba</span>
-    <span class="font-medium text-slate-500">Fontys ICT</span>
+  <!-- Full-Width Bottom Footer -->
+  <footer class="w-full border-t border-slate-100 pt-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs sm:text-sm text-slate-400">
+    <span class="font-medium text-slate-600">Martim Ferreira Galamba</span>
+    <span class="text-slate-400">Fontys School of ICT • Semester 1, Block 2</span>
   </footer>
 
 </body>

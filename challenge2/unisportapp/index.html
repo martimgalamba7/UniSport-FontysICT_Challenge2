@@ -12,19 +12,37 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="bg-black text-white min-h-screen flex flex-col items-center justify-center font-sans select-none p-6">
+<body class="bg-black text-white min-h-screen flex flex-col justify-between font-sans select-none px-8 sm:px-16 lg:px-24 xl:px-32 py-8">
 
-  <div class="flex flex-col items-center space-y-6 text-center">
+  <!-- Top Header Navigation -->
+  <header class="w-full flex items-center justify-between">
+    <a href="/" class="text-xs sm:text-sm font-semibold text-zinc-500 hover:text-white transition flex items-center space-x-1.5">
+      <span>&larr;</span>
+      <span>Back to Hub</span>
+    </a>
+    <span class="text-xs sm:text-sm font-mono text-zinc-600 uppercase tracking-widest">
+      Challenge 2
+    </span>
+  </header>
+
+  <!-- Large Bold Center Stage -->
+  <main class="flex-grow flex flex-col items-center justify-center space-y-8 sm:space-y-12 text-center py-12">
     
-    <!-- Natural UniSport Logo (No square frame) -->
-    <img src="/assets/logoUniSport.png" alt="UniSport" class="h-24 w-auto object-contain" onerror="this.src='./assets/logoUniSport.png';" />
+    <!-- Large Natural UniSport Logo -->
+    <img src="/assets/logoUniSport.png" alt="UniSport" class="h-36 sm:h-48 md:h-64 lg:h-72 w-auto object-contain transition-transform duration-500 hover:scale-105" onerror="this.src='./assets/logoUniSport.png';" />
 
-    <!-- Pure White SOON -->
-    <h1 class="text-3xl sm:text-4xl font-black tracking-widest text-white uppercase">
+    <!-- Massive Cinematic SOON Typography -->
+    <h1 class="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-[0.2em] sm:tracking-[0.25em] text-white uppercase ml-[0.2em]">
       SOON
     </h1>
 
-  </div>
+  </main>
+
+  <!-- Bottom Bar -->
+  <footer class="w-full flex items-center justify-between text-xs sm:text-sm text-zinc-600">
+    <span>UniSport Platform</span>
+    <span>Fontys ICT</span>
+  </footer>
 
 </body>
 </html>
