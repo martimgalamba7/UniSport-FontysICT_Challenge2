@@ -908,15 +908,39 @@
         }
       });
 
-      // Language detection & Google Translate controller (Strictly EN -> Target Language)
-      function detectUserLanguage() {
-        // 1. Check if user already made an explicit manual choice
+      // Country to Language Mapping
+      const countryToLang = {
+        'PT': 'pt', 'BR': 'pt', 'AO': 'pt', 'MZ': 'pt', 'CV': 'pt', 'GW': 'pt', 'ST': 'pt', 'TL': 'pt', 'MO': 'pt',
+        'FR': 'fr', 'MC': 'fr', 'SN': 'fr', 'CI': 'fr', 'ML': 'fr', 'CD': 'fr', 'CG': 'fr', 'GA': 'fr', 'GN': 'fr', 'TG': 'fr', 'BJ': 'fr', 'NE': 'fr', 'BF': 'fr', 'MG': 'fr', 'CM': 'fr', 'DZ': 'fr', 'MA': 'fr', 'TN': 'fr',
+        'NL': 'nl', 'SR': 'nl', 'CW': 'nl', 'AW': 'nl', 'SX': 'nl',
+        'DE': 'de', 'AT': 'de', 'LI': 'de'
+      };
+
+      // Set cookie helper across current domain and root domain
+      function setTransCookie(langCode) {
+        if (langCode === 'en' || !langCode) {
+          document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+          document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; domain=" + window.location.hostname + "; path=/;";
+          const parts = window.location.hostname.split('.');
+          if (parts.length > 1) {
+            document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; domain=." + parts.slice(-2).join('.') + "; path=/;";
+          }
+        } else {
+          document.cookie = `googtrans=/en/${langCode}; path=/;`;
+          document.cookie = `googtrans=/en/${langCode}; domain=${window.location.hostname}; path=/;`;
+          const parts = window.location.hostname.split('.');
+          if (parts.length > 1) {
+            document.cookie = `googtrans=/en/${langCode}; domain=.` + parts.slice(-2).join('.') + `; path=/;`;
+          }
+        }
+      }
+
+      // Fast synchronous locale detection
+      function getSyncLanguage() {
         const savedChoice = localStorage.getItem('unisport_user_selected_lang');
         if (savedChoice && ['en', 'nl', 'pt', 'fr', 'de'].includes(savedChoice)) {
           return savedChoice;
         }
-
-        // 2. Detect from browser locales / region
         try {
           const navLangs = (navigator.languages && navigator.languages.length) ? navigator.languages : [navigator.language || navigator.userLanguage || ''];
           for (const loc of navLangs) {
@@ -928,24 +952,48 @@
             if (code.startsWith('de')) return 'de';
             if (code.startsWith('en')) return 'en';
           }
-        } catch (e) {
-          return 'en';
-        }
-
-        // 3. Fallback if region is not supported or not detectable
+        } catch (e) {}
         return 'en';
       }
 
-      window.detectUserLanguage = detectUserLanguage;
-      const currentLang = detectUserLanguage();
+      // Async IP-based Geolocation detection (supports VPNs & physical countries)
+      async function detectGeoLanguage() {
+        const manual = localStorage.getItem('unisport_user_selected_lang');
+        if (manual && ['en', 'nl', 'pt', 'fr', 'de'].includes(manual)) {
+          return manual;
+        }
 
-      // Set cookie immediately so Google Translate initializes with correct target
-      if (currentLang !== 'en') {
-        document.cookie = `googtrans=/en/${currentLang}; path=/;`;
-        document.cookie = `googtrans=/en/${currentLang}; domain=${window.location.hostname}; path=/;`;
-      } else {
-        document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; domain=" + window.location.hostname + "; path=/;";
+        try {
+          const res = await fetch('https://api.country.is', { cache: 'no-store' });
+          if (res.ok) {
+            const data = await res.json();
+            const country = (data && data.country) ? data.country.toUpperCase() : '';
+            if (countryToLang[country]) return countryToLang[country];
+            if (country === 'BE') {
+              const bl = (navigator.language || '').toLowerCase();
+              return bl.startsWith('fr') ? 'fr' : 'nl';
+            }
+            if (country === 'CH') {
+              const bl = (navigator.language || '').toLowerCase();
+              return bl.startsWith('fr') ? 'fr' : (bl.startsWith('it') ? 'en' : 'de');
+            }
+            if (country === 'LU') {
+              const bl = (navigator.language || '').toLowerCase();
+              return bl.startsWith('de') ? 'de' : 'fr';
+            }
+          }
+        } catch (err) {
+          try {
+            const res2 = await fetch('https://get.geojs.io/v1/ip/country.json', { cache: 'no-store' });
+            if (res2.ok) {
+              const data2 = await res2.json();
+              const country = (data2 && data2.country) ? data2.country.toUpperCase() : '';
+              if (countryToLang[country]) return countryToLang[country];
+            }
+          } catch (e2) {}
+        }
+
+        return getSyncLanguage();
       }
 
       window.setLanguage = function(langCode, isManual = true) {
@@ -957,34 +1005,39 @@
           btn.classList.toggle('active', btn.getAttribute('data-lang') === langCode);
         });
 
-        if (langCode === 'en') {
-          document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-          document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; domain=" + window.location.hostname + "; path=/;";
+        setTransCookie(langCode);
+
+        let attempts = 0;
+        const triggerCombo = () => {
           const select = document.querySelector('.goog-te-combo');
           if (select) {
-            select.value = 'en';
-            select.dispatchEvent(new Event('change'));
-          } else {
-            location.reload();
+            if (select.value !== langCode) {
+              select.value = langCode;
+              select.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+          } else if (attempts < 25) {
+            attempts++;
+            setTimeout(triggerCombo, 150);
           }
-          return;
-        }
-
-        document.cookie = `googtrans=/en/${langCode}; path=/;`;
-        document.cookie = `googtrans=/en/${langCode}; domain=${window.location.hostname}; path=/;`;
-        
-        const select = document.querySelector('.goog-te-combo');
-        if (select) {
-          select.value = langCode;
-          select.dispatchEvent(new Event('change'));
-        }
+        };
+        triggerCombo();
       };
 
-      // Set active language button state
+      // Initial synchronous setup
+      const initialSyncLang = getSyncLanguage();
+      setTransCookie(initialSyncLang);
       document.querySelectorAll('.lang-btn').forEach(b => {
-        b.classList.toggle('active', b.getAttribute('data-lang') === currentLang);
+        b.classList.toggle('active', b.getAttribute('data-lang') === initialSyncLang);
       });
 
+      // Async IP-Geo detection (overrides if user has not manually locked a preference)
+      detectGeoLanguage().then(detectedLang => {
+        if (detectedLang && (!localStorage.getItem('unisport_user_selected_lang') || localStorage.getItem('unisport_user_selected_lang') === detectedLang)) {
+          window.setLanguage(detectedLang, false);
+        }
+      });
+
+      // Language buttons event listeners
       document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           const lang = btn.getAttribute('data-lang');
@@ -1003,27 +1056,6 @@
         includedLanguages: 'en,nl,pt,fr,de',
         autoDisplay: false
       }, 'google_translate_element');
-
-      // Verify combo synchronization if auto-detected language is not EN
-      if (typeof window.detectUserLanguage === 'function') {
-        const lang = window.detectUserLanguage();
-        if (lang && lang !== 'en') {
-          let attempts = 0;
-          const syncInterval = setInterval(() => {
-            attempts++;
-            const combo = document.querySelector('.goog-te-combo');
-            if (combo) {
-              clearInterval(syncInterval);
-              if (combo.value !== lang) {
-                combo.value = lang;
-                combo.dispatchEvent(new Event('change'));
-              }
-            } else if (attempts > 25) {
-              clearInterval(syncInterval);
-            }
-          }, 150);
-        }
-      }
     }
   </script>
   <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
