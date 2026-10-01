@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UniSport — Academic Research Survey | Fontys ICT Block 2</title>
+  
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              indigo: '#4F46E5',
+              'indigo-dark': '#3730A3',
+              'indigo-light': '#EEF2FF',
+              orange: '#FF6B00',
+              'orange-hover': '#E65D00',
+              'orange-light': '#FFF4EB',
+            }
+          },
+          boxShadow: {
+            'glow-indigo': '0 0 25px -5px rgba(79, 70, 229, 0.3)',
+            'glow-orange': '0 0 25px -5px rgba(255, 107, 0, 0.35)',
+            'subtle': '0 2px 15px -3px rgba(15, 23, 42, 0.07), 0 10px 20px -2px rgba(15, 23, 42, 0.04)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <style>
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #F1F5F9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94A3B8;
+    }
+
+    /* Pulse animation for locked icon */
+    @keyframes gentlePulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    .animate-gentle {
+      animation: gentlePulse 2.5s infinite ease-in-out;
+    }
+
+    /* Custom Checkbox/Radio Styling */
+    .custom-checkbox:checked + div {
+      border-color: #4F46E5;
+      background-color: #EEF2FF;
+      color: #3730A3;
+    }
+    .custom-checkbox:checked + div .check-indicator {
+      background-color: #4F46E5;
+      border-color: #4F46E5;
+      color: white;
+    }
+
+    .custom-radio:checked + div {
+      border-color: #FF6B00;
+      background-color: #FFF4EB;
+      color: #9A3412;
+    }
+    .custom-radio:checked + div .radio-indicator {
+      border-color: #FF6B00;
+      background-color: #FF6B00;
+    }
+    .custom-radio:checked + div .radio-dot {
+      opacity: 1;
+      transform: scale(1);
+    }
+  </style>
+</head>
+
+<body class="bg-slate-50 text-slate-800 antialiased font-sans min-h-screen flex flex-col selection:bg-brand-indigo selection:text-white">
+
+  <!-- ================= TOP HEADER / NAVBAR ================= -->
+  <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200/80 transition-all duration-300 shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      
+      <!-- Brand Logo / Typography Placeholder -->
+      <div class="flex items-center space-x-3">
+        <div class="relative flex items-center justify-center h-12 w-12 rounded-xl bg-gradient-to-tr from-brand-indigo to-indigo-700 text-white shadow-md shadow-indigo-200 overflow-hidden group">
+          <!-- Image Logo with Universal Fallback -->
+          <img src="/assets/logoUniSport.png" alt="UniSport Icon" class="h-10 w-10 object-contain p-0.5" onerror="this.onerror=null; this.src='./assets/logoUniSport.png'; this.onerror=()=>{this.src='../logoUniSport.png'; this.onerror=()=>{this.style.display='none'; document.getElementById('svg-fallback-icon').style.display='block';};}" />
+          <i id="svg-fallback-icon" data-lucide="activity" class="hidden w-6 h-6 text-white group-hover:scale-110 transition-transform"></i>
+        </div>
+        
+        <div class="flex flex-col">
+          <div class="flex items-center space-x-2">
+            <!-- Brand Wordmark / Typography with Universal Fallback -->
+            <img src="/assets/lettersUniSport.png" alt="UniSport" class="h-7 w-auto object-contain hidden sm:block" onerror="this.onerror=null; this.src='./assets/lettersUniSport.png'; this.onerror=()=>{this.src='../lettersUniSport.png'; this.onerror=()=>{this.style.display='none'; document.getElementById('text-brand-wordmark').style.display='block';};}" />
+            <span id="text-brand-wordmark" class="text-2xl font-black tracking-tight text-slate-900 flex items-center">
+              Uni<span class="text-brand-orange">Sport</span>
+            </span>
+            <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-brand-orange-light text-brand-orange border border-orange-200">
+              Fontys ICT
+            </span>
+          </div>
+          <span class="text-xs text-slate-500 font-medium">Semester 1 • Block 2 Community Research</span>
+        </div>
+      </div>
+
+      <!-- Right Meta & Google Sheets Status -->
+      <div class="flex items-center space-x-3">
+        <div class="hidden md:flex items-center space-x-2 text-xs font-medium text-slate-600 bg-slate-100/90 px-3 py-1.5 rounded-lg border border-slate-200">
+          <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600"></i>
+          <span>100% Anonymous</span>
+        </div>
+
+        <!-- Google Sheets DB Status Tag / Config Trigger -->
+        <button type="button" id="sheets-config-btn" title="Click to view or edit Google Sheets Database Webhook URL" class="flex items-center space-x-1.5 bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-200 text-emerald-800 px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer">
+          <i data-lucide="sheet" class="w-3.5 h-3.5 text-emerald-600"></i>
+          <span id="sheets-status-text">Google Sheets DB</span>
+          <i data-lucide="settings-2" class="w-3 h-3 text-emerald-600/70 ml-0.5"></i>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Progress Indicator Bar -->
+    <div class="w-full bg-slate-100 h-1">
+      <div id="survey-progress-bar" class="bg-gradient-to-r from-brand-indigo via-indigo-500 to-brand-orange h-1 w-0 transition-all duration-500 ease-out"></div>
+    </div>
+  </header>
+
+  <!-- ================= MAIN CONTENT ================= -->
+  <main class="flex-grow max-w-4xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 space-y-8">
+    
+    <!-- Hero Banner -->
+    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white p-8 md:p-10 shadow-2xl border border-indigo-900/50">
+      <div class="absolute -right-16 -bottom-16 w-64 h-64 bg-brand-orange/20 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -left-16 -top-16 w-64 h-64 bg-brand-indigo/30 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="relative z-10 max-w-2xl space-y-4">
+        <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-orange-300 text-xs font-semibold tracking-wide">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+          <span>Challenge 2: Student Sports Community Platform</span>
+        </div>
+
+        <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight leading-tight text-white">
+          Help shape <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-amber-300 to-orange-500">UniSport</span> for students in Eindhoven
+        </h1>
+
+        <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+          We are developing a student-centric platform to connect people for casual and competitive sports in Eindhoven. Share your feedback in under <strong>3 minutes</strong> to power our academic research and database model.
+        </p>
+
+        <div class="flex flex-wrap items-center gap-4 pt-2 text-xs text-slate-300">
+          <div class="flex items-center space-x-1.5">
+            <i data-lucide="clock" class="w-4 h-4 text-orange-400"></i>
+            <span>Est. time: ~2-3 mins</span>
+          </div>
+          <div class="flex items-center space-x-1.5">
+            <i data-lucide="user-x" class="w-4 h-4 text-emerald-400"></i>
+            <span>No personal data tracked</span>
+          </div>
+          <div class="flex items-center space-x-1.5">
+            <i data-lucide="table" class="w-4 h-4 text-emerald-300"></i>
+            <span>Google Sheets Live Database Backend</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= PRIVACY & CONSENT CARD ================= -->
+    <section id="consent-section" class="bg-white rounded-2xl p-6 sm:p-8 shadow-subtle border border-slate-200/90 transition-all duration-300 hover:border-indigo-200">
+      <div class="flex items-start justify-between flex-wrap gap-4 border-b border-slate-100 pb-5">
+        <div class="flex items-center space-x-3">
+          <div class="p-3 bg-indigo-50 text-brand-indigo rounded-xl border border-indigo-100">
+            <i data-lucide="shield-check" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+              Privacy Policy & Terms of Consent
+              <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">Required</span>
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-500">GDPR-compliant academic research protocol for Fontys ICT Block 2</p>
+          </div>
+        </div>
+        <div id="consent-status-badge" class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+          <i data-lucide="lock" class="w-3.5 h-3.5"></i>
+          <span>Consent Required</span>
+        </div>
+      </div>
+
+      <!-- Key guarantees grid -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-6">
+        
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/70 hover:border-slate-300 transition-colors">
+          <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center mb-3">
+            <i data-lucide="eye-off" class="w-4 h-4"></i>
+          </div>
+          <h3 class="font-bold text-sm text-slate-900 mb-1">100% Anonymous</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            No names, email addresses, student IDs, or IP addresses are recorded. Your responses cannot be linked to your identity.
+          </p>
+        </div>
+
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/70 hover:border-slate-300 transition-colors">
+          <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center mb-3">
+            <i data-lucide="table-2" class="w-4 h-4"></i>
+          </div>
+          <h3 class="font-bold text-sm text-slate-900 mb-1">Google Sheets DB</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            Data is recorded directly into our cloud <strong>Google Sheets database</strong> for academic analysis and platform prototyping.
+          </p>
+        </div>
+
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/70 hover:border-slate-300 transition-colors">
+          <div class="w-8 h-8 rounded-lg bg-orange-100 text-brand-orange flex items-center justify-center mb-3">
+            <i data-lucide="heart-handshake" class="w-4 h-4"></i>
+          </div>
+          <h3 class="font-bold text-sm text-slate-900 mb-1">Voluntary & Secure</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            Participation is 100% voluntary. You may stop at any point. All research findings are aggregated responsibly.
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Mandatory Checkbox Box -->
+      <div class="bg-gradient-to-r from-indigo-50/70 via-slate-50 to-orange-50/70 border-2 border-dashed border-indigo-200 rounded-xl p-4 sm:p-5 transition-all duration-200">
+        <label class="flex items-start space-x-3.5 cursor-pointer select-none">
+          <input type="checkbox" id="consent-checkbox" class="mt-1 h-5 w-5 text-brand-indigo rounded border-slate-300 focus:ring-brand-indigo transition cursor-pointer" />
+          <div class="flex-1">
+            <span class="text-sm font-semibold text-slate-900 leading-snug block">
+              I have read, understood, and consent to the privacy terms & research conditions.
+            </span>
+            <span class="text-xs text-slate-500 mt-1 block">
+              Checking this box verifies your voluntary consent and enables the survey form below.
+            </span>
+          </div>
+        </label>
+      </div>
+
+      <!-- Locked Warning Banner -->
+      <div id="locked-survey-notice" class="mt-4 flex items-center justify-between p-3.5 rounded-xl bg-slate-100 border border-slate-200 text-xs text-slate-600">
+        <div class="flex items-center space-x-2">
+          <i data-lucide="info" class="w-4 h-4 text-brand-indigo flex-shrink-0"></i>
+          <span>Please accept the privacy terms above to unlock the survey questions.</span>
+        </div>
+        <span class="font-bold text-slate-400">Locked</span>
+      </div>
+    </section>
+
+    <!-- ================= SURVEY FORM (LOCKED / UNLOCKED) ================= -->
+    <form id="unisport-survey-form" class="space-y-8 opacity-40 pointer-events-none transition-all duration-500 blur-[1px]">
+      
+      <!-- ================= SECTION 1: GENERAL BACKGROUND ================= -->
+      <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-subtle border border-slate-200/90 relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-1.5 h-full bg-brand-indigo"></div>
+        
+        <div class="flex items-center space-x-3 mb-6">
+          <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-100 text-brand-indigo text-xs font-extrabold">
+            01
+          </span>
+          <div>
+            <h2 class="text-xl font-bold text-slate-900">General Background</h2>
+            <p class="text-xs sm:text-sm text-slate-500">Tell us a bit about your student life and sports habits in Eindhoven</p>
+          </div>
+        </div>
+
+        <div class="space-y-6">
+          
+          <!-- Q1.1: Student Status -->
+          <div class="space-y-3">
+            <label class="block text-sm font-semibold text-slate-900">
+              1.1 Are you currently a student living or studying in the Eindhoven area? <span class="text-brand-orange">*</span>
+            </label>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <label class="cursor-pointer relative">
+                <input type="radio" name="student_status" value="Yes" required class="sr-only custom-radio" />
+                <div class="p-4 rounded-xl border border-slate-200 bg-white hover:border-slate-300 transition-all flex items-center justify-between">
+                  <div class="flex items-center space-x-3">
+                    <i data-lucide="graduation-cap" class="w-5 h-5 text-brand-indigo"></i>
+                    <div>
+                      <div class="text-sm font-medium text-slate-800">Yes, active student</div>
+                      <div class="text-xs text-slate-400">Fontys, TU/e, Summa, etc.</div>
+                    </div>
+                  </div>
+                  <div class="w-5 h-5 rounded-full border border-slate-300 flex items-center justify-center radio-indicator transition-colors">
+                    <div class="w-2 h-2 rounded-full bg-white opacity-0 radio-dot transition-opacity"></div>
+                  </div>
+                </div>
+              </label>
+
+              <label class="cursor-pointer relative">
+                <input type="radio" name="student_status" value="No" class="sr-only custom-radio" />
+                <div class="p-4 rounded-xl border border-slate-200 bg-white hover:border-slate-300 transition-all flex items-center justify-between">
+                  <div class="flex items-center space-x-3">
+                    <i data-lucide="briefcase" class="w-5 h-5 text-slate-500"></i>
+                    <div>
+                      <div class="text-sm font-medium text-slate-800">No / Working / Other</div>
+                      <div class="text-xs text-slate-400">Alumni, resident, or prospective</div>
+                    </div>
+                  </div>
+                  <div class="w-5 h-5 rounded-full border border-slate-300 flex items-center justify-center radio-indicator transition-colors">
+                    <div class="w-2 h-2 rounded-full bg-white opacity-0 radio-dot transition-opacity"></div>
+                  </div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Q1.2: Sports Frequency -->
+          <div class="space-y-3">
+            <label for="sports_frequency" class="block text-sm font-semibold text-slate-900">
+              1.2 On average, how often do you practice sports or exercise per week? <span class="text-brand-orange">*</span>
+            </label>
+            <div class="relative">
+              <select id="sports_frequency" name="sports_frequency" required class="w-full appearance-none bg-slate-50 border border-slate-300 rounded-xl px-4 py-3.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-indigo/30 focus:border-brand-indigo transition font-medium cursor-pointer">
+                <option value="" disabled selected>Select your weekly frequency...</option>
+                <option value="Never">Rarely or Never (< 1 time per month)</option>
+                <option value="1-2 times">1 – 2 times per week</option>
+                <option value="3-4 times">3 – 4 times per week</option>
+                <option value="5+ times">5 or more times per week (Daily athlete)</option>
+              </select>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
+                <i data-lucide="chevron-down" class="w-4 h-4"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Q1.3: Favorite Sports -->
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <label class="block text-sm font-semibold text-slate-900">
+                1.3 What are your favorite sports or activities? <span class="text-brand-orange">*</span>
+              </label>
+              <span class="text-xs text-slate-400 font-medium">Select all that apply</span>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5" id="sports-grid">
+              
+              <!-- Running -->
+              <label class="cursor-pointer">
+                <input type="checkbox" name="favorite_sports" value="Running" class="sr-only custom-checkbox" />
+                <div class="p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-white hover:border-slate-300 transition-all flex items-center space-x-2.5 text-slate-700">
+                  <div class="w-4 h-4 rounded border border-slate-300 flex items-center justify-center check-indicator transition-colors">
+                    <i data-lucide="check" class="w-3 h-3 text-white"></i>
+                  </div>
+                  <span class="text-xs sm:text-sm font-medium">🏃 Running</span>
+                </div>
+              </label>
+
+              <!-- Football -->
+              <label class="cursor-pointer">
+                <input type="checkbox" name="favorite_sports" value="Football" class="sr-only custom-checkbox" />
+                <div class="p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-white hover:border-slate-300 transition-all flex items-center space-x-2.5 text-slate-700">
+                  <div class="w-4 h-4 rounded border border-slate-300 flex items-center justify-center check-indicator transition-colors">
+                    <i data-lucide="check" class="w-3 h-3 text-white"></i>
+                  </div>
+                  <span class="text-xs sm:text-sm font-medium">⚽ Football</span>
+                </div>
+              </label>
+
+              <!-- Tennis -->
+              <label class="cursor-pointer">
+                <input type="checkbox" name="favorite_sports" value="Tennis" class="sr-only custom-checkbox" />
+                <div class="p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-white hover:border-slate-300 transition-all flex items-center space-x-2.5 text-slate-700">
+                  <div class="w-4 h-4 rounded border border-slate-300 flex items-center justify-center check-indicator transition-colors">
+                    <i data-lucide="check" class="w-3 h-3 text-white"></i>
+                  </div>
+                  <span class="text-xs sm:text-sm font-medium">🎾 Tennis / Padel</span>
+                </div>
+              </label>
+
+              <!-- Cycling -->
+              <label class="cursor-pointer">
+                <input type="checkbox" name="favorite_sports" value="Cycling" class="sr-only custom-checkbox" />
+                <div class="p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-white hover:border-slate-300 transition-all flex items-center space-x-2.5 text-slate-700">
+                  <div class="w-4 h-4 rounded border border-slate-300 flex items-center justify-center check-indicator transition-colors">
+                    <i data-lucide="check" class="w-3 h-3 text-white"></i>
+                  </div>
+                  <span class="text-xs sm:text-sm font-medium">🚴 Cycling</span>
+                </div>
+              </label>
+
+              <!-- Gym -->
+              <label class="cursor-pointer">
+                <input type="checkbox" name="favorite_sports" value="Gym" class="sr-only custom-checkbox" />
+                <div class="p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-white hover:border-slate-300 transition-all flex items-center space-x-2.5 text-slate-700">
+                  <div class="w-4 h-4 rounded border border-slate-300 flex items-center justify-center check-indicator transition-colors">
+                    <i data-lucide="check" class="w-3 h-3 text-white"></i>
+                  </div>
+                  <span class="text-xs sm:text-sm font-medium">🏋️ Gym / Fitness</span>
+                </div>
+              </label>
+
+              <!-- Basketball -->
+              <label class="cursor-pointer">
+                <input type="checkbox" name="favorite_sports" value="Basketball" class="sr-only custom-checkbox" />
+                <div class="p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-white hover:border-slate-300 transition-all flex items-center space-x-2.5 text-slate-700">
+                  <div class="w-4 h-4 rounded border border-slate-300 flex items-center justify-center check-indicator transition-colors">
+                    <i data-lucide="check" class="w-3 h-3 text-white"></i>
+                  </div>
+                  <span class="text-xs sm:text-sm font-medium">🏀 Basketball</span>
+                </div>
+              </label>
+
+              <!-- Swimming -->
+              <label class="cursor-pointer">
+                <input type="checkbox" name="favorite_sports" value="Swimming" class="sr-only custom-checkbox" />
+                <div class="p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-white hover:border-slate-300 transition-all flex items-center space-x-2.5 text-slate-700">
+                  <div class="w-4 h-4 rounded border border-slate-300 flex items-center justify-center check-indicator transition-colors">
+                    <i data-lucide="check" class="w-3 h-3 text-white"></i>
+                  </div>
+                  <span class="text-xs sm:text-sm font-medium">🏊 Swimming</span>
+                </div>
+              </label>
+
+              <!-- Volleyball -->
+              <label class="cursor-pointer">
+                <input type="checkbox" name="favorite_sports" value="Volleyball" class="sr-only custom-checkbox" />
+                <div class="p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-white hover:border-slate-300 transition-all flex items-center space-x-2.5 text-slate-700">
+                  <div class="w-4 h-4 rounded border border-slate-300 flex items-center justify-center check-indicator transition-colors">
+                    <i data-lucide="check" class="w-3 h-3 text-white"></i>
+                  </div>
+                  <span class="text-xs sm:text-sm font-medium">🏐 Volleyball</span>
+                </div>
+              </label>
+
+              <!-- Bouldering -->
+              <label class="cursor-pointer">
+                <input type="checkbox" name="favorite_sports" value="Bouldering" class="sr-only custom-checkbox" />
+                <div class="p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-white hover:border-slate-300 transition-all flex items-center space-x-2.5 text-slate-700">
+                  <div class="w-4 h-4 rounded border border-slate-300 flex items-center justify-center check-indicator transition-colors">
+                    <i data-lucide="check" class="w-3 h-3 text-white"></i>
+                  </div>
+                  <span class="text-xs sm:text-sm font-medium">🧗 Climbing</span>
+                </div>
+              </label>
+
+              <!-- Badminton -->
+              <label class="cursor-pointer">
+                <input type="checkbox" name="favorite_sports" value="Badminton" class="sr-only custom-checkbox" />
+                <div class="p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-white hover:border-slate-300 transition-all flex items-center space-x-2.5 text-slate-700">
+                  <div class="w-4 h-4 rounded border border-slate-300 flex items-center justify-center check-indicator transition-colors">
+                    <i data-lucide="check" class="w-3 h-3 text-white"></i>
+                  </div>
+                  <span class="text-xs sm:text-sm font-medium">🏸 Badminton</span>
+                </div>
+              </label>
+
+              <!-- Yoga / Calisthenics -->
+              <label class="cursor-pointer">
+                <input type="checkbox" name="favorite_sports" value="Yoga" class="sr-only custom-checkbox" />
+                <div class="p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-white hover:border-slate-300 transition-all flex items-center space-x-2.5 text-slate-700">
+                  <div class="w-4 h-4 rounded border border-slate-300 flex items-center justify-center check-indicator transition-colors">
+                    <i data-lucide="check" class="w-3 h-3 text-white"></i>
+                  </div>
+                  <span class="text-xs sm:text-sm font-medium">🧘 Yoga / Pilate</span>
+                </div>
+              </label>
+
+              <!-- Other -->
+              <label class="cursor-pointer">
+                <input type="checkbox" id="sports-other-checkbox" name="favorite_sports" value="Other" class="sr-only custom-checkbox" />
+                <div class="p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-white hover:border-slate-300 transition-all flex items-center space-x-2.5 text-slate-700">
+                  <div class="w-4 h-4 rounded border border-slate-300 flex items-center justify-center check-indicator transition-colors">
+                    <i data-lucide="check" class="w-3 h-3 text-white"></i>
+                  </div>
+                  <span class="text-xs sm:text-sm font-medium">✨ Other</span>
+                </div>
+              </label>
+
+            </div>
+
+            <!-- Other sport input field (hidden by default) -->
+            <div id="sports-other-container" class="hidden mt-2">
+              <input type="text" id="sports_other_text" placeholder="Please specify your sport(s)..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-indigo/30 focus:border-brand-indigo transition" />
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ================= SECTION 2: THE PROBLEM ================= -->
+      <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-subtle border border-slate-200/90 relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-1.5 h-full bg-brand-orange"></div>
+
+        <div class="flex items-center space-x-3 mb-6">
+          <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-orange-100 text-brand-orange text-xs font-extrabold">
+            02
+          </span>
+          <div>
+            <h2 class="text-xl font-bold text-slate-900">The Problem & Student Barriers</h2>
+            <p class="text-xs sm:text-sm text-slate-500">Understanding your biggest friction points when practicing sports</p>
+          </div>
+        </div>
+
+        <div class="space-y-6">
+          
+          <!-- Q2.1: Skipped sports due to company -->
+          <div class="space-y-3">
+            <label class="block text-sm font-semibold text-slate-900">
+              2.1 Have you ever skipped doing sports because you didn't have anyone to go with or play against? <span class="text-brand-orange">*</span>
+            </label>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+              
+              <label class="cursor-pointer">
+                <input type="radio" name="skipped_lack_of_company" value="Frequently" required class="sr-only custom-radio" />
+                <div class="p-3.5 rounded-xl border border-slate-200 bg-white hover:border-slate-300 transition-all text-center">
+                  <span class="text-lg block mb-1">😔</span>
+                  <div class="text-sm font-semibold text-slate-800">Frequently</div>
+                  <div class="text-[11px] text-slate-400">Happens very often</div>
+                </div>
+              </label>
+
+              <label class="cursor-pointer">
+                <input type="radio" name="skipped_lack_of_company" value="Sometimes" class="sr-only custom-radio" />
+                <div class="p-3.5 rounded-xl border border-slate-200 bg-white hover:border-slate-300 transition-all text-center">
+                  <span class="text-lg block mb-1">🤔</span>
+                  <div class="text-sm font-semibold text-slate-800">Sometimes</div>
+                  <div class="text-[11px] text-slate-400">A few times a month</div>
+                </div>
+              </label>
+
+              <label class="cursor-pointer">
+                <input type="radio" name="skipped_lack_of_company" value="Rarely" class="sr-only custom-radio" />
+                <div class="p-3.5 rounded-xl border border-slate-200 bg-white hover:border-slate-300 transition-all text-center">
+                  <span class="text-lg block mb-1">🙂</span>
+                  <div class="text-sm font-semibold text-slate-800">Rarely</div>
+                  <div class="text-[11px] text-slate-400">Almost never</div>
+                </div>
+              </label>
+
+              <label class="cursor-pointer">
+                <input type="radio" name="skipped_lack_of_company" value="Never" class="sr-only custom-radio" />
+                <div class="p-3.5 rounded-xl border border-slate-200 bg-white hover:border-slate-300 transition-all text-center">
+                  <span class="text-lg block mb-1">💪</span>
+                  <div class="text-sm font-semibold text-slate-800">Never</div>
+                  <div class="text-[11px] text-slate-400">I always go alone/fixed team</div>
+                </div>
+              </label>
+
+            </div>
+          </div>
+
+          <!-- Q2.2: Biggest Obstacles -->
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <label class="block text-sm font-semibold text-slate-900">
+                2.2 What are your biggest obstacles when organizing or joining sports with other students? <span class="text-brand-orange">*</span>
+              </label>
+              <span class="text-xs text-slate-400 font-medium">Select all that apply</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              
+              <label class="cursor-pointer">
+                <input type="checkbox" name="obstacles" value="Skill Level Mismatch" class="sr-only custom-checkbox" />
+                <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-white hover:border-slate-300 transition-all flex items-start space-x-3 text-slate-700">
+                  <div class="w-4 h-4 rounded border border-slate-300 flex items-center justify-center check-indicator transition-colors mt-0.5 flex-shrink-0">
+                    <i data-lucide="check" class="w-3 h-3 text-white"></i>
+                  </div>
+                  <div>
+                    <div class="text-sm font-semibold text-slate-800">Skill Level Mismatch</div>
+                    <div class="text-xs text-slate-500">Finding players at a similar competitive or casual level</div>
+                  </div>
+                </div>
+              </label>
+
+              <label class="cursor-pointer">
+                <input type="checkbox" name="obstacles" value="Conflicting Schedules" class="sr-only custom-checkbox" />
+                <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-white hover:border-slate-300 transition-all flex items-start space-x-3 text-slate-700">
+                  <div class="w-4 h-4 rounded border border-slate-300 flex items-center justify-center check-indicator transition-colors mt-0.5 flex-shrink-0">
+                    <i data-lucide="check" class="w-3 h-3 text-white"></i>
+                  </div>
+                  <div>
+                    <div class="text-sm font-semibold text-slate-800">Conflicting Schedules</div>
+                    <div class="text-xs text-slate-500">Irregular student timetables, exams, and busy calendar</div>
+                  </div>
+                </div>
+              </label>
+
+              <label class="cursor-pointer">
+                <input type="checkbox" name="obstacles" value="Venue & Court Availability" class="sr-only custom-checkbox" />
+                <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-white hover:border-slate-300 transition-all flex items-start space-x-3 text-slate-700">
+                  <div class="w-4 h-4 rounded border border-slate-300 flex items-center justify-center check-indicator transition-colors mt-0.5 flex-shrink-0">
+                    <i data-lucide="check" class="w-3 h-3 text-white"></i>
+                  </div>
+                  <div>
+                    <div class="text-sm font-semibold text-slate-800">Finding / Booking Venues</div>
+                    <div class="text-xs text-slate-500">Unclear where to play in Eindhoven or expensive facilities</div>
+                  </div>
+                </div>
+              </label>
+
+              <label class="cursor-pointer">
+                <input type="checkbox" name="obstacles" value="Group Chat Chaos" class="sr-only custom-checkbox" />
+                <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-white hover:border-slate-300 transition-all flex items-start space-x-3 text-slate-700">
+                  <div class="w-4 h-4 rounded border border-slate-300 flex items-center justify-center check-indicator transition-colors mt-0.5 flex-shrink-0">
+                    <i data-lucide="check" class="w-3 h-3 text-white"></i>
+                  </div>
+                  <div>
+                    <div class="text-sm font-semibold text-slate-800">Chaotic Group Chats</div>
+                    <div class="text-xs text-slate-500">Endless WhatsApp/Discord threads where plans fade away</div>
+                  </div>
+                </div>
+              </label>
+
+              <label class="cursor-pointer">
+                <input type="checkbox" name="obstacles" value="Lack of Motivation Alone" class="sr-only custom-checkbox" />
+                <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-white hover:border-slate-300 transition-all flex items-start space-x-3 text-slate-700">
+                  <div class="w-4 h-4 rounded border border-slate-300 flex items-center justify-center check-indicator transition-colors mt-0.5 flex-shrink-0">
+                    <i data-lucide="check" class="w-3 h-3 text-white"></i>
+                  </div>
+                  <div>
+                    <div class="text-sm font-semibold text-slate-800">Lack of Solo Motivation</div>
+                    <div class="text-xs text-slate-500">Low accountability and energy when working out by oneself</div>
+                  </div>
+                </div>
+              </label>
+
+              <label class="cursor-pointer">
+                <input type="checkbox" name="obstacles" value="New in Eindhoven / Network" class="sr-only custom-checkbox" />
+                <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-white hover:border-slate-300 transition-all flex items-start space-x-3 text-slate-700">
+                  <div class="w-4 h-4 rounded border border-slate-300 flex items-center justify-center check-indicator transition-colors mt-0.5 flex-shrink-0">
+                    <i data-lucide="check" class="w-3 h-3 text-white"></i>
+                  </div>
+                  <div>
+                    <div class="text-sm font-semibold text-slate-800">New in City / Small Network</div>
+                    <div class="text-xs text-slate-500">International or first-year student without a local sports circle</div>
+                  </div>
+                </div>
+              </label>
+
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ================= SECTION 3: THE SOLUTION / FEATURES ================= -->
+      <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-subtle border border-slate-200/90 relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-1.5 h-full bg-indigo-600"></div>
+
+        <div class="flex items-center space-x-3 mb-6">
+          <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 text-xs font-extrabold">
+            03
+          </span>
+          <div>
+            <h2 class="text-xl font-bold text-slate-900">The Solution & Proposed Platform Features</h2>
+            <p class="text-xs sm:text-sm text-slate-500">Help prioritize UniSport's core features and architecture</p>
+          </div>
+        </div>
+
+        <div class="space-y-6">
+          
+          <!-- Q3.1: Quick Activity Creation -->
+          <div class="space-y-3 p-4 rounded-xl bg-slate-50/70 border border-slate-200">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+              <label class="block text-sm font-semibold text-slate-900">
+                3.1 Quick Activity Creation & Student Invites <span class="text-brand-orange">*</span>
+              </label>
+              <span class="text-xs text-slate-400">e.g., "Need 1 player for tennis in 30 mins"</span>
+            </div>
+            <p class="text-xs text-slate-500">How important is it to create or join a sports meetup in under 30 seconds with instant push notifications?</p>
+
+            <!-- 1 to 5 Rating scale -->
+            <div class="grid grid-cols-5 gap-2 pt-2">
+              <label class="cursor-pointer text-center">
+                <input type="radio" name="feature_quick_creation" value="1" required class="sr-only custom-radio" />
+                <div class="p-3 rounded-xl border border-slate-200 bg-white hover:border-slate-300 transition-all">
+                  <span class="text-xs sm:text-sm font-bold block text-slate-800">1</span>
+                  <span class="text-[10px] text-slate-400 hidden sm:block">Not important</span>
+                </div>
+              </label>
+
+              <label class="cursor-pointer text-center">
+                <input type="radio" name="feature_quick_creation" value="2" class="sr-only custom-radio" />
+                <div class="p-3 rounded-xl border border-slate-200 bg-white hover:border-slate-300 transition-all">
+                  <span class="text-xs sm:text-sm font-bold block text-slate-800">2</span>
+                  <span class="text-[10px] text-slate-400 hidden sm:block">Low</span>
+                </div>
+              </label>
+
+              <label class="cursor-pointer text-center">
+                <input type="radio" name="feature_quick_creation" value="3" class="sr-only custom-radio" />
+                <div class="p-3 rounded-xl border border-slate-200 bg-white hover:border-slate-300 transition-all">
+                  <span class="text-xs sm:text-sm font-bold block text-slate-800">3</span>
+                  <span class="text-[10px] text-slate-400 hidden sm:block">Moderate</span>
+                </div>
+              </label>
+
+              <label class="cursor-pointer text-center">
+                <input type="radio" name="feature_quick_creation" value="4" class="sr-only custom-radio" />
+                <div class="p-3 rounded-xl border border-slate-200 bg-white hover:border-slate-300 transition-all">
+                  <span class="text-xs sm:text-sm font-bold block text-slate-800">4</span>
+                  <span class="text-[10px] text-slate-400 hidden sm:block">High</span>
+                </div>
+              </label>
+
+              <label class="cursor-pointer text-center">
+                <input type="radio" name="feature_quick_creation" value="5" class="sr-only custom-radio" />
+                <div class="p-3 rounded-xl border border-slate-200 bg-white hover:border-slate-300 transition-all">
+                  <span class="text-xs sm:text-sm font-bold block text-slate-800">5</span>
+                  <span class="text-[10px] text-slate-400 hidden sm:block">Essential 🔥</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Q3.2: Geographic & Sport Filter Feed -->
+          <div class="space-y-3 p-4 rounded-xl bg-slate-50/70 border border-slate-200">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+              <label class="block text-sm font-semibold text-slate-900">
+                3.2 Geographic & Sport Filter Feed <span class="text-brand-orange">*</span>
+              </label>
+              <span class="text-xs text-slate-400">Map & feed filtered by radius & sports</span>
+            </div>
+            <p class="text-xs text-slate-500">How interested are you in filtering sports games around Fontys Rachelsmolen, Strijp-S, or Eindhoven center?</p>
+
+            <!-- 1 to 5 Rating scale -->
+            <div class="grid grid-cols-5 gap-2 pt-2">
+              <label class="cursor-pointer text-center">
+                <input type="radio" name="feature_geo_feed" value="1" required class="sr-only custom-radio" />
+                <div class="p-3 rounded-xl border border-slate-200 bg-white hover:border-slate-300 transition-all">
+                  <span class="text-xs sm:text-sm font-bold block text-slate-800">1</span>
+                  <span class="text-[10px] text-slate-400 hidden sm:block">Not interested</span>
+                </div>
+              </label>
+
+              <label class="cursor-pointer text-center">
+                <input type="radio" name="feature_geo_feed" value="2" class="sr-only custom-radio" />
+                <div class="p-3 rounded-xl border border-slate-200 bg-white hover:border-slate-300 transition-all">
+                  <span class="text-xs sm:text-sm font-bold block text-slate-800">2</span>
+                  <span class="text-[10px] text-slate-400 hidden sm:block">Slight</span>
+                </div>
+              </label>
+
+              <label class="cursor-pointer text-center">
+                <input type="radio" name="feature_geo_feed" value="3" class="sr-only custom-radio" />
+                <div class="p-3 rounded-xl border border-slate-200 bg-white hover:border-slate-300 transition-all">
+                  <span class="text-xs sm:text-sm font-bold block text-slate-800">3</span>
+                  <span class="text-[10px] text-slate-400 hidden sm:block">Neutral</span>
+                </div>
+              </label>
+
+              <label class="cursor-pointer text-center">
+                <input type="radio" name="feature_geo_feed" value="4" class="sr-only custom-radio" />
+                <div class="p-3 rounded-xl border border-slate-200 bg-white hover:border-slate-300 transition-all">
+                  <span class="text-xs sm:text-sm font-bold block text-slate-800">4</span>
+                  <span class="text-[10px] text-slate-400 hidden sm:block">Interested</span>
+                </div>
+              </label>
+
+              <label class="cursor-pointer text-center">
+                <input type="radio" name="feature_geo_feed" value="5" class="sr-only custom-radio" />
+                <div class="p-3 rounded-xl border border-slate-200 bg-white hover:border-slate-300 transition-all">
+                  <span class="text-xs sm:text-sm font-bold block text-slate-800">5</span>
+                  <span class="text-[10px] text-slate-400 hidden sm:block">Very excited 🚀</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Q3.3: Open Text Feedback -->
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <label for="extra_features" class="block text-sm font-semibold text-slate-900">
+                3.3 What other feature or idea would make UniSport indispensable for you?
+              </label>
+              <span class="text-xs text-slate-400">Optional</span>
+            </div>
+            
+            <textarea id="extra_features" name="extra_features" rows="3" placeholder="E.g., student discount integrations, skill rating badges, equipment borrowing/sharing, post-game drinks..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-indigo/30 focus:border-brand-indigo transition"></textarea>
+
+            <!-- Suggestion chips -->
+            <div class="flex flex-wrap gap-1.5 items-center pt-1">
+              <span class="text-xs text-slate-400 mr-1">Quick ideas:</span>
+              <button type="button" class="idea-chip text-[11px] bg-slate-100 hover:bg-indigo-50 hover:text-brand-indigo text-slate-600 px-2.5 py-1 rounded-full border border-slate-200 transition">
+                + Equipment sharing
+              </button>
+              <button type="button" class="idea-chip text-[11px] bg-slate-100 hover:bg-indigo-50 hover:text-brand-indigo text-slate-600 px-2.5 py-1 rounded-full border border-slate-200 transition">
+                + Student tournaments
+              </button>
+              <button type="button" class="idea-chip text-[11px] bg-slate-100 hover:bg-indigo-50 hover:text-brand-indigo text-slate-600 px-2.5 py-1 rounded-full border border-slate-200 transition">
+                + WhatsApp notifications
+              </button>
+              <button type="button" class="idea-chip text-[11px] bg-slate-100 hover:bg-indigo-50 hover:text-brand-indigo text-slate-600 px-2.5 py-1 rounded-full border border-slate-200 transition">
+                + Fontys Rachelsmolen check-in
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ================= SUBMIT ACTION CARD ================= -->
+      <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-2xl p-6 sm:p-8 text-white flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xl border border-indigo-900/60">
+        <div class="space-y-1 text-center sm:text-left">
+          <h3 class="text-lg font-bold text-white">Ready to submit your feedback?</h3>
+          <p class="text-xs sm:text-sm text-slate-300">Your anonymous response will be sent in real-time to the UniSport Google Sheets database.</p>
+        </div>
+
+        <button type="submit" id="submit-survey-btn" class="w-full sm:w-auto px-8 py-4 bg-brand-orange hover:bg-brand-orange-hover text-white font-bold text-sm sm:text-base rounded-xl shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center space-x-2 flex-shrink-0 group">
+          <span id="submit-btn-text">Submit to Google Sheets</span>
+          <i id="submit-btn-icon" data-lucide="send" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
+          <svg id="submit-btn-spinner" class="hidden animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+        </button>
+      </div>
+
+    </form>
+
+    <!-- ================= SUCCESS CONFIRMATION MODAL ================= -->
+    <div id="success-modal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-950/80 backdrop-blur-sm p-4 flex items-center justify-center animate-fade-in">
+      <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-100 text-center space-y-6 relative overflow-hidden transform transition-all scale-100">
+        
+        <!-- Decorative Header Gradient -->
+        <div class="absolute top-0 left-0 right-0 h-3 bg-gradient-to-r from-emerald-500 via-brand-indigo to-orange-500"></div>
+
+        <!-- Success Icon -->
+        <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto shadow-inner shadow-emerald-200">
+          <i data-lucide="check-check" class="w-8 h-8"></i>
+        </div>
+
+        <div class="space-y-2">
+          <h3 class="text-2xl font-extrabold text-slate-900 tracking-tight">Survey Recorded!</h3>
+          <p class="text-sm text-slate-600 leading-relaxed">
+            Your response has been saved to the <strong class="text-emerald-700">Google Sheets Database</strong> for <strong class="text-slate-800">UniSport (Fontys ICT Block 2)</strong>.
+          </p>
+        </div>
+
+        <!-- Details Card -->
+        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 text-left space-y-3">
+          <div class="flex items-center justify-between text-xs font-semibold text-slate-700">
+            <span class="flex items-center gap-1.5 text-emerald-700">
+              <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-600"></i>
+              Google Sheets Live Sync
+            </span>
+            <span id="response-id-badge" class="px-2 py-0.5 bg-indigo-100 text-brand-indigo rounded-md font-mono text-[11px]">ID: #UNISPORT-101</span>
+          </div>
+
+          <p class="text-xs text-slate-500">
+            A new row has been added to your survey spreadsheet. You can also export a copy in CSV or JSON format.
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-2 pt-1">
+            <button type="button" id="download-csv-btn" class="flex-1 py-2 px-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold flex items-center justify-center space-x-1.5 transition">
+              <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i>
+              <span>Download CSV Row</span>
+            </button>
+            <button type="button" id="download-json-btn" class="flex-1 py-2 px-3 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-lg text-xs font-semibold flex items-center justify-center space-x-1.5 transition">
+              <i data-lucide="file-code" class="w-3.5 h-3.5"></i>
+              <span>Download JSON</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="pt-2 flex flex-col gap-2">
+          <button type="button" id="close-modal-btn" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-sm font-bold transition">
+            Done & Return
+          </button>
+          <button type="button" id="reset-survey-btn" class="text-xs text-slate-500 hover:text-slate-800 font-medium py-1">
+            Submit another survey response (Testing mode)
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ================= GOOGLE SHEETS CONFIG MODAL ================= -->
+    <div id="config-modal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-950/80 backdrop-blur-sm p-4 flex items-center justify-center animate-fade-in">
+      <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-100 text-left space-y-5 relative">
+        
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div class="flex items-center space-x-2.5">
+            <div class="p-2 rounded-lg bg-emerald-100 text-emerald-700">
+              <i data-lucide="sheet" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-slate-900">Google Sheets Database Setup</h3>
+              <p class="text-xs text-slate-500">Connect your Google Apps Script Web App</p>
+            </div>
+          </div>
+          <button type="button" id="close-config-modal-btn" class="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <div class="space-y-3 text-xs text-slate-600">
+          <p class="leading-relaxed">
+            Follow the instructions in <code class="bg-slate-100 text-indigo-700 px-1 py-0.5 rounded font-mono font-semibold">google_apps_script.js</code> to deploy your free Google Sheet Web App, then paste the URL below:
+          </p>
+
+          <div class="space-y-1.5">
+            <label for="script-url-input" class="block font-semibold text-slate-800">
+              Google Apps Script Web App URL:
+            </label>
+            <input type="url" id="script-url-input" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 font-mono" />
+          </div>
+
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+            <span class="font-bold text-slate-700">Quick 3-step setup:</span>
+            <ol class="list-decimal list-inside text-slate-500 space-y-0.5">
+              <li>Open Google Sheets &gt; <strong>Extensions &gt; Apps Script</strong></li>
+              <li>Paste the code from <code class="font-mono">google_apps_script.js</code></li>
+              <li>Click <strong>Deploy &gt; New deployment &gt; Web App</strong> (Access: Anyone)</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 pt-2">
+          <button type="button" id="save-config-btn" class="flex-1 py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition flex items-center justify-center space-x-1.5">
+            <i data-lucide="save" class="w-4 h-4"></i>
+            <span>Save Configuration</span>
+          </button>
+          <button type="button" id="test-connection-btn" class="py-2.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition">
+            Test
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="mt-16 bg-white border-t border-slate-200/80 py-8 text-center text-xs text-slate-500">
+    <div class="max-w-4xl mx-auto px-4 space-y-3">
+      <div class="flex items-center justify-center space-x-2">
+        <span class="font-bold text-slate-800">UniSport</span>
+        <span>•</span>
+        <span>Fontys University of Applied Sciences (Fontys ICT)</span>
+        <span>•</span>
+        <span>Semester 1, Challenge 2</span>
+      </div>
+      <p class="text-slate-400">
+        Academic research tool for student sports engagement in Eindhoven. Real-time data pipeline powered by Google Sheets DB.
+      </p>
+    </div>
+  </footer>
+
+  <!-- ================= JAVASCRIPT APPLICATION LOGIC ================= -->
+  <script>
+    /**
+     * CONFIGURAÇÃO DA BASE DE DADOS GOOGLE SHEETS
+     * Podes definir o URL padrão aqui ou alterá-lo através do botão de configurações na interface!
+     */
+    let GOOGLE_SHEET_WEBAPP_URL = localStorage.getItem('unisport_sheets_url') || '';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Initialize Lucide icons
+      lucide.createIcons();
+
+      // Elements
+      const consentCheckbox = document.getElementById('consent-checkbox');
+      const consentStatusBadge = document.getElementById('consent-status-badge');
+      const lockedNotice = document.getElementById('locked-survey-notice');
+      const surveyForm = document.getElementById('unisport-survey-form');
+      const progressBar = document.getElementById('survey-progress-bar');
+      
+      const sportsOtherCheckbox = document.getElementById('sports-other-checkbox');
+      const sportsOtherContainer = document.getElementById('sports-other-container');
+      const sportsOtherText = document.getElementById('sports_other_text');
+
+      const submitBtn = document.getElementById('submit-survey-btn');
+      const submitBtnText = document.getElementById('submit-btn-text');
+      const submitBtnIcon = document.getElementById('submit-btn-icon');
+      const submitBtnSpinner = document.getElementById('submit-btn-spinner');
+
+      const successModal = document.getElementById('success-modal');
+      const closeModalBtn = document.getElementById('close-modal-btn');
+      const resetSurveyBtn = document.getElementById('reset-survey-btn');
+      const downloadCsvBtn = document.getElementById('download-csv-btn');
+      const downloadJsonBtn = document.getElementById('download-json-btn');
+      const responseIdBadge = document.getElementById('response-id-badge');
+
+      // Config Modal Elements
+      const sheetsConfigBtn = document.getElementById('sheets-config-btn');
+      const configModal = document.getElementById('config-modal');
+      const closeConfigModalBtn = document.getElementById('close-config-modal-btn');
+      const scriptUrlInput = document.getElementById('script-url-input');
+      const saveConfigBtn = document.getElementById('save-config-btn');
+      const testConnectionBtn = document.getElementById('test-connection-btn');
+      const sheetsStatusText = document.getElementById('sheets-status-text');
+
+      let currentResponseData = null;
+
+      // Update status badge UI based on configured URL
+      function updateSheetsStatusBadge() {
+        if (GOOGLE_SHEET_WEBAPP_URL && GOOGLE_SHEET_WEBAPP_URL.startsWith('https://script.google.com')) {
+          sheetsStatusText.textContent = 'Google Sheets Connected 🟢';
+        } else {
+          sheetsStatusText.textContent = 'Google Sheets Setup';
+        }
+      }
+      updateSheetsStatusBadge();
+
+      // Config Modal Handlers
+      sheetsConfigBtn.addEventListener('click', () => {
+        scriptUrlInput.value = GOOGLE_SHEET_WEBAPP_URL;
+        configModal.classList.remove('hidden');
+      });
+
+      closeConfigModalBtn.addEventListener('click', () => {
+        configModal.classList.add('hidden');
+      });
+
+      saveConfigBtn.addEventListener('click', () => {
+        const val = scriptUrlInput.value.trim();
+        GOOGLE_SHEET_WEBAPP_URL = val;
+        localStorage.setItem('unisport_sheets_url', val);
+        updateSheetsStatusBadge();
+        configModal.classList.add('hidden');
+        alert('Google Sheets Web App URL saved successfully!');
+      });
+
+      testConnectionBtn.addEventListener('click', async () => {
+        const val = scriptUrlInput.value.trim();
+        if (!val) {
+          alert('Please enter a Google Apps Script Web App URL first.');
+          return;
+        }
+        testConnectionBtn.textContent = 'Testing...';
+        try {
+          // Send test GET ping
+          await fetch(val, { mode: 'no-cors' });
+          alert('Connection tested! The Web App responded.');
+        } catch (e) {
+          alert('Note: If deployed with "Anyone" access, the endpoint is ready to receive submissions.');
+        } finally {
+          testConnectionBtn.textContent = 'Test';
+        }
+      });
+
+      // Toggle Other sport input
+      sportsOtherCheckbox.addEventListener('change', (e) => {
+        if (e.target.checked) {
+          sportsOtherContainer.classList.remove('hidden');
+          sportsOtherText.focus();
+        } else {
+          sportsOtherContainer.classList.add('hidden');
+          sportsOtherText.value = '';
+        }
+        updateProgress();
+      });
+
+      // Idea chips injection
+      const extraFeaturesTextarea = document.getElementById('extra_features');
+      document.querySelectorAll('.idea-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          const textToAdd = chip.textContent.replace('+', '').trim();
+          if (extraFeaturesTextarea.value.trim().length > 0) {
+            extraFeaturesTextarea.value += `, ${textToAdd}`;
+          } else {
+            extraFeaturesTextarea.value = textToAdd;
+          }
+          extraFeaturesTextarea.focus();
+          updateProgress();
+        });
+      });
+
+      // Consent Checkbox Handler
+      consentCheckbox.addEventListener('change', (e) => {
+        if (e.target.checked) {
+          // Unlock Form
+          surveyForm.classList.remove('opacity-40', 'pointer-events-none', 'blur-[1px]');
+          lockedNotice.classList.add('hidden');
+          
+          consentStatusBadge.className = 'inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200';
+          consentStatusBadge.innerHTML = `<i data-lucide="check" class="w-3.5 h-3.5"></i><span>Consent Accepted</span>`;
+          lucide.createIcons();
+
+          // Smooth scroll towards section 1
+          surveyForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          updateProgress();
+        } else {
+          // Lock Form
+          surveyForm.classList.add('opacity-40', 'pointer-events-none', 'blur-[1px]');
+          lockedNotice.classList.remove('hidden');
+          
+          consentStatusBadge.className = 'inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200';
+          consentStatusBadge.innerHTML = `<i data-lucide="lock" class="w-3.5 h-3.5"></i><span>Consent Required</span>`;
+          lucide.createIcons();
+          progressBar.style.width = '0%';
+        }
+      });
+
+      // Progress Tracker
+      function updateProgress() {
+        if (!consentCheckbox.checked) {
+          progressBar.style.width = '0%';
+          return;
+        }
+
+        let score = 20; // 20% for consent
+        
+        // Check student status
+        if (document.querySelector('input[name="student_status"]:checked')) score += 15;
+        // Check sports frequency
+        if (document.getElementById('sports_frequency').value) score += 15;
+        // Check favorite sports
+        if (document.querySelectorAll('input[name="favorite_sports"]:checked').length > 0) score += 15;
+        // Check problem skipped
+        if (document.querySelector('input[name="skipped_lack_of_company"]:checked')) score += 15;
+        // Check obstacles
+        if (document.querySelectorAll('input[name="obstacles"]:checked').length > 0) score += 10;
+        // Check solutions
+        if (document.querySelector('input[name="feature_quick_creation"]:checked')) score += 5;
+        if (document.querySelector('input[name="feature_geo_feed"]:checked')) score += 5;
+
+        progressBar.style.width = `${Math.min(score, 100)}%`;
+      }
+
+      // Attach progress tracking to all form inputs
+      surveyForm.addEventListener('change', updateProgress);
+      surveyForm.addEventListener('input', updateProgress);
+
+      // Form Submission Handler
+      surveyForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // Validation for checkboxes groups
+        const favoriteSports = Array.from(document.querySelectorAll('input[name="favorite_sports"]:checked')).map(cb => {
+          if (cb.value === 'Other' && sportsOtherText.value.trim()) {
+            return `Other (${sportsOtherText.value.trim()})`;
+          }
+          return cb.value;
+        });
+
+        if (favoriteSports.length === 0) {
+          alert('Please select at least one favorite sport in Section 1.');
+          document.getElementById('sports-grid').scrollIntoView({ behavior: 'smooth', block: 'center' });
+          return;
+        }
+
+        const obstacles = Array.from(document.querySelectorAll('input[name="obstacles"]:checked')).map(cb => cb.value);
+        if (obstacles.length === 0) {
+          alert('Please select at least one obstacle in Section 2.');
+          return;
+        }
+
+        // Gather full responses
+        const timestamp = new Date().toLocaleString();
+        const responseId = 'UNISPORT-' + Math.floor(1000 + Math.random() * 9000);
+
+        const responseObj = {
+          response_id: responseId,
+          timestamp: timestamp,
+          student_status: document.querySelector('input[name="student_status"]:checked')?.value || '',
+          sports_frequency: document.getElementById('sports_frequency').value,
+          favorite_sports: favoriteSports,
+          skipped_lack_of_company: document.querySelector('input[name="skipped_lack_of_company"]:checked')?.value || '',
+          obstacles: obstacles,
+          feature_quick_creation_rating: parseInt(document.querySelector('input[name="feature_quick_creation"]:checked')?.value || '0', 10),
+          feature_geo_feed_rating: parseInt(document.querySelector('input[name="feature_geo_feed"]:checked')?.value || '0', 10),
+          extra_features_feedback: document.getElementById('extra_features').value.trim()
+        };
+
+        currentResponseData = responseObj;
+
+        // UI Loading State
+        submitBtn.disabled = true;
+        submitBtnText.textContent = 'Sending to Google Sheets...';
+        submitBtnIcon.classList.add('hidden');
+        submitBtnSpinner.classList.remove('hidden');
+
+        // Send to Google Sheets DB via Web App
+        if (GOOGLE_SHEET_WEBAPP_URL) {
+          try {
+            await fetch(GOOGLE_SHEET_WEBAPP_URL, {
+              method: 'POST',
+              mode: 'no-cors',
+              headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+              body: JSON.stringify(responseObj)
+            });
+            console.log('Dispatched to Google Sheets Webhook successfully.');
+          } catch (err) {
+            console.warn('Google Sheets transmission note:', err);
+          }
+        }
+
+        // Save in localStorage as cache
+        try {
+          const existingResponses = JSON.parse(localStorage.getItem('unisport_survey_responses') || '[]');
+          existingResponses.push(responseObj);
+          localStorage.setItem('unisport_survey_responses', JSON.stringify(existingResponses));
+        } catch (err) {
+          console.error('Storage error:', err);
+        }
+
+        // Reset button state
+        setTimeout(() => {
+          submitBtn.disabled = false;
+          submitBtnText.textContent = 'Submit to Google Sheets';
+          submitBtnIcon.classList.remove('hidden');
+          submitBtnSpinner.classList.add('hidden');
+
+          // Trigger Confetti Celebration
+          triggerConfetti();
+
+          // Show Modal
+          responseIdBadge.textContent = `ID: #${responseId}`;
+          successModal.classList.remove('hidden');
+          progressBar.style.width = '100%';
+        }, 500);
+      });
+
+      // Confetti Effect
+      function triggerConfetti() {
+        try {
+          confetti({
+            particleCount: 80,
+            spread: 70,
+            origin: { y: 0.6 },
+            colors: ['#4F46E5', '#FF6B00', '#10B981', '#F59E0B']
+          });
+        } catch (e) {
+          console.log('Confetti effect');
+        }
+      }
+
+      // Close Modal Handler
+      closeModalBtn.addEventListener('click', () => {
+        successModal.classList.add('hidden');
+      });
+
+      // Reset Survey Handler
+      resetSurveyBtn.addEventListener('click', () => {
+        surveyForm.reset();
+        sportsOtherContainer.classList.add('hidden');
+        successModal.classList.add('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        updateProgress();
+      });
+
+      // Download CSV row handler
+      downloadCsvBtn.addEventListener('click', () => {
+        if (!currentResponseData) return;
+        
+        const headers = ["Response ID","Timestamp","Student Status","Sports Frequency","Favorite Sports","Skipped Due To Company","Obstacles","Rating Quick Creation","Rating Geo Feed","Extra Features Feedback"];
+        const row = [
+          `"${currentResponseData.response_id}"`,
+          `"${currentResponseData.timestamp}"`,
+          `"${currentResponseData.student_status}"`,
+          `"${currentResponseData.sports_frequency}"`,
+          `"${currentResponseData.favorite_sports.join(', ')}"`,
+          `"${currentResponseData.skipped_lack_of_company}"`,
+          `"${currentResponseData.obstacles.join(', ')}"`,
+          currentResponseData.feature_quick_creation_rating,
+          currentResponseData.feature_geo_feed_rating,
+          `"${currentResponseData.extra_features_feedback.replace(/"/g, '""')}"`
+        ];
+
+        const csvContent = headers.join(',') + '\n' + row.join(',');
+        downloadFile(csvContent, `unisport_response_${currentResponseData.response_id}.csv`, 'text/csv;charset=utf-8;');
+      });
+
+      // Download JSON handler
+      downloadJsonBtn.addEventListener('click', () => {
+        if (!currentResponseData) return;
+        const jsonStr = JSON.stringify(currentResponseData, null, 2);
+        downloadFile(jsonStr, `unisport_response_${currentResponseData.response_id}.json`, 'application/json');
+      });
+
+      // Helper function to trigger browser download
+      function downloadFile(content, fileName, contentType) {
+        const blob = new Blob([content], { type: contentType });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+    });
+  </script>
+</body>
+</html>
