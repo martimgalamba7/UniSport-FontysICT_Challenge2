@@ -2,13 +2,12 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
-    { "source": "/", "destination": "/project/index.html" },
-    { "source": "/challenge2", "destination": "/project/index.html" },
-    { "source": "/challenge2/survey", "destination": "/project/survey/index.html" },
-    { "source": "/challenge2/unisportapp", "destination": "/project/app/index.html" },
-    { "source": "/survey", "destination": "/project/survey/index.html" },
-    { "source": "/unisportapp", "destination": "/project/app/index.html" },
-    { "source": "/app", "destination": "/project/app/index.html" },
-    { "source": "/assets/:match*", "destination": "/project/assets/:match*" }
+    { "source": "/", "destination": "/index.html" },
+    { "source": "/challenge2", "destination": "/index.html" },
+    { "source": "/challenge2/survey", "destination": "/survey/index.html" },
+    { "source": "/challenge2/unisportapp", "destination": "/app/index.html" },
+    { "source": "/survey", "destination": "/survey/index.html" },
+    { "source": "/unisportapp", "destination": "/app/index.html" },
+    { "source": "/app", "destination": "/app/index.html" }
   ]
 }
