@@ -6,12 +6,12 @@
   <title>UniSport • The Student Sports Community</title>
   
   <!-- Meta & OpenGraph -->
-  <meta name="description" content="UniSport connects university students for spontaneous pick-up games, court bookings, and athletic partners. Find your match in 30 seconds." />
+  <meta name="description" content="UniSport connects university students for spontaneous pick-up games, court bookings, and athletic partners. Never play alone." />
   
   <link rel="icon" type="image/png" href="./assets/logoUniSport.png" />
   <link rel="apple-touch-icon" href="./assets/logoUniSport.png" />
 
-  <!-- Google Fonts: Plus Jakarta Sans (Modern Geometric Startup Sans) + Syne (Display Punch) -->
+  <!-- Google Fonts: Plus Jakarta Sans + Syne -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
@@ -71,7 +71,7 @@
     .animate-marquee {
       display: flex;
       width: 200%;
-      animation: marquee 28s linear infinite;
+      animation: marquee 26s linear infinite;
     }
     .animate-marquee:hover {
       animation-play-state: paused;
@@ -111,18 +111,11 @@
         <a href="#why" class="hover:text-zinc-950 transition-colors">Why UniSport</a>
         <a href="#features" class="hover:text-zinc-950 transition-colors">Features</a>
         <a href="#sports" class="hover:text-zinc-950 transition-colors">Sports</a>
-        <a href="#community" class="hover:text-zinc-950 transition-colors">Community</a>
         <a href="#faq" class="hover:text-zinc-950 transition-colors">FAQ</a>
       </nav>
 
-      <!-- Action Buttons -->
+      <!-- Action Button -->
       <div class="flex items-center space-x-3 sm:space-x-4">
-        <!-- Community Survey Link -->
-        <a href="../survey/" class="hidden sm:inline-flex items-center space-x-2 text-xs lg:text-sm font-bold text-zinc-700 hover:text-zinc-950 py-2.5 px-4 rounded-full border border-zinc-200 hover:border-zinc-300 bg-white shadow-xs transition">
-          <i data-lucide="sparkles" class="w-4 h-4 text-brand-orange"></i>
-          <span>Early Survey</span>
-        </a>
-
         <!-- Launch Web App CTA -->
         <a href="./app/" class="inline-flex items-center space-x-2 bg-zinc-950 hover:bg-zinc-800 text-white text-xs lg:text-sm font-bold py-2.5 px-6 rounded-full shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5">
           <span>Open App</span>
@@ -137,127 +130,108 @@
   <main class="flex-grow w-full">
 
     <!-- ================= HERO SECTION (Full Viewport Scaled) ================= -->
-    <section class="w-full px-6 sm:px-10 lg:px-16 2xl:px-24 pt-16 sm:pt-24 pb-20 lg:pb-32 border-b border-zinc-200/80">
+    <section class="w-full px-6 sm:px-10 lg:px-16 2xl:px-24 pt-20 sm:pt-28 pb-20 lg:pb-32 border-b border-zinc-200/80">
       <div class="w-full">
         
-        <!-- Startup Tagline Pill -->
-        <div class="inline-flex items-center space-x-2.5 px-4 py-2 rounded-full bg-brand-orange-light text-brand-orange text-xs sm:text-sm font-bold mb-8">
-          <span class="w-2 h-2 rounded-full bg-brand-orange animate-pulse"></span>
-          <span>The Student Sports Network • Eindhoven</span>
-        </div>
-
-        <!-- Oversized Fluid Hero Headline -->
+        <!-- Oversized Fluid Hero Headline with New Motto -->
         <div class="max-w-[1900px] space-y-6">
           <h1 class="hero-title font-display font-extrabold text-zinc-950 uppercase">
-            Sports happen together.<br />
-            <span class="text-brand-orange">Find your match in 30 seconds.</span>
+            Never play alone.<br />
+            <span class="text-brand-orange">Your campus is your court.</span>
           </h1>
 
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 pt-4 items-end">
             <p class="lg:col-span-8 text-lg sm:text-2xl text-zinc-600 font-normal leading-relaxed max-w-3xl">
-              Break the solo workout barrier. Leave chaotic 100-message group chats behind. Discover spontaneous pick-up games, court bookings, and running partners across your campus.
+              Break the solo workout barrier. Leave chaotic 100-message group chats behind. Discover spontaneous pick-up games, court bookings, and running partners across your campus in seconds.
             </p>
 
             <div class="lg:col-span-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-              <a href="./app/" class="w-full sm:w-auto inline-flex items-center justify-center space-x-3 bg-brand-orange hover:bg-brand-orange-hover text-white font-bold text-base py-4 px-8 rounded-full shadow-lg transition-all transform hover:-translate-y-0.5">
+              <a href="./app/" class="w-full sm:w-auto inline-flex items-center justify-center space-x-3 bg-brand-orange hover:bg-brand-orange-hover text-white font-bold text-base py-4 px-9 rounded-full shadow-lg transition-all transform hover:-translate-y-0.5">
                 <span>Start Playing</span>
                 <i data-lucide="arrow-right" class="w-5 h-5"></i>
               </a>
-
-              <a href="../survey/" class="w-full sm:w-auto inline-flex items-center justify-center space-x-2 bg-white hover:bg-zinc-100 text-zinc-900 font-bold text-base py-4 px-8 rounded-full border border-zinc-300 transition-all">
-                <span>Join Survey</span>
-              </a>
             </div>
-          </div>
-        </div>
-
-        <!-- Ultra-Wide Interactive Startup Preview Grid -->
-        <div class="mt-16 sm:mt-24 w-full">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 2xl:gap-8">
-            
-            <!-- Hero Feature Card 1 -->
-            <div class="bg-white p-8 sm:p-10 rounded-3xl border border-zinc-200 card-hover flex flex-col justify-between min-h-[320px]">
-              <div class="space-y-4">
-                <div class="w-12 h-12 rounded-2xl bg-orange-100 text-brand-orange flex items-center justify-center">
-                  <i data-lucide="zap" class="w-6 h-6"></i>
-                </div>
-                <h3 class="font-display font-bold text-2xl text-zinc-950">Host a Match in &lt;30s</h3>
-                <p class="text-sm sm:text-base text-zinc-600 leading-relaxed">
-                  Select your sport, pick your campus court or local park, set the spot limit, and publish. No cumbersome forms.
-                </p>
-              </div>
-              <div class="pt-6 border-t border-zinc-100 flex items-center justify-between text-xs font-bold text-zinc-500">
-                <span>Instant match broadcast</span>
-                <span class="text-brand-orange">&rarr;</span>
-              </div>
-            </div>
-
-            <!-- Hero Feature Card 2 -->
-            <div class="bg-white p-8 sm:p-10 rounded-3xl border border-zinc-200 card-hover flex flex-col justify-between min-h-[320px]">
-              <div class="space-y-4">
-                <div class="w-12 h-12 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center">
-                  <i data-lucide="map-pin" class="w-6 h-6"></i>
-                </div>
-                <h3 class="font-display font-bold text-2xl text-zinc-950">Campus Proximity Radar</h3>
-                <p class="text-sm sm:text-base text-zinc-600 leading-relaxed">
-                  Discover student activities happening within walking or biking distance. Rachelsmolen, Student Sports Centre, Strijp-S, and more.
-                </p>
-              </div>
-              <div class="pt-6 border-t border-zinc-100 flex items-center justify-between text-xs font-bold text-zinc-500">
-                <span>Hyper-local campus feed</span>
-                <span class="text-blue-600">&rarr;</span>
-              </div>
-            </div>
-
-            <!-- Hero Feature Card 3 -->
-            <div class="bg-white p-8 sm:p-10 rounded-3xl border border-zinc-200 card-hover flex flex-col justify-between min-h-[320px]">
-              <div class="space-y-4">
-                <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
-                  <i data-lucide="users" class="w-6 h-6"></i>
-                </div>
-                <h3 class="font-display font-bold text-2xl text-zinc-950">Zero Overbooking</h3>
-                <p class="text-sm sm:text-base text-zinc-600 leading-relaxed">
-                  Real-time participant rosters guarantee headcounts. When a match fills, it locks. If someone cancels, the slot instantly opens up.
-                </p>
-              </div>
-              <div class="pt-6 border-t border-zinc-100 flex items-center justify-between text-xs font-bold text-zinc-500">
-                <span>Live spot management</span>
-                <span class="text-emerald-600">&rarr;</span>
-              </div>
-            </div>
-
           </div>
         </div>
 
       </div>
     </section>
 
-    <!-- ================= FULL-WIDTH KINETIC MARQUEE ================= -->
-    <div class="w-full py-5 bg-zinc-950 text-white overflow-hidden font-display font-extrabold text-xl sm:text-2xl 2xl:text-3xl tracking-tight uppercase select-none">
-      <div class="animate-marquee whitespace-nowrap flex space-x-12">
-        <span>⚽ FOOTBALL 5V5</span>
-        <span class="text-brand-orange">•</span>
-        <span>🎾 PADEL DOUBLES</span>
-        <span class="text-brand-orange">•</span>
-        <span>🏃 SUNSET 5K RUN</span>
-        <span class="text-brand-orange">•</span>
-        <span>🧗 BOULDERING CREW</span>
-        <span class="text-brand-orange">•</span>
-        <span>🏀 BASKETBALL 3X3</span>
-        <span class="text-brand-orange">•</span>
-        <span>🏋️ FITNESS CIRCUITS</span>
-        <span class="text-brand-orange">•</span>
-        <span>🏐 VOLLEYBALL SQUAD</span>
-        <span class="text-brand-orange">•</span>
-        <span>⚽ FOOTBALL 5V5</span>
-        <span class="text-brand-orange">•</span>
-        <span>🎾 PADEL DOUBLES</span>
-        <span class="text-brand-orange">•</span>
-        <span>🏃 SUNSET 5K RUN</span>
-        <span class="text-brand-orange">•</span>
-        <span>🧗 BOULDERING CREW</span>
-        <span class="text-brand-orange">•</span>
-        <span>🏀 BASKETBALL 3X3</span>
+    <!-- ================= FULL-WIDTH KINETIC MARQUEE (Clean SVG Icons) ================= -->
+    <div class="w-full py-5 bg-zinc-950 text-white overflow-hidden font-display font-extrabold text-lg sm:text-xl 2xl:text-2xl tracking-tight uppercase select-none">
+      <div class="animate-marquee whitespace-nowrap flex items-center space-x-12">
+        <span class="inline-flex items-center space-x-3">
+          <i data-lucide="circle-dot" class="w-5 h-5 text-brand-orange"></i>
+          <span>Football 5v5</span>
+        </span>
+        <span class="text-zinc-700">•</span>
+        <span class="inline-flex items-center space-x-3">
+          <i data-lucide="crosshair" class="w-5 h-5 text-brand-orange"></i>
+          <span>Padel Doubles</span>
+        </span>
+        <span class="text-zinc-700">•</span>
+        <span class="inline-flex items-center space-x-3">
+          <i data-lucide="footprints" class="w-5 h-5 text-brand-orange"></i>
+          <span>Sunset 5K Run</span>
+        </span>
+        <span class="text-zinc-700">•</span>
+        <span class="inline-flex items-center space-x-3">
+          <i data-lucide="mountain" class="w-5 h-5 text-brand-orange"></i>
+          <span>Bouldering Crew</span>
+        </span>
+        <span class="text-zinc-700">•</span>
+        <span class="inline-flex items-center space-x-3">
+          <i data-lucide="target" class="w-5 h-5 text-brand-orange"></i>
+          <span>Basketball 3x3</span>
+        </span>
+        <span class="text-zinc-700">•</span>
+        <span class="inline-flex items-center space-x-3">
+          <i data-lucide="dumbbell" class="w-5 h-5 text-brand-orange"></i>
+          <span>Fitness Circuits</span>
+        </span>
+        <span class="text-zinc-700">•</span>
+        <span class="inline-flex items-center space-x-3">
+          <i data-lucide="activity" class="w-5 h-5 text-brand-orange"></i>
+          <span>Volleyball Squad</span>
+        </span>
+        <span class="text-zinc-700">•</span>
+        <span class="inline-flex items-center space-x-3">
+          <i data-lucide="bike" class="w-5 h-5 text-brand-orange"></i>
+          <span>Group Cycling</span>
+        </span>
+        <span class="text-zinc-700">•</span>
+
+        <!-- Duplicated items for smooth infinite loop -->
+        <span class="inline-flex items-center space-x-3">
+          <i data-lucide="circle-dot" class="w-5 h-5 text-brand-orange"></i>
+          <span>Football 5v5</span>
+        </span>
+        <span class="text-zinc-700">•</span>
+        <span class="inline-flex items-center space-x-3">
+          <i data-lucide="crosshair" class="w-5 h-5 text-brand-orange"></i>
+          <span>Padel Doubles</span>
+        </span>
+        <span class="text-zinc-700">•</span>
+        <span class="inline-flex items-center space-x-3">
+          <i data-lucide="footprints" class="w-5 h-5 text-brand-orange"></i>
+          <span>Sunset 5K Run</span>
+        </span>
+        <span class="text-zinc-700">•</span>
+        <span class="inline-flex items-center space-x-3">
+          <i data-lucide="mountain" class="w-5 h-5 text-brand-orange"></i>
+          <span>Bouldering Crew</span>
+        </span>
+        <span class="text-zinc-700">•</span>
+        <span class="inline-flex items-center space-x-3">
+          <i data-lucide="target" class="w-5 h-5 text-brand-orange"></i>
+          <span>Basketball 3x3</span>
+        </span>
+        <span class="text-zinc-700">•</span>
+        <span class="inline-flex items-center space-x-3">
+          <i data-lucide="dumbbell" class="w-5 h-5 text-brand-orange"></i>
+          <span>Fitness Circuits</span>
+        </span>
+        <span class="text-zinc-700">•</span>
       </div>
     </div>
 
@@ -266,7 +240,6 @@
       <div class="w-full">
         
         <div class="max-w-4xl space-y-4">
-          <span class="text-xs sm:text-sm font-bold uppercase tracking-wider text-brand-orange">Why We Built UniSport</span>
           <h2 class="section-title font-display font-extrabold text-zinc-950 uppercase">
             Sports shouldn't be hard to organize.
           </h2>
@@ -279,7 +252,6 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16 sm:mt-20">
           
           <div class="bg-white p-8 sm:p-12 rounded-3xl border border-zinc-200/80 card-hover space-y-4">
-            <span class="text-xs font-bold text-brand-orange tracking-widest uppercase">Pillar 01</span>
             <h3 class="font-display font-bold text-2xl text-zinc-950">Ditch the Solo Inertia</h3>
             <p class="text-zinc-600 leading-relaxed text-sm sm:text-base">
               Moving to a new city or having friends with different study schedules shouldn't stop you from exercising. Find players on your level whenever you have an hour free.
@@ -287,7 +259,6 @@
           </div>
 
           <div class="bg-white p-8 sm:p-12 rounded-3xl border border-zinc-200/80 card-hover space-y-4">
-            <span class="text-xs font-bold text-brand-orange tracking-widest uppercase">Pillar 02</span>
             <h3 class="font-display font-bold text-2xl text-zinc-950">End Group Chat Chaos</h3>
             <p class="text-zinc-600 leading-relaxed text-sm sm:text-base">
               No more 100-person WhatsApp threads where plans fall apart. UniSport replaces back-and-forth texting with clear spot availability and instant sign-ups.
@@ -295,7 +266,6 @@
           </div>
 
           <div class="bg-white p-8 sm:p-12 rounded-3xl border border-zinc-200/80 card-hover space-y-4">
-            <span class="text-xs font-bold text-brand-orange tracking-widest uppercase">Pillar 03</span>
             <h3 class="font-display font-bold text-2xl text-zinc-950">Inclusive Skill Levels</h3>
             <p class="text-zinc-600 leading-relaxed text-sm sm:text-base">
               From casual first-time padel rallies to competitive 5v5 soccer leagues. Filter games by competitive vibe so everyone feels challenged and welcome.
@@ -313,7 +283,6 @@
         
         <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-16 sm:mb-20">
           <div class="space-y-4 max-w-3xl">
-            <span class="text-xs sm:text-sm font-bold uppercase tracking-wider text-brand-orange">Platform Capabilities</span>
             <h2 class="section-title font-display font-extrabold text-zinc-950 uppercase">
               Everything built for seamless play.
             </h2>
@@ -323,16 +292,15 @@
           </p>
         </div>
 
-        <!-- Scaled Bento Grid (Adapts to all screen widths, from mobile to 34" ultrawide) -->
+        <!-- Scaled Bento Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 2xl:gap-8">
           
           <!-- Bento 1: Large Wide Banner -->
           <div class="lg:col-span-8 bg-white p-8 sm:p-12 rounded-3xl border border-zinc-200 card-hover flex flex-col justify-between space-y-8">
             <div class="space-y-4 max-w-2xl">
-              <span class="px-3 py-1 rounded-full bg-orange-100 text-brand-orange text-xs font-bold uppercase">Proximity First</span>
               <h3 class="font-display font-bold text-3xl sm:text-4xl text-zinc-950">Hyper-Local Campus Map & Activity Radius</h3>
               <p class="text-base text-zinc-600 leading-relaxed">
-                Whether you’re wrapping up class at Rachelsmolen, studying at the TU/e library, or relaxing in Strijp-S, UniSport automatically highlights games happening within your preferred distance.
+                Whether you’re wrapping up class, studying at the library, or relaxing in the city, UniSport automatically highlights games happening within your preferred distance.
               </p>
             </div>
 
@@ -342,7 +310,7 @@
                 <span class="text-zinc-500 font-medium">Customizable Radius</span>
               </div>
               <div class="p-4 rounded-2xl bg-zinc-50 border border-zinc-200">
-                <span class="text-zinc-900 block text-lg font-display">Instant Live Feed</span>
+                <span class="text-zinc-900 block text-lg font-display">Instant Feed</span>
                 <span class="text-zinc-500 font-medium">Today & Upcoming</span>
               </div>
               <div class="p-4 rounded-2xl bg-zinc-50 border border-zinc-200">
@@ -355,7 +323,6 @@
           <!-- Bento 2: Fast Match Creation -->
           <div class="lg:col-span-4 bg-zinc-950 text-white p-8 sm:p-12 rounded-3xl card-hover flex flex-col justify-between space-y-8">
             <div class="space-y-4">
-              <span class="px-3 py-1 rounded-full bg-zinc-800 text-brand-orange text-xs font-bold uppercase">Speed</span>
               <h3 class="font-display font-bold text-3xl text-white">30-Second Match Creation</h3>
               <p class="text-sm sm:text-base text-zinc-400 leading-relaxed">
                 Need a 4th player for padel in an hour? Post a game with 3 taps. Push alerts notify matching athletes in the area immediately.
@@ -370,7 +337,6 @@
           <!-- Bento 3: Verified Student Access -->
           <div class="lg:col-span-6 bg-white p-8 sm:p-12 rounded-3xl border border-zinc-200 card-hover flex flex-col justify-between space-y-6">
             <div class="space-y-3">
-              <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold uppercase">Trust & Safety</span>
               <h3 class="font-display font-bold text-2xl sm:text-3xl text-zinc-950">Verified Student Profiles</h3>
               <p class="text-sm sm:text-base text-zinc-600 leading-relaxed">
                 Connect safely. See your peers' preferred sports, general skill ratings, and campus affiliation before heading to the court.
@@ -386,7 +352,6 @@
           <!-- Bento 4: Live Rosters -->
           <div class="lg:col-span-6 bg-white p-8 sm:p-12 rounded-3xl border border-zinc-200 card-hover flex flex-col justify-between space-y-6">
             <div class="space-y-3">
-              <span class="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-bold uppercase">Coordination</span>
               <h3 class="font-display font-bold text-2xl sm:text-3xl text-zinc-950">Live Spot Confirmation</h3>
               <p class="text-sm sm:text-base text-zinc-600 leading-relaxed">
                 Every game has an exact capacity limit. When a student hits "Join", their spot is secured instantly without asking questions.
@@ -403,12 +368,11 @@
       </div>
     </section>
 
-    <!-- ================= SECTION: POPULAR SPORTS (Interactive Tabs & Full Width) ================= -->
+    <!-- ================= SECTION: POPULAR SPORTS (SVG Icon Badges) ================= -->
     <section id="sports" class="w-full px-6 sm:px-10 lg:px-16 2xl:px-24 py-24 sm:py-32 bg-[#F4F2EC] border-b border-zinc-200">
       <div class="w-full">
         
         <div class="max-w-3xl space-y-4 mb-16">
-          <span class="text-xs sm:text-sm font-bold uppercase tracking-wider text-brand-orange">Explore Sports</span>
           <h2 class="section-title font-display font-extrabold text-zinc-950 uppercase">
             Whatever you play, someone's in.
           </h2>
@@ -417,77 +381,101 @@
           </p>
         </div>
 
-        <!-- Sport Cards Grid (Full-bleed responsive cards) -->
+        <!-- Sport Cards Grid with Clean Lucide SVG Icons -->
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6 gap-4 sm:gap-6">
           
           <div class="bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3">
-            <span class="text-3xl">⚽</span>
+            <div class="w-10 h-10 rounded-2xl bg-orange-50 text-brand-orange flex items-center justify-center">
+              <i data-lucide="circle-dot" class="w-5 h-5"></i>
+            </div>
             <h4 class="font-display font-bold text-lg text-zinc-950">Football 5v5</h4>
             <p class="text-xs text-zinc-500">Pick-up turf matches, astro cages, and casual Sunday matches.</p>
           </div>
 
           <div class="bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3">
-            <span class="text-3xl">🎾</span>
+            <div class="w-10 h-10 rounded-2xl bg-orange-50 text-brand-orange flex items-center justify-center">
+              <i data-lucide="crosshair" class="w-5 h-5"></i>
+            </div>
             <h4 class="font-display font-bold text-lg text-zinc-950">Padel Doubles</h4>
             <p class="text-xs text-zinc-500">Fast 4-player doubles matches. Find your 4th partner in minutes.</p>
           </div>
 
           <div class="bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3">
-            <span class="text-3xl">🏃</span>
+            <div class="w-10 h-10 rounded-2xl bg-orange-50 text-brand-orange flex items-center justify-center">
+              <i data-lucide="footprints" class="w-5 h-5"></i>
+            </div>
             <h4 class="font-display font-bold text-lg text-zinc-950">Running Clubs</h4>
             <p class="text-xs text-zinc-500">Group pacing, sunrise 5Ks, and trail training loops.</p>
           </div>
 
           <div class="bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3">
-            <span class="text-3xl">🧗</span>
+            <div class="w-10 h-10 rounded-2xl bg-orange-50 text-brand-orange flex items-center justify-center">
+              <i data-lucide="mountain" class="w-5 h-5"></i>
+            </div>
             <h4 class="font-display font-bold text-lg text-zinc-950">Bouldering</h4>
             <p class="text-xs text-zinc-500">Indoor climbing sessions, beta solving, and social sessions.</p>
           </div>
 
           <div class="bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3">
-            <span class="text-3xl">🏀</span>
+            <div class="w-10 h-10 rounded-2xl bg-orange-50 text-brand-orange flex items-center justify-center">
+              <i data-lucide="target" class="w-5 h-5"></i>
+            </div>
             <h4 class="font-display font-bold text-lg text-zinc-950">Basketball 3x3</h4>
             <p class="text-xs text-zinc-500">Half-court games, street ball courts, and indoor gym runs.</p>
           </div>
 
           <div class="bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3">
-            <span class="text-3xl">🏋️</span>
+            <div class="w-10 h-10 rounded-2xl bg-orange-50 text-brand-orange flex items-center justify-center">
+              <i data-lucide="dumbbell" class="w-5 h-5"></i>
+            </div>
             <h4 class="font-display font-bold text-lg text-zinc-950">Gym & Fitness</h4>
             <p class="text-xs text-zinc-500">Workout partners, spotters, and calisthenics circuits.</p>
           </div>
 
           <div class="bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3">
-            <span class="text-3xl">🏐</span>
+            <div class="w-10 h-10 rounded-2xl bg-orange-50 text-brand-orange flex items-center justify-center">
+              <i data-lucide="activity" class="w-5 h-5"></i>
+            </div>
             <h4 class="font-display font-bold text-lg text-zinc-950">Volleyball</h4>
             <p class="text-xs text-zinc-500">Beach volleyball, sand pits, and indoor campus games.</p>
           </div>
 
           <div class="bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3">
-            <span class="text-3xl">🏸</span>
+            <div class="w-10 h-10 rounded-2xl bg-orange-50 text-brand-orange flex items-center justify-center">
+              <i data-lucide="disc" class="w-5 h-5"></i>
+            </div>
             <h4 class="font-display font-bold text-lg text-zinc-950">Badminton</h4>
             <p class="text-xs text-zinc-500">Indoor singles and doubles across student sports halls.</p>
           </div>
 
           <div class="bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3">
-            <span class="text-3xl">🚴</span>
+            <div class="w-10 h-10 rounded-2xl bg-orange-50 text-brand-orange flex items-center justify-center">
+              <i data-lucide="bike" class="w-5 h-5"></i>
+            </div>
             <h4 class="font-display font-bold text-lg text-zinc-950">Cycling</h4>
             <p class="text-xs text-zinc-500">Road group rides, gravel loops, and leisure weekend tours.</p>
           </div>
 
           <div class="bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3">
-            <span class="text-3xl">🎾</span>
+            <div class="w-10 h-10 rounded-2xl bg-orange-50 text-brand-orange flex items-center justify-center">
+              <i data-lucide="shield" class="w-5 h-5"></i>
+            </div>
             <h4 class="font-display font-bold text-lg text-zinc-950">Tennis</h4>
             <p class="text-xs text-zinc-500">Clay and hard-court singles sparring or casual sets.</p>
           </div>
 
           <div class="bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3">
-            <span class="text-3xl">🧘</span>
+            <div class="w-10 h-10 rounded-2xl bg-orange-50 text-brand-orange flex items-center justify-center">
+              <i data-lucide="sparkles" class="w-5 h-5"></i>
+            </div>
             <h4 class="font-display font-bold text-lg text-zinc-950">Yoga / Core</h4>
             <p class="text-xs text-zinc-500">Park yoga sessions, mobility routines, and recovery groups.</p>
           </div>
 
           <div class="bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3">
-            <span class="text-3xl">🏓</span>
+            <div class="w-10 h-10 rounded-2xl bg-orange-50 text-brand-orange flex items-center justify-center">
+              <i data-lucide="award" class="w-5 h-5"></i>
+            </div>
             <h4 class="font-display font-bold text-lg text-zinc-950">Table Tennis</h4>
             <p class="text-xs text-zinc-500">Campus table tournaments and casual after-class ping pong.</p>
           </div>
@@ -502,7 +490,6 @@
       <div class="max-w-4xl mx-auto space-y-12">
         
         <div class="text-center space-y-3">
-          <span class="text-xs sm:text-sm font-bold uppercase tracking-wider text-brand-orange">Common Inquiries</span>
           <h2 class="section-title font-display font-extrabold text-zinc-950 uppercase">
             Frequently Asked Questions
           </h2>
@@ -526,7 +513,7 @@
               <span class="text-brand-orange text-2xl font-normal faq-icon">+</span>
             </div>
             <p class="hidden pt-4 text-sm sm:text-base text-zinc-600 leading-relaxed faq-answer">
-              Any verified student can post a match in under 30 seconds by picking a sport, choosing a location in Eindhoven, selecting the time, and setting maximum participants. Nearby students will see the match in their feed and can claim open spots.
+              Any verified student can post a match in under 30 seconds by picking a sport, choosing a location, selecting the time, and setting maximum participants. Nearby students will see the match in their feed and can claim open spots.
             </p>
           </div>
 
@@ -555,31 +542,23 @@
       </div>
     </section>
 
-    <!-- ================= HIGH-IMPACT CONTRAST CLIMAX BANNER (Deep Obsidian) ================= -->
+    <!-- ================= HIGH-IMPACT CONTRAST CLIMAX BANNER ================= -->
     <section class="w-full px-6 sm:px-10 lg:px-16 2xl:px-24 py-24 sm:py-36 bg-zinc-950 text-white text-center">
       <div class="max-w-4xl mx-auto space-y-8">
         
-        <span class="inline-block px-4 py-1.5 rounded-full bg-zinc-900 border border-zinc-800 text-brand-orange text-xs sm:text-sm font-bold uppercase tracking-wider">
-          Get Started Today
-        </span>
-
         <h2 class="hero-title font-display font-extrabold text-white uppercase">
           Your next game is<br />
           <span class="text-brand-orange">waiting for you.</span>
         </h2>
 
         <p class="text-lg sm:text-xl text-zinc-400 max-w-2xl mx-auto font-normal leading-relaxed">
-          Join thousands of university students in Eindhoven. Experience the easiest way to organize and play sports.
+          Join university students across the city. Experience the easiest way to organize and play sports.
         </p>
 
-        <div class="pt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <a href="./app/" class="w-full sm:w-auto inline-flex items-center justify-center space-x-3 bg-brand-orange hover:bg-brand-orange-hover text-white font-bold text-base py-5 px-10 rounded-full shadow-2xl transition-all transform hover:-translate-y-0.5">
+        <div class="pt-6 flex items-center justify-center">
+          <a href="./app/" class="inline-flex items-center space-x-3 bg-brand-orange hover:bg-brand-orange-hover text-white font-bold text-base py-5 px-12 rounded-full shadow-2xl transition-all transform hover:-translate-y-0.5">
             <span>Launch UniSport Web App</span>
             <i data-lucide="arrow-right" class="w-5 h-5"></i>
-          </a>
-
-          <a href="../survey/" class="w-full sm:w-auto inline-flex items-center justify-center space-x-2 bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-base py-5 px-10 rounded-full border border-zinc-800 transition-all">
-            <span>Take Community Survey</span>
           </a>
         </div>
 
@@ -604,14 +583,13 @@
           <a href="#why" class="hover:text-zinc-950 transition">Why UniSport</a>
           <a href="#features" class="hover:text-zinc-950 transition">Features</a>
           <a href="#sports" class="hover:text-zinc-950 transition">Sports</a>
-          <a href="../survey/" class="hover:text-zinc-950 transition">Community Survey</a>
           <a href="./app/" class="hover:text-brand-orange transition">Web App</a>
         </div>
       </div>
 
       <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-400">
         <div>
-          &copy; 2026 UniSport Technologies. All rights reserved.
+          &copy; 2026 UniSport Technologies Inc. All rights reserved.
         </div>
         <div class="flex items-center space-x-6">
           <a href="#" class="hover:text-zinc-600 transition">Privacy Policy</a>
