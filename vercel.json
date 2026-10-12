@@ -5,9 +5,12 @@
     { "source": "/", "destination": "/index.html" },
     { "source": "/challenge2", "destination": "/index.html" },
     { "source": "/challenge2/survey", "destination": "/survey/index.html" },
-    { "source": "/challenge2/unisportapp", "destination": "/app/index.html" },
     { "source": "/survey", "destination": "/survey/index.html" },
-    { "source": "/unisportapp", "destination": "/app/index.html" },
-    { "source": "/app", "destination": "/app/index.html" }
+    { "source": "/unisport", "destination": "/UniSport/index.html" },
+    { "source": "/unisport/app", "destination": "/UniSport/app/index.html" },
+    { "source": "/challenge2/unisport", "destination": "/UniSport/index.html" },
+    { "source": "/challenge2/unisport/app", "destination": "/UniSport/app/index.html" },
+    { "source": "/app", "destination": "/UniSport/app/index.html" },
+    { "source": "/unisportapp", "destination": "/UniSport/app/index.html" }
   ]
 }
