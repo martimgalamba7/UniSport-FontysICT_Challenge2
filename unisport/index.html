@@ -1,21 +1,20 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth bg-[#08080A] text-zinc-100 antialiased selection:bg-[#FF4D00] selection:text-black">
+<html lang="en" class="scroll-smooth bg-[#FAFAF8] text-zinc-900 antialiased selection:bg-[#FF4D00] selection:text-white">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>UniSport • Student Sports Network Eindhoven [Fontys & TU/e]</title>
+  <title>UniSport • The Student Sports Community</title>
   
   <!-- Meta & OpenGraph -->
-  <meta name="description" content="UniSport is the hyper-localized sports community platform engineered for higher education students across Eindhoven. Spontaneous match creation, campus radar, real-time rosters." />
-  <meta name="author" content="Martim Ferreira Galamba" />
+  <meta name="description" content="UniSport connects university students for spontaneous pick-up games, court bookings, and athletic partners. Find your match in 30 seconds." />
   
   <link rel="icon" type="image/png" href="./assets/logoUniSport.png" />
   <link rel="apple-touch-icon" href="./assets/logoUniSport.png" />
 
-  <!-- Google Fonts: Syne (Ultra Display) + Plus Jakarta Sans (Editorial Body) + JetBrains Mono (Technical HUD) -->
+  <!-- Google Fonts: Plus Jakarta Sans (Modern Geometric Startup Sans) + Syne (Display Punch) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -24,24 +23,23 @@
       theme: {
         extend: {
           fontFamily: {
-            display: ['Syne', 'sans-serif'],
-            sans: ['Plus Jakarta Sans', '-apple-system', 'sans-serif'],
-            mono: ['JetBrains Mono', 'monospace'],
+            display: ['Syne', 'Plus Jakarta Sans', 'sans-serif'],
+            sans: ['Plus Jakarta Sans', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
           },
           colors: {
             brand: {
-              blaze: '#FF4D00',
-              'blaze-hover': '#FF651F',
-              carbon: '#09090B',
-              surface: '#111115',
-              panel: '#16161C',
-              volt: '#D4FF00',
-              electric: '#3B82F6',
+              orange: '#FF4D00',
+              'orange-hover': '#EA4500',
+              'orange-light': '#FFF1EB',
+              cream: '#FAFAF8',
+              warm: '#F4F2EC',
+              card: '#FFFFFF',
+              dark: '#111113',
             }
           },
-          letterSpacing: {
-            tighter: '-0.04em',
-            widest2: '0.2em',
+          screens: {
+            '3xl': '1920px',
+            '4xl': '2560px',
           }
         }
       }
@@ -52,19 +50,20 @@
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <style>
-    /* Noise Background Overlay */
-    .noise-bg {
-      background-image: radial-gradient(rgba(255, 77, 0, 0.08) 1px, transparent 0), radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 0);
-      background-size: 32px 32px;
-      background-position: 0 0, 16px 16px;
+    /* Fluid Responsive Typography */
+    .hero-title {
+      font-size: clamp(2.75rem, 6.5vw + 1rem, 7.5rem);
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+    }
+    
+    .section-title {
+      font-size: clamp(2.25rem, 4.5vw + 0.5rem, 5.5rem);
+      line-height: 1.02;
+      letter-spacing: -0.03em;
     }
 
-    /* Ambient Spotlight */
-    .glow-spotlight {
-      background: radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 30%), rgba(255, 77, 0, 0.12), transparent 40%);
-    }
-
-    /* Infinite Marquee Animation */
+    /* Infinite Marquee */
     @keyframes marquee {
       0% { transform: translateX(0%); }
       100% { transform: translateX(-50%); }
@@ -72,364 +71,235 @@
     .animate-marquee {
       display: flex;
       width: 200%;
-      animation: marquee 22s linear infinite;
+      animation: marquee 28s linear infinite;
     }
     .animate-marquee:hover {
       animation-play-state: paused;
     }
 
-    /* Subtle Border Glows */
-    .tech-border {
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      position: relative;
+    /* Smooth Startup Shadow & Transitions */
+    .card-hover {
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .tech-border::before {
-      content: '';
-      position: absolute;
-      top: -1px; left: -1px;
-      width: 6px; height: 6px;
-      border-top: 2px solid #FF4D00;
-      border-left: 2px solid #FF4D00;
-    }
-    .tech-border::after {
-      content: '';
-      position: absolute;
-      bottom: -1px; right: -1px;
-      width: 6px; height: 6px;
-      border-bottom: 2px solid #FF4D00;
-      border-right: 2px solid #FF4D00;
-    }
-
-    /* Crosshair marker */
-    .crosshair-corner {
-      position: relative;
-    }
-    .crosshair-corner::before {
-      content: "+";
-      position: absolute;
-      top: -8px; left: -6px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      color: rgba(255, 77, 0, 0.6);
-      pointer-events: none;
-    }
-
-    /* Button Magnetic feel */
-    .btn-athletic {
-      position: relative;
-      overflow: hidden;
-      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .btn-athletic:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 30px -5px rgba(255, 77, 0, 0.4);
+    .card-hover:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.07);
     }
 
     /* Custom Scrollbar */
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: #08080A; }
-    ::-webkit-scrollbar-thumb { background: #27272A; border-radius: 9999px; }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #FAFAF8; }
+    ::-webkit-scrollbar-thumb { background: #D4D4D8; border-radius: 9999px; }
     ::-webkit-scrollbar-thumb:hover { background: #FF4D00; }
   </style>
 </head>
 
-<body class="bg-[#08080A] text-zinc-100 font-sans selection:bg-[#FF4D00] selection:text-black noise-bg min-h-screen flex flex-col justify-between">
+<body class="bg-[#FAFAF8] text-zinc-900 font-sans min-h-screen flex flex-col justify-between selection:bg-brand-orange selection:text-white">
 
-  <!-- ================= TOP HUD HEADER (Industrial & Studio Minimal) ================= -->
-  <header class="sticky top-0 z-50 bg-[#08080A]/90 backdrop-blur-xl border-b border-zinc-800/80">
-    <div class="max-w-[1400px] mx-auto px-6 sm:px-10 h-20 flex items-center justify-between">
+  <!-- ================= TOP NAVIGATION BAR (Full-Bleed Ultra-Wide Startup Header) ================= -->
+  <header class="sticky top-0 z-50 bg-[#FAFAF8]/90 backdrop-blur-xl border-b border-zinc-200/80 transition-all">
+    <div class="w-full px-6 sm:px-10 lg:px-16 2xl:px-24 h-20 flex items-center justify-between">
       
-      <!-- Left: Brand Emblem + Telemetry Coordinates -->
-      <div class="flex items-center space-x-6">
-        <a href="../" class="group flex items-center space-x-3.5 focus:outline-none" title="Return to Challenge 2 Hub">
-          <div class="relative">
-            <img src="./assets/logoUniSport.png" alt="UniSport" class="h-9 w-auto object-contain transition-transform duration-300 group-hover:scale-105" onerror="this.onerror=null; this.src='../assets/logoUniSport.png';" />
-            <span class="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-brand-blaze animate-ping"></span>
-            <span class="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-brand-blaze"></span>
-          </div>
-          <div class="flex flex-col">
-            <span class="font-display font-extrabold text-lg tracking-tight text-white leading-none">UNISPORT</span>
-            <span class="font-mono text-[9px] uppercase tracking-widest text-zinc-500 mt-0.5">Eindhoven Campus Hub</span>
-          </div>
-        </a>
+      <!-- Brand Logo & Name -->
+      <a href="#" class="flex items-center space-x-3.5 group focus:outline-none">
+        <img src="./assets/logoUniSport.png" alt="UniSport" class="h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105" onerror="this.onerror=null; this.src='../assets/logoUniSport.png';" />
+        <span class="font-display font-extrabold text-2xl tracking-tight text-zinc-950">UniSport</span>
+      </a>
 
-        <!-- Geo Telemetry Badge (Desktop) -->
-        <div class="hidden lg:flex items-center space-x-2 text-zinc-600 font-mono text-[11px] border-l border-zinc-800/90 pl-6">
-          <span class="text-zinc-400">LOC:</span>
-          <span class="text-zinc-200">51°26' N • 05°29' E</span>
-          <span class="text-zinc-600">|</span>
-          <span class="text-zinc-400">EHV</span>
-        </div>
-      </div>
+      <!-- Desktop Navigation Links -->
+      <nav class="hidden md:flex items-center space-x-8 lg:space-x-12 text-sm font-semibold text-zinc-600">
+        <a href="#why" class="hover:text-zinc-950 transition-colors">Why UniSport</a>
+        <a href="#features" class="hover:text-zinc-950 transition-colors">Features</a>
+        <a href="#sports" class="hover:text-zinc-950 transition-colors">Sports</a>
+        <a href="#community" class="hover:text-zinc-950 transition-colors">Community</a>
+        <a href="#faq" class="hover:text-zinc-950 transition-colors">FAQ</a>
+      </nav>
 
-      <!-- Center: Live CET Clock & System Status Indicator -->
-      <div class="hidden md:flex items-center space-x-3 font-mono text-xs px-3.5 py-1.5 rounded-full bg-zinc-900/80 border border-zinc-800">
-        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-        <span class="text-zinc-400">CET:</span>
-        <span id="live-time-ticker" class="text-zinc-200 font-semibold">16:55:00</span>
-        <span class="text-zinc-600">•</span>
-        <span class="text-zinc-400">PITCHES ACTIVE</span>
-      </div>
-
-      <!-- Right: Action HUD Triggers -->
-      <div class="flex items-center space-x-3 sm:space-x-5">
-        <!-- Survey Trigger -->
-        <a href="../survey/" class="hidden sm:inline-flex items-center space-x-2 font-mono text-xs text-zinc-300 hover:text-white px-4 py-2 rounded-full border border-zinc-700/80 hover:border-zinc-500 bg-zinc-900/40 transition">
-          <span class="w-1.5 h-1.5 rounded-full bg-brand-blaze"></span>
-          <span>RESEARCH SURVEY</span>
+      <!-- Action Buttons -->
+      <div class="flex items-center space-x-3 sm:space-x-4">
+        <!-- Community Survey Link -->
+        <a href="../survey/" class="hidden sm:inline-flex items-center space-x-2 text-xs lg:text-sm font-bold text-zinc-700 hover:text-zinc-950 py-2.5 px-4 rounded-full border border-zinc-200 hover:border-zinc-300 bg-white shadow-xs transition">
+          <i data-lucide="sparkles" class="w-4 h-4 text-brand-orange"></i>
+          <span>Early Survey</span>
         </a>
 
         <!-- Launch Web App CTA -->
-        <a href="./app/" class="btn-athletic inline-flex items-center space-x-2.5 bg-brand-blaze hover:bg-brand-blaze-hover text-white font-mono text-xs sm:text-sm font-bold uppercase tracking-wider px-5 sm:px-6 py-2.5 rounded-full shadow-lg transition">
-          <span>ENTER APP</span>
-          <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+        <a href="./app/" class="inline-flex items-center space-x-2 bg-zinc-950 hover:bg-zinc-800 text-white text-xs lg:text-sm font-bold py-2.5 px-6 rounded-full shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5">
+          <span>Open App</span>
+          <i data-lucide="arrow-right" class="w-4 h-4"></i>
         </a>
       </div>
 
     </div>
   </header>
 
-  <main class="flex-grow">
-    
-    <!-- ================= HERO SECTION (Oversized Athletic Kineticism) ================= -->
-    <section class="relative pt-12 sm:pt-20 pb-20 sm:pb-32 overflow-hidden border-b border-zinc-800/80">
-      
-      <!-- Top Section Metadata Line -->
-      <div class="max-w-[1400px] mx-auto px-6 sm:px-10 mb-8 sm:mb-12">
-        <div class="flex flex-wrap items-center justify-between gap-4 font-mono text-xs text-zinc-500 pb-4 border-b border-zinc-800/50">
-          <div class="flex items-center space-x-3">
-            <span class="text-brand-blaze font-bold">[PROJECT 02]</span>
-            <span>HBO-ICT SEMESTER 1 // FONTYS UNIVERSITY OF APPLIED SCIENCES</span>
-          </div>
-          <div class="flex items-center space-x-4">
-            <span>RACHELSMOLEN • TU/E • SSC • STRIJP-S</span>
-            <span class="text-zinc-700">//</span>
-            <span class="text-zinc-300">EST. 2026</span>
-          </div>
-        </div>
-      </div>
+  <!-- ================= MAIN CONTENT (Ultra-Wide Full-Bleed Scaling) ================= -->
+  <main class="flex-grow w-full">
 
-      <div class="max-w-[1400px] mx-auto px-6 sm:px-10">
+    <!-- ================= HERO SECTION (Full Viewport Scaled) ================= -->
+    <section class="w-full px-6 sm:px-10 lg:px-16 2xl:px-24 pt-16 sm:pt-24 pb-20 lg:pb-32 border-b border-zinc-200/80">
+      <div class="w-full">
         
-        <!-- Brutalist Massive Title -->
-        <div class="space-y-3 sm:space-y-4">
-          <div class="inline-block px-3 py-1 bg-zinc-900 border border-zinc-800 font-mono text-[11px] uppercase tracking-widest text-brand-blaze">
-            ATHLETIC COLLECTIVE ARCHITECTURE
-          </div>
-
-          <h1 class="font-display font-extrabold text-5xl sm:text-7xl md:text-8xl lg:text-9xl tracking-tighter text-white leading-[0.92] uppercase">
-            BREAK THE<br />
-            <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-blaze via-orange-400 to-amber-300">SOLO BARRIER.</span><br />
-            PLAY SPONTANEOUS.
-          </h1>
+        <!-- Startup Tagline Pill -->
+        <div class="inline-flex items-center space-x-2.5 px-4 py-2 rounded-full bg-brand-orange-light text-brand-orange text-xs sm:text-sm font-bold mb-8">
+          <span class="w-2 h-2 rounded-full bg-brand-orange animate-pulse"></span>
+          <span>The Student Sports Network • Eindhoven</span>
         </div>
 
-        <!-- Editorial Pitch Grid (Subhead + Athlete Telemetry Pass) -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mt-12 sm:mt-16 items-start">
-          
-          <!-- Manifesto Lead -->
-          <div class="lg:col-span-7 space-y-6">
-            <p class="text-lg sm:text-2xl text-zinc-300 font-light leading-relaxed max-w-2xl">
-              Sports shouldn't dissolve in disorganized 200-message WhatsApp threads. UniSport is Eindhoven’s hyper-local sports radar connecting Fontys and TU/e students into pick-up matches in under 30 seconds.
+        <!-- Oversized Fluid Hero Headline -->
+        <div class="max-w-[1900px] space-y-6">
+          <h1 class="hero-title font-display font-extrabold text-zinc-950 uppercase">
+            Sports happen together.<br />
+            <span class="text-brand-orange">Find your match in 30 seconds.</span>
+          </h1>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 pt-4 items-end">
+            <p class="lg:col-span-8 text-lg sm:text-2xl text-zinc-600 font-normal leading-relaxed max-w-3xl">
+              Break the solo workout barrier. Leave chaotic 100-message group chats behind. Discover spontaneous pick-up games, court bookings, and running partners across your campus.
             </p>
 
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-4">
-              <a href="./app/" class="btn-athletic inline-flex items-center justify-center space-x-3 bg-white hover:bg-zinc-200 text-black font-display font-extrabold text-base uppercase px-8 py-4 tracking-tight rounded-xl transition">
-                <span>LAUNCH WEB APP</span>
+            <div class="lg:col-span-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+              <a href="./app/" class="w-full sm:w-auto inline-flex items-center justify-center space-x-3 bg-brand-orange hover:bg-brand-orange-hover text-white font-bold text-base py-4 px-8 rounded-full shadow-lg transition-all transform hover:-translate-y-0.5">
+                <span>Start Playing</span>
                 <i data-lucide="arrow-right" class="w-5 h-5"></i>
               </a>
 
-              <a href="../survey/" class="inline-flex items-center justify-center space-x-2 font-mono text-xs uppercase font-semibold text-zinc-300 hover:text-white px-7 py-4 rounded-xl border border-zinc-800 bg-zinc-900/60 hover:bg-zinc-800 transition">
-                <i data-lucide="clipboard-list" class="w-4 h-4 text-brand-blaze"></i>
-                <span>PARTICIPATE IN SURVEY</span>
+              <a href="../survey/" class="w-full sm:w-auto inline-flex items-center justify-center space-x-2 bg-white hover:bg-zinc-100 text-zinc-900 font-bold text-base py-4 px-8 rounded-full border border-zinc-300 transition-all">
+                <span>Join Survey</span>
               </a>
             </div>
-
-            <!-- Key Specs HUD -->
-            <div class="grid grid-cols-3 gap-6 pt-8 border-t border-zinc-800/70 font-mono text-xs">
-              <div>
-                <span class="text-zinc-500 block uppercase">LATENCY</span>
-                <span class="text-lg font-bold text-white">&lt; 30 SEC</span>
-                <span class="text-[10px] text-zinc-500 block">Host to Broadcast</span>
-              </div>
-              <div>
-                <span class="text-zinc-500 block uppercase">SYNC ENGINE</span>
-                <span class="text-lg font-bold text-brand-blaze">FIRESTORE</span>
-                <span class="text-[10px] text-zinc-500 block">0ms Client Jitter</span>
-              </div>
-              <div>
-                <span class="text-zinc-500 block uppercase">RADIUS</span>
-                <span class="text-lg font-bold text-white">5.0 KM</span>
-                <span class="text-[10px] text-zinc-500 block">Eindhoven Core</span>
-              </div>
-            </div>
           </div>
+        </div>
 
-          <!-- Right: Interactive Tactical Athlete Card (Telemetric Vibe) -->
-          <div class="lg:col-span-5">
-            <div class="tech-border bg-zinc-900/80 p-6 sm:p-7 backdrop-blur-md space-y-6">
-              
-              <!-- Card Top Header -->
-              <div class="flex items-center justify-between pb-4 border-b border-zinc-800 font-mono text-xs">
-                <div class="flex items-center space-x-2">
-                  <span class="w-2.5 h-2.5 rounded-full bg-brand-blaze"></span>
-                  <span class="text-white font-bold tracking-wider">LIVE ACTIVITY // 040</span>
-                </div>
-                <span class="text-zinc-500">ID: #EHV-9942</span>
-              </div>
-
-              <!-- Match Content -->
+        <!-- Ultra-Wide Interactive Startup Preview Grid -->
+        <div class="mt-16 sm:mt-24 w-full">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 2xl:gap-8">
+            
+            <!-- Hero Feature Card 1 -->
+            <div class="bg-white p-8 sm:p-10 rounded-3xl border border-zinc-200 card-hover flex flex-col justify-between min-h-[320px]">
               <div class="space-y-4">
-                <div class="flex items-start justify-between">
-                  <div>
-                    <span class="inline-block px-2 py-0.5 bg-brand-blaze/10 border border-brand-blaze/30 text-brand-blaze font-mono text-[10px] uppercase font-bold tracking-wider mb-2">
-                      PADEL DOUBLES
-                    </span>
-                    <h3 class="font-display font-bold text-xl sm:text-2xl text-white">
-                      Peakz Padel Eindhoven
-                    </h3>
-                    <p class="text-xs text-zinc-400 font-mono mt-1">
-                      Today • 18:30 CET • Court 03
-                    </p>
-                  </div>
-
-                  <div class="text-right">
-                    <span class="inline-block font-mono text-xs px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-bold">
-                      1 SPOT OPEN
-                    </span>
-                  </div>
+                <div class="w-12 h-12 rounded-2xl bg-orange-100 text-brand-orange flex items-center justify-center">
+                  <i data-lucide="zap" class="w-6 h-6"></i>
                 </div>
-
-                <p class="text-xs text-zinc-300 font-sans leading-relaxed border-l-2 border-brand-blaze pl-3">
-                  Intermediate set after lectures. Need 1 player to complete 4-player game. Split via Tikkie.
+                <h3 class="font-display font-bold text-2xl text-zinc-950">Host a Match in &lt;30s</h3>
+                <p class="text-sm sm:text-base text-zinc-600 leading-relaxed">
+                  Select your sport, pick your campus court or local park, set the spot limit, and publish. No cumbersome forms.
                 </p>
-
-                <!-- Live Slots Visualizer -->
-                <div class="space-y-2 pt-2">
-                  <div class="flex items-center justify-between font-mono text-[11px] text-zinc-400">
-                    <span>CONFIRMED ROSTER</span>
-                    <span class="text-white font-bold">3 / 4 ATHLETES</span>
-                  </div>
-
-                  <div class="grid grid-cols-4 gap-2">
-                    <div class="p-2 rounded bg-zinc-800/90 border border-zinc-700 text-center font-mono text-xs">
-                      <span class="text-brand-blaze font-bold block">MG</span>
-                      <span class="text-[9px] text-zinc-400">HOST</span>
-                    </div>
-                    <div class="p-2 rounded bg-zinc-800/90 border border-zinc-700 text-center font-mono text-xs">
-                      <span class="text-white font-bold block">LT</span>
-                      <span class="text-[9px] text-zinc-400">TU/e</span>
-                    </div>
-                    <div class="p-2 rounded bg-zinc-800/90 border border-zinc-700 text-center font-mono text-xs">
-                      <span class="text-white font-bold block">SA</span>
-                      <span class="text-[9px] text-zinc-400">FONTYS</span>
-                    </div>
-                    <div class="p-2 rounded border border-dashed border-brand-blaze/60 bg-brand-blaze/5 text-center font-mono text-xs flex flex-col items-center justify-center animate-pulse">
-                      <span class="text-brand-blaze font-bold block">+ YOU</span>
-                      <span class="text-[8px] text-brand-blaze uppercase">CLAIM</span>
-                    </div>
-                  </div>
-                </div>
-
               </div>
-
-              <!-- Card Action Button -->
-              <a href="./app/" class="w-full py-3.5 bg-white hover:bg-zinc-200 text-black font-display font-extrabold text-xs uppercase tracking-wider text-center block rounded transition">
-                CONFIRM SLOT ON WEB APP &rarr;
-              </a>
-
+              <div class="pt-6 border-t border-zinc-100 flex items-center justify-between text-xs font-bold text-zinc-500">
+                <span>Instant match broadcast</span>
+                <span class="text-brand-orange">&rarr;</span>
+              </div>
             </div>
-          </div>
 
+            <!-- Hero Feature Card 2 -->
+            <div class="bg-white p-8 sm:p-10 rounded-3xl border border-zinc-200 card-hover flex flex-col justify-between min-h-[320px]">
+              <div class="space-y-4">
+                <div class="w-12 h-12 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center">
+                  <i data-lucide="map-pin" class="w-6 h-6"></i>
+                </div>
+                <h3 class="font-display font-bold text-2xl text-zinc-950">Campus Proximity Radar</h3>
+                <p class="text-sm sm:text-base text-zinc-600 leading-relaxed">
+                  Discover student activities happening within walking or biking distance. Rachelsmolen, Student Sports Centre, Strijp-S, and more.
+                </p>
+              </div>
+              <div class="pt-6 border-t border-zinc-100 flex items-center justify-between text-xs font-bold text-zinc-500">
+                <span>Hyper-local campus feed</span>
+                <span class="text-blue-600">&rarr;</span>
+              </div>
+            </div>
+
+            <!-- Hero Feature Card 3 -->
+            <div class="bg-white p-8 sm:p-10 rounded-3xl border border-zinc-200 card-hover flex flex-col justify-between min-h-[320px]">
+              <div class="space-y-4">
+                <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                  <i data-lucide="users" class="w-6 h-6"></i>
+                </div>
+                <h3 class="font-display font-bold text-2xl text-zinc-950">Zero Overbooking</h3>
+                <p class="text-sm sm:text-base text-zinc-600 leading-relaxed">
+                  Real-time participant rosters guarantee headcounts. When a match fills, it locks. If someone cancels, the slot instantly opens up.
+                </p>
+              </div>
+              <div class="pt-6 border-t border-zinc-100 flex items-center justify-between text-xs font-bold text-zinc-500">
+                <span>Live spot management</span>
+                <span class="text-emerald-600">&rarr;</span>
+              </div>
+            </div>
+
+          </div>
         </div>
 
       </div>
-
     </section>
 
-    <!-- ================= HORIZONTAL MARQUEE TICKER (High-Octane Athletic Pulse) ================= -->
-    <div class="py-4 bg-brand-blaze text-black overflow-hidden font-display font-extrabold text-xl sm:text-2xl tracking-tight uppercase select-none border-y-2 border-black">
-      <div class="animate-marquee whitespace-nowrap flex space-x-8">
-        <span>⚽ FOOTBALL 5V5 RACHELSMOLEN</span>
-        <span>•</span>
-        <span>🎾 PADEL DOUBLES PEAKZ</span>
-        <span>•</span>
-        <span>🏃 RUNNING GENNEPER PARKEN</span>
-        <span>•</span>
-        <span>🧗 MONK BOULDERING STRIJP-S</span>
-        <span>•</span>
-        <span>🏀 BASKETBALL 3X3 SSC</span>
-        <span>•</span>
+    <!-- ================= FULL-WIDTH KINETIC MARQUEE ================= -->
+    <div class="w-full py-5 bg-zinc-950 text-white overflow-hidden font-display font-extrabold text-xl sm:text-2xl 2xl:text-3xl tracking-tight uppercase select-none">
+      <div class="animate-marquee whitespace-nowrap flex space-x-12">
+        <span>⚽ FOOTBALL 5V5</span>
+        <span class="text-brand-orange">•</span>
+        <span>🎾 PADEL DOUBLES</span>
+        <span class="text-brand-orange">•</span>
+        <span>🏃 SUNSET 5K RUN</span>
+        <span class="text-brand-orange">•</span>
+        <span>🧗 BOULDERING CREW</span>
+        <span class="text-brand-orange">•</span>
+        <span>🏀 BASKETBALL 3X3</span>
+        <span class="text-brand-orange">•</span>
         <span>🏋️ FITNESS CIRCUITS</span>
-        <span>•</span>
-        <span>⚡ 30 SECONDS TO HOST</span>
-        <span>•</span>
-        <span>⚽ FOOTBALL 5V5 RACHELSMOLEN</span>
-        <span>•</span>
-        <span>🎾 PADEL DOUBLES PEAKZ</span>
-        <span>•</span>
-        <span>🏃 RUNNING GENNEPER PARKEN</span>
-        <span>•</span>
-        <span>🧗 MONK BOULDERING STRIJP-S</span>
-        <span>•</span>
-        <span>🏀 BASKETBALL 3X3 SSC</span>
+        <span class="text-brand-orange">•</span>
+        <span>🏐 VOLLEYBALL SQUAD</span>
+        <span class="text-brand-orange">•</span>
+        <span>⚽ FOOTBALL 5V5</span>
+        <span class="text-brand-orange">•</span>
+        <span>🎾 PADEL DOUBLES</span>
+        <span class="text-brand-orange">•</span>
+        <span>🏃 SUNSET 5K RUN</span>
+        <span class="text-brand-orange">•</span>
+        <span>🧗 BOULDERING CREW</span>
+        <span class="text-brand-orange">•</span>
+        <span>🏀 BASKETBALL 3X3</span>
       </div>
     </div>
 
-    <!-- ================= SECTION 01: THE SYSTEM FRICTION (Brutalist Contrast) ================= -->
-    <section id="mission" class="py-24 sm:py-32 border-b border-zinc-800/80">
-      <div class="max-w-[1400px] mx-auto px-6 sm:px-10">
+    <!-- ================= SECTION: WHY UNISPORT (Warm Cream Full-Bleed Section) ================= -->
+    <section id="why" class="w-full px-6 sm:px-10 lg:px-16 2xl:px-24 py-24 sm:py-32 bg-[#F4F2EC] border-b border-zinc-200">
+      <div class="w-full">
         
-        <!-- Section Header -->
-        <div class="flex items-center space-x-3 font-mono text-xs text-brand-blaze mb-4">
-          <span>[01]</span>
-          <span>// SYSTEM DIAGNOSIS</span>
+        <div class="max-w-4xl space-y-4">
+          <span class="text-xs sm:text-sm font-bold uppercase tracking-wider text-brand-orange">Why We Built UniSport</span>
+          <h2 class="section-title font-display font-extrabold text-zinc-950 uppercase">
+            Sports shouldn't be hard to organize.
+          </h2>
+          <p class="text-lg sm:text-xl text-zinc-600 font-normal leading-relaxed">
+            University life is fast, unpredictable, and busy. Existing solutions either focus purely on solo GPS tracking or trap people in endless chat messages. UniSport bridges the gap.
+          </p>
         </div>
 
-        <h2 class="font-display font-extrabold text-4xl sm:text-6xl text-white tracking-tighter uppercase max-w-4xl leading-tight">
-          THE GAP BETWEEN WANTING TO PLAY AND ACTUALLY PLAYING.
-        </h2>
-
-        <!-- Three Asymmetric Columns -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
+        <!-- 3 Wide Startup Pillars -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16 sm:mt-20">
           
-          <!-- Box 1 -->
-          <div class="p-8 bg-zinc-900/40 border border-zinc-800 space-y-4 hover:border-zinc-700 transition">
-            <span class="font-mono text-xs text-zinc-500 font-bold">FAULT 01</span>
-            <h3 class="font-display font-bold text-2xl text-white uppercase">THE SOLO INERTIA</h3>
-            <p class="text-sm text-zinc-400 font-sans leading-relaxed">
-              Moving to Eindhoven as a new student breaks your existing sports network. Over 68% of surveyed students skip physical exercise simply because finding a teammate feels like a logistical hurdle.
+          <div class="bg-white p-8 sm:p-12 rounded-3xl border border-zinc-200/80 card-hover space-y-4">
+            <span class="text-xs font-bold text-brand-orange tracking-widest uppercase">Pillar 01</span>
+            <h3 class="font-display font-bold text-2xl text-zinc-950">Ditch the Solo Inertia</h3>
+            <p class="text-zinc-600 leading-relaxed text-sm sm:text-base">
+              Moving to a new city or having friends with different study schedules shouldn't stop you from exercising. Find players on your level whenever you have an hour free.
             </p>
-            <div class="pt-4 font-mono text-[11px] text-red-400 flex items-center space-x-1.5">
-              <span>✕</span>
-              <span>RESULT: INACTIVITY & ISOLATION</span>
-            </div>
           </div>
 
-          <!-- Box 2 -->
-          <div class="p-8 bg-zinc-900/40 border border-zinc-800 space-y-4 hover:border-zinc-700 transition">
-            <span class="font-mono text-xs text-zinc-500 font-bold">FAULT 02</span>
-            <h3 class="font-display font-bold text-2xl text-white uppercase">GROUP CHAT CHAOS</h3>
-            <p class="text-sm text-zinc-400 font-sans leading-relaxed">
-              WhatsApp and Discord are messaging protocols, not activity managers. In unstructured chats with 80+ members, plans dissolve into endless polls, schedule clashes, and last-minute ghosting.
+          <div class="bg-white p-8 sm:p-12 rounded-3xl border border-zinc-200/80 card-hover space-y-4">
+            <span class="text-xs font-bold text-brand-orange tracking-widest uppercase">Pillar 02</span>
+            <h3 class="font-display font-bold text-2xl text-zinc-950">End Group Chat Chaos</h3>
+            <p class="text-zinc-600 leading-relaxed text-sm sm:text-base">
+              No more 100-person WhatsApp threads where plans fall apart. UniSport replaces back-and-forth texting with clear spot availability and instant sign-ups.
             </p>
-            <div class="pt-4 font-mono text-[11px] text-red-400 flex items-center space-x-1.5">
-              <span>✕</span>
-              <span>RESULT: 200 MESSAGES, ZERO MATCHES</span>
-            </div>
           </div>
 
-          <!-- Box 3: UniSport Solution -->
-          <div class="p-8 bg-brand-blaze text-black space-y-4 shadow-xl">
-            <span class="font-mono text-xs font-bold uppercase text-black/70">SOLUTION // 03</span>
-            <h3 class="font-display font-extrabold text-2xl uppercase">THE UNISPORT PROTOCOL</h3>
-            <p class="text-sm text-black/90 font-sans font-medium leading-relaxed">
-              One central live map. Strict participant ceilings with instant roster locks. Broadcast a match in 30 seconds; let nearby students fill the spots in real time. No noise.
+          <div class="bg-white p-8 sm:p-12 rounded-3xl border border-zinc-200/80 card-hover space-y-4">
+            <span class="text-xs font-bold text-brand-orange tracking-widest uppercase">Pillar 03</span>
+            <h3 class="font-display font-bold text-2xl text-zinc-950">Inclusive Skill Levels</h3>
+            <p class="text-zinc-600 leading-relaxed text-sm sm:text-base">
+              From casual first-time padel rallies to competitive 5v5 soccer leagues. Filter games by competitive vibe so everyone feels challenged and welcome.
             </p>
-            <div class="pt-4 font-mono text-[11px] font-bold text-black flex items-center space-x-1.5">
-              <span>✓</span>
-              <span>RESULT: COURT BOOKED & PLAYED</span>
-            </div>
           </div>
 
         </div>
@@ -437,205 +307,189 @@
       </div>
     </section>
 
-    <!-- ================= SECTION 02: TACTICAL RADAR (Interactive Pitch & Spot Switcher) ================= -->
-    <section id="features" class="py-24 sm:py-32 border-b border-zinc-800/80 bg-zinc-950/60">
-      <div class="max-w-[1400px] mx-auto px-6 sm:px-10">
+    <!-- ================= SECTION: FEATURES (Full-Width Bento Grid) ================= -->
+    <section id="features" class="w-full px-6 sm:px-10 lg:px-16 2xl:px-24 py-24 sm:py-32 border-b border-zinc-200/80">
+      <div class="w-full">
         
-        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
-          <div>
-            <div class="flex items-center space-x-3 font-mono text-xs text-brand-blaze mb-3">
-              <span>[02]</span>
-              <span>// TACTICAL RADAR</span>
-            </div>
-            <h2 class="font-display font-extrabold text-4xl sm:text-6xl text-white tracking-tighter uppercase">
-              ENGINEERED PROTOCOLS.
+        <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-16 sm:mb-20">
+          <div class="space-y-4 max-w-3xl">
+            <span class="text-xs sm:text-sm font-bold uppercase tracking-wider text-brand-orange">Platform Capabilities</span>
+            <h2 class="section-title font-display font-extrabold text-zinc-950 uppercase">
+              Everything built for seamless play.
             </h2>
           </div>
-
-          <div class="font-mono text-xs text-zinc-500 max-w-sm">
-            Interactive simulated radar of student activities active across Eindhoven districts. Select sport to inspect parameters.
-          </div>
+          <p class="text-base sm:text-lg text-zinc-600 max-w-md">
+            Clean, mobile-first, and lightning-fast. Designed to get you onto the court with the least friction possible.
+          </p>
         </div>
 
-        <!-- Sport Tab Switcher -->
-        <div class="flex flex-wrap gap-2 pb-8 border-b border-zinc-800/80 font-mono text-xs" id="sport-tab-container">
-          <button type="button" class="sport-tab-btn px-5 py-2.5 bg-brand-blaze text-black font-bold uppercase tracking-wider rounded" data-sport="football">
-            ⚽ FOOTBALL [5v5]
-          </button>
-          <button type="button" class="sport-tab-btn px-5 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-bold uppercase tracking-wider rounded border border-zinc-800" data-sport="padel">
-            🎾 PADEL DOUBLES
-          </button>
-          <button type="button" class="sport-tab-btn px-5 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-bold uppercase tracking-wider rounded border border-zinc-800" data-sport="running">
-            🏃 CAMPUS RUN
-          </button>
-          <button type="button" class="sport-tab-btn px-5 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-bold uppercase tracking-wider rounded border border-zinc-800" data-sport="bouldering">
-            🧗 BOULDERING STRIJP-S
-          </button>
-        </div>
-
-        <!-- Dynamic Tactical Display Card -->
-        <div class="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+        <!-- Scaled Bento Grid (Adapts to all screen widths, from mobile to 34" ultrawide) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 2xl:gap-8">
           
-          <!-- Tactical Pitch Graphic Overlay -->
-          <div class="lg:col-span-8 bg-[#0D0D12] border border-zinc-800 p-8 sm:p-12 relative overflow-hidden flex flex-col justify-between min-h-[380px]">
-            
-            <!-- Pitch Top Specs -->
-            <div class="flex items-center justify-between font-mono text-xs text-zinc-500 relative z-10">
-              <span id="tactical-field-code">GEO-ZONE: RACHELSMOLEN-01</span>
-              <span id="tactical-field-surface">SURFACE: 3G ASTROTURF</span>
+          <!-- Bento 1: Large Wide Banner -->
+          <div class="lg:col-span-8 bg-white p-8 sm:p-12 rounded-3xl border border-zinc-200 card-hover flex flex-col justify-between space-y-8">
+            <div class="space-y-4 max-w-2xl">
+              <span class="px-3 py-1 rounded-full bg-orange-100 text-brand-orange text-xs font-bold uppercase">Proximity First</span>
+              <h3 class="font-display font-bold text-3xl sm:text-4xl text-zinc-950">Hyper-Local Campus Map & Activity Radius</h3>
+              <p class="text-base text-zinc-600 leading-relaxed">
+                Whether you’re wrapping up class at Rachelsmolen, studying at the TU/e library, or relaxing in Strijp-S, UniSport automatically highlights games happening within your preferred distance.
+              </p>
             </div>
 
-            <!-- Pitch SVG Wireframe Graphic Backdrop -->
-            <div class="my-8 flex items-center justify-center opacity-40 hover:opacity-70 transition-opacity">
-              <svg id="tactical-pitch-svg" class="w-full max-w-md h-44 stroke-brand-blaze fill-none" viewBox="0 0 400 200" stroke-width="1.5">
-                <!-- Football Pitch Default -->
-                <rect x="10" y="10" width="380" height="180" rx="4" stroke="currentColor"/>
-                <line x1="200" y1="10" x2="200" y2="190" stroke="currentColor"/>
-                <circle cx="200" cy="100" r="35" stroke="currentColor"/>
-                <rect x="10" y="55" width="55" height="90" stroke="currentColor"/>
-                <rect x="335" y="55" width="55" height="90" stroke="currentColor"/>
-              </svg>
-            </div>
-
-            <!-- Pitch Bottom Live Indicator -->
-            <div class="flex items-center justify-between font-mono text-xs relative z-10">
-              <div class="flex items-center space-x-2 text-emerald-400">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span id="tactical-status-label">MATCH READY // 9/10 PLAYERS</span>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-zinc-100 text-xs font-bold text-zinc-700">
+              <div class="p-4 rounded-2xl bg-zinc-50 border border-zinc-200">
+                <span class="text-brand-orange block text-lg font-display">1 – 10 km</span>
+                <span class="text-zinc-500 font-medium">Customizable Radius</span>
               </div>
-              <span class="text-zinc-500 font-mono">FIRESTORE SYNC ACTIVE</span>
+              <div class="p-4 rounded-2xl bg-zinc-50 border border-zinc-200">
+                <span class="text-zinc-900 block text-lg font-display">Instant Live Feed</span>
+                <span class="text-zinc-500 font-medium">Today & Upcoming</span>
+              </div>
+              <div class="p-4 rounded-2xl bg-zinc-50 border border-zinc-200">
+                <span class="text-zinc-900 block text-lg font-display">Filter by Sport</span>
+                <span class="text-zinc-500 font-medium">10+ Categories</span>
+              </div>
             </div>
-
           </div>
 
-          <!-- Tactical Parameter Metadata Column -->
-          <div class="lg:col-span-4 bg-zinc-900 border border-zinc-800 p-8 flex flex-col justify-between space-y-8">
-            <div class="space-y-6">
-              <div class="font-mono text-xs text-brand-blaze uppercase font-bold tracking-widest">
-                TELEMETRY PARAMETERS
-              </div>
-
-              <div>
-                <h4 id="tactical-title" class="font-display font-bold text-2xl text-white uppercase">
-                  5v5 Campus Kickabout
-                </h4>
-                <p id="tactical-venue" class="font-mono text-xs text-zinc-400 mt-1">
-                  Fontys Rachelsmolen AstroTurf
-                </p>
-              </div>
-
-              <div class="space-y-3 font-mono text-xs border-y border-zinc-800 py-4">
-                <div class="flex justify-between">
-                  <span class="text-zinc-500">FORMAT:</span>
-                  <span id="tactical-format" class="text-white font-bold">10 PLAYERS [5 vs 5]</span>
-                </div>
-                <div class="flex justify-between">
-                  <span class="text-zinc-500">SCHEDULE:</span>
-                  <span id="tactical-time" class="text-white font-bold">TODAY @ 17:30 CET</span>
-                </div>
-                <div class="flex justify-between">
-                  <span class="text-zinc-500">SKILL RATING:</span>
-                  <span id="tactical-level" class="text-brand-blaze font-bold">CASUAL / ALL LEVELS</span>
-                </div>
-              </div>
+          <!-- Bento 2: Fast Match Creation -->
+          <div class="lg:col-span-4 bg-zinc-950 text-white p-8 sm:p-12 rounded-3xl card-hover flex flex-col justify-between space-y-8">
+            <div class="space-y-4">
+              <span class="px-3 py-1 rounded-full bg-zinc-800 text-brand-orange text-xs font-bold uppercase">Speed</span>
+              <h3 class="font-display font-bold text-3xl text-white">30-Second Match Creation</h3>
+              <p class="text-sm sm:text-base text-zinc-400 leading-relaxed">
+                Need a 4th player for padel in an hour? Post a game with 3 taps. Push alerts notify matching athletes in the area immediately.
+              </p>
             </div>
 
-            <a href="./app/" class="btn-athletic w-full py-4 bg-brand-blaze hover:bg-brand-blaze-hover text-white text-center font-display font-extrabold text-xs uppercase tracking-wider block rounded">
-              JOIN ROSTER ON APP &rarr;
+            <a href="./app/" class="w-full py-4 bg-brand-orange hover:bg-brand-orange-hover text-white text-center font-bold text-sm rounded-2xl transition">
+              Create a Match Now &rarr;
             </a>
           </div>
 
+          <!-- Bento 3: Verified Student Access -->
+          <div class="lg:col-span-6 bg-white p-8 sm:p-12 rounded-3xl border border-zinc-200 card-hover flex flex-col justify-between space-y-6">
+            <div class="space-y-3">
+              <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold uppercase">Trust & Safety</span>
+              <h3 class="font-display font-bold text-2xl sm:text-3xl text-zinc-950">Verified Student Profiles</h3>
+              <p class="text-sm sm:text-base text-zinc-600 leading-relaxed">
+                Connect safely. See your peers' preferred sports, general skill ratings, and campus affiliation before heading to the court.
+              </p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2 pt-2 text-xs font-bold text-zinc-500">
+              <span class="px-3 py-1.5 rounded-xl bg-zinc-100">Safe Community</span>
+              <span class="px-3 py-1.5 rounded-xl bg-zinc-100">Zero Commercial Spam</span>
+              <span class="px-3 py-1.5 rounded-xl bg-zinc-100">Peer Reviews</span>
+            </div>
+          </div>
+
+          <!-- Bento 4: Live Rosters -->
+          <div class="lg:col-span-6 bg-white p-8 sm:p-12 rounded-3xl border border-zinc-200 card-hover flex flex-col justify-between space-y-6">
+            <div class="space-y-3">
+              <span class="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-bold uppercase">Coordination</span>
+              <h3 class="font-display font-bold text-2xl sm:text-3xl text-zinc-950">Live Spot Confirmation</h3>
+              <p class="text-sm sm:text-base text-zinc-600 leading-relaxed">
+                Every game has an exact capacity limit. When a student hits "Join", their spot is secured instantly without asking questions.
+              </p>
+            </div>
+            <div class="flex items-center space-x-3 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 p-3 rounded-2xl">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span>Roster updates sync in real-time across all devices</span>
+            </div>
+          </div>
+
         </div>
 
       </div>
     </section>
 
-    <!-- ================= SECTION 03: EINDHOVEN CAMPUSES & TERRITORIES (Architectural Grid) ================= -->
-    <section id="locations" class="py-24 sm:py-32 border-b border-zinc-800/80">
-      <div class="max-w-[1400px] mx-auto px-6 sm:px-10">
+    <!-- ================= SECTION: POPULAR SPORTS (Interactive Tabs & Full Width) ================= -->
+    <section id="sports" class="w-full px-6 sm:px-10 lg:px-16 2xl:px-24 py-24 sm:py-32 bg-[#F4F2EC] border-b border-zinc-200">
+      <div class="w-full">
         
-        <div class="flex items-center space-x-3 font-mono text-xs text-brand-blaze mb-4">
-          <span>[03]</span>
-          <span>// CAMPUS TERRITORIES</span>
+        <div class="max-w-3xl space-y-4 mb-16">
+          <span class="text-xs sm:text-sm font-bold uppercase tracking-wider text-brand-orange">Explore Sports</span>
+          <h2 class="section-title font-display font-extrabold text-zinc-950 uppercase">
+            Whatever you play, someone's in.
+          </h2>
+          <p class="text-base sm:text-lg text-zinc-600">
+            From classic team sports to urban boulder gyms and distance running loops.
+          </p>
         </div>
 
-        <h2 class="font-display font-extrabold text-4xl sm:text-6xl text-white tracking-tighter uppercase max-w-4xl leading-tight">
-          FOUR HUBS. ONE UNIFIED STUDENT COMMUNITY.
-        </h2>
-
-        <!-- 4 Architectural Hub Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-16">
+        <!-- Sport Cards Grid (Full-bleed responsive cards) -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6 gap-4 sm:gap-6">
           
-          <!-- Hub 1 -->
-          <div class="tech-border bg-zinc-900/50 p-6 flex flex-col justify-between min-h-[300px]">
-            <div class="space-y-3">
-              <div class="font-mono text-[10px] text-brand-blaze font-bold uppercase tracking-widest">
-                ZONE 01 // NORTH
-              </div>
-              <h3 class="font-display font-bold text-xl text-white uppercase">
-                FONTYS RACHELSMOLEN
-              </h3>
-              <p class="text-xs text-zinc-400 font-sans leading-relaxed">
-                Campus AstroTurf pitch, outdoor calisthenics rigs, table tennis corridors, and indoor fitness halls.
-              </p>
-            </div>
-            <div class="pt-6 border-t border-zinc-800/80 font-mono text-[11px] text-zinc-500">
-              Rachelsmolen 1, 5612 MA
-            </div>
+          <div class="bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3">
+            <span class="text-3xl">⚽</span>
+            <h4 class="font-display font-bold text-lg text-zinc-950">Football 5v5</h4>
+            <p class="text-xs text-zinc-500">Pick-up turf matches, astro cages, and casual Sunday matches.</p>
           </div>
 
-          <!-- Hub 2 -->
-          <div class="tech-border bg-zinc-900/50 p-6 flex flex-col justify-between min-h-[300px]">
-            <div class="space-y-3">
-              <div class="font-mono text-[10px] text-brand-blaze font-bold uppercase tracking-widest">
-                ZONE 02 // EAST
-              </div>
-              <h3 class="font-display font-bold text-xl text-white uppercase">
-                STUDENT SPORTS CENTRE (SSC)
-              </h3>
-              <p class="text-xs text-zinc-400 font-sans leading-relaxed">
-                70+ sports on TU/e campus. 11 tennis courts, heated swimming pool, squash halls, and athletic tracks.
-              </p>
-            </div>
-            <div class="pt-6 border-t border-zinc-800/80 font-mono text-[11px] text-zinc-500">
-              Onze Lieve Vrouwestraat 1
-            </div>
+          <div class="bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3">
+            <span class="text-3xl">🎾</span>
+            <h4 class="font-display font-bold text-lg text-zinc-950">Padel Doubles</h4>
+            <p class="text-xs text-zinc-500">Fast 4-player doubles matches. Find your 4th partner in minutes.</p>
           </div>
 
-          <!-- Hub 3 -->
-          <div class="tech-border bg-zinc-900/50 p-6 flex flex-col justify-between min-h-[300px]">
-            <div class="space-y-3">
-              <div class="font-mono text-[10px] text-brand-blaze font-bold uppercase tracking-widest">
-                ZONE 03 // WEST
-              </div>
-              <h3 class="font-display font-bold text-xl text-white uppercase">
-                STRIJP-S URBAN DISTRICT
-              </h3>
-              <p class="text-xs text-zinc-400 font-sans leading-relaxed">
-                Industrial youth culture. Monk Bouldering Gym, skate park Area 51, and outdoor street ball courts.
-              </p>
-            </div>
-            <div class="pt-6 border-t border-zinc-800/80 font-mono text-[11px] text-zinc-500">
-              Klokgebouw / Torenallee
-            </div>
+          <div class="bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3">
+            <span class="text-3xl">🏃</span>
+            <h4 class="font-display font-bold text-lg text-zinc-950">Running Clubs</h4>
+            <p class="text-xs text-zinc-500">Group pacing, sunrise 5Ks, and trail training loops.</p>
           </div>
 
-          <!-- Hub 4 -->
-          <div class="tech-border bg-zinc-900/50 p-6 flex flex-col justify-between min-h-[300px]">
-            <div class="space-y-3">
-              <div class="font-mono text-[10px] text-brand-blaze font-bold uppercase tracking-widest">
-                ZONE 04 // SOUTH
-              </div>
-              <h3 class="font-display font-bold text-xl text-white uppercase">
-                GENNEPER PARKEN
-              </h3>
-              <p class="text-xs text-zinc-400 font-sans leading-relaxed">
-                Distance running circuits, gravel cycling trails, hockey pitches, and sprawling sports grounds.
-              </p>
-            </div>
-            <div class="pt-6 border-t border-zinc-800/80 font-mono text-[11px] text-zinc-500">
-              Antoon Coolenlaan 1
-            </div>
+          <div class="bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3">
+            <span class="text-3xl">🧗</span>
+            <h4 class="font-display font-bold text-lg text-zinc-950">Bouldering</h4>
+            <p class="text-xs text-zinc-500">Indoor climbing sessions, beta solving, and social sessions.</p>
+          </div>
+
+          <div class="bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3">
+            <span class="text-3xl">🏀</span>
+            <h4 class="font-display font-bold text-lg text-zinc-950">Basketball 3x3</h4>
+            <p class="text-xs text-zinc-500">Half-court games, street ball courts, and indoor gym runs.</p>
+          </div>
+
+          <div class="bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3">
+            <span class="text-3xl">🏋️</span>
+            <h4 class="font-display font-bold text-lg text-zinc-950">Gym & Fitness</h4>
+            <p class="text-xs text-zinc-500">Workout partners, spotters, and calisthenics circuits.</p>
+          </div>
+
+          <div class="bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3">
+            <span class="text-3xl">🏐</span>
+            <h4 class="font-display font-bold text-lg text-zinc-950">Volleyball</h4>
+            <p class="text-xs text-zinc-500">Beach volleyball, sand pits, and indoor campus games.</p>
+          </div>
+
+          <div class="bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3">
+            <span class="text-3xl">🏸</span>
+            <h4 class="font-display font-bold text-lg text-zinc-950">Badminton</h4>
+            <p class="text-xs text-zinc-500">Indoor singles and doubles across student sports halls.</p>
+          </div>
+
+          <div class="bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3">
+            <span class="text-3xl">🚴</span>
+            <h4 class="font-display font-bold text-lg text-zinc-950">Cycling</h4>
+            <p class="text-xs text-zinc-500">Road group rides, gravel loops, and leisure weekend tours.</p>
+          </div>
+
+          <div class="bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3">
+            <span class="text-3xl">🎾</span>
+            <h4 class="font-display font-bold text-lg text-zinc-950">Tennis</h4>
+            <p class="text-xs text-zinc-500">Clay and hard-court singles sparring or casual sets.</p>
+          </div>
+
+          <div class="bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3">
+            <span class="text-3xl">🧘</span>
+            <h4 class="font-display font-bold text-lg text-zinc-950">Yoga / Core</h4>
+            <p class="text-xs text-zinc-500">Park yoga sessions, mobility routines, and recovery groups.</p>
+          </div>
+
+          <div class="bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3">
+            <span class="text-3xl">🏓</span>
+            <h4 class="font-display font-bold text-lg text-zinc-950">Table Tennis</h4>
+            <p class="text-xs text-zinc-500">Campus table tournaments and casual after-class ping pong.</p>
           </div>
 
         </div>
@@ -643,124 +497,56 @@
       </div>
     </section>
 
-    <!-- ================= SECTION 04: EMPIRICAL RESEARCH STUDY (Academic Grounding) ================= -->
-    <section id="research" class="py-24 sm:py-32 border-b border-zinc-800/80 bg-zinc-950">
-      <div class="max-w-[1400px] mx-auto px-6 sm:px-10">
+    <!-- ================= SECTION: FAQ ACCORDION ================= -->
+    <section id="faq" class="w-full px-6 sm:px-10 lg:px-16 2xl:px-24 py-24 sm:py-32 border-b border-zinc-200/80">
+      <div class="max-w-4xl mx-auto space-y-12">
         
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <div class="text-center space-y-3">
+          <span class="text-xs sm:text-sm font-bold uppercase tracking-wider text-brand-orange">Common Inquiries</span>
+          <h2 class="section-title font-display font-extrabold text-zinc-950 uppercase">
+            Frequently Asked Questions
+          </h2>
+        </div>
+
+        <div class="space-y-4" id="faq-accordion">
           
-          <div class="lg:col-span-7 space-y-6">
-            <div class="flex items-center space-x-3 font-mono text-xs text-brand-blaze">
-              <span>[04]</span>
-              <span>// EMPIRICAL HBO-ICT STUDY</span>
+          <div class="bg-white p-6 sm:p-8 rounded-3xl border border-zinc-200 cursor-pointer faq-item shadow-xs">
+            <div class="flex items-center justify-between font-display font-bold text-lg sm:text-xl text-zinc-950">
+              <span>Is UniSport completely free to use?</span>
+              <span class="text-brand-orange text-2xl font-normal faq-icon">+</span>
             </div>
-
-            <h2 class="font-display font-extrabold text-4xl sm:text-6xl text-white tracking-tighter uppercase leading-tight">
-              DESIGNED FROM HARD DATA, NOT ASSUMPTIONS.
-            </h2>
-
-            <p class="text-base sm:text-lg text-zinc-400 font-sans leading-relaxed">
-              Conducted by <strong>Martim Ferreira Galamba</strong> as part of <strong>Challenge 2 (Semester 1, Block 2)</strong> within the HBO-ICT program at Fontys University of Applied Sciences in Eindhoven.
-            </p>
-
-            <p class="text-sm text-zinc-500 font-sans leading-relaxed">
-              Every design decision—from the 30-second match creation velocity to the dynamic spot counter and campus radius filtering—is directly grounded in quantitative and qualitative student survey responses collected across Eindhoven.
-            </p>
-
-            <div class="pt-4 flex flex-wrap items-center gap-4">
-              <a href="../survey/" class="btn-athletic inline-flex items-center space-x-3 bg-brand-blaze hover:bg-brand-blaze-hover text-white font-mono text-xs uppercase font-bold px-7 py-3.5 rounded">
-                <span>TAKE THE RESEARCH SURVEY</span>
-                <i data-lucide="arrow-right" class="w-4 h-4"></i>
-              </a>
-
-              <a href="https://portfolio.fontysict.martimgalamba7.xyz" target="_blank" rel="noopener noreferrer" class="font-mono text-xs text-zinc-400 hover:text-white px-5 py-3.5 border border-zinc-800 rounded flex items-center space-x-2 transition">
-                <span>ACADEMIC PORTFOLIO</span>
-                <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
-              </a>
-            </div>
-          </div>
-
-          <!-- Right: Survey QR Scanner Card -->
-          <div class="lg:col-span-5">
-            <div class="tech-border bg-black p-8 text-center space-y-6">
-              <div class="flex items-center justify-center space-x-4">
-                <img src="./assets/logoFontys.png" alt="Fontys ICT" class="h-9 w-auto object-contain" onerror="this.onerror=null; this.src='../assets/logoFontys.png';" />
-                <span class="text-zinc-600 font-mono">X</span>
-                <img src="./assets/logoUniSport.png" alt="UniSport" class="h-9 w-auto object-contain" onerror="this.onerror=null; this.src='../assets/logoUniSport.png';" />
-              </div>
-
-              <div>
-                <span class="font-mono text-xs text-zinc-400 block uppercase">MOBILE FIELD SCAN</span>
-                <h4 class="font-display font-bold text-xl text-white uppercase mt-1">Scan & Contribute</h4>
-              </div>
-
-              <div class="flex justify-center p-3 bg-white rounded-xl max-w-[200px] mx-auto shadow-xl">
-                <img src="./assets/UniSportSurveyQR.png" alt="UniSport Survey QR" class="w-full h-auto object-contain" onerror="this.onerror=null; this.src='../assets/UniSportSurveyQR.png';" />
-              </div>
-
-              <div class="font-mono text-[11px] text-zinc-500">
-                100% ANONYMOUS • 2-3 MINS • ACADEMIC USE ONLY
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-    </section>
-
-    <!-- ================= SECTION 05: TECHNICAL FAQ ACCORDION ================= -->
-    <section id="faq" class="py-24 sm:py-32 border-b border-zinc-800/80">
-      <div class="max-w-[1000px] mx-auto px-6 sm:px-10">
-        
-        <div class="flex items-center space-x-3 font-mono text-xs text-brand-blaze mb-4">
-          <span>[05]</span>
-          <span>// COMMON QUESTIONS</span>
-        </div>
-
-        <h2 class="font-display font-extrabold text-4xl sm:text-5xl text-white tracking-tighter uppercase mb-12">
-          FREQUENTLY ASKED QUESTIONS.
-        </h2>
-
-        <div class="space-y-4" id="faq-container">
-          
-          <div class="tech-border bg-zinc-900/40 p-6 cursor-pointer faq-card">
-            <div class="flex items-center justify-between font-mono text-sm sm:text-base text-white font-bold">
-              <span>01 // WHO IS ELIGIBLE TO JOIN UNISPORT?</span>
-              <span class="faq-icon text-brand-blaze font-mono text-xl">+</span>
-            </div>
-            <p class="hidden pt-4 text-sm text-zinc-400 font-sans leading-relaxed faq-body">
-              UniSport is engineered specifically for students enrolled in higher education in the Eindhoven region, including Fontys University of Applied Sciences, Eindhoven University of Technology (TU/e), and regional student sports clubs.
+            <p class="hidden pt-4 text-sm sm:text-base text-zinc-600 leading-relaxed faq-answer">
+              Yes, UniSport is 100% free for students. Our goal is to break physical inactivity and make connecting for sports as seamless and spontaneous as sending a message.
             </p>
           </div>
 
-          <div class="tech-border bg-zinc-900/40 p-6 cursor-pointer faq-card">
-            <div class="flex items-center justify-between font-mono text-sm sm:text-base text-white font-bold">
-              <span>02 // HOW DOES REAL-TIME SPOT LOCKING PREVENT OVERBOOKING?</span>
-              <span class="faq-icon text-brand-blaze font-mono text-xl">+</span>
+          <div class="bg-white p-6 sm:p-8 rounded-3xl border border-zinc-200 cursor-pointer faq-item shadow-xs">
+            <div class="flex items-center justify-between font-display font-bold text-lg sm:text-xl text-zinc-950">
+              <span>How does match hosting work?</span>
+              <span class="text-brand-orange text-2xl font-normal faq-icon">+</span>
             </div>
-            <p class="hidden pt-4 text-sm text-zinc-400 font-sans leading-relaxed faq-body">
-              Matches maintain a hard maximum spot capacity. When an athlete clicks "Join", a transactional Firestore state updates instantaneously for every connected student via real-time WebSocket listeners, locking the roster the millisecond capacity is hit.
+            <p class="hidden pt-4 text-sm sm:text-base text-zinc-600 leading-relaxed faq-answer">
+              Any verified student can post a match in under 30 seconds by picking a sport, choosing a location in Eindhoven, selecting the time, and setting maximum participants. Nearby students will see the match in their feed and can claim open spots.
             </p>
           </div>
 
-          <div class="tech-border bg-zinc-900/40 p-6 cursor-pointer faq-card">
-            <div class="flex items-center justify-between font-mono text-sm sm:text-base text-white font-bold">
-              <span>03 // IS THE PLATFORM COMPLETELY FREE?</span>
-              <span class="faq-icon text-brand-blaze font-mono text-xl">+</span>
+          <div class="bg-white p-6 sm:p-8 rounded-3xl border border-zinc-200 cursor-pointer faq-item shadow-xs">
+            <div class="flex items-center justify-between font-display font-bold text-lg sm:text-xl text-zinc-950">
+              <span>What if I'm a complete beginner in a sport?</span>
+              <span class="text-brand-orange text-2xl font-normal faq-icon">+</span>
             </div>
-            <p class="hidden pt-4 text-sm text-zinc-400 font-sans leading-relaxed faq-body">
-              Yes, 100% free of charge. Developed as an HBO-ICT academic innovation challenge to eradicate student isolation and physical inactivity in Eindhoven.
+            <p class="hidden pt-4 text-sm sm:text-base text-zinc-600 leading-relaxed faq-answer">
+              UniSport has skill tags on every activity ("Casual", "Beginner Friendly", "Intermediate", "Competitive"). You can join games matching your confidence level without feeling out of place.
             </p>
           </div>
 
-          <div class="tech-border bg-zinc-900/40 p-6 cursor-pointer faq-card">
-            <div class="flex items-center justify-between font-mono text-sm sm:text-base text-white font-bold">
-              <span>04 // WHAT STACK POWERS UNISPORT?</span>
-              <span class="faq-icon text-brand-blaze font-mono text-xl">+</span>
+          <div class="bg-white p-6 sm:p-8 rounded-3xl border border-zinc-200 cursor-pointer faq-item shadow-xs">
+            <div class="flex items-center justify-between font-display font-bold text-lg sm:text-xl text-zinc-950">
+              <span>Can I use UniSport on mobile?</span>
+              <span class="text-brand-orange text-2xl font-normal faq-icon">+</span>
             </div>
-            <p class="hidden pt-4 text-sm text-zinc-400 font-sans leading-relaxed faq-body">
-              Built on a modern reactive stack: TypeScript component architecture, Tailwind CSS industrial styling, Firebase Auth with student domain security, and Cloud Firestore for document synchronization.
+            <p class="hidden pt-4 text-sm sm:text-base text-zinc-600 leading-relaxed faq-answer">
+              Absolutely. UniSport is built mobile-first as a Progressive Web App (PWA). You can open it on Safari or Chrome on your phone, add it to your home screen, and access everything instantly.
             </p>
           </div>
 
@@ -769,31 +555,31 @@
       </div>
     </section>
 
-    <!-- ================= BOTTOM CLIMAX CALL TO ACTION ================= -->
-    <section class="py-24 sm:py-36 relative overflow-hidden bg-black text-center">
-      <div class="max-w-[1200px] mx-auto px-6 sm:px-10 relative z-10 space-y-8">
+    <!-- ================= HIGH-IMPACT CONTRAST CLIMAX BANNER (Deep Obsidian) ================= -->
+    <section class="w-full px-6 sm:px-10 lg:px-16 2xl:px-24 py-24 sm:py-36 bg-zinc-950 text-white text-center">
+      <div class="max-w-4xl mx-auto space-y-8">
         
-        <span class="font-mono text-xs text-brand-blaze uppercase tracking-widest block">
-          READY FOR KICKOFF?
+        <span class="inline-block px-4 py-1.5 rounded-full bg-zinc-900 border border-zinc-800 text-brand-orange text-xs sm:text-sm font-bold uppercase tracking-wider">
+          Get Started Today
         </span>
 
-        <h2 class="font-display font-extrabold text-5xl sm:text-7xl md:text-8xl text-white tracking-tighter uppercase leading-none">
-          NEVER WORKOUT<br />
-          <span class="text-brand-blaze">ALONE AGAIN.</span>
+        <h2 class="hero-title font-display font-extrabold text-white uppercase">
+          Your next game is<br />
+          <span class="text-brand-orange">waiting for you.</span>
         </h2>
 
-        <p class="text-base sm:text-lg text-zinc-400 max-w-xl mx-auto font-sans font-light">
-          Host a match. Find a padel partner. Join the Eindhoven student movement.
+        <p class="text-lg sm:text-xl text-zinc-400 max-w-2xl mx-auto font-normal leading-relaxed">
+          Join thousands of university students in Eindhoven. Experience the easiest way to organize and play sports.
         </p>
 
         <div class="pt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <a href="./app/" class="btn-athletic inline-flex items-center space-x-3 bg-brand-blaze hover:bg-brand-blaze-hover text-white font-display font-extrabold text-base uppercase tracking-tight px-10 py-5 rounded-xl shadow-2xl">
-            <span>OPEN UNISPORT WEB APP</span>
+          <a href="./app/" class="w-full sm:w-auto inline-flex items-center justify-center space-x-3 bg-brand-orange hover:bg-brand-orange-hover text-white font-bold text-base py-5 px-10 rounded-full shadow-2xl transition-all transform hover:-translate-y-0.5">
+            <span>Launch UniSport Web App</span>
             <i data-lucide="arrow-right" class="w-5 h-5"></i>
           </a>
 
-          <a href="../survey/" class="font-mono text-xs uppercase font-bold text-zinc-400 hover:text-white px-8 py-5 border border-zinc-800 rounded-xl hover:border-zinc-700 transition">
-            FILL RESEARCH SURVEY
+          <a href="../survey/" class="w-full sm:w-auto inline-flex items-center justify-center space-x-2 bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-base py-5 px-10 rounded-full border border-zinc-800 transition-all">
+            <span>Take Community Survey</span>
           </a>
         </div>
 
@@ -802,34 +588,37 @@
 
   </main>
 
-  <!-- ================= TECHNICAL FOOTER ================= -->
-  <footer class="border-t border-zinc-800 bg-[#060608] py-12 font-mono text-xs text-zinc-500">
-    <div class="max-w-[1400px] mx-auto px-6 sm:px-10 space-y-8">
+  <!-- ================= MODERN STARTUP FOOTER (Full Bleed) ================= -->
+  <footer class="w-full px-6 sm:px-10 lg:px-16 2xl:px-24 py-12 bg-white border-t border-zinc-200 text-zinc-600 text-xs sm:text-sm">
+    <div class="w-full space-y-8">
       
-      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-8 border-b border-zinc-900">
-        <div class="flex items-center space-x-4">
-          <img src="./assets/logoUniSport.png" alt="UniSport" class="h-7 w-auto object-contain" onerror="this.onerror=null; this.src='../assets/logoUniSport.png';" />
-          <span class="text-white font-bold font-display text-base">UNISPORT</span>
-          <span class="text-zinc-700">|</span>
-          <span class="text-zinc-400">Eindhoven Student Sports Collective</span>
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-8 border-b border-zinc-100">
+        <div class="flex items-center space-x-3.5">
+          <img src="./assets/logoUniSport.png" alt="UniSport" class="h-8 w-auto object-contain" onerror="this.onerror=null; this.src='../assets/logoUniSport.png';" />
+          <span class="font-display font-bold text-lg text-zinc-950">UniSport</span>
+          <span class="text-zinc-300">|</span>
+          <span class="text-zinc-500 font-medium">The Student Sports Platform</span>
         </div>
 
-        <div class="flex flex-wrap items-center gap-6">
-          <a href="#mission" class="hover:text-white transition">MISSION</a>
-          <a href="#features" class="hover:text-white transition">RADAR</a>
-          <a href="#locations" class="hover:text-white transition">CAMPUSES</a>
-          <a href="../survey/" class="hover:text-white transition">SURVEY</a>
-          <a href="./app/" class="hover:text-brand-blaze transition">WEB APP</a>
-          <a href="https://portfolio.fontysict.martimgalamba7.xyz" target="_blank" rel="noopener noreferrer" class="hover:text-white transition">PORTFOLIO</a>
+        <div class="flex flex-wrap items-center gap-6 lg:gap-8 font-semibold text-zinc-700">
+          <a href="#why" class="hover:text-zinc-950 transition">Why UniSport</a>
+          <a href="#features" class="hover:text-zinc-950 transition">Features</a>
+          <a href="#sports" class="hover:text-zinc-950 transition">Sports</a>
+          <a href="../survey/" class="hover:text-zinc-950 transition">Community Survey</a>
+          <a href="./app/" class="hover:text-brand-orange transition">Web App</a>
         </div>
       </div>
 
-      <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px]">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-400">
         <div>
-          &copy; 2024–2026 UNISPORT. RESEARCHED & DEVELOPED BY <span class="text-zinc-300 font-bold">MARTIM FERREIRA GALAMBA</span>.
+          &copy; 2026 UniSport Technologies. All rights reserved.
         </div>
-        <div>
-          FONTYS UNIVERSITY OF APPLIED SCIENCES • HBO-ICT CHALLENGE 2
+        <div class="flex items-center space-x-6">
+          <a href="#" class="hover:text-zinc-600 transition">Privacy Policy</a>
+          <span>•</span>
+          <a href="#" class="hover:text-zinc-600 transition">Terms of Service</a>
+          <span>•</span>
+          <span>Eindhoven, Netherlands</span>
         </div>
       </div>
 
@@ -842,132 +631,20 @@
       // 1. Initialize Icons
       lucide.createIcons();
 
-      // 2. Realtime Eindhoven Clock
-      function updateClock() {
-        const now = new Date();
-        const hours = String(now.getHours()).padStart(2, '0');
-        const minutes = String(now.getMinutes()).padStart(2, '0');
-        const seconds = String(now.getSeconds()).padStart(2, '0');
-        const clockEl = document.getElementById('live-time-ticker');
-        if (clockEl) {
-          clockEl.textContent = `${hours}:${minutes}:${seconds}`;
-        }
-      }
-      setInterval(updateClock, 1000);
-      updateClock();
-
-      // 3. Tactical Radar Switcher (Interactive Court & Sports Telemetry)
-      const sportsData = {
-        football: {
-          code: 'GEO-ZONE: RACHELSMOLEN-01',
-          surface: 'SURFACE: 3G ASTROTURF',
-          status: 'MATCH READY // 9/10 PLAYERS',
-          title: '5v5 Campus Kickabout',
-          venue: 'Fontys Rachelsmolen AstroTurf',
-          format: '10 PLAYERS [5 vs 5]',
-          time: 'TODAY @ 17:30 CET',
-          level: 'CASUAL / ALL LEVELS',
-          svg: `
-            <rect x="10" y="10" width="380" height="180" rx="4" stroke="currentColor"/>
-            <line x1="200" y1="10" x2="200" y2="190" stroke="currentColor"/>
-            <circle cx="200" cy="100" r="35" stroke="currentColor"/>
-            <rect x="10" y="55" width="55" height="90" stroke="currentColor"/>
-            <rect x="335" y="55" width="55" height="90" stroke="currentColor"/>
-          `
-        },
-        padel: {
-          code: 'GEO-ZONE: PEAKZ-EHV-03',
-          surface: 'SURFACE: PANORAMIC TURF GLASS',
-          status: '1 SPOT NEEDED // 3/4 CONFIRMED',
-          title: 'Intermediate Padel Doubles',
-          venue: 'Peakz Padel Eindhoven Court 03',
-          format: '4 PLAYERS [2 vs 2]',
-          time: 'TOMORROW @ 18:30 CET',
-          level: 'INTERMEDIATE [LEVEL 4-5]',
-          svg: `
-            <rect x="20" y="20" width="360" height="160" rx="2" stroke="currentColor"/>
-            <line x1="200" y1="20" x2="200" y2="180" stroke="currentColor"/>
-            <line x1="90" y1="20" x2="90" y2="180" stroke="currentColor" stroke-dasharray="4"/>
-            <line x1="310" y1="20" x2="310" y2="180" stroke="currentColor" stroke-dasharray="4"/>
-            <line x1="90" y1="100" x2="310" y2="100" stroke="currentColor"/>
-          `
-        },
-        running: {
-          code: 'GEO-ZONE: GENNEPER-TRAIL',
-          surface: 'SURFACE: GRAVEL & TARMAC LOOP',
-          status: 'GROUP PACING // 6 JOINED',
-          title: 'Sunset 7K Campus Pace',
-          venue: 'Genneper Parken Trailhead',
-          format: 'OPEN SQUAD PACING',
-          time: 'THURSDAY @ 19:00 CET',
-          level: '5:30 MIN/KM PACE',
-          svg: `
-            <path d="M 30,100 C 60,30 160,30 200,100 C 240,170 340,170 370,100 C 340,30 240,30 200,100 C 160,170 60,170 30,100 Z" stroke="currentColor"/>
-            <circle cx="30" cy="100" r="6" fill="#FF4D00"/>
-            <circle cx="200" cy="100" r="6" fill="#FF4D00"/>
-            <circle cx="370" cy="100" r="6" fill="#FF4D00"/>
-          `
-        },
-        bouldering: {
-          code: 'GEO-ZONE: STRIJP-S-MONK',
-          surface: 'SURFACE: INDOOR MATS & SLOPERS',
-          status: 'CLIMBING CREW // 4 CONFIRMED',
-          title: 'Monk Bouldering Session',
-          venue: 'Monk Bouldergym Strijp-S',
-          format: 'OPEN CREW [PROJECT V4-V6]',
-          time: 'FRIDAY @ 17:00 CET',
-          level: 'ALL LEVELS WELCOME',
-          svg: `
-            <polygon points="40,170 120,40 190,120 280,30 360,170" stroke="currentColor"/>
-            <circle cx="120" cy="40" r="4" fill="#FF4D00"/>
-            <circle cx="280" cy="30" r="4" fill="#FF4D00"/>
-            <circle cx="190" cy="120" r="4" fill="#FF4D00"/>
-          `
-        }
-      };
-
-      const tabButtons = document.querySelectorAll('.sport-tab-btn');
-      tabButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-          const sportKey = btn.dataset.sport;
-          const data = sportsData[sportKey];
-          if (!data) return;
-
-          // Toggle button styles
-          tabButtons.forEach(b => {
-            b.classList.remove('bg-brand-blaze', 'text-black');
-            b.classList.add('bg-zinc-900', 'text-zinc-300');
-          });
-          btn.classList.remove('bg-zinc-900', 'text-zinc-300');
-          btn.classList.add('bg-brand-blaze', 'text-black');
-
-          // Update tactical elements
-          document.getElementById('tactical-field-code').textContent = data.code;
-          document.getElementById('tactical-field-surface').textContent = data.surface;
-          document.getElementById('tactical-status-label').textContent = data.status;
-          document.getElementById('tactical-title').textContent = data.title;
-          document.getElementById('tactical-venue').textContent = data.venue;
-          document.getElementById('tactical-format').textContent = data.format;
-          document.getElementById('tactical-time').textContent = data.time;
-          document.getElementById('tactical-level').textContent = data.level;
-          document.getElementById('tactical-pitch-svg').innerHTML = data.svg;
-        });
-      });
-
-      // 4. FAQ Accordion Toggle
-      const faqCards = document.querySelectorAll('.faq-card');
-      faqCards.forEach(card => {
-        card.addEventListener('click', () => {
-          const body = card.querySelector('.faq-body');
-          const icon = card.querySelector('.faq-icon');
-          const isClosed = body.classList.contains('hidden');
+      // 2. FAQ Accordion Toggle
+      const faqItems = document.querySelectorAll('.faq-item');
+      faqItems.forEach(item => {
+        item.addEventListener('click', () => {
+          const answer = item.querySelector('.faq-answer');
+          const icon = item.querySelector('.faq-icon');
+          const isClosed = answer.classList.contains('hidden');
 
           // Close all
-          document.querySelectorAll('.faq-body').forEach(b => b.classList.add('hidden'));
+          document.querySelectorAll('.faq-answer').forEach(a => a.classList.add('hidden'));
           document.querySelectorAll('.faq-icon').forEach(i => i.textContent = '+');
 
           if (isClosed) {
-            body.classList.remove('hidden');
+            answer.classList.remove('hidden');
             icon.textContent = '—';
           }
         });
