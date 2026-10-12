@@ -131,25 +131,25 @@
   <main class="flex-grow w-full">
 
     <!-- ================= HERO SECTION (Full Viewport Scaled) ================= -->
-    <section class="w-full px-6 sm:px-10 lg:px-16 2xl:px-24 pt-20 sm:pt-28 pb-20 lg:pb-32 border-b border-zinc-200/80">
+    <section class="w-full min-h-[calc(100vh-5rem)] flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-16 sm:py-24 border-b border-zinc-200/80">
       <div class="w-full">
         
-        <!-- Oversized Fluid Hero Headline with New Motto -->
-        <div class="max-w-[1900px] space-y-6">
+        <!-- Oversized Fluid Hero Headline with Startup Motto -->
+        <div class="w-full max-w-[2200px] space-y-8">
           <h1 class="hero-title font-display font-extrabold text-zinc-950 uppercase">
             Never play alone.<br />
-            <span class="text-brand-orange">Your campus is your court.</span>
+            <span class="text-brand-orange">Find your squad. Play any sport.</span>
           </h1>
 
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 pt-4 items-end">
-            <p class="lg:col-span-8 text-lg sm:text-2xl text-zinc-600 font-normal leading-relaxed max-w-3xl">
-              Break the solo workout barrier. Leave chaotic 100-message group chats behind. Discover spontaneous pick-up games, court bookings, and running partners across your campus in seconds.
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 pt-2 items-end">
+            <p class="lg:col-span-8 text-lg sm:text-2xl 2xl:text-3xl text-zinc-600 font-normal leading-relaxed max-w-4xl">
+              Break the solo workout barrier. Leave chaotic 100-message group chats behind. Discover spontaneous pick-up games, court bookings, and athletic partners across your campus in seconds.
             </p>
 
             <div class="lg:col-span-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-              <a href="./app/" class="w-full sm:w-auto inline-flex items-center justify-center space-x-3 bg-brand-orange hover:bg-brand-orange-hover text-white font-bold text-base py-4 px-9 rounded-full shadow-lg transition-all transform hover:-translate-y-0.5">
+              <a href="./app/" class="group relative w-full sm:w-auto inline-flex items-center justify-center space-x-4 bg-brand-orange hover:bg-brand-orange-hover text-white font-extrabold text-base sm:text-lg uppercase tracking-wider py-5 px-10 rounded-2xl shadow-[0_12px_30px_-8px_rgba(255,77,0,0.55)] hover:shadow-[0_20px_40px_-6px_rgba(255,77,0,0.7)] transition-all duration-300 transform hover:-translate-y-1 active:translate-y-0 active:scale-[0.98] border border-orange-400/30">
                 <span>Start Playing</span>
-                <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                <i data-lucide="arrow-right" class="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1.5"></i>
               </a>
             </div>
           </div>
@@ -237,14 +237,14 @@
     </div>
 
     <!-- ================= SECTION: WHY UNISPORT (Warm Cream Full-Bleed Section) ================= -->
-    <section id="why" class="w-full px-6 sm:px-10 lg:px-16 2xl:px-24 py-24 sm:py-32 bg-[#F4F2EC] border-b border-zinc-200">
-      <div class="w-full">
+    <section id="why" class="w-full min-h-screen flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-20 sm:py-28 bg-[#F4F2EC] border-b border-zinc-200">
+      <div class="w-full max-w-[2200px] mx-auto">
         
         <div class="max-w-4xl space-y-4">
           <h2 class="section-title font-display font-extrabold text-zinc-950 uppercase">
             Sports shouldn't be hard to organize.
           </h2>
-          <p class="text-lg sm:text-xl text-zinc-600 font-normal leading-relaxed">
+          <p class="text-lg sm:text-2xl text-zinc-600 font-normal leading-relaxed">
             University life is fast, unpredictable, and busy. Existing solutions either focus purely on solo GPS tracking or trap people in endless chat messages. UniSport bridges the gap.
           </p>
         </div>
@@ -279,16 +279,16 @@
     </section>
 
     <!-- ================= SECTION: FEATURES (Full-Width Bento Grid) ================= -->
-    <section id="features" class="w-full px-6 sm:px-10 lg:px-16 2xl:px-24 py-24 sm:py-32 border-b border-zinc-200/80">
-      <div class="w-full">
+    <section id="features" class="w-full min-h-screen flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-20 sm:py-28 border-b border-zinc-200/80">
+      <div class="w-full max-w-[2200px] mx-auto">
         
-        <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-16 sm:mb-20">
+        <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-12 sm:mb-16">
           <div class="space-y-4 max-w-3xl">
             <h2 class="section-title font-display font-extrabold text-zinc-950 uppercase">
               Everything built for seamless play.
             </h2>
           </div>
-          <p class="text-base sm:text-lg text-zinc-600 max-w-md">
+          <p class="text-base sm:text-xl text-zinc-600 max-w-md">
             Clean, mobile-first, and lightning-fast. Designed to get you onto the court with the least friction possible.
           </p>
         </div>
@@ -370,14 +370,14 @@
     </section>
 
     <!-- ================= SECTION: POPULAR SPORTS (SVG Icon Badges) ================= -->
-    <section id="sports" class="w-full px-6 sm:px-10 lg:px-16 2xl:px-24 py-24 sm:py-32 bg-[#F4F2EC] border-b border-zinc-200">
-      <div class="w-full">
+    <section id="sports" class="w-full min-h-screen flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-20 sm:py-28 bg-[#F4F2EC] border-b border-zinc-200">
+      <div class="w-full max-w-[2200px] mx-auto">
         
-        <div class="max-w-3xl space-y-4 mb-16">
+        <div class="max-w-3xl space-y-4 mb-12 sm:mb-16">
           <h2 class="section-title font-display font-extrabold text-zinc-950 uppercase">
             Whatever you play, someone's in.
           </h2>
-          <p class="text-base sm:text-lg text-zinc-600">
+          <p class="text-base sm:text-xl text-zinc-600">
             From classic team sports to urban boulder gyms and distance running loops.
           </p>
         </div>
@@ -487,13 +487,16 @@
     </section>
 
     <!-- ================= SECTION: FAQ ACCORDION ================= -->
-    <section id="faq" class="w-full px-6 sm:px-10 lg:px-16 2xl:px-24 py-24 sm:py-32 border-b border-zinc-200/80">
-      <div class="max-w-4xl mx-auto space-y-12">
+    <section id="faq" class="w-full min-h-screen flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-20 sm:py-28 border-b border-zinc-200/80">
+      <div class="w-full max-w-5xl mx-auto space-y-12">
         
-        <div class="text-center space-y-3">
+        <div class="text-center space-y-4">
           <h2 class="section-title font-display font-extrabold text-zinc-950 uppercase">
             Frequently Asked Questions
           </h2>
+          <p class="text-base sm:text-xl text-zinc-600 max-w-2xl mx-auto">
+            Everything you need to know about starting, finding teammates, and organizing games.
+          </p>
         </div>
 
         <div class="space-y-4" id="faq-accordion">
@@ -544,22 +547,21 @@
     </section>
 
     <!-- ================= HIGH-IMPACT CONTRAST CLIMAX BANNER ================= -->
-    <section class="w-full px-6 sm:px-10 lg:px-16 2xl:px-24 py-24 sm:py-36 bg-zinc-950 text-white text-center">
-      <div class="max-w-4xl mx-auto space-y-8">
+    <section class="w-full min-h-[85vh] flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-20 sm:py-28 bg-zinc-950 text-white text-center">
+      <div class="w-full max-w-[1900px] mx-auto space-y-10">
         
-        <h2 class="hero-title font-display font-extrabold text-white uppercase">
-          Your next game is<br />
-          <span class="text-brand-orange">waiting for you.</span>
+        <h2 class="hero-title font-display font-extrabold text-white uppercase tracking-tight max-w-[1800px] mx-auto leading-tight">
+          Your next game is <span class="text-brand-orange inline-block">waiting for you.</span>
         </h2>
 
-        <p class="text-lg sm:text-xl text-zinc-400 max-w-2xl mx-auto font-normal leading-relaxed">
-          Join university students across the city. Experience the easiest way to organize and play sports.
+        <p class="text-lg sm:text-2xl 2xl:text-3xl text-zinc-400 max-w-3xl mx-auto font-normal leading-relaxed">
+          Join university students across the city. Experience the easiest way to organize, discover, and play sports together.
         </p>
 
         <div class="pt-6 flex items-center justify-center">
-          <a href="./app/" class="inline-flex items-center space-x-3 bg-brand-orange hover:bg-brand-orange-hover text-white font-bold text-base py-5 px-12 rounded-full shadow-2xl transition-all transform hover:-translate-y-0.5">
+          <a href="./app/" class="group relative inline-flex items-center space-x-4 bg-brand-orange hover:bg-brand-orange-hover text-white font-extrabold text-base sm:text-xl uppercase tracking-wider py-6 px-12 rounded-2xl shadow-[0_15px_35px_-8px_rgba(255,77,0,0.65)] hover:shadow-[0_25px_45px_-6px_rgba(255,77,0,0.8)] transition-all duration-300 transform hover:-translate-y-1 active:translate-y-0 active:scale-[0.98] border border-orange-400/30">
             <span>Launch UniSport Web App</span>
-            <i data-lucide="arrow-right" class="w-5 h-5"></i>
+            <i data-lucide="arrow-right" class="w-6 h-6 transition-transform duration-300 group-hover:translate-x-1.5"></i>
           </a>
         </div>
 
