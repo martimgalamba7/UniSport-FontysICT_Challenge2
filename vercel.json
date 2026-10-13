@@ -14,16 +14,7 @@
     { "source": "/challenge2", "destination": "/index.html" },
     { "source": "/challenge2/survey", "destination": "/survey/index.html" },
     { "source": "/survey", "destination": "/survey/index.html" },
-    { "source": "/challenge2/unisport", "destination": "/unisport/index.html" },
-    { "source": "/challenge2/unisport/", "destination": "/unisport/index.html" },
-    { "source": "/challenge2/unisport/app", "destination": "/unisport/app/index.html" },
-    { "source": "/challenge2/unisport/app/", "destination": "/unisport/app/index.html" },
-    { "source": "/challenge2/unisport/styles.css", "destination": "/unisport/styles.css" },
-    { "source": "/challenge2/styles.css", "destination": "/unisport/styles.css" },
-    { "source": "/challenge2/unisport/assets/:match*", "destination": "/unisport/assets/:match*" },
-    { "source": "/challenge2/assets/:match*", "destination": "/unisport/assets/:match*" },
-    { "source": "/challenge2/unisport/app/assets/:match*", "destination": "/unisport/app/assets/:match*" },
-    { "source": "/app", "destination": "/unisport/app/index.html" },
-    { "source": "/unisportapp", "destination": "/unisport/app/index.html" }
+    { "source": "/app", "destination": "/challenge2/unisport/app/index.html" },
+    { "source": "/unisportapp", "destination": "/challenge2/unisport/app/index.html" }
   ]
 }
