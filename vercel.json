@@ -1,19 +1,28 @@
 {
   "cleanUrls": true,
   "trailingSlash": false,
+  "redirects": [
+    { "source": "/unisport", "destination": "/challenge2/unisport", "permanent": true },
+    { "source": "/unisport/", "destination": "/challenge2/unisport", "permanent": true },
+    { "source": "/unisport/app", "destination": "/challenge2/unisport/app", "permanent": true },
+    { "source": "/unisport/app/", "destination": "/challenge2/unisport/app", "permanent": true },
+    { "source": "/UniSport", "destination": "/challenge2/unisport", "permanent": true },
+    { "source": "/UniSport/app", "destination": "/challenge2/unisport/app", "permanent": true }
+  ],
   "rewrites": [
     { "source": "/", "destination": "/index.html" },
     { "source": "/challenge2", "destination": "/index.html" },
     { "source": "/challenge2/survey", "destination": "/survey/index.html" },
     { "source": "/survey", "destination": "/survey/index.html" },
-    { "source": "/unisport", "destination": "/unisport/index.html" },
-    { "source": "/unisport/", "destination": "/unisport/index.html" },
-    { "source": "/unisport/app", "destination": "/unisport/app/index.html" },
-    { "source": "/unisport/app/", "destination": "/unisport/app/index.html" },
-    { "source": "/UniSport", "destination": "/unisport/index.html" },
-    { "source": "/UniSport/app", "destination": "/unisport/app/index.html" },
     { "source": "/challenge2/unisport", "destination": "/unisport/index.html" },
+    { "source": "/challenge2/unisport/", "destination": "/unisport/index.html" },
     { "source": "/challenge2/unisport/app", "destination": "/unisport/app/index.html" },
+    { "source": "/challenge2/unisport/app/", "destination": "/unisport/app/index.html" },
+    { "source": "/challenge2/unisport/styles.css", "destination": "/unisport/styles.css" },
+    { "source": "/challenge2/styles.css", "destination": "/unisport/styles.css" },
+    { "source": "/challenge2/unisport/assets/:match*", "destination": "/unisport/assets/:match*" },
+    { "source": "/challenge2/assets/:match*", "destination": "/unisport/assets/:match*" },
+    { "source": "/challenge2/unisport/app/assets/:match*", "destination": "/unisport/app/assets/:match*" },
     { "source": "/app", "destination": "/unisport/app/index.html" },
     { "source": "/unisportapp", "destination": "/unisport/app/index.html" }
   ]

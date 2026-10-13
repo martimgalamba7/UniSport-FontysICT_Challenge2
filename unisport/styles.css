@@ -1,0 +1,267 @@
+/* ==========================================================================
+   UNISPORT PLATFORM • DESIGN SYSTEM & ANIMATION ENGINE
+   Identity: Electric Student Sports Platform (Eindhoven)
+   Typography: Syne (Display) + Plus Jakarta Sans (UI & Body)
+   Palette: Electric Orange (#FF4D00), Warm Chalk (#FAFAF8 / #F3F1EA), Obsidian (#111113)
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Root Variables & Typography
+   -------------------------------------------------------------------------- */
+:root {
+  --brand-orange: #FF4D00;
+  --brand-orange-hover: #EA4500;
+  --brand-orange-light: #FFF2EB;
+  --brand-orange-glow: rgba(255, 77, 0, 0.35);
+  --bg-cream: #FAFAF8;
+  --bg-warm: #F4F2EC;
+  --bg-card: #FFFFFF;
+  --text-dark: #111113;
+  --text-muted: #52525B;
+  --border-light: rgba(228, 228, 231, 0.8);
+  --ease-spring: cubic-bezier(0.19, 1, 0.22, 1);
+  --ease-elastic: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Fluid Responsive Typography */
+.hero-title {
+  font-size: clamp(2.75rem, 6.2vw + 1rem, 7.25rem);
+  line-height: 0.94;
+  letter-spacing: -0.04em;
+}
+
+.section-title {
+  font-size: clamp(2.2rem, 4.2vw + 0.5rem, 5.25rem);
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+}
+
+/* --------------------------------------------------------------------------
+   2. Custom Scrollbar
+   -------------------------------------------------------------------------- */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-cream);
+}
+::-webkit-scrollbar-thumb {
+  background: #D4D4D8;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--brand-orange);
+}
+
+/* --------------------------------------------------------------------------
+   3. Kinetic Marquee Ticker
+   -------------------------------------------------------------------------- */
+@keyframes marquee-scroll {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-50%, 0, 0); }
+}
+
+.animate-marquee-smooth {
+  display: flex;
+  width: 200%;
+  animation: marquee-scroll 28s linear infinite;
+  will-change: transform;
+}
+.animate-marquee-smooth:hover {
+  animation-play-state: paused;
+}
+
+/* --------------------------------------------------------------------------
+   4. High-End Scroll Reveal Engine
+   -------------------------------------------------------------------------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.85s var(--ease-spring), transform 0.85s var(--ease-spring);
+  will-change: opacity, transform;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-scale {
+  opacity: 0;
+  transform: scale(0.94) translateY(20px);
+  transition: opacity 0.85s var(--ease-spring), transform 0.85s var(--ease-spring);
+  will-change: opacity, transform;
+}
+.reveal-scale.is-visible {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+/* Stagger Delays */
+.delay-1 { transition-delay: 60ms; }
+.delay-2 { transition-delay: 120ms; }
+.delay-3 { transition-delay: 180ms; }
+.delay-4 { transition-delay: 240ms; }
+.delay-5 { transition-delay: 300ms; }
+.delay-6 { transition-delay: 360ms; }
+
+/* --------------------------------------------------------------------------
+   5. Smooth Keyframe Micro-Animations
+   -------------------------------------------------------------------------- */
+@keyframes float-gentle {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(1.5deg); }
+}
+
+@keyframes float-reverse {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(12px) rotate(-1.5deg); }
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.85); opacity: 0.9; }
+  100% { transform: scale(2.6); opacity: 0; }
+}
+
+@keyframes radar-sweep {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.75; transform: scale(1.05); }
+}
+
+.animate-float-gentle {
+  animation: float-gentle 5.5s ease-in-out infinite;
+}
+.animate-float-reverse {
+  animation: float-reverse 6.5s ease-in-out infinite;
+}
+.animate-radar-sweep {
+  animation: radar-sweep 4s linear infinite;
+  transform-origin: center center;
+}
+
+/* Live Radar Rings */
+.radar-pulse-ring {
+  position: absolute;
+  border-radius: 9999px;
+  animation: pulse-ring 3s cubic-bezier(0.1, 0.2, 0.7, 1) infinite;
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   6. Athletic Court Line Aesthetics (UniSport Brand Accents)
+   -------------------------------------------------------------------------- */
+.court-lines-pattern {
+  background-image: 
+    radial-gradient(circle at 50% 50%, rgba(255, 77, 0, 0.04) 0%, transparent 60%),
+    linear-gradient(to right, rgba(228, 228, 231, 0.35) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(228, 228, 231, 0.35) 1px, transparent 1px);
+  background-size: 100% 100%, 60px 60px, 60px 60px;
+}
+
+.court-arc-decor {
+  border: 2px dashed rgba(255, 77, 0, 0.18);
+  border-radius: 9999px;
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   7. Card Interactions & Smooth Hover Depth
+   -------------------------------------------------------------------------- */
+.card-hover-pro {
+  transition: transform 0.35s var(--ease-spring), box-shadow 0.35s var(--ease-spring), border-color 0.35s ease;
+  will-change: transform, box-shadow;
+}
+.card-hover-pro:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.03);
+  border-color: rgba(255, 77, 0, 0.35);
+}
+
+/* --------------------------------------------------------------------------
+   8. Tactile Rectangular CTA Buttons
+   -------------------------------------------------------------------------- */
+.btn-primary-rect {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--brand-orange);
+  color: #FFFFFF;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 1.15rem 2.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 12px 28px -6px var(--brand-orange-glow);
+  transition: transform 0.3s var(--ease-spring), box-shadow 0.3s var(--ease-spring), background-color 0.2s ease;
+  overflow: hidden;
+}
+.btn-primary-rect:hover {
+  background-color: var(--brand-orange-hover);
+  transform: translateY(-3px);
+  box-shadow: 0 20px 40px -6px rgba(255, 77, 0, 0.6);
+}
+.btn-primary-rect:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.btn-primary-rect .btn-arrow-icon {
+  transition: transform 0.3s var(--ease-spring);
+}
+.btn-primary-rect:hover .btn-arrow-icon {
+  transform: translateX(4px);
+}
+
+/* Secondary Dark Button */
+.btn-dark-rect {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--text-dark);
+  color: #FFFFFF;
+  font-weight: 700;
+  border-radius: 0.875rem;
+  transition: transform 0.25s var(--ease-spring), background-color 0.2s ease;
+}
+.btn-dark-rect:hover {
+  background-color: #27272A;
+  transform: translateY(-2px);
+}
+
+/* --------------------------------------------------------------------------
+   9. Sport Card Micro-Interactions
+   -------------------------------------------------------------------------- */
+.sport-tile {
+  transition: transform 0.3s var(--ease-spring), border-color 0.3s ease, background-color 0.3s ease;
+  cursor: pointer;
+}
+.sport-tile:hover {
+  transform: translateY(-4px);
+  border-color: var(--brand-orange);
+}
+.sport-tile .sport-tile-icon {
+  transition: transform 0.3s var(--ease-spring), background-color 0.3s ease, color 0.3s ease;
+}
+.sport-tile:hover .sport-tile-icon {
+  transform: scale(1.12) rotate(-4deg);
+  background-color: var(--brand-orange);
+  color: #FFFFFF;
+}
+
+/* --------------------------------------------------------------------------
+   10. Interactive Sport Match Simulator Tabs
+   -------------------------------------------------------------------------- */
+.match-tab-btn {
+  transition: all 0.25s var(--ease-smooth);
+}
+.match-tab-btn.is-active {
+  background-color: var(--text-dark);
+  color: #FFFFFF;
+  border-color: var(--text-dark);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+}
