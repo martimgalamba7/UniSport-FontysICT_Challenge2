@@ -92,10 +92,236 @@
     ::-webkit-scrollbar-track { background: #FAFAF8; }
     ::-webkit-scrollbar-thumb { background: #D4D4D8; border-radius: 9999px; }
     ::-webkit-scrollbar-thumb:hover { background: #FF4D00; }
+
+    /* ================= MENTIC-STYLE ANIMATIONS & FLOATING STICKERS ================= */
+    @keyframes float-slow {
+      0% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-16px) rotate(3deg); }
+      100% { transform: translateY(0px) rotate(0deg); }
+    }
+    @keyframes float-reverse {
+      0% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(18px) rotate(-4deg); }
+      100% { transform: translateY(0px) rotate(0deg); }
+    }
+    @keyframes float-drift {
+      0% { transform: translate(0px, 0px) rotate(0deg); }
+      33% { transform: translate(8px, -12px) rotate(2deg); }
+      66% { transform: translate(-6px, -18px) rotate(-2deg); }
+      100% { transform: translate(0px, 0px) rotate(0deg); }
+    }
+    @keyframes spin-slow {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    @keyframes spin-reverse {
+      0% { transform: rotate(360deg); }
+      100% { transform: rotate(0deg); }
+    }
+    @keyframes pulse-soft {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+    }
+    @keyframes wiggle {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(-7deg); }
+      75% { transform: rotate(7deg); }
+    }
+    @keyframes radar-ping {
+      0% { transform: scale(0.8); opacity: 0.8; }
+      100% { transform: scale(2.4); opacity: 0; }
+    }
+    @keyframes bounce-subtle {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+
+    .animate-float-slow {
+      animation: float-slow 6s ease-in-out infinite;
+    }
+    .animate-float-reverse {
+      animation: float-reverse 7s ease-in-out infinite;
+    }
+    .animate-float-drift {
+      animation: float-drift 8s ease-in-out infinite;
+    }
+    .animate-spin-slow {
+      animation: spin-slow 22s linear infinite;
+    }
+    .animate-spin-reverse {
+      animation: spin-reverse 26s linear infinite;
+    }
+    .animate-pulse-soft {
+      animation: pulse-soft 3s ease-in-out infinite;
+    }
+    .animate-wiggle {
+      animation: wiggle 3.5s ease-in-out infinite;
+    }
+    .animate-bounce-subtle {
+      animation: bounce-subtle 2.5s ease-in-out infinite;
+    }
+
+    /* Radar Ping Wave */
+    .radar-ring {
+      position: absolute;
+      border-radius: 9999px;
+      animation: radar-ping 2.5s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+    }
+
+    /* ================= SCROLL REVEAL SYSTEM ================= */
+    .reveal-item {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+      transition-delay: var(--delay, 0ms);
+      will-change: opacity, transform;
+    }
+    .reveal-item.is-revealed {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-scale {
+      opacity: 0;
+      transform: scale(0.92);
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+      transition-delay: var(--delay, 0ms);
+      will-change: opacity, transform;
+    }
+    .reveal-scale.is-revealed {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* ================= INTERACTIVE 3D TILT CARDS ================= */
+    .tilt-card {
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      transform-style: preserve-3d;
+      perspective: 1000px;
+    }
+
+    /* ================= ICON MICRO-INTERACTIONS ON HOVER ================= */
+    .sport-card:hover .sport-icon-badge {
+      transform: scale(1.15) rotate(-6deg);
+      background-color: #FF4D00;
+      color: #FFFFFF;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .sport-card .sport-icon-badge {
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Individual icon micro-animations */
+    .sport-card:hover [data-lucide="circle-dot"] { animation: spin-slow 1.2s linear infinite; }
+    .sport-card:hover [data-lucide="crosshair"] { animation: wiggle 0.5s ease-in-out infinite; }
+    .sport-card:hover [data-lucide="footprints"] { animation: bounce-subtle 0.6s ease-in-out infinite; }
+    .sport-card:hover [data-lucide="mountain"] { transform: translateY(-3px) scale(1.1); transition: transform 0.2s ease; }
+    .sport-card:hover [data-lucide="target"] { animation: pulse-soft 0.7s ease-in-out infinite; }
+    .sport-card:hover [data-lucide="dumbbell"] { transform: translateY(-4px) rotate(15deg); transition: transform 0.25s ease; }
+    .sport-card:hover [data-lucide="activity"] { animation: pulse-soft 0.5s ease-in-out infinite; }
+    .sport-card:hover [data-lucide="disc"] { animation: spin-slow 1.5s linear infinite; }
+    .sport-card:hover [data-lucide="bike"] { animation: spin-slow 2s linear infinite; }
+    .sport-card:hover [data-lucide="shield"] { animation: wiggle 0.6s ease-in-out infinite; }
+    .sport-card:hover [data-lucide="sparkles"] { animation: spin-slow 1.8s linear infinite; }
+    .sport-card:hover [data-lucide="award"] { animation: bounce-subtle 0.5s ease-in-out infinite; }
+
+    /* Cartoon sticker styles */
+    .cartoon-sticker {
+      filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.07));
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      cursor: pointer;
+    }
+    .cartoon-sticker:hover {
+      transform: scale(1.12) rotate(6deg) !important;
+    }
+
+    /* Mentic Pastel Card Visual Styles */
+    .bg-pastel-peach { background-color: #FFE6D5; }
+    .bg-pastel-blue { background-color: #DCEBFE; }
+    .bg-pastel-lilac { background-color: #EDE4FB; }
+    .bg-pastel-yellow { background-color: #FEF3C7; }
+    .bg-pastel-sand { background-color: #F1EFE9; }
+    .bg-pastel-orange { background-color: #FF4D00; }
   </style>
 </head>
 
-<body class="bg-[#FAFAF8] text-zinc-900 font-sans min-h-screen flex flex-col justify-between selection:bg-brand-orange selection:text-white">
+<body class="bg-[#FAFAF8] text-zinc-900 font-sans min-h-screen flex flex-col justify-between selection:bg-brand-orange selection:text-white relative overflow-x-hidden">
+
+  <!-- ================= MENTIC-STYLE STICKER SVG SPRITE ================= -->
+  <svg width="0" height="0" class="absolute hidden" aria-hidden="true">
+    <defs>
+      <!-- Geometric Stickers -->
+      <symbol id="s-ring" viewBox="0 0 120 120">
+        <path fill-rule="evenodd" d="M60 0a60 60 0 110 120A60 60 0 0160 0zm0 34a26 26 0 100 52 26 26 0 000-52z" />
+      </symbol>
+      <symbol id="s-spark" viewBox="0 0 120 120">
+        <path d="M60 0c4 32 24 52 60 60-36 8-56 28-60 60-4-32-24-52-60-60C36 52 56 32 60 0z" />
+      </symbol>
+      <symbol id="s-bolt" viewBox="0 0 74 120">
+        <path d="M44 0L0 68h26l4 52 44-72H46z" />
+      </symbol>
+      <symbol id="s-arc" viewBox="0 0 120 120">
+        <path fill-rule="evenodd" d="M60 0a60 60 0 0160 60h-34a26 26 0 00-26-26 26 26 0 00-26 26H0A60 60 0 0160 0z" />
+      </symbol>
+      <symbol id="s-halfdisc" viewBox="0 0 120 62">
+        <path d="M0 60A60 60 0 01120 60v2H0z" />
+      </symbol>
+      <symbol id="s-cross" viewBox="0 0 120 120">
+        <path d="M46 0h28v46h46v28H74v46H46V74H0V46h46z" />
+      </symbol>
+
+      <!-- Cartoon Sports Doodle Stickers -->
+      <symbol id="d-chat-cross" viewBox="0 0 120 120">
+        <path d="M60 10c22 0 38 9 41 24s-6 32-24 40-40 9-52 1S10 50 18 32 40 10 60 10Z" fill="#FAF9F6" />
+        <circle cx="92" cy="36" r="16" fill="#FF4D00" />
+        <path d="M26 30h46a8 8 0 0 1 8 8v24a8 8 0 0 1-8 8H48L32 84V70h-6a8 8 0 0 1-8-8V38a8 8 0 0 1 8-8Z" fill="none" stroke="#18181B" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M34 44h28 M34 56h16" stroke="#18181B" stroke-width="4.5" stroke-linecap="round" />
+        <path d="M84 28l16 16 M100 28l-16 16" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" />
+      </symbol>
+
+      <symbol id="d-sneaker" viewBox="0 0 120 120">
+        <path d="M60 12c24 0 42 12 44 28s-8 36-26 44-44 8-54-2S12 52 20 34 38 12 60 12Z" fill="#FAF9F6" />
+        <circle cx="94" cy="84" r="16" fill="#3B82F6" />
+        <path d="M18 64l24-12 18 10 32-4c8 0 14 6 14 14v4H16l2-12Z" fill="none" stroke="#18181B" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M38 48l8 12 M50 44l8 12 M62 42l6 12" stroke="#18181B" stroke-width="3.5" stroke-linecap="round" />
+        <path d="M86 76l16 16 M102 76l-16 16" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" />
+      </symbol>
+
+      <symbol id="d-players" viewBox="0 0 120 120">
+        <path d="M62 8c22 2 36 14 37 28s-11 30-28 38-37 8-48-3-12-30-3-42S42 6 62 8Z" fill="#FAF9F6" />
+        <circle cx="88" cy="84" r="16" fill="#8B5CF6" />
+        <circle cx="36" cy="36" r="12" fill="#18181B" />
+        <circle cx="80" cy="36" r="12" fill="#18181B" />
+        <circle cx="36" cy="74" r="12" fill="#18181B" />
+        <circle cx="80" cy="74" r="12" fill="none" stroke="#18181B" stroke-width="4" stroke-dasharray="6 6" />
+        <path d="M78 84l16-16 M78 68l16 16" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" />
+      </symbol>
+
+      <symbol id="d-racket" viewBox="0 0 120 120">
+        <path d="M58 8c20 0 38 10 40 26s-8 32-26 40-40 8-50-2-12-28-4-40 20-24 40-24Z" fill="#FAF9F6" />
+        <circle cx="90" cy="34" r="16" fill="#F59E0B" />
+        <ellipse cx="48" cy="48" rx="26" ry="32" fill="none" stroke="#18181B" stroke-width="4.5" />
+        <path d="M66 70l26 30" stroke="#18181B" stroke-width="5" stroke-linecap="round" />
+        <path d="M38 32h20 M32 48h32 M38 64h20" stroke="#18181B" stroke-width="3" />
+        <circle cx="90" cy="34" r="7" fill="#FFFFFF" />
+      </symbol>
+
+      <symbol id="d-trophy" viewBox="0 0 120 120">
+        <path d="M60 8c22 0 38 10 40 26s-7 32-24 40-40 9-52 1S10 48 18 30 38 8 60 8Z" fill="#FAF9F6" />
+        <circle cx="92" cy="86" r="16" fill="#10B981" />
+        <path d="M34 26h52v26a26 26 0 0 1-52 0V26Z" fill="none" stroke="#18181B" stroke-width="4.5" stroke-linejoin="round" />
+        <path d="M60 52v20 M44 86h32" stroke="#18181B" stroke-width="4.5" stroke-linecap="round" />
+        <path d="M34 34H20a8 8 0 0 0 0 16h14 M86 34h14a8 8 0 0 1 0 16H86" stroke="#18181B" stroke-width="4.5" stroke-linecap="round" />
+        <path d="M84 86l6 6 12-12" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+      </symbol>
+
+      <symbol id="d-lightning" viewBox="0 0 120 120">
+        <path d="M60 8c22 0 38 10 40 26s-7 32-24 40-40 9-52 1S10 48 18 30 38 8 60 8Z" fill="#FAF9F6" />
+        <circle cx="88" cy="84" r="16" fill="#FFD700" />
+        <path d="M58 18L32 62h24l-4 40 36-54H62z" fill="#18181B" />
+        <path d="M80 76l16 16 M96 76l-16 16" stroke="#18181B" stroke-width="4" stroke-linecap="round" />
+      </symbol>
+    </defs>
+  </svg>
 
   <!-- ================= TOP NAVIGATION BAR (Full-Bleed Ultra-Wide Startup Header) ================= -->
   <header class="sticky top-0 z-50 bg-[#FAFAF8]/90 backdrop-blur-xl border-b border-zinc-200/80 transition-all">
@@ -130,23 +356,71 @@
   <!-- ================= MAIN CONTENT (Ultra-Wide Full-Bleed Scaling) ================= -->
   <main class="flex-grow w-full">
 
-    <!-- ================= HERO SECTION (Full Viewport Scaled) ================= -->
-    <section class="w-full min-h-[calc(100vh-5rem)] flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-16 sm:py-24 border-b border-zinc-200/80">
-      <div class="w-full">
+    <!-- ================= HERO SECTION (Full Viewport Scaled + Floating Stickers) ================= -->
+    <section class="w-full min-h-[calc(100vh-5rem)] flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-16 sm:py-24 border-b border-zinc-200/80 relative overflow-hidden">
+      
+      <!-- Floating Background Stickers with Scroll Parallax -->
+      <div class="pointer-events-none absolute inset-0 z-0 overflow-hidden select-none">
+        <!-- Top Left: Lavender / Lilac Ring (from Mentic) -->
+        <div class="absolute top-10 sm:top-16 left-4 sm:left-12 lg:left-20 text-[#DDD6FE] w-16 h-16 sm:w-28 sm:h-28 2xl:w-36 2xl:h-36 animate-float-slow opacity-85" data-parallax="0.22">
+          <svg viewBox="0 0 120 120" class="w-full h-full fill-current"><use href="#s-ring" /></svg>
+        </div>
+
+        <!-- Top Right: Vibrant Orange 4-Point Sparkle Star -->
+        <div class="absolute top-12 sm:top-20 right-6 sm:right-20 lg:right-32 text-brand-orange w-16 h-16 sm:w-24 sm:h-24 2xl:w-32 2xl:h-32 animate-spin-slow opacity-90" data-parallax="-0.28">
+          <svg viewBox="0 0 120 120" class="w-full h-full fill-current"><use href="#s-spark" /></svg>
+        </div>
+
+        <!-- Middle Right: Energetic Yellow Lightning Bolt -->
+        <div class="absolute top-1/2 -translate-y-12 right-4 sm:right-12 lg:right-28 text-[#FBBF24] w-12 h-16 sm:w-20 sm:h-28 animate-wiggle opacity-90" data-parallax="-0.18">
+          <svg viewBox="0 0 74 120" class="w-full h-full fill-current"><use href="#s-bolt" /></svg>
+        </div>
+
+        <!-- Bottom Left: Cobalt Blue Semicircle / Arch -->
+        <div class="absolute bottom-8 sm:bottom-14 left-8 sm:left-24 text-[#93C5FD] w-20 h-20 sm:w-28 sm:h-28 animate-float-reverse opacity-80" data-parallax="0.18">
+          <svg viewBox="0 0 120 120" class="w-full h-full fill-current"><use href="#s-arc" /></svg>
+        </div>
+      </div>
+
+      <!-- Floating Interactive Student Activity Stickers (Mentic style) -->
+      <div class="hidden lg:flex items-center space-x-3.5 absolute top-28 right-36 bg-white/95 backdrop-blur-md p-3.5 pr-6 rounded-2xl border border-zinc-200/90 shadow-[0_14px_30px_-6px_rgba(0,0,0,0.08)] cartoon-sticker animate-float-drift z-10" data-parallax="-0.15">
+        <div class="w-11 h-11 rounded-xl bg-orange-100 flex items-center justify-center text-brand-orange font-black">
+          <i data-lucide="crosshair" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <span class="text-xs font-black uppercase tracking-wide text-zinc-950">Padel Eindhoven</span>
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+          </div>
+          <p class="text-xs text-zinc-500 font-medium">3/4 players • Need 1 partner!</p>
+        </div>
+      </div>
+
+      <div class="hidden lg:flex items-center space-x-3.5 absolute bottom-24 right-24 bg-white/95 backdrop-blur-md p-3.5 pr-6 rounded-2xl border border-zinc-200/90 shadow-[0_14px_30px_-6px_rgba(0,0,0,0.08)] cartoon-sticker animate-float-reverse z-10" data-parallax="0.2">
+        <div class="w-11 h-11 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600 font-black">
+          <i data-lucide="footprints" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <span class="text-xs font-black uppercase tracking-wide text-zinc-950">Campus 5K Sunset Run</span>
+          <p class="text-xs text-zinc-500 font-medium">Tonight 19:30 • 8 joined</p>
+        </div>
+      </div>
+
+      <div class="w-full relative z-10">
         
-        <!-- Oversized Fluid Hero Headline with Startup Motto -->
+        <!-- Oversized Fluid Hero Headline with Startup Motto & Inline Stickers -->
         <div class="w-full max-w-[2200px] space-y-8">
-          <h1 class="hero-title font-display font-extrabold text-zinc-950 uppercase">
-            Never play alone.<br />
-            <span class="text-brand-orange">Find your squad. Play any sport.</span>
+          <h1 class="hero-title font-display font-extrabold text-zinc-950 uppercase reveal-item" style="--delay: 100ms">
+            Never play alone.<span class="inline-flex items-center mx-1.5 sm:mx-3 text-[#FBBF24] align-middle animate-wiggle"><svg class="w-8 h-8 sm:w-14 sm:h-14 lg:w-18 lg:h-18 fill-current" viewBox="0 0 74 120"><use href="#s-bolt" /></svg></span><br />
+            <span class="text-brand-orange">Find your squad.<span class="inline-flex items-center mx-1.5 sm:mx-3 text-brand-orange align-middle animate-spin-slow"><svg class="w-8 h-8 sm:w-14 sm:h-14 lg:w-18 lg:h-18 fill-current" viewBox="0 0 120 120"><use href="#s-spark" /></svg></span>Play any sport.</span>
           </h1>
 
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 pt-2 items-end">
-            <p class="lg:col-span-8 text-lg sm:text-2xl 2xl:text-3xl text-zinc-600 font-normal leading-relaxed max-w-4xl">
+            <p class="lg:col-span-8 text-lg sm:text-2xl 2xl:text-3xl text-zinc-600 font-normal leading-relaxed max-w-4xl reveal-item" style="--delay: 200ms">
               Break the solo workout barrier. Leave chaotic 100-message group chats behind. Discover spontaneous pick-up games, court bookings, and athletic partners across your campus in seconds.
             </p>
 
-            <div class="lg:col-span-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+            <div class="lg:col-span-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-4 reveal-item" style="--delay: 300ms">
               <a href="./app/" class="group relative w-full sm:w-auto inline-flex items-center justify-center space-x-4 bg-brand-orange hover:bg-brand-orange-hover text-white font-extrabold text-base sm:text-lg uppercase tracking-wider py-5 px-10 rounded-2xl shadow-[0_12px_30px_-8px_rgba(255,77,0,0.55)] hover:shadow-[0_20px_40px_-6px_rgba(255,77,0,0.7)] transition-all duration-300 transform hover:-translate-y-1 active:translate-y-0 active:scale-[0.98] border border-orange-400/30">
                 <span>Start Playing</span>
                 <i data-lucide="arrow-right" class="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1.5"></i>
@@ -237,129 +511,304 @@
     </div>
 
     <!-- ================= SECTION: WHY UNISPORT (Warm Cream Full-Bleed Section) ================= -->
-    <section id="why" class="w-full min-h-screen flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-20 sm:py-28 bg-[#F4F2EC] border-b border-zinc-200">
-      <div class="w-full max-w-[2200px] mx-auto">
+    <!-- ================= SECTION: WHY UNISPORT (Mentic-Inspired Pastel Doodle Cards) ================= -->
+    <section id="why" class="w-full min-h-screen flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-20 sm:py-28 bg-[#F4F2EC] border-b border-zinc-200 relative overflow-hidden">
+      
+      <!-- Floating Geometric Parallax Stickers -->
+      <div class="pointer-events-none absolute inset-0 z-0 overflow-hidden select-none">
+        <div class="absolute top-12 left-8 lg:left-16 text-[#DDD6FE] w-16 h-16 sm:w-24 sm:h-24 animate-float-slow opacity-80" data-parallax="0.2">
+          <svg viewBox="0 0 120 120" class="w-full h-full fill-current"><use href="#s-ring" /></svg>
+        </div>
+        <div class="absolute top-20 right-10 lg:right-24 text-brand-orange w-16 h-16 sm:w-24 sm:h-24 animate-spin-slow opacity-85" data-parallax="-0.22">
+          <svg viewBox="0 0 120 120" class="w-full h-full fill-current"><use href="#s-spark" /></svg>
+        </div>
+        <div class="absolute bottom-16 left-6 lg:left-20 text-[#93C5FD] w-20 h-20 sm:w-28 sm:h-28 animate-float-reverse opacity-75" data-parallax="0.18">
+          <svg viewBox="0 0 120 120" class="w-full h-full fill-current"><use href="#s-arc" /></svg>
+        </div>
+        <div class="absolute bottom-24 right-8 lg:right-28 text-[#FBBF24] w-12 h-16 sm:w-16 sm:h-24 animate-wiggle opacity-80" data-parallax="-0.2">
+          <svg viewBox="0 0 74 120" class="w-full h-full fill-current"><use href="#s-bolt" /></svg>
+        </div>
+      </div>
+
+      <div class="w-full max-w-[2200px] mx-auto relative z-10 space-y-16">
         
         <div class="max-w-4xl space-y-4">
-          <h2 class="section-title font-display font-extrabold text-zinc-950 uppercase">
-            Sports shouldn't be hard to organize.
+          <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-orange-100 border border-orange-200 text-brand-orange text-xs font-black uppercase tracking-wider reveal-item">
+            <span class="w-2 h-2 rounded-full bg-brand-orange animate-ping"></span>
+            <span>The Problem We Solve</span>
+          </div>
+          <h2 class="section-title font-display font-extrabold text-zinc-950 uppercase reveal-item" style="--delay: 100ms">
+            Sports shouldn't be hard to organize.<span class="inline-flex items-center mx-2 text-[#3B82F6] align-middle animate-float-slow"><svg class="w-8 h-8 sm:w-12 sm:h-12 fill-current" viewBox="0 0 120 120"><use href="#s-arc" /></svg></span>
           </h2>
-          <p class="text-lg sm:text-2xl text-zinc-600 font-normal leading-relaxed">
-            University life is fast, unpredictable, and busy. Existing solutions either focus purely on solo GPS tracking or trap people in endless chat messages. UniSport bridges the gap.
+          <p class="text-lg sm:text-2xl text-zinc-600 font-normal leading-relaxed reveal-item" style="--delay: 150ms">
+            Six common roadblocks kill student matches before anyone hits the court. UniSport replaces endless chaotic texting with instant spot reservations.
           </p>
         </div>
 
-        <!-- 3 Wide Startup Pillars -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16 sm:mt-20">
+        <!-- Mentic-Style 6 Pastel Problem Cards Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           
-          <div class="bg-white p-8 sm:p-12 rounded-3xl border border-zinc-200/80 card-hover space-y-4">
-            <h3 class="font-display font-bold text-2xl text-zinc-950">Ditch the Solo Inertia</h3>
-            <p class="text-zinc-600 leading-relaxed text-sm sm:text-base">
-              Moving to a new city or having friends with different study schedules shouldn't stop you from exercising. Find players on your level whenever you have an hour free.
-            </p>
-          </div>
+          <!-- Card [01]: Peach -->
+          <article class="bg-white rounded-3xl border border-zinc-200/90 overflow-hidden shadow-xs card-hover tilt-card reveal-item flex flex-col justify-between" style="--delay: 50ms">
+            <div class="h-44 sm:h-52 bg-pastel-peach flex items-center justify-center relative p-6">
+              <div class="cartoon-sticker w-24 h-24 sm:w-28 sm:h-28">
+                <svg viewBox="0 0 120 120" class="w-full h-full"><use href="#d-chat-cross" /></svg>
+              </div>
+            </div>
+            <div class="p-6 sm:p-8 flex flex-col justify-between flex-grow space-y-4">
+              <div class="flex items-start justify-between gap-4">
+                <h3 class="font-display font-extrabold text-xl sm:text-2xl text-zinc-950 leading-snug">Group chats go completely silent</h3>
+                <span class="text-xs font-black tracking-widest text-zinc-400 shrink-0 pt-1">[01]</span>
+              </div>
+              <p class="text-sm sm:text-base text-zinc-600 leading-relaxed font-normal">
+                Plans get buried under 80 unrelated messages. When game day arrives, people drop out without warning and matches fall apart.
+              </p>
+            </div>
+          </article>
 
-          <div class="bg-white p-8 sm:p-12 rounded-3xl border border-zinc-200/80 card-hover space-y-4">
-            <h3 class="font-display font-bold text-2xl text-zinc-950">End Group Chat Chaos</h3>
-            <p class="text-zinc-600 leading-relaxed text-sm sm:text-base">
-              No more 100-person WhatsApp threads where plans fall apart. UniSport replaces back-and-forth texting with clear spot availability and instant sign-ups.
-            </p>
-          </div>
+          <!-- Card [02]: Soft Blue -->
+          <article class="bg-white rounded-3xl border border-zinc-200/90 overflow-hidden shadow-xs card-hover tilt-card reveal-item flex flex-col justify-between" style="--delay: 100ms">
+            <div class="h-44 sm:h-52 bg-pastel-blue flex items-center justify-center relative p-6">
+              <div class="cartoon-sticker w-24 h-24 sm:w-28 sm:h-28">
+                <svg viewBox="0 0 120 120" class="w-full h-full"><use href="#d-sneaker" /></svg>
+              </div>
+            </div>
+            <div class="p-6 sm:p-8 flex flex-col justify-between flex-grow space-y-4">
+              <div class="flex items-start justify-between gap-4">
+                <h3 class="font-display font-extrabold text-xl sm:text-2xl text-zinc-950 leading-snug">Solo workout inertia takes over</h3>
+                <span class="text-xs font-black tracking-widest text-zinc-400 shrink-0 pt-1">[02]</span>
+              </div>
+              <p class="text-sm sm:text-base text-zinc-600 leading-relaxed font-normal">
+                You want to run 5K or hit circuits, but working out completely alone feels boring. You lose motivation and stay home.
+              </p>
+            </div>
+          </article>
 
-          <div class="bg-white p-8 sm:p-12 rounded-3xl border border-zinc-200/80 card-hover space-y-4">
-            <h3 class="font-display font-bold text-2xl text-zinc-950">Inclusive Skill Levels</h3>
-            <p class="text-zinc-600 leading-relaxed text-sm sm:text-base">
-              From casual first-time padel rallies to competitive 5v5 soccer leagues. Filter games by competitive vibe so everyone feels challenged and welcome.
-            </p>
-          </div>
+          <!-- Card [03]: Lilac -->
+          <article class="bg-white rounded-3xl border border-zinc-200/90 overflow-hidden shadow-xs card-hover tilt-card reveal-item flex flex-col justify-between" style="--delay: 150ms">
+            <div class="h-44 sm:h-52 bg-pastel-lilac flex items-center justify-center relative p-6">
+              <div class="cartoon-sticker w-24 h-24 sm:w-28 sm:h-28">
+                <svg viewBox="0 0 120 120" class="w-full h-full"><use href="#d-players" /></svg>
+              </div>
+            </div>
+            <div class="p-6 sm:p-8 flex flex-col justify-between flex-grow space-y-4">
+              <div class="flex items-start justify-between gap-4">
+                <h3 class="font-display font-extrabold text-xl sm:text-2xl text-zinc-950 leading-snug">Always missing the 4th player</h3>
+                <span class="text-xs font-black tracking-widest text-zinc-400 shrink-0 pt-1">[03]</span>
+              </div>
+              <p class="text-sm sm:text-base text-zinc-600 leading-relaxed font-normal">
+                You have 3 friends ready for padel or doubles, but court slots expire while you desperately message friends of friends.
+              </p>
+            </div>
+          </article>
+
+          <!-- Card [04]: Warm Yellow -->
+          <article class="bg-white rounded-3xl border border-zinc-200/90 overflow-hidden shadow-xs card-hover tilt-card reveal-item flex flex-col justify-between" style="--delay: 200ms">
+            <div class="h-44 sm:h-52 bg-pastel-yellow flex items-center justify-center relative p-6">
+              <div class="cartoon-sticker w-24 h-24 sm:w-28 sm:h-28">
+                <svg viewBox="0 0 120 120" class="w-full h-full"><use href="#d-racket" /></svg>
+              </div>
+            </div>
+            <div class="p-6 sm:p-8 flex flex-col justify-between flex-grow space-y-4">
+              <div class="flex items-start justify-between gap-4">
+                <h3 class="font-display font-extrabold text-xl sm:text-2xl text-zinc-950 leading-snug">Awkward skill level mismatches</h3>
+                <span class="text-xs font-black tracking-widest text-zinc-400 shrink-0 pt-1">[04]</span>
+              </div>
+              <p class="text-sm sm:text-base text-zinc-600 leading-relaxed font-normal">
+                Casual beginners get paired with high-intensity pros. UniSport uses clear vibe tags (Casual vs Competitive) so everyone feels at home.
+              </p>
+            </div>
+          </article>
+
+          <!-- Card [05]: Sand / Beige -->
+          <article class="bg-white rounded-3xl border border-zinc-200/90 overflow-hidden shadow-xs card-hover tilt-card reveal-item flex flex-col justify-between" style="--delay: 250ms">
+            <div class="h-44 sm:h-52 bg-pastel-sand flex items-center justify-center relative p-6">
+              <div class="cartoon-sticker w-24 h-24 sm:w-28 sm:h-28">
+                <svg viewBox="0 0 120 120" class="w-full h-full"><use href="#d-trophy" /></svg>
+              </div>
+            </div>
+            <div class="p-6 sm:p-8 flex flex-col justify-between flex-grow space-y-4">
+              <div class="flex items-start justify-between gap-4">
+                <h3 class="font-display font-extrabold text-xl sm:text-2xl text-zinc-950 leading-snug">Zero local student visibility</h3>
+                <span class="text-xs font-black tracking-widest text-zinc-400 shrink-0 pt-1">[05]</span>
+              </div>
+              <p class="text-sm sm:text-base text-zinc-600 leading-relaxed font-normal">
+                Dozens of active students live 500m from your dorm or library, but you have no shared radar to find each other spontaneously.
+              </p>
+            </div>
+          </article>
+
+          <!-- Card [06]: Vibrant Orange -->
+          <article class="bg-zinc-950 text-white rounded-3xl border border-zinc-800 overflow-hidden shadow-md card-hover tilt-card reveal-item flex flex-col justify-between" style="--delay: 300ms">
+            <div class="h-44 sm:h-52 bg-brand-orange flex items-center justify-center relative p-6">
+              <div class="cartoon-sticker w-24 h-24 sm:w-28 sm:h-28">
+                <svg viewBox="0 0 120 120" class="w-full h-full"><use href="#d-lightning" /></svg>
+              </div>
+            </div>
+            <div class="p-6 sm:p-8 flex flex-col justify-between flex-grow space-y-4">
+              <div class="flex items-start justify-between gap-4">
+                <h3 class="font-display font-extrabold text-xl sm:text-2xl text-white leading-snug">Instant 30-second sign up</h3>
+                <span class="text-xs font-black tracking-widest text-brand-orange shrink-0 pt-1">[06]</span>
+              </div>
+              <p class="text-sm sm:text-base text-zinc-300 leading-relaxed font-normal">
+                One tap to lock your spot. Live synchronized rosters confirm your place instantly without awkward back-and-forth negotiations.
+              </p>
+            </div>
+          </article>
 
         </div>
 
       </div>
     </section>
 
-    <!-- ================= SECTION: FEATURES (Full-Width Bento Grid) ================= -->
-    <section id="features" class="w-full min-h-screen flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-20 sm:py-28 border-b border-zinc-200/80">
-      <div class="w-full max-w-[2200px] mx-auto">
+    <!-- ================= SECTION: FEATURES (Full-Width Bento Grid + Interactive Visuals) ================= -->
+    <section id="features" class="w-full min-h-screen flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-20 sm:py-28 border-b border-zinc-200/80 relative overflow-hidden">
+      
+      <div class="w-full max-w-[2200px] mx-auto relative z-10">
         
         <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-12 sm:mb-16">
           <div class="space-y-4 max-w-3xl">
-            <h2 class="section-title font-display font-extrabold text-zinc-950 uppercase">
-              Everything built for seamless play.
+            <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-blue-100 border border-blue-200 text-blue-600 text-xs font-black uppercase tracking-wider reveal-item">
+              <span class="w-2 h-2 rounded-full bg-blue-600 animate-ping"></span>
+              <span>Platform Engine</span>
+            </div>
+            <h2 class="section-title font-display font-extrabold text-zinc-950 uppercase reveal-item" style="--delay: 100ms">
+              Everything built for seamless play.<span class="inline-flex items-center mx-2 text-[#FBBF24] align-middle animate-wiggle"><svg class="w-8 h-8 sm:w-12 sm:h-12 fill-current" viewBox="0 0 74 120"><use href="#s-bolt" /></svg></span>
             </h2>
           </div>
-          <p class="text-base sm:text-xl text-zinc-600 max-w-md">
+          <p class="text-base sm:text-xl text-zinc-600 max-w-md reveal-item" style="--delay: 150ms">
             Clean, mobile-first, and lightning-fast. Designed to get you onto the court with the least friction possible.
           </p>
         </div>
 
-        <!-- Scaled Bento Grid -->
+        <!-- Scaled Bento Grid with Interactive Micro-Animations -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 2xl:gap-8">
           
-          <!-- Bento 1: Large Wide Banner -->
-          <div class="lg:col-span-8 bg-white p-8 sm:p-12 rounded-3xl border border-zinc-200 card-hover flex flex-col justify-between space-y-8">
-            <div class="space-y-4 max-w-2xl">
-              <h3 class="font-display font-bold text-3xl sm:text-4xl text-zinc-950">Hyper-Local Campus Map & Activity Radius</h3>
-              <p class="text-base text-zinc-600 leading-relaxed">
-                Whether you’re wrapping up class, studying at the library, or relaxing in the city, UniSport automatically highlights games happening within your preferred distance.
-              </p>
+          <!-- Bento 1: Large Wide Banner with Live Radar Visualization -->
+          <div class="lg:col-span-8 bg-white p-8 sm:p-12 rounded-3xl border border-zinc-200 shadow-xs card-hover tilt-card reveal-item flex flex-col justify-between space-y-8 relative overflow-hidden" style="--delay: 50ms">
+            
+            <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-6 relative z-10">
+              <div class="space-y-4 max-w-xl">
+                <h3 class="font-display font-extrabold text-2xl sm:text-4xl text-zinc-950 leading-tight">Hyper-Local Campus Map & Activity Radius</h3>
+                <p class="text-base text-zinc-600 leading-relaxed font-normal">
+                  Whether you’re wrapping up class, studying at the library, or relaxing in your dorm, UniSport scans games within your preferred radius.
+                </p>
+              </div>
+
+              <!-- Animated Radar Map Miniature Graphic -->
+              <div class="w-36 h-36 sm:w-44 sm:h-44 rounded-3xl bg-orange-50/80 border border-orange-200/80 relative flex items-center justify-center shrink-0 overflow-hidden shadow-inner">
+                <!-- Concentric Pulsing Radar Rings -->
+                <div class="radar-ring w-16 h-16 border border-brand-orange/40 bg-brand-orange/10"></div>
+                <div class="radar-ring w-28 h-28 border border-brand-orange/30 bg-brand-orange/5" style="animation-delay: 0.8s;"></div>
+                <div class="radar-ring w-40 h-40 border border-brand-orange/20" style="animation-delay: 1.6s;"></div>
+
+                <!-- Eindhoven Campus Center Pin -->
+                <div class="relative z-10 w-9 h-9 rounded-2xl bg-brand-orange text-white flex items-center justify-center shadow-md animate-bounce-subtle">
+                  <i data-lucide="crosshair" class="w-4 h-4"></i>
+                </div>
+
+                <!-- Surrounding nearby match dots -->
+                <div class="absolute top-4 right-5 w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm animate-ping"></div>
+                <div class="absolute bottom-6 left-6 w-2.5 h-2.5 rounded-full bg-blue-500 shadow-sm animate-pulse"></div>
+                <div class="absolute top-10 left-4 w-2 h-2 rounded-full bg-purple-500 shadow-sm"></div>
+              </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-zinc-100 text-xs font-bold text-zinc-700">
-              <div class="p-4 rounded-2xl bg-zinc-50 border border-zinc-200">
-                <span class="text-brand-orange block text-lg font-display">1 – 10 km</span>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-zinc-100 text-xs font-bold text-zinc-700 relative z-10">
+              <div class="p-4 rounded-2xl bg-zinc-50 border border-zinc-200 card-hover">
+                <span class="text-brand-orange block text-lg font-display font-black">1 – 10 km</span>
                 <span class="text-zinc-500 font-medium">Customizable Radius</span>
               </div>
-              <div class="p-4 rounded-2xl bg-zinc-50 border border-zinc-200">
-                <span class="text-zinc-900 block text-lg font-display">Instant Feed</span>
+              <div class="p-4 rounded-2xl bg-zinc-50 border border-zinc-200 card-hover">
+                <span class="text-zinc-900 block text-lg font-display font-black">Instant Feed</span>
                 <span class="text-zinc-500 font-medium">Today & Upcoming</span>
               </div>
-              <div class="p-4 rounded-2xl bg-zinc-50 border border-zinc-200">
-                <span class="text-zinc-900 block text-lg font-display">Filter by Sport</span>
+              <div class="p-4 rounded-2xl bg-zinc-50 border border-zinc-200 card-hover">
+                <span class="text-zinc-900 block text-lg font-display font-black">Filter by Sport</span>
                 <span class="text-zinc-500 font-medium">10+ Categories</span>
               </div>
             </div>
           </div>
 
-          <!-- Bento 2: Fast Match Creation -->
-          <div class="lg:col-span-4 bg-zinc-950 text-white p-8 sm:p-12 rounded-3xl card-hover flex flex-col justify-between space-y-8">
-            <div class="space-y-4">
-              <h3 class="font-display font-bold text-3xl text-white">30-Second Match Creation</h3>
-              <p class="text-sm sm:text-base text-zinc-400 leading-relaxed">
+          <!-- Bento 2: Fast Match Creation with Countdown Visual -->
+          <div class="lg:col-span-4 bg-zinc-950 text-white p-8 sm:p-12 rounded-3xl shadow-lg card-hover tilt-card reveal-item flex flex-col justify-between space-y-8 relative overflow-hidden" style="--delay: 100ms">
+            <div class="space-y-4 relative z-10">
+              <div class="flex items-center justify-between">
+                <span class="px-3 py-1 rounded-full bg-orange-500/20 text-brand-orange border border-orange-500/30 text-xs font-black uppercase tracking-wider">Fast Hosting</span>
+                <div class="text-[#FBBF24] animate-wiggle"><svg class="w-6 h-6 fill-current" viewBox="0 0 74 120"><use href="#s-bolt" /></svg></div>
+              </div>
+              <h3 class="font-display font-extrabold text-3xl text-white">30-Second Match Creation</h3>
+              <p class="text-sm sm:text-base text-zinc-400 leading-relaxed font-normal">
                 Need a 4th player for padel in an hour? Post a game with 3 taps. Push alerts notify matching athletes in the area immediately.
               </p>
             </div>
 
-            <a href="./app/" class="w-full py-4 bg-brand-orange hover:bg-brand-orange-hover text-white text-center font-bold text-sm rounded-2xl transition">
-              Create a Match Now &rarr;
+            <!-- Visual Match Progress Bar -->
+            <div class="p-4 rounded-2xl bg-zinc-900 border border-zinc-800 space-y-2 relative z-10">
+              <div class="flex items-center justify-between text-xs text-zinc-400 font-bold">
+                <span>Quick Setup</span>
+                <span class="text-brand-orange font-mono">00:30</span>
+              </div>
+              <div class="w-full bg-zinc-800 h-2 rounded-full overflow-hidden">
+                <div class="bg-gradient-to-r from-brand-orange to-amber-400 h-full w-3/4 rounded-full animate-pulse"></div>
+              </div>
+            </div>
+
+            <a href="./app/" class="w-full py-4 bg-brand-orange hover:bg-brand-orange-hover text-white text-center font-extrabold text-sm uppercase tracking-wide rounded-2xl transition duration-300 shadow-lg relative z-10 flex items-center justify-center space-x-2">
+              <span>Create a Match Now</span>
+              <i data-lucide="arrow-right" class="w-4 h-4"></i>
             </a>
           </div>
 
           <!-- Bento 3: Verified Student Access -->
-          <div class="lg:col-span-6 bg-white p-8 sm:p-12 rounded-3xl border border-zinc-200 card-hover flex flex-col justify-between space-y-6">
+          <div class="lg:col-span-6 bg-white p-8 sm:p-12 rounded-3xl border border-zinc-200 shadow-xs card-hover tilt-card reveal-item flex flex-col justify-between space-y-6" style="--delay: 150ms">
             <div class="space-y-3">
-              <h3 class="font-display font-bold text-2xl sm:text-3xl text-zinc-950">Verified Student Profiles</h3>
-              <p class="text-sm sm:text-base text-zinc-600 leading-relaxed">
+              <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-black">
+                <i data-lucide="shield-check" class="w-6 h-6"></i>
+              </div>
+              <h3 class="font-display font-extrabold text-2xl sm:text-3xl text-zinc-950">Verified Student Profiles</h3>
+              <p class="text-sm sm:text-base text-zinc-600 leading-relaxed font-normal">
                 Connect safely. See your peers' preferred sports, general skill ratings, and campus affiliation before heading to the court.
               </p>
             </div>
-            <div class="flex flex-wrap items-center gap-2 pt-2 text-xs font-bold text-zinc-500">
-              <span class="px-3 py-1.5 rounded-xl bg-zinc-100">Safe Community</span>
-              <span class="px-3 py-1.5 rounded-xl bg-zinc-100">Zero Commercial Spam</span>
-              <span class="px-3 py-1.5 rounded-xl bg-zinc-100">Peer Reviews</span>
+            <div class="flex flex-wrap items-center gap-2 pt-2 text-xs font-bold text-zinc-600">
+              <span class="px-3.5 py-1.5 rounded-xl bg-zinc-100 border border-zinc-200/80 flex items-center space-x-1.5">
+                <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600"></i>
+                <span>Safe Community</span>
+              </span>
+              <span class="px-3.5 py-1.5 rounded-xl bg-zinc-100 border border-zinc-200/80 flex items-center space-x-1.5">
+                <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600"></i>
+                <span>Zero Commercial Spam</span>
+              </span>
+              <span class="px-3.5 py-1.5 rounded-xl bg-zinc-100 border border-zinc-200/80 flex items-center space-x-1.5">
+                <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600"></i>
+                <span>Peer Endorsements</span>
+              </span>
             </div>
           </div>
 
           <!-- Bento 4: Live Rosters -->
-          <div class="lg:col-span-6 bg-white p-8 sm:p-12 rounded-3xl border border-zinc-200 card-hover flex flex-col justify-between space-y-6">
+          <div class="lg:col-span-6 bg-white p-8 sm:p-12 rounded-3xl border border-zinc-200 shadow-xs card-hover tilt-card reveal-item flex flex-col justify-between space-y-6" style="--delay: 200ms">
             <div class="space-y-3">
-              <h3 class="font-display font-bold text-2xl sm:text-3xl text-zinc-950">Live Spot Confirmation</h3>
-              <p class="text-sm sm:text-base text-zinc-600 leading-relaxed">
+              <div class="w-12 h-12 rounded-2xl bg-orange-50 text-brand-orange flex items-center justify-center font-black">
+                <i data-lucide="users" class="w-6 h-6"></i>
+              </div>
+              <h3 class="font-display font-extrabold text-2xl sm:text-3xl text-zinc-950">Live Spot Confirmation</h3>
+              <p class="text-sm sm:text-base text-zinc-600 leading-relaxed font-normal">
                 Every game has an exact capacity limit. When a student hits "Join", their spot is secured instantly without asking questions.
               </p>
             </div>
+
+            <!-- Live Synchronized Roster Slots -->
+            <div class="grid grid-cols-4 gap-2 text-center text-xs font-black">
+              <div class="p-2.5 rounded-xl bg-zinc-100 text-zinc-800 border border-zinc-200">Player 1 ✓</div>
+              <div class="p-2.5 rounded-xl bg-zinc-100 text-zinc-800 border border-zinc-200">Player 2 ✓</div>
+              <div class="p-2.5 rounded-xl bg-zinc-100 text-zinc-800 border border-zinc-200">Player 3 ✓</div>
+              <div class="p-2.5 rounded-xl bg-orange-100 text-brand-orange border border-orange-300 animate-pulse">Spot 4 ⚡</div>
+            </div>
+
             <div class="flex items-center space-x-3 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 p-3 rounded-2xl">
-              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
               <span>Roster updates sync in real-time across all devices</span>
             </div>
           </div>
@@ -369,113 +818,128 @@
       </div>
     </section>
 
-    <!-- ================= SECTION: POPULAR SPORTS (SVG Icon Badges) ================= -->
-    <section id="sports" class="w-full min-h-screen flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-20 sm:py-28 bg-[#F4F2EC] border-b border-zinc-200">
-      <div class="w-full max-w-[2200px] mx-auto">
+    <!-- ================= SECTION: POPULAR SPORTS (SVG Icon Badges + Micro-Interactions) ================= -->
+    <section id="sports" class="w-full min-h-screen flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-20 sm:py-28 bg-[#F4F2EC] border-b border-zinc-200 relative overflow-hidden">
+      
+      <!-- Subtle Floating Decorative Shapes on Borders -->
+      <div class="pointer-events-none absolute inset-0 z-0 overflow-hidden select-none">
+        <div class="absolute top-16 right-12 text-[#DDD6FE] w-20 h-20 animate-float-slow opacity-60" data-parallax="-0.2">
+          <svg viewBox="0 0 120 120" class="w-full h-full fill-current"><use href="#s-ring" /></svg>
+        </div>
+        <div class="absolute bottom-16 left-10 text-brand-orange w-16 h-16 animate-spin-slow opacity-75" data-parallax="0.18">
+          <svg viewBox="0 0 120 120" class="w-full h-full fill-current"><use href="#s-spark" /></svg>
+        </div>
+      </div>
+
+      <div class="w-full max-w-[2200px] mx-auto relative z-10 space-y-12">
         
-        <div class="max-w-3xl space-y-4 mb-12 sm:mb-16">
-          <h2 class="section-title font-display font-extrabold text-zinc-950 uppercase">
-            Whatever you play, someone's in.
+        <div class="max-w-3xl space-y-4">
+          <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-orange-100 border border-orange-200 text-brand-orange text-xs font-black uppercase tracking-wider reveal-item">
+            <span class="w-2 h-2 rounded-full bg-brand-orange animate-ping"></span>
+            <span>All Categories</span>
+          </div>
+          <h2 class="section-title font-display font-extrabold text-zinc-950 uppercase reveal-item" style="--delay: 100ms">
+            Whatever you play, someone's in.<span class="inline-flex items-center mx-2 text-brand-orange align-middle animate-spin-slow"><svg class="w-8 h-8 sm:w-12 sm:h-12 fill-current" viewBox="0 0 120 120"><use href="#s-spark" /></svg></span>
           </h2>
-          <p class="text-base sm:text-xl text-zinc-600">
-            From classic team sports to urban boulder gyms and distance running loops.
+          <p class="text-base sm:text-xl text-zinc-600 reveal-item" style="--delay: 150ms">
+            From classic team sports to urban boulder gyms and distance running loops. Hover any sport to preview.
           </p>
         </div>
 
-        <!-- Sport Cards Grid with Clean Lucide SVG Icons -->
+        <!-- Sport Cards Grid with Micro-Interactions on Hover & Scroll Reveal -->
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6 gap-4 sm:gap-6">
           
-          <div class="bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3">
-            <div class="w-10 h-10 rounded-2xl bg-orange-50 text-brand-orange flex items-center justify-center">
-              <i data-lucide="circle-dot" class="w-5 h-5"></i>
+          <div class="sport-card bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover tilt-card reveal-item space-y-3 cursor-pointer" style="--delay: 50ms">
+            <div class="sport-icon-badge w-12 h-12 rounded-2xl bg-orange-50 text-brand-orange flex items-center justify-center">
+              <i data-lucide="circle-dot" class="w-6 h-6"></i>
             </div>
             <h4 class="font-display font-bold text-lg text-zinc-950">Football 5v5</h4>
             <p class="text-xs text-zinc-500">Pick-up turf matches, astro cages, and casual Sunday matches.</p>
           </div>
 
-          <div class="bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3">
-            <div class="w-10 h-10 rounded-2xl bg-orange-50 text-brand-orange flex items-center justify-center">
-              <i data-lucide="crosshair" class="w-5 h-5"></i>
+          <div class="sport-card bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover tilt-card reveal-item space-y-3 cursor-pointer" style="--delay: 100ms">
+            <div class="sport-icon-badge w-12 h-12 rounded-2xl bg-orange-50 text-brand-orange flex items-center justify-center">
+              <i data-lucide="crosshair" class="w-6 h-6"></i>
             </div>
             <h4 class="font-display font-bold text-lg text-zinc-950">Padel Doubles</h4>
             <p class="text-xs text-zinc-500">Fast 4-player doubles matches. Find your 4th partner in minutes.</p>
           </div>
 
-          <div class="bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3">
-            <div class="w-10 h-10 rounded-2xl bg-orange-50 text-brand-orange flex items-center justify-center">
-              <i data-lucide="footprints" class="w-5 h-5"></i>
+          <div class="sport-card bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover tilt-card reveal-item space-y-3 cursor-pointer" style="--delay: 150ms">
+            <div class="sport-icon-badge w-12 h-12 rounded-2xl bg-orange-50 text-brand-orange flex items-center justify-center">
+              <i data-lucide="footprints" class="w-6 h-6"></i>
             </div>
             <h4 class="font-display font-bold text-lg text-zinc-950">Running Clubs</h4>
             <p class="text-xs text-zinc-500">Group pacing, sunrise 5Ks, and trail training loops.</p>
           </div>
 
-          <div class="bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3">
-            <div class="w-10 h-10 rounded-2xl bg-orange-50 text-brand-orange flex items-center justify-center">
-              <i data-lucide="mountain" class="w-5 h-5"></i>
+          <div class="sport-card bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover tilt-card reveal-item space-y-3 cursor-pointer" style="--delay: 200ms">
+            <div class="sport-icon-badge w-12 h-12 rounded-2xl bg-orange-50 text-brand-orange flex items-center justify-center">
+              <i data-lucide="mountain" class="w-6 h-6"></i>
             </div>
             <h4 class="font-display font-bold text-lg text-zinc-950">Bouldering</h4>
             <p class="text-xs text-zinc-500">Indoor climbing sessions, beta solving, and social sessions.</p>
           </div>
 
-          <div class="bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3">
-            <div class="w-10 h-10 rounded-2xl bg-orange-50 text-brand-orange flex items-center justify-center">
-              <i data-lucide="target" class="w-5 h-5"></i>
+          <div class="sport-card bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover tilt-card reveal-item space-y-3 cursor-pointer" style="--delay: 250ms">
+            <div class="sport-icon-badge w-12 h-12 rounded-2xl bg-orange-50 text-brand-orange flex items-center justify-center">
+              <i data-lucide="target" class="w-6 h-6"></i>
             </div>
             <h4 class="font-display font-bold text-lg text-zinc-950">Basketball 3x3</h4>
             <p class="text-xs text-zinc-500">Half-court games, street ball courts, and indoor gym runs.</p>
           </div>
 
-          <div class="bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3">
-            <div class="w-10 h-10 rounded-2xl bg-orange-50 text-brand-orange flex items-center justify-center">
-              <i data-lucide="dumbbell" class="w-5 h-5"></i>
+          <div class="sport-card bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover tilt-card reveal-item space-y-3 cursor-pointer" style="--delay: 300ms">
+            <div class="sport-icon-badge w-12 h-12 rounded-2xl bg-orange-50 text-brand-orange flex items-center justify-center">
+              <i data-lucide="dumbbell" class="w-6 h-6"></i>
             </div>
             <h4 class="font-display font-bold text-lg text-zinc-950">Gym & Fitness</h4>
             <p class="text-xs text-zinc-500">Workout partners, spotters, and calisthenics circuits.</p>
           </div>
 
-          <div class="bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3">
-            <div class="w-10 h-10 rounded-2xl bg-orange-50 text-brand-orange flex items-center justify-center">
-              <i data-lucide="activity" class="w-5 h-5"></i>
+          <div class="sport-card bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover tilt-card reveal-item space-y-3 cursor-pointer" style="--delay: 350ms">
+            <div class="sport-icon-badge w-12 h-12 rounded-2xl bg-orange-50 text-brand-orange flex items-center justify-center">
+              <i data-lucide="activity" class="w-6 h-6"></i>
             </div>
             <h4 class="font-display font-bold text-lg text-zinc-950">Volleyball</h4>
             <p class="text-xs text-zinc-500">Beach volleyball, sand pits, and indoor campus games.</p>
           </div>
 
-          <div class="bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3">
-            <div class="w-10 h-10 rounded-2xl bg-orange-50 text-brand-orange flex items-center justify-center">
-              <i data-lucide="disc" class="w-5 h-5"></i>
+          <div class="sport-card bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover tilt-card reveal-item space-y-3 cursor-pointer" style="--delay: 400ms">
+            <div class="sport-icon-badge w-12 h-12 rounded-2xl bg-orange-50 text-brand-orange flex items-center justify-center">
+              <i data-lucide="disc" class="w-6 h-6"></i>
             </div>
             <h4 class="font-display font-bold text-lg text-zinc-950">Badminton</h4>
             <p class="text-xs text-zinc-500">Indoor singles and doubles across student sports halls.</p>
           </div>
 
-          <div class="bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3">
-            <div class="w-10 h-10 rounded-2xl bg-orange-50 text-brand-orange flex items-center justify-center">
-              <i data-lucide="bike" class="w-5 h-5"></i>
+          <div class="sport-card bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover tilt-card reveal-item space-y-3 cursor-pointer" style="--delay: 450ms">
+            <div class="sport-icon-badge w-12 h-12 rounded-2xl bg-orange-50 text-brand-orange flex items-center justify-center">
+              <i data-lucide="bike" class="w-6 h-6"></i>
             </div>
             <h4 class="font-display font-bold text-lg text-zinc-950">Cycling</h4>
             <p class="text-xs text-zinc-500">Road group rides, gravel loops, and leisure weekend tours.</p>
           </div>
 
-          <div class="bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3">
-            <div class="w-10 h-10 rounded-2xl bg-orange-50 text-brand-orange flex items-center justify-center">
-              <i data-lucide="shield" class="w-5 h-5"></i>
+          <div class="sport-card bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover tilt-card reveal-item space-y-3 cursor-pointer" style="--delay: 500ms">
+            <div class="sport-icon-badge w-12 h-12 rounded-2xl bg-orange-50 text-brand-orange flex items-center justify-center">
+              <i data-lucide="shield" class="w-6 h-6"></i>
             </div>
             <h4 class="font-display font-bold text-lg text-zinc-950">Tennis</h4>
             <p class="text-xs text-zinc-500">Clay and hard-court singles sparring or casual sets.</p>
           </div>
 
-          <div class="bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3">
-            <div class="w-10 h-10 rounded-2xl bg-orange-50 text-brand-orange flex items-center justify-center">
-              <i data-lucide="sparkles" class="w-5 h-5"></i>
+          <div class="sport-card bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover tilt-card reveal-item space-y-3 cursor-pointer" style="--delay: 550ms">
+            <div class="sport-icon-badge w-12 h-12 rounded-2xl bg-orange-50 text-brand-orange flex items-center justify-center">
+              <i data-lucide="sparkles" class="w-6 h-6"></i>
             </div>
             <h4 class="font-display font-bold text-lg text-zinc-950">Yoga / Core</h4>
             <p class="text-xs text-zinc-500">Park yoga sessions, mobility routines, and recovery groups.</p>
           </div>
 
-          <div class="bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3">
-            <div class="w-10 h-10 rounded-2xl bg-orange-50 text-brand-orange flex items-center justify-center">
-              <i data-lucide="award" class="w-5 h-5"></i>
+          <div class="sport-card bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover tilt-card reveal-item space-y-3 cursor-pointer" style="--delay: 600ms">
+            <div class="sport-icon-badge w-12 h-12 rounded-2xl bg-orange-50 text-brand-orange flex items-center justify-center">
+              <i data-lucide="award" class="w-6 h-6"></i>
             </div>
             <h4 class="font-display font-bold text-lg text-zinc-950">Table Tennis</h4>
             <p class="text-xs text-zinc-500">Campus table tournaments and casual after-class ping pong.</p>
@@ -487,54 +951,69 @@
     </section>
 
     <!-- ================= SECTION: FAQ ACCORDION ================= -->
-    <section id="faq" class="w-full min-h-screen flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-20 sm:py-28 border-b border-zinc-200/80">
-      <div class="w-full max-w-5xl mx-auto space-y-12">
+    <section id="faq" class="w-full min-h-screen flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-20 sm:py-28 border-b border-zinc-200/80 relative overflow-hidden">
+      
+      <!-- Subtle Floating Decorative Shapes on FAQ Borders -->
+      <div class="pointer-events-none absolute inset-0 z-0 overflow-hidden select-none">
+        <div class="absolute top-20 left-10 text-[#DDD6FE] w-16 h-16 animate-float-slow opacity-65" data-parallax="0.18">
+          <svg viewBox="0 0 120 120" class="w-full h-full fill-current"><use href="#s-ring" /></svg>
+        </div>
+        <div class="absolute bottom-20 right-10 text-[#FBBF24] w-12 h-16 animate-wiggle opacity-75" data-parallax="-0.2">
+          <svg viewBox="0 0 74 120" class="w-full h-full fill-current"><use href="#s-bolt" /></svg>
+        </div>
+      </div>
+
+      <div class="w-full max-w-5xl mx-auto space-y-12 relative z-10">
         
         <div class="text-center space-y-4">
-          <h2 class="section-title font-display font-extrabold text-zinc-950 uppercase">
-            Frequently Asked Questions
+          <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-orange-100 border border-orange-200 text-brand-orange text-xs font-black uppercase tracking-wider reveal-item">
+            <span class="w-2 h-2 rounded-full bg-brand-orange animate-ping"></span>
+            <span>Support & Info</span>
+          </div>
+          <h2 class="section-title font-display font-extrabold text-zinc-950 uppercase reveal-item" style="--delay: 100ms">
+            Frequently Asked Questions<span class="inline-flex items-center mx-2 text-[#3B82F6] align-middle animate-float-slow"><svg class="w-8 h-8 sm:w-12 sm:h-12 fill-current" viewBox="0 0 120 120"><use href="#s-arc" /></svg></span>
           </h2>
-          <p class="text-base sm:text-xl text-zinc-600 max-w-2xl mx-auto">
+          <p class="text-base sm:text-xl text-zinc-600 max-w-2xl mx-auto reveal-item" style="--delay: 150ms">
             Everything you need to know about starting, finding teammates, and organizing games.
           </p>
         </div>
 
         <div class="space-y-4" id="faq-accordion">
           
-          <div class="bg-white p-6 sm:p-8 rounded-3xl border border-zinc-200 cursor-pointer faq-item shadow-xs">
+          <div class="bg-white p-6 sm:p-8 rounded-3xl border border-zinc-200 cursor-pointer faq-item shadow-xs card-hover reveal-item" style="--delay: 50ms">
             <div class="flex items-center justify-between font-display font-bold text-lg sm:text-xl text-zinc-950">
               <span>Is UniSport completely free to use?</span>
-              <span class="text-brand-orange text-2xl font-normal faq-icon">+</span>
+              <span class="text-brand-orange text-2xl font-normal faq-icon transition-transform duration-300">+</span>
             </div>
             <p class="hidden pt-4 text-sm sm:text-base text-zinc-600 leading-relaxed faq-answer">
               Yes, UniSport is 100% free for students. Our goal is to break physical inactivity and make connecting for sports as seamless and spontaneous as sending a message.
             </p>
           </div>
 
-          <div class="bg-white p-6 sm:p-8 rounded-3xl border border-zinc-200 cursor-pointer faq-item shadow-xs">
+          <div class="bg-white p-6 sm:p-8 rounded-3xl border border-zinc-200 cursor-pointer faq-item shadow-xs card-hover reveal-item" style="--delay: 100ms">
             <div class="flex items-center justify-between font-display font-bold text-lg sm:text-xl text-zinc-950">
               <span>How does match hosting work?</span>
-              <span class="text-brand-orange text-2xl font-normal faq-icon">+</span>
+              <span class="text-brand-orange text-2xl font-normal faq-icon transition-transform duration-300">+</span>
             </div>
             <p class="hidden pt-4 text-sm sm:text-base text-zinc-600 leading-relaxed faq-answer">
               Any verified student can post a match in under 30 seconds by picking a sport, choosing a location, selecting the time, and setting maximum participants. Nearby students will see the match in their feed and can claim open spots.
             </p>
           </div>
 
-          <div class="bg-white p-6 sm:p-8 rounded-3xl border border-zinc-200 cursor-pointer faq-item shadow-xs">
+          <div class="bg-white p-6 sm:p-8 rounded-3xl border border-zinc-200 cursor-pointer faq-item shadow-xs card-hover reveal-item" style="--delay: 150ms">
             <div class="flex items-center justify-between font-display font-bold text-lg sm:text-xl text-zinc-950">
               <span>What if I'm a complete beginner in a sport?</span>
-              <span class="text-brand-orange text-2xl font-normal faq-icon">+</span>
+              <span class="text-brand-orange text-2xl font-normal faq-icon transition-transform duration-300">+</span>
             </div>
             <p class="hidden pt-4 text-sm sm:text-base text-zinc-600 leading-relaxed faq-answer">
               UniSport has skill tags on every activity ("Casual", "Beginner Friendly", "Intermediate", "Competitive"). You can join games matching your confidence level without feeling out of place.
             </p>
           </div>
 
-          <div class="bg-white p-6 sm:p-8 rounded-3xl border border-zinc-200 cursor-pointer faq-item shadow-xs">
+          <div class="bg-white p-6 sm:p-8 rounded-3xl border border-zinc-200 cursor-pointer faq-item shadow-xs card-hover reveal-item" style="--delay: 200ms">
             <div class="flex items-center justify-between font-display font-bold text-lg sm:text-xl text-zinc-950">
               <span>Can I use UniSport on mobile?</span>
-              <span class="text-brand-orange text-2xl font-normal faq-icon">+</span>
+              <span class="text-brand-orange text-2xl font-normal faq-icon transition-transform duration-300">+</span>
             </div>
             <p class="hidden pt-4 text-sm sm:text-base text-zinc-600 leading-relaxed faq-answer">
               Absolutely. UniSport is built mobile-first as a Progressive Web App (PWA). You can open it on Safari or Chrome on your phone, add it to your home screen, and access everything instantly.
@@ -547,18 +1026,35 @@
     </section>
 
     <!-- ================= HIGH-IMPACT CONTRAST CLIMAX BANNER ================= -->
-    <section class="w-full min-h-[85vh] flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-20 sm:py-28 bg-zinc-950 text-white text-center">
-      <div class="w-full max-w-[1900px] mx-auto space-y-10">
+    <section class="w-full min-h-[85vh] flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-20 sm:py-28 bg-zinc-950 text-white text-center relative overflow-hidden">
+      
+      <!-- Neon Floating Stickers in Dark Section -->
+      <div class="pointer-events-none absolute inset-0 z-0 overflow-hidden select-none">
+        <div class="absolute top-12 left-8 sm:left-24 text-brand-orange w-16 h-16 sm:w-28 sm:h-28 animate-spin-slow opacity-80" data-parallax="0.25">
+          <svg viewBox="0 0 120 120" class="w-full h-full fill-current drop-shadow-[0_0_20px_rgba(255,77,0,0.6)]"><use href="#s-spark" /></svg>
+        </div>
+        <div class="absolute bottom-16 right-8 sm:right-28 text-[#FBBF24] w-12 h-16 sm:w-20 sm:h-28 animate-wiggle opacity-85" data-parallax="-0.25">
+          <svg viewBox="0 0 74 120" class="w-full h-full fill-current drop-shadow-[0_0_20px_rgba(251,191,36,0.5)]"><use href="#s-bolt" /></svg>
+        </div>
+        <div class="absolute top-1/2 -translate-y-12 right-6 sm:right-16 text-[#60A5FA] w-14 h-14 sm:w-20 sm:h-20 animate-float-slow opacity-60" data-parallax="0.15">
+          <svg viewBox="0 0 120 120" class="w-full h-full fill-current drop-shadow-[0_0_15px_rgba(96,165,250,0.4)]"><use href="#s-arc" /></svg>
+        </div>
+        <div class="absolute bottom-12 left-10 sm:left-20 text-[#DDD6FE] w-14 h-14 sm:w-20 sm:h-20 animate-float-reverse opacity-50" data-parallax="-0.15">
+          <svg viewBox="0 0 120 120" class="w-full h-full fill-current drop-shadow-[0_0_15px_rgba(221,214,254,0.3)]"><use href="#s-ring" /></svg>
+        </div>
+      </div>
+
+      <div class="w-full max-w-[1900px] mx-auto space-y-10 relative z-10">
         
-        <h2 class="hero-title font-display font-extrabold text-white uppercase tracking-tight max-w-[1800px] mx-auto leading-tight">
-          Your next game is <span class="text-brand-orange inline-block">waiting for you.</span>
+        <h2 class="hero-title font-display font-extrabold text-white uppercase tracking-tight max-w-[1800px] mx-auto leading-tight reveal-item" style="--delay: 100ms">
+          Your next game is <span class="text-brand-orange inline-flex items-center gap-2 sm:gap-3">waiting for you.<svg class="w-8 h-8 sm:w-14 sm:h-14 inline-block text-[#FBBF24] animate-wiggle fill-current" viewBox="0 0 74 120"><use href="#s-bolt" /></svg></span>
         </h2>
 
-        <p class="text-lg sm:text-2xl 2xl:text-3xl text-zinc-400 max-w-3xl mx-auto font-normal leading-relaxed">
+        <p class="text-lg sm:text-2xl 2xl:text-3xl text-zinc-400 max-w-3xl mx-auto font-normal leading-relaxed reveal-item" style="--delay: 200ms">
           Join university students across the city. Experience the easiest way to organize, discover, and play sports together.
         </p>
 
-        <div class="pt-6 flex items-center justify-center">
+        <div class="pt-6 flex items-center justify-center reveal-item" style="--delay: 300ms">
           <a href="./app/" class="group relative inline-flex items-center space-x-4 bg-brand-orange hover:bg-brand-orange-hover text-white font-extrabold text-base sm:text-xl uppercase tracking-wider py-6 px-12 rounded-2xl shadow-[0_15px_35px_-8px_rgba(255,77,0,0.65)] hover:shadow-[0_25px_45px_-6px_rgba(255,77,0,0.8)] transition-all duration-300 transform hover:-translate-y-1 active:translate-y-0 active:scale-[0.98] border border-orange-400/30">
             <span>Launch UniSport Web App</span>
             <i data-lucide="arrow-right" class="w-6 h-6 transition-transform duration-300 group-hover:translate-x-1.5"></i>
@@ -576,7 +1072,7 @@
       
       <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-8 border-b border-zinc-100">
         <div class="flex items-center space-x-3.5">
-          <img src="./assets/logoUniSport.png" alt="UniSport" class="h-8 w-auto object-contain" onerror="this.onerror=null; this.src='../assets/logoUniSport.png';" />
+          <img src="./assets/logoUniSport.png" alt="UniSport" class="h-8 w-auto object-contain transition-transform hover:scale-110" onerror="this.onerror=null; this.src='../assets/logoUniSport.png';" />
           <span class="font-display font-bold text-lg text-zinc-950">UniSport</span>
           <span class="text-zinc-300">|</span>
           <span class="text-zinc-500 font-medium">The Student Sports Platform</span>
@@ -591,8 +1087,11 @@
       </div>
 
       <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-400">
-        <div>
-          &copy; 2026 UniSport Technologies Inc. All rights reserved.
+        <div class="flex items-center space-x-2">
+          <span>&copy; 2026 UniSport Technologies Inc. All rights reserved.</span>
+          <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 font-medium text-[11px] border border-emerald-200">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping mr-1"></span> Eindhoven Active
+          </span>
         </div>
         <div class="flex items-center space-x-6">
           <a href="#" class="hover:text-zinc-600 transition">Privacy Policy</a>
@@ -606,13 +1105,92 @@
     </div>
   </footer>
 
-  <!-- ================= LOGIC CONTROLLER ================= -->
+  <!-- ================= COMPREHENSIVE INTERACTIVE ANIMATION CONTROLLER ================= -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // 1. Initialize Icons
+      // 1. Initialize Lucide Icons
       lucide.createIcons();
 
-      // 2. FAQ Accordion Toggle
+      // 2. IntersectionObserver for Smooth Scroll Reveal Animations
+      const revealObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-revealed');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, {
+        threshold: 0.12,
+        rootMargin: '0px 0px -40px 0px'
+      });
+
+      document.querySelectorAll('.reveal-item, .reveal-scale').forEach(el => {
+        revealObserver.observe(el);
+      });
+
+      // 3. Scroll Parallax Engine for Floating Stickers (Mentic style)
+      const parallaxElements = document.querySelectorAll('[data-parallax]');
+      let ticking = false;
+
+      function updateParallax() {
+        const scrollY = window.pageYOffset || document.documentElement.scrollTop;
+        parallaxElements.forEach(el => {
+          const speed = parseFloat(el.getAttribute('data-parallax')) || 0.1;
+          const rect = el.getBoundingClientRect();
+          // Only transform if in near-viewport
+          if (rect.top < window.innerHeight + 200 && rect.bottom > -200) {
+            const yOffset = (scrollY - (rect.top + scrollY - window.innerHeight / 2)) * speed * 0.15;
+            el.style.transform = `translate3d(0, ${yOffset}px, 0)`;
+          }
+        });
+        ticking = false;
+      }
+
+      window.addEventListener('scroll', () => {
+        if (!ticking) {
+          window.requestAnimationFrame(updateParallax);
+          ticking = true;
+        }
+      }, { passive: true });
+      updateParallax();
+
+      // 4. Interactive 3D Tilt on Hover for Cards
+      const tiltCards = document.querySelectorAll('.tilt-card');
+      tiltCards.forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          const centerX = rect.width / 2;
+          const centerY = rect.height / 2;
+          const rotateX = ((y - centerY) / centerY) * -5;
+          const rotateY = ((x - centerX) / centerX) * 5;
+
+          card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px)`;
+        });
+
+        card.addEventListener('mouseleave', () => {
+          card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)';
+        });
+      });
+
+      // 5. Playful Easter Egg Click on Cartoon Stickers (360 Bounce Spin)
+      const stickers = document.querySelectorAll('.cartoon-sticker');
+      stickers.forEach(sticker => {
+        sticker.addEventListener('click', () => {
+          sticker.animate([
+            { transform: 'scale(1) rotate(0deg)' },
+            { transform: 'scale(1.3) rotate(-15deg)' },
+            { transform: 'scale(1.2) rotate(375deg)' },
+            { transform: 'scale(1) rotate(360deg)' }
+          ], {
+            duration: 650,
+            easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)'
+          });
+        });
+      });
+
+      // 6. Smooth FAQ Accordion Toggle
       const faqItems = document.querySelectorAll('.faq-item');
       faqItems.forEach(item => {
         item.addEventListener('click', () => {
@@ -622,11 +1200,15 @@
 
           // Close all
           document.querySelectorAll('.faq-answer').forEach(a => a.classList.add('hidden'));
-          document.querySelectorAll('.faq-icon').forEach(i => i.textContent = '+');
+          document.querySelectorAll('.faq-icon').forEach(i => {
+            i.textContent = '+';
+            i.style.transform = 'rotate(0deg)';
+          });
 
           if (isClosed) {
             answer.classList.remove('hidden');
             icon.textContent = '—';
+            icon.style.transform = 'rotate(180deg)';
           }
         });
       });
