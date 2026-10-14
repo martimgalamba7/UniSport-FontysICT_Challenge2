@@ -12,6 +12,8 @@
   "rewrites": [
     { "source": "/", "destination": "/index.html" },
     { "source": "/challenge2", "destination": "/index.html" },
+    { "source": "/challenge2/unisport", "destination": "/challenge2/unisport/index.html" },
+    { "source": "/challenge2/unisport/app", "destination": "/challenge2/unisport/app/index.html" },
     { "source": "/challenge2/survey", "destination": "/survey/index.html" },
     { "source": "/survey", "destination": "/survey/index.html" },
     { "source": "/app", "destination": "/challenge2/unisport/app/index.html" },
