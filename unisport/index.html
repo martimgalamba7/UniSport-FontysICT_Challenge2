@@ -52,14 +52,6 @@
 
   <!-- Critical Inline Typography Fallback (ensures 100% resilient layout regardless of stylesheet load timing) -->
   <style>
-    html {
-      scroll-snap-type: y mandatory;
-      scroll-padding-top: 5rem;
-    }
-    .snap-section {
-      scroll-snap-align: start;
-      scroll-snap-stop: always;
-    }
     .hero-title {
       font-size: clamp(2.75rem, 6.5vw + 1rem, 7.5rem);
       line-height: 0.95;
@@ -86,28 +78,6 @@
 </head>
 
 <body class="bg-[#FAFAF8] text-zinc-900 font-sans min-h-screen flex flex-col justify-between selection:bg-brand-orange selection:text-white">
-
-  <!-- ================= FLOATING GUIDED SECTION INDICATOR (Desktop Right Margin) ================= -->
-  <nav class="guided-scroll-nav hidden lg:flex" aria-label="Guided Section Navigation">
-    <a href="#hero" class="guided-dot active" data-section="hero" title="Home">
-      <span class="guided-tooltip">Home</span>
-    </a>
-    <a href="#why" class="guided-dot" data-section="why" title="Why UniSport">
-      <span class="guided-tooltip">Why UniSport</span>
-    </a>
-    <a href="#features" class="guided-dot" data-section="features" title="Features">
-      <span class="guided-tooltip">Features</span>
-    </a>
-    <a href="#sports" class="guided-dot" data-section="sports" title="Sports">
-      <span class="guided-tooltip">Sports</span>
-    </a>
-    <a href="#faq" class="guided-dot" data-section="faq" title="FAQ">
-      <span class="guided-tooltip">FAQ</span>
-    </a>
-    <a href="#launch" class="guided-dot" data-section="launch" title="Get Started">
-      <span class="guided-tooltip">Get Started</span>
-    </a>
-  </nav>
 
   <!-- ================= TOP NAVIGATION BAR (Full-Bleed Startup Header) ================= -->
   <header class="sticky top-0 z-50 bg-[#FAFAF8]/90 backdrop-blur-xl border-b border-zinc-200/80 transition-all">
@@ -139,11 +109,11 @@
     </div>
   </header>
 
-  <!-- ================= MAIN CONTENT (Ultra-Wide Full-Bleed Guided Snap Sections) ================= -->
+  <!-- ================= MAIN CONTENT (Ultra-Wide Full-Bleed Scaling) ================= -->
   <main class="flex-grow w-full">
 
-    <!-- ================= 1. HERO SECTION (Snap Section with Kinetic Marquee at Bottom) ================= -->
-    <section id="hero" class="snap-section w-full min-h-[calc(100vh-5rem)] flex flex-col justify-between border-b border-zinc-200/80 relative overflow-hidden">
+    <!-- ================= HERO SECTION (Full Viewport Scaled) ================= -->
+    <section class="w-full min-h-[calc(100vh-5rem)] flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-16 sm:py-24 border-b border-zinc-200/80 relative overflow-hidden">
       
       <!-- Large Sports Parallax Icons in Hero -->
       <div class="sport-parallax-icon-wrapper absolute right-4 sm:right-12 lg:right-24 top-16 sm:top-20 pointer-events-none z-0" data-parallax-speed="0.22" data-parallax-rotate="0.05">
@@ -152,7 +122,7 @@
         </div>
       </div>
 
-      <div class="sport-parallax-icon-wrapper absolute right-16 sm:right-36 lg:right-60 bottom-24 sm:bottom-32 pointer-events-none z-0 opacity-40" data-parallax-speed="-0.18" data-parallax-rotate="-0.04">
+      <div class="sport-parallax-icon-wrapper absolute right-16 sm:right-36 lg:right-60 bottom-12 sm:bottom-20 pointer-events-none z-0 opacity-40" data-parallax-speed="-0.18" data-parallax-rotate="-0.04">
         <div class="animate-bob-2 icon-size-lg text-zinc-500">
           <i data-lucide="target" class="w-full h-full stroke-[1.5]"></i>
         </div>
@@ -164,9 +134,9 @@
         </div>
       </div>
 
-      <!-- Main Hero Content Stage -->
-      <div class="w-full px-6 sm:px-10 lg:px-16 2xl:px-24 pt-12 sm:pt-20 pb-8 my-auto relative z-10">
+      <div class="w-full relative z-10">
         
+        <!-- Oversized Fluid Hero Headline with Startup Motto -->
         <div class="w-full max-w-[2200px] space-y-8">
           
           <h1 class="hero-title font-display font-extrabold text-zinc-950 uppercase reveal-on-scroll">
@@ -189,89 +159,88 @@
         </div>
 
       </div>
-
-      <!-- Kinetic Marquee anchored at the base of Hero -->
-      <div class="w-full py-4 sm:py-5 bg-zinc-950 text-white overflow-hidden font-display font-extrabold text-lg sm:text-xl 2xl:text-2xl tracking-tight uppercase select-none relative z-10">
-        <div class="animate-marquee whitespace-nowrap flex items-center space-x-12">
-          <span class="inline-flex items-center space-x-3">
-            <i data-lucide="circle-dot" class="w-5 h-5 text-brand-orange"></i>
-            <span>Football 5v5</span>
-          </span>
-          <span class="text-zinc-700">•</span>
-          <span class="inline-flex items-center space-x-3">
-            <i data-lucide="crosshair" class="w-5 h-5 text-brand-orange"></i>
-            <span>Padel Doubles</span>
-          </span>
-          <span class="text-zinc-700">•</span>
-          <span class="inline-flex items-center space-x-3">
-            <i data-lucide="footprints" class="w-5 h-5 text-brand-orange"></i>
-            <span>Sunset 5K Run</span>
-          </span>
-          <span class="text-zinc-700">•</span>
-          <span class="inline-flex items-center space-x-3">
-            <i data-lucide="mountain" class="w-5 h-5 text-brand-orange"></i>
-            <span>Bouldering Crew</span>
-          </span>
-          <span class="text-zinc-700">•</span>
-          <span class="inline-flex items-center space-x-3">
-            <i data-lucide="target" class="w-5 h-5 text-brand-orange"></i>
-            <span>Basketball 3x3</span>
-          </span>
-          <span class="text-zinc-700">•</span>
-          <span class="inline-flex items-center space-x-3">
-            <i data-lucide="dumbbell" class="w-5 h-5 text-brand-orange"></i>
-            <span>Fitness Circuits</span>
-          </span>
-          <span class="text-zinc-700">•</span>
-          <span class="inline-flex items-center space-x-3">
-            <i data-lucide="activity" class="w-5 h-5 text-brand-orange"></i>
-            <span>Volleyball Squad</span>
-          </span>
-          <span class="text-zinc-700">•</span>
-          <span class="inline-flex items-center space-x-3">
-            <i data-lucide="bike" class="w-5 h-5 text-brand-orange"></i>
-            <span>Group Cycling</span>
-          </span>
-          <span class="text-zinc-700">•</span>
-
-          <!-- Duplicated items for smooth infinite loop -->
-          <span class="inline-flex items-center space-x-3">
-            <i data-lucide="circle-dot" class="w-5 h-5 text-brand-orange"></i>
-            <span>Football 5v5</span>
-          </span>
-          <span class="text-zinc-700">•</span>
-          <span class="inline-flex items-center space-x-3">
-            <i data-lucide="crosshair" class="w-5 h-5 text-brand-orange"></i>
-            <span>Padel Doubles</span>
-          </span>
-          <span class="text-zinc-700">•</span>
-          <span class="inline-flex items-center space-x-3">
-            <i data-lucide="footprints" class="w-5 h-5 text-brand-orange"></i>
-            <span>Sunset 5K Run</span>
-          </span>
-          <span class="text-zinc-700">•</span>
-          <span class="inline-flex items-center space-x-3">
-            <i data-lucide="mountain" class="w-5 h-5 text-brand-orange"></i>
-            <span>Bouldering Crew</span>
-          </span>
-          <span class="text-zinc-700">•</span>
-          <span class="inline-flex items-center space-x-3">
-            <i data-lucide="target" class="w-5 h-5 text-brand-orange"></i>
-            <span>Basketball 3x3</span>
-          </span>
-          <span class="text-zinc-700">•</span>
-          <span class="inline-flex items-center space-x-3">
-            <i data-lucide="dumbbell" class="w-5 h-5 text-brand-orange"></i>
-            <span>Fitness Circuits</span>
-          </span>
-          <span class="text-zinc-700">•</span>
-        </div>
-      </div>
-
     </section>
 
-    <!-- ================= 2. WHY UNISPORT (Snap Section - Editorial Manifesto) ================= -->
-    <section id="why" class="snap-section w-full min-h-screen flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-20 sm:py-28 bg-[#F4F2EC] border-b border-zinc-200 relative overflow-hidden">
+    <!-- ================= FULL-WIDTH KINETIC MARQUEE (Clean SVG Icons) ================= -->
+    <div class="w-full py-5 bg-zinc-950 text-white overflow-hidden font-display font-extrabold text-lg sm:text-xl 2xl:text-2xl tracking-tight uppercase select-none">
+      <div class="animate-marquee whitespace-nowrap flex items-center space-x-12">
+        <span class="inline-flex items-center space-x-3">
+          <i data-lucide="circle-dot" class="w-5 h-5 text-brand-orange"></i>
+          <span>Football 5v5</span>
+        </span>
+        <span class="text-zinc-700">•</span>
+        <span class="inline-flex items-center space-x-3">
+          <i data-lucide="crosshair" class="w-5 h-5 text-brand-orange"></i>
+          <span>Padel Doubles</span>
+        </span>
+        <span class="text-zinc-700">•</span>
+        <span class="inline-flex items-center space-x-3">
+          <i data-lucide="footprints" class="w-5 h-5 text-brand-orange"></i>
+          <span>Sunset 5K Run</span>
+        </span>
+        <span class="text-zinc-700">•</span>
+        <span class="inline-flex items-center space-x-3">
+          <i data-lucide="mountain" class="w-5 h-5 text-brand-orange"></i>
+          <span>Bouldering Crew</span>
+        </span>
+        <span class="text-zinc-700">•</span>
+        <span class="inline-flex items-center space-x-3">
+          <i data-lucide="target" class="w-5 h-5 text-brand-orange"></i>
+          <span>Basketball 3x3</span>
+        </span>
+        <span class="text-zinc-700">•</span>
+        <span class="inline-flex items-center space-x-3">
+          <i data-lucide="dumbbell" class="w-5 h-5 text-brand-orange"></i>
+          <span>Fitness Circuits</span>
+        </span>
+        <span class="text-zinc-700">•</span>
+        <span class="inline-flex items-center space-x-3">
+          <i data-lucide="activity" class="w-5 h-5 text-brand-orange"></i>
+          <span>Volleyball Squad</span>
+        </span>
+        <span class="text-zinc-700">•</span>
+        <span class="inline-flex items-center space-x-3">
+          <i data-lucide="bike" class="w-5 h-5 text-brand-orange"></i>
+          <span>Group Cycling</span>
+        </span>
+        <span class="text-zinc-700">•</span>
+
+        <!-- Duplicated items for smooth infinite loop -->
+        <span class="inline-flex items-center space-x-3">
+          <i data-lucide="circle-dot" class="w-5 h-5 text-brand-orange"></i>
+          <span>Football 5v5</span>
+        </span>
+        <span class="text-zinc-700">•</span>
+        <span class="inline-flex items-center space-x-3">
+          <i data-lucide="crosshair" class="w-5 h-5 text-brand-orange"></i>
+          <span>Padel Doubles</span>
+        </span>
+        <span class="text-zinc-700">•</span>
+        <span class="inline-flex items-center space-x-3">
+          <i data-lucide="footprints" class="w-5 h-5 text-brand-orange"></i>
+          <span>Sunset 5K Run</span>
+        </span>
+        <span class="text-zinc-700">•</span>
+        <span class="inline-flex items-center space-x-3">
+          <i data-lucide="mountain" class="w-5 h-5 text-brand-orange"></i>
+          <span>Bouldering Crew</span>
+        </span>
+        <span class="text-zinc-700">•</span>
+        <span class="inline-flex items-center space-x-3">
+          <i data-lucide="target" class="w-5 h-5 text-brand-orange"></i>
+          <span>Basketball 3x3</span>
+        </span>
+        <span class="text-zinc-700">•</span>
+        <span class="inline-flex items-center space-x-3">
+          <i data-lucide="dumbbell" class="w-5 h-5 text-brand-orange"></i>
+          <span>Fitness Circuits</span>
+        </span>
+        <span class="text-zinc-700">•</span>
+      </div>
+    </div>
+
+    <!-- ================= SECTION: WHY UNISPORT (Editorial Manifesto Style - ZERO BOXED CARDS) ================= -->
+    <section id="why" class="w-full min-h-screen flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-20 sm:py-28 bg-[#F4F2EC] border-b border-zinc-200 relative overflow-hidden">
       
       <!-- Sports Parallax Icons in Why Section -->
       <div class="sport-parallax-icon-wrapper absolute -left-4 sm:left-6 lg:left-14 top-1/4 pointer-events-none z-0 opacity-20" data-parallax-speed="0.22" data-parallax-rotate="-0.04">
@@ -299,7 +268,7 @@
           </p>
         </div>
 
-        <!-- 3 Open Editorial Columns with Large Typographic Numbers -->
+        <!-- 3 Open Editorial Columns with Large Typographic Numbers (Cardless, Spacious) -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-16 mt-16 sm:mt-24 pt-10 border-t border-zinc-300">
           
           <div class="space-y-6 reveal-on-scroll delay-100 group">
@@ -352,8 +321,8 @@
       </div>
     </section>
 
-    <!-- ================= 3. FEATURES (Snap Section - Interactive Product Experience) ================= -->
-    <section id="features" class="snap-section w-full min-h-screen flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-20 sm:py-28 border-b border-zinc-200/80 relative overflow-hidden bg-white">
+    <!-- ================= SECTION: FEATURES (Interactive Product Experience - UNIFIED & FLUID) ================= -->
+    <section id="features" class="w-full min-h-screen flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-20 sm:py-28 border-b border-zinc-200/80 relative overflow-hidden bg-white">
       
       <!-- Sports Parallax Icons in Features Section -->
       <div class="sport-parallax-icon-wrapper absolute right-4 sm:right-12 lg:right-24 top-20 pointer-events-none z-0 opacity-20" data-parallax-speed="0.2" data-parallax-rotate="0.05">
@@ -383,10 +352,10 @@
           </p>
         </div>
 
-        <!-- 1. Expansive Feature Stage: Campus Radar & Live Match Stream -->
+        <!-- 1. Expansive Feature Stage: Campus Radar & Live Match Stream (Single Cohesive Surface) -->
         <div class="w-full rounded-3xl bg-[#FAFAF8] border border-zinc-200/80 p-8 sm:p-12 lg:p-16 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center reveal-on-scroll delay-100">
           
-          <!-- Left: Radar Pitch & Distance Selector -->
+          <!-- Left: Radar Pitch & Interactive Distance Selector -->
           <div class="lg:col-span-6 space-y-8">
             <div class="space-y-4">
               <span class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-brand-orange/10 text-brand-orange font-bold text-xs tracking-wider uppercase">
@@ -413,7 +382,7 @@
               </div>
             </div>
 
-            <!-- Quick Metrics Row -->
+            <!-- Quick Metrics Row (Border-top separator, no mini-boxes) -->
             <div class="grid grid-cols-3 gap-6 pt-6 border-t border-zinc-200 text-xs text-zinc-600">
               <div>
                 <span class="font-display font-extrabold text-2xl text-zinc-950 block">10+</span>
@@ -430,7 +399,7 @@
             </div>
           </div>
 
-          <!-- Right: Live Active Campus Stream -->
+          <!-- Right: Live Active Campus Stream (Real UI Preview) -->
           <div class="lg:col-span-6 space-y-4">
             
             <div class="flex items-center justify-between px-2 text-xs font-bold text-zinc-400 uppercase tracking-wider">
@@ -496,10 +465,10 @@
 
         </div>
 
-        <!-- 2. Dual Experience Stage -->
+        <!-- 2. Dual Experience Stage: 30-Sec Hosting + Verified Spot Security (Fluid Contrast) -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 pt-4">
           
-          <!-- Left: 30-Second Match Creation -->
+          <!-- Left: 30-Second Match Creation (High Impact Architectural Black) -->
           <div class="lg:col-span-6 bg-zinc-950 text-white rounded-3xl p-8 sm:p-12 lg:p-14 flex flex-col justify-between space-y-10 reveal-on-scroll delay-150 relative overflow-hidden">
             <div class="space-y-6">
               <span class="text-brand-orange font-bold text-xs tracking-widest uppercase block font-display">Instant Hosting</span>
@@ -510,6 +479,7 @@
                 Need a 4th player for padel in an hour? Post a game with 3 taps. Push alerts notify matching athletes in the area immediately.
               </p>
 
+              <!-- Streamlined 3-Step Flow -->
               <div class="space-y-3 pt-2 text-sm text-zinc-300">
                 <div class="flex items-center space-x-3">
                   <span class="w-6 h-6 rounded-full bg-zinc-800 text-brand-orange font-bold text-xs flex items-center justify-center">1</span>
@@ -534,7 +504,7 @@
             </div>
           </div>
 
-          <!-- Right: Verified Students & Guaranteed Spots -->
+          <!-- Right: Verified Profiles & Live Rosters (Clean Modern Cream) -->
           <div class="lg:col-span-6 bg-[#FAFAF8] rounded-3xl border border-zinc-200/80 p-8 sm:p-12 lg:p-14 flex flex-col justify-between space-y-10 reveal-on-scroll delay-250">
             <div class="space-y-6">
               <span class="text-brand-orange font-bold text-xs tracking-widest uppercase block font-display">Trust & Reliability</span>
@@ -545,6 +515,7 @@
                 Connect safely. See your peers' preferred sports, skill levels, and campus affiliation before heading to the court. Every game has an exact capacity limit — no more awkward overfilled matches or missing players.
               </p>
 
+              <!-- Live Roster Lock Ticker -->
               <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200/80 text-emerald-800 text-xs sm:text-sm font-semibold flex items-center space-x-3">
                 <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
                 <span>Rosters lock and sync in real-time across all student devices</span>
@@ -563,8 +534,8 @@
       </div>
     </section>
 
-    <!-- ================= 4. POPULAR SPORTS (Snap Section) ================= -->
-    <section id="sports" class="snap-section w-full min-h-screen flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-20 sm:py-28 bg-[#F4F2EC] border-b border-zinc-200 relative overflow-hidden">
+    <!-- ================= SECTION: POPULAR SPORTS (SVG Icon Badges Without Background) ================= -->
+    <section id="sports" class="w-full min-h-screen flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-20 sm:py-28 bg-[#F4F2EC] border-b border-zinc-200 relative overflow-hidden">
       
       <!-- Sports Parallax Icons in Sports Section -->
       <div class="sport-parallax-icon-wrapper absolute right-4 sm:right-12 lg:right-20 top-16 pointer-events-none z-0 opacity-30" data-parallax-speed="0.24" data-parallax-rotate="0.06">
@@ -590,7 +561,7 @@
           </p>
         </div>
 
-        <!-- 12 Scaled Sport Cards -->
+        <!-- 12 Scaled Sport Cards (Pure icons without container backgrounds) -->
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6 gap-4 sm:gap-6">
           
           <div class="sport-card bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3 reveal-on-scroll delay-100">
@@ -694,8 +665,8 @@
       </div>
     </section>
 
-    <!-- ================= 5. FAQ ACCORDION (Snap Section) ================= -->
-    <section id="faq" class="snap-section w-full min-h-screen flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-20 sm:py-28 border-b border-zinc-200/80 relative overflow-hidden">
+    <!-- ================= SECTION: FAQ ACCORDION ================= -->
+    <section id="faq" class="w-full min-h-screen flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-20 sm:py-28 border-b border-zinc-200/80 relative overflow-hidden">
       
       <!-- Sports Parallax Icons in FAQ Section -->
       <div class="sport-parallax-icon-wrapper absolute left-4 sm:left-12 top-24 pointer-events-none z-0 opacity-20" data-parallax-speed="0.18" data-parallax-rotate="0.04">
@@ -768,8 +739,8 @@
       </div>
     </section>
 
-    <!-- ================= 6. CLIMAX BANNER (Snap Section) ================= -->
-    <section id="launch" class="snap-section w-full min-h-[calc(100vh-5rem)] flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-20 sm:py-28 bg-zinc-950 text-white text-center relative overflow-hidden">
+    <!-- ================= HIGH-IMPACT CONTRAST CLIMAX BANNER ================= -->
+    <section class="w-full min-h-[85vh] flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-20 sm:py-28 bg-zinc-950 text-white text-center relative overflow-hidden">
       
       <!-- Glowing Giant Sports Parallax Icons in Climax Banner -->
       <div class="sport-parallax-icon-wrapper absolute left-2 sm:left-12 lg:left-24 top-1/2 -translate-y-1/2 pointer-events-none z-0" data-parallax-speed="0.25" data-parallax-rotate="0.06">
@@ -806,8 +777,8 @@
 
   </main>
 
-  <!-- ================= MODERN STARTUP FOOTER (Full Bleed Snap Section) ================= -->
-  <footer id="footer" class="snap-section w-full px-6 sm:px-10 lg:px-16 2xl:px-24 py-12 bg-white border-t border-zinc-200 text-zinc-600 text-xs sm:text-sm">
+  <!-- ================= MODERN STARTUP FOOTER (Full Bleed) ================= -->
+  <footer class="w-full px-6 sm:px-10 lg:px-16 2xl:px-24 py-12 bg-white border-t border-zinc-200 text-zinc-600 text-xs sm:text-sm">
     <div class="w-full space-y-8">
       
       <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-8 border-b border-zinc-100">
@@ -840,7 +811,7 @@
     </div>
   </footer>
 
-  <!-- ================= LOGIC CONTROLLER: GUIDED SCROLL, SECTION SNAP & PARALLAX ================= -->
+  <!-- ================= LOGIC CONTROLLER: ICONS, CONTINUOUS SCROLL PARALLAX, BI-DIRECTIONAL REVEAL & ACCORDION ================= -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       // 1. Initialize Lucide Icons
@@ -898,7 +869,7 @@
       }, { passive: true });
       updateScrollMotion();
 
-      // 3. Bi-Directional Continuous Scroll Reveal Observer
+      // 3. Bi-Directional Continuous Scroll Reveal Observer (Triggers both on scroll UP and scroll DOWN)
       const revealElements = document.querySelectorAll('.reveal-on-scroll');
       if ('IntersectionObserver' in window) {
         const revealObserver = new IntersectionObserver((entries) => {
@@ -912,6 +883,7 @@
                 entry.target.classList.remove('is-revealed-up');
               }
             } else {
+              // Scrolled out of viewport: reset classes so animation replays every time you scroll up or down!
               entry.target.classList.remove('is-revealed', 'is-revealed-up');
             }
           });
@@ -925,64 +897,7 @@
         revealElements.forEach(el => el.classList.add('is-revealed'));
       }
 
-      // 4. Guided Scroll Floating Indicator Controller
-      const snapSections = Array.from(document.querySelectorAll('.snap-section[id]'));
-      const guidedDots = document.querySelectorAll('.guided-dot');
-
-      function updateActiveGuidedDot() {
-        const scrollPosition = window.pageYOffset + 120;
-        let currentId = 'hero';
-
-        snapSections.forEach(sec => {
-          if (sec.offsetTop <= scrollPosition) {
-            currentId = sec.id;
-          }
-        });
-
-        guidedDots.forEach(dot => {
-          if (dot.dataset.section === currentId) {
-            dot.classList.add('active');
-          } else {
-            dot.classList.remove('active');
-          }
-        });
-      }
-
-      window.addEventListener('scroll', updateActiveGuidedDot, { passive: true });
-      updateActiveGuidedDot();
-
-      // Smooth click on guided dots
-      guidedDots.forEach(dot => {
-        dot.addEventListener('click', (e) => {
-          e.preventDefault();
-          const targetId = dot.dataset.section;
-          const targetEl = document.getElementById(targetId);
-          if (targetEl) {
-            targetEl.scrollIntoView({ behavior: 'smooth' });
-          }
-        });
-      });
-
-      // Guided Keyboard Navigation (Arrow Keys / PageUp / PageDown)
-      window.addEventListener('keydown', (e) => {
-        if (['ArrowDown', 'PageDown'].includes(e.key)) {
-          const currentId = document.querySelector('.guided-dot.active')?.dataset.section;
-          const currentIdx = snapSections.findIndex(s => s.id === currentId);
-          if (currentIdx !== -1 && currentIdx < snapSections.length - 1) {
-            e.preventDefault();
-            snapSections[currentIdx + 1].scrollIntoView({ behavior: 'smooth' });
-          }
-        } else if (['ArrowUp', 'PageUp'].includes(e.key)) {
-          const currentId = document.querySelector('.guided-dot.active')?.dataset.section;
-          const currentIdx = snapSections.findIndex(s => s.id === currentId);
-          if (currentIdx > 0) {
-            e.preventDefault();
-            snapSections[currentIdx - 1].scrollIntoView({ behavior: 'smooth' });
-          }
-        }
-      });
-
-      // 5. Smooth FAQ Accordion Toggle
+      // 4. Smooth FAQ Accordion Toggle
       const faqItems = document.querySelectorAll('.faq-item');
       faqItems.forEach(item => {
         item.addEventListener('click', () => {
