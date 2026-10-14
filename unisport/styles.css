@@ -64,71 +64,69 @@
 }
 
 /* ==========================================================================
-   BRANDING & PLAYFUL FLOATING ANIMATIONS
+   LARGE SPORTS ICONS - RESPONSIVE & SCROLL ANIMATED
    ========================================================================== */
 
-/* Floating stickers keyframes */
-@keyframes floatSlow {
+.sport-parallax-icon-wrapper {
+  transform: translate3d(0, var(--scroll-ty, 0px), 0) rotate(var(--scroll-rot, 0deg));
+  transition: transform 0.08s linear;
+  will-change: transform;
+}
+
+/* Fluid responsive sizes: noticeable on screen and reactive to any monitor (10" to 34"+) */
+.icon-size-hero {
+  width: clamp(6.5rem, 12vw, 15rem);
+  height: clamp(6.5rem, 12vw, 15rem);
+}
+
+.icon-size-lg {
+  width: clamp(5rem, 9.5vw, 12rem);
+  height: clamp(5rem, 9.5vw, 12rem);
+}
+
+.icon-size-md {
+  width: clamp(4rem, 7vw, 9rem);
+  height: clamp(4rem, 7vw, 9rem);
+}
+
+/* Organic floating bobbing keyframes */
+@keyframes floatBob1 {
   0%, 100% {
     transform: translateY(0px) rotate(0deg);
   }
   50% {
-    transform: translateY(-10px) rotate(1.5deg);
+    transform: translateY(-18px) rotate(4deg);
   }
 }
 
-@keyframes floatMedium {
+@keyframes floatBob2 {
   0%, 100% {
-    transform: translateY(0px) rotate(-1deg);
+    transform: translateY(0px) rotate(0deg);
   }
   50% {
-    transform: translateY(-13px) rotate(2deg);
+    transform: translateY(-22px) rotate(-6deg);
   }
 }
 
-@keyframes floatFast {
+@keyframes floatBob3 {
   0%, 100% {
-    transform: translateY(0px) rotate(1.2deg);
+    transform: translateY(0px) rotate(0deg);
   }
   50% {
-    transform: translateY(-8px) rotate(-1.5deg);
+    transform: translateY(-15px) rotate(5deg);
   }
 }
 
-.animate-float-slow {
-  animation: floatSlow 4.5s ease-in-out infinite;
+.animate-bob-1 {
+  animation: floatBob1 6s ease-in-out infinite;
 }
 
-.animate-float-medium {
-  animation: floatMedium 5.5s ease-in-out infinite 0.6s;
+.animate-bob-2 {
+  animation: floatBob2 7.5s ease-in-out infinite 0.8s;
 }
 
-.animate-float-fast {
-  animation: floatFast 3.8s ease-in-out infinite 1.2s;
-}
-
-/* Floating Badges Styling */
-.hero-floating-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0.875rem;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(228, 228, 231, 0.9);
-  border-radius: 9999px;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.06), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: #18181b;
-  user-select: none;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-}
-
-.hero-floating-badge:hover {
-  transform: scale(1.06) translateY(-2px);
-  box-shadow: 0 16px 32px -6px rgba(255, 77, 0, 0.2);
-  border-color: rgba(255, 77, 0, 0.4);
+.animate-bob-3 {
+  animation: floatBob3 8.5s ease-in-out infinite 1.6s;
 }
 
 /* ==========================================================================
@@ -148,7 +146,6 @@
   transform: translateY(0);
 }
 
-/* Scale reveal variation */
 .reveal-scale {
   opacity: 0;
   transform: scale(0.94);
@@ -162,7 +159,6 @@
   transform: scale(1);
 }
 
-/* Slide in from left */
 .reveal-left {
   opacity: 0;
   transform: translateX(-32px);
@@ -176,7 +172,6 @@
   transform: translateX(0);
 }
 
-/* Slide in from right */
 .reveal-right {
   opacity: 0;
   transform: translateX(32px);
@@ -288,20 +283,4 @@
 
 .faq-icon.is-open {
   transform: rotate(45deg);
-}
-
-/* Pulsing accent badge */
-@keyframes pulseDot {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.4);
-    opacity: 0.6;
-  }
-}
-
-.pulse-dot {
-  animation: pulseDot 2s infinite ease-in-out;
 }

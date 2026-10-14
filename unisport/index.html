@@ -114,38 +114,42 @@
 
     <!-- ================= HERO SECTION (Full Viewport Scaled) ================= -->
     <section class="w-full min-h-[calc(100vh-5rem)] flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-16 sm:py-24 border-b border-zinc-200/80 relative overflow-hidden">
-      <div class="w-full">
+      
+      <!-- Large Sports Parallax Icons in Hero -->
+      <div class="sport-parallax-icon-wrapper absolute right-4 sm:right-12 lg:right-24 top-16 sm:top-20 pointer-events-none z-0" data-parallax-speed="0.22" data-parallax-rotate="0.05">
+        <div class="animate-bob-1 icon-size-hero text-brand-orange drop-shadow-[0_20px_45px_rgba(255,77,0,0.35)] opacity-90">
+          <i data-lucide="circle-dot" class="w-full h-full stroke-[1.6]"></i>
+        </div>
+      </div>
+
+      <div class="sport-parallax-icon-wrapper absolute right-16 sm:right-36 lg:right-60 bottom-12 sm:bottom-20 pointer-events-none z-0 opacity-40" data-parallax-speed="-0.18" data-parallax-rotate="-0.04">
+        <div class="animate-bob-2 icon-size-lg text-zinc-500">
+          <i data-lucide="target" class="w-full h-full stroke-[1.5]"></i>
+        </div>
+      </div>
+
+      <div class="sport-parallax-icon-wrapper absolute left-4 sm:left-12 lg:left-20 top-20 pointer-events-none z-0 opacity-30 hidden md:block" data-parallax-speed="0.14" data-parallax-rotate="0.06">
+        <div class="animate-bob-3 icon-size-md text-brand-orange">
+          <i data-lucide="crosshair" class="w-full h-full stroke-[1.6]"></i>
+        </div>
+      </div>
+
+      <div class="w-full relative z-10">
         
         <!-- Oversized Fluid Hero Headline with Startup Motto -->
         <div class="w-full max-w-[2200px] space-y-8">
           
-          <!-- Playful Floating Sports Activity Badges -->
-          <div class="flex flex-wrap items-center gap-3 pb-2 reveal-on-scroll">
-            <div class="hero-floating-badge animate-float-slow">
-              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span>⚡ Match starting in 15m</span>
-            </div>
-            <div class="hero-floating-badge animate-float-medium hidden sm:inline-flex">
-              <i data-lucide="crosshair" class="w-3.5 h-3.5 text-brand-orange"></i>
-              <span>🎾 Padel • 1 Spot Left</span>
-            </div>
-            <div class="hero-floating-badge animate-float-fast hidden md:inline-flex">
-              <i data-lucide="map-pin" class="w-3.5 h-3.5 text-brand-orange"></i>
-              <span>📍 Fontys Rachelsmolen</span>
-            </div>
-          </div>
-
-          <h1 class="hero-title font-display font-extrabold text-zinc-950 uppercase reveal-on-scroll delay-100">
+          <h1 class="hero-title font-display font-extrabold text-zinc-950 uppercase reveal-on-scroll">
             Never play alone.<br />
             <span class="text-brand-orange">Find your squad. Play any sport.</span>
           </h1>
 
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 pt-2 items-end">
-            <p class="lg:col-span-8 text-lg sm:text-2xl 2xl:text-3xl text-zinc-600 font-normal leading-relaxed max-w-4xl reveal-on-scroll delay-200">
+            <p class="lg:col-span-8 text-lg sm:text-2xl 2xl:text-3xl text-zinc-600 font-normal leading-relaxed max-w-4xl reveal-on-scroll delay-100">
               Break the solo workout barrier. Leave chaotic 100-message group chats behind. Discover spontaneous pick-up games, court bookings, and athletic partners across your campus in seconds.
             </p>
 
-            <div class="lg:col-span-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-4 reveal-on-scroll delay-300">
+            <div class="lg:col-span-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-4 reveal-on-scroll delay-200">
               <a href="/challenge2/unisport/app" class="btn-shimmer group relative w-full sm:w-auto inline-flex items-center justify-center space-x-4 bg-brand-orange hover:bg-brand-orange-hover text-white font-extrabold text-base sm:text-lg uppercase tracking-wider py-5 px-10 rounded-2xl shadow-[0_12px_30px_-8px_rgba(255,77,0,0.55)] hover:shadow-[0_20px_40px_-6px_rgba(255,77,0,0.7)] transition-all duration-300 transform hover:-translate-y-1 active:translate-y-0 active:scale-[0.98] border border-orange-400/30">
                 <span>Start Playing</span>
                 <i data-lucide="arrow-right" class="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1.5"></i>
@@ -236,8 +240,22 @@
     </div>
 
     <!-- ================= SECTION: WHY UNISPORT (Warm Cream Full-Bleed Section) ================= -->
-    <section id="why" class="w-full min-h-screen flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-20 sm:py-28 bg-[#F4F2EC] border-b border-zinc-200">
-      <div class="w-full max-w-[2200px] mx-auto">
+    <section id="why" class="w-full min-h-screen flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-20 sm:py-28 bg-[#F4F2EC] border-b border-zinc-200 relative overflow-hidden">
+      
+      <!-- Sports Parallax Icons in Why Section -->
+      <div class="sport-parallax-icon-wrapper absolute -left-4 sm:left-6 lg:left-14 top-1/4 pointer-events-none z-0 opacity-25" data-parallax-speed="0.22" data-parallax-rotate="-0.04">
+        <div class="animate-bob-2 icon-size-lg text-zinc-900">
+          <i data-lucide="footprints" class="w-full h-full stroke-[1.5]"></i>
+        </div>
+      </div>
+
+      <div class="sport-parallax-icon-wrapper absolute right-4 sm:right-12 lg:right-20 bottom-16 pointer-events-none z-0 opacity-35" data-parallax-speed="-0.2" data-parallax-rotate="0.05">
+        <div class="animate-bob-1 icon-size-lg text-brand-orange">
+          <i data-lucide="dumbbell" class="w-full h-full stroke-[1.5]"></i>
+        </div>
+      </div>
+
+      <div class="w-full max-w-[2200px] mx-auto relative z-10">
         
         <div class="max-w-4xl space-y-4 reveal-on-scroll">
           <h2 class="section-title font-display font-extrabold text-zinc-950 uppercase">
@@ -287,8 +305,22 @@
     </section>
 
     <!-- ================= SECTION: FEATURES (Full-Width Bento Grid) ================= -->
-    <section id="features" class="w-full min-h-screen flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-20 sm:py-28 border-b border-zinc-200/80">
-      <div class="w-full max-w-[2200px] mx-auto">
+    <section id="features" class="w-full min-h-screen flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-20 sm:py-28 border-b border-zinc-200/80 relative overflow-hidden">
+      
+      <!-- Sports Parallax Icons in Features Section -->
+      <div class="sport-parallax-icon-wrapper absolute right-4 sm:right-12 lg:right-24 top-20 pointer-events-none z-0 opacity-25" data-parallax-speed="0.2" data-parallax-rotate="0.05">
+        <div class="animate-bob-3 icon-size-lg text-zinc-800">
+          <i data-lucide="mountain" class="w-full h-full stroke-[1.5]"></i>
+        </div>
+      </div>
+
+      <div class="sport-parallax-icon-wrapper absolute left-4 sm:left-12 bottom-16 pointer-events-none z-0 opacity-30" data-parallax-speed="-0.18" data-parallax-rotate="-0.04">
+        <div class="animate-bob-1 icon-size-md text-brand-orange">
+          <i data-lucide="activity" class="w-full h-full stroke-[1.5]"></i>
+        </div>
+      </div>
+
+      <div class="w-full max-w-[2200px] mx-auto relative z-10">
         
         <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-12 sm:mb-16 reveal-on-scroll">
           <div class="space-y-4 max-w-3xl">
@@ -378,8 +410,22 @@
     </section>
 
     <!-- ================= SECTION: POPULAR SPORTS (SVG Icon Badges) ================= -->
-    <section id="sports" class="w-full min-h-screen flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-20 sm:py-28 bg-[#F4F2EC] border-b border-zinc-200">
-      <div class="w-full max-w-[2200px] mx-auto">
+    <section id="sports" class="w-full min-h-screen flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-20 sm:py-28 bg-[#F4F2EC] border-b border-zinc-200 relative overflow-hidden">
+      
+      <!-- Sports Parallax Icons in Sports Section -->
+      <div class="sport-parallax-icon-wrapper absolute right-4 sm:right-12 lg:right-20 top-16 pointer-events-none z-0 opacity-30" data-parallax-speed="0.24" data-parallax-rotate="0.06">
+        <div class="animate-bob-2 icon-size-lg text-brand-orange">
+          <i data-lucide="bike" class="w-full h-full stroke-[1.5]"></i>
+        </div>
+      </div>
+
+      <div class="sport-parallax-icon-wrapper absolute left-4 sm:left-12 bottom-12 pointer-events-none z-0 opacity-25" data-parallax-speed="-0.16" data-parallax-rotate="-0.05">
+        <div class="animate-bob-3 icon-size-lg text-zinc-800">
+          <i data-lucide="disc" class="w-full h-full stroke-[1.5]"></i>
+        </div>
+      </div>
+
+      <div class="w-full max-w-[2200px] mx-auto relative z-10">
         
         <div class="max-w-3xl space-y-4 mb-12 sm:mb-16 reveal-on-scroll">
           <h2 class="section-title font-display font-extrabold text-zinc-950 uppercase">
@@ -495,8 +541,22 @@
     </section>
 
     <!-- ================= SECTION: FAQ ACCORDION ================= -->
-    <section id="faq" class="w-full min-h-screen flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-20 sm:py-28 border-b border-zinc-200/80">
-      <div class="w-full max-w-5xl mx-auto space-y-12">
+    <section id="faq" class="w-full min-h-screen flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-20 sm:py-28 border-b border-zinc-200/80 relative overflow-hidden">
+      
+      <!-- Sports Parallax Icons in FAQ Section -->
+      <div class="sport-parallax-icon-wrapper absolute left-4 sm:left-12 top-24 pointer-events-none z-0 opacity-20" data-parallax-speed="0.18" data-parallax-rotate="0.04">
+        <div class="animate-bob-1 icon-size-lg text-zinc-700">
+          <i data-lucide="shield" class="w-full h-full stroke-[1.5]"></i>
+        </div>
+      </div>
+
+      <div class="sport-parallax-icon-wrapper absolute right-4 sm:right-16 bottom-20 pointer-events-none z-0 opacity-30" data-parallax-speed="-0.2" data-parallax-rotate="-0.05">
+        <div class="animate-bob-2 icon-size-md text-brand-orange">
+          <i data-lucide="award" class="w-full h-full stroke-[1.5]"></i>
+        </div>
+      </div>
+
+      <div class="w-full max-w-5xl mx-auto space-y-12 relative z-10">
         
         <div class="text-center space-y-4 reveal-on-scroll">
           <h2 class="section-title font-display font-extrabold text-zinc-950 uppercase">
@@ -555,8 +615,22 @@
     </section>
 
     <!-- ================= HIGH-IMPACT CONTRAST CLIMAX BANNER ================= -->
-    <section class="w-full min-h-[85vh] flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-20 sm:py-28 bg-zinc-950 text-white text-center">
-      <div class="w-full max-w-[1900px] mx-auto space-y-10">
+    <section class="w-full min-h-[85vh] flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-20 sm:py-28 bg-zinc-950 text-white text-center relative overflow-hidden">
+      
+      <!-- Glowing Giant Sports Parallax Icons in Climax Banner -->
+      <div class="sport-parallax-icon-wrapper absolute left-2 sm:left-12 lg:left-24 top-1/2 -translate-y-1/2 pointer-events-none z-0" data-parallax-speed="0.25" data-parallax-rotate="0.06">
+        <div class="animate-bob-1 icon-size-hero text-brand-orange opacity-40 drop-shadow-[0_0_55px_rgba(255,77,0,0.7)]">
+          <i data-lucide="award" class="w-full h-full stroke-[1.2]"></i>
+        </div>
+      </div>
+
+      <div class="sport-parallax-icon-wrapper absolute right-2 sm:right-12 lg:right-24 top-1/2 -translate-y-1/2 pointer-events-none z-0" data-parallax-speed="-0.25" data-parallax-rotate="-0.06">
+        <div class="animate-bob-2 icon-size-hero text-brand-orange opacity-40 drop-shadow-[0_0_55px_rgba(255,77,0,0.7)]">
+          <i data-lucide="zap" class="w-full h-full stroke-[1.2]"></i>
+        </div>
+      </div>
+
+      <div class="w-full max-w-[1900px] mx-auto space-y-10 relative z-10">
         
         <h2 class="hero-title font-display font-extrabold text-white uppercase tracking-tight max-w-[1800px] mx-auto leading-tight reveal-on-scroll">
           Your next game is <span class="text-brand-orange inline-block">waiting for you.</span>
@@ -614,7 +688,7 @@
     </div>
   </footer>
 
-  <!-- ================= LOGIC CONTROLLER: ICONS, SCROLL REVEAL & ACCORDION ================= -->
+  <!-- ================= LOGIC CONTROLLER: ICONS, SCROLL PARALLAX, REVEAL & ACCORDION ================= -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       // 1. Initialize Lucide Icons
@@ -622,7 +696,33 @@
         lucide.createIcons();
       }
 
-      // 2. Scroll Reveal Observer
+      // 2. Dynamic Scroll-Driven Parallax for Sports Icons
+      const parallaxWrappers = document.querySelectorAll('.sport-parallax-icon-wrapper[data-parallax-speed]');
+      function updateScrollParallax() {
+        const vh = window.innerHeight;
+        parallaxWrappers.forEach(wrap => {
+          const speed = parseFloat(wrap.dataset.parallaxSpeed) || 0.15;
+          const rotSpeed = parseFloat(wrap.dataset.parallaxRotate) || 0.04;
+          const parent = wrap.parentElement;
+          if (!parent) return;
+          const rect = parent.getBoundingClientRect();
+          
+          // Calculate distance from center of viewport
+          const distFromCenter = (rect.top + rect.height / 2) - (vh / 2);
+          const translateY = -distFromCenter * speed;
+          const rotate = -distFromCenter * rotSpeed;
+          
+          wrap.style.setProperty('--scroll-ty', `${translateY.toFixed(1)}px`);
+          wrap.style.setProperty('--scroll-rot', `${rotate.toFixed(1)}deg`);
+        });
+      }
+
+      window.addEventListener('scroll', () => {
+        requestAnimationFrame(updateScrollParallax);
+      }, { passive: true });
+      updateScrollParallax();
+
+      // 3. Scroll Reveal Observer
       const revealElements = document.querySelectorAll('.reveal-on-scroll');
       if ('IntersectionObserver' in window) {
         const revealObserver = new IntersectionObserver((entries, observer) => {
@@ -639,11 +739,10 @@
 
         revealElements.forEach(el => revealObserver.observe(el));
       } else {
-        // Fallback for older browsers
         revealElements.forEach(el => el.classList.add('is-revealed'));
       }
 
-      // 3. Smooth FAQ Accordion Toggle
+      // 4. Smooth FAQ Accordion Toggle
       const faqItems = document.querySelectorAll('.faq-item');
       faqItems.forEach(item => {
         item.addEventListener('click', () => {

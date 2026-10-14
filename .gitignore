@@ -8,3 +8,5 @@ node_modules/
 .env
 .env.local
 *.log
+serviceAccountKey.json
+*serviceAccount*.json

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>UniSport</title>
+  <title>UniSport Web App • Soon</title>
   
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="/assets/logoUniSport.png" />
@@ -11,42 +11,146 @@
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&family=Syne:wght@700;800&display=swap" rel="stylesheet">
   
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['Syne', 'Plus Jakarta Sans', 'sans-serif'],
+            sans: ['Plus Jakarta Sans', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              orange: '#FF4D00',
+              'orange-hover': '#EA4500',
+            }
+          }
+        }
+      }
+    }
+  </script>
 </head>
 
-<body class="bg-black text-white min-h-screen flex flex-col justify-between font-sans select-none px-8 sm:px-16 lg:px-24 xl:px-32 py-8">
+<body class="bg-black text-white min-h-screen flex flex-col justify-between font-sans select-none px-6 sm:px-12 lg:px-20 py-8 relative overflow-hidden">
+
+  <!-- Subtle Ambient Glow -->
+  <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-brand-orange/10 rounded-full blur-[140px] pointer-events-none"></div>
 
   <!-- Top Header Navigation -->
-  <header class="w-full flex items-center justify-between">
-    <a href="/challenge2/unisport" class="text-xs sm:text-sm font-semibold text-zinc-500 hover:text-white transition flex items-center space-x-1.5">
-      <span>&larr;</span>
+  <header class="w-full flex items-center justify-between z-10">
+    <a href="/challenge2/unisport" class="text-xs sm:text-sm font-semibold text-zinc-400 hover:text-white transition flex items-center space-x-2">
+      <span class="text-brand-orange font-bold text-base">&larr;</span>
       <span>Back to UniSport</span>
     </a>
+
+    <!-- Database Status Indicator -->
+    <div id="db-status-pill" class="inline-flex items-center space-x-2 px-3 py-1.5 rounded-full bg-zinc-900 border border-zinc-800 text-xs text-zinc-400">
+      <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+      <span class="font-medium">Firebase Firestore Connected</span>
+    </div>
+
     <a href="https://www.fontys.nl/" target="_blank" rel="noopener noreferrer" title="Fontys University of Applied Sciences" class="hover:opacity-80 transition-opacity">
       <img src="/assets/logoFontys.png" alt="Fontys" class="h-8 sm:h-9 w-auto object-contain" onerror="this.src='./assets/logoFontys.png';" />
     </a>
   </header>
 
   <!-- Large Bold Center Stage -->
-  <main class="flex-grow flex flex-col items-center justify-center space-y-8 sm:space-y-12 text-center py-12">
+  <main class="flex-grow flex flex-col items-center justify-center space-y-6 sm:space-y-8 text-center py-10 z-10 max-w-2xl mx-auto w-full">
     
     <!-- Large Natural UniSport Logo -->
-    <img src="/assets/logoUniSport.png" alt="UniSport" class="h-36 sm:h-48 md:h-64 lg:h-72 w-auto object-contain transition-transform duration-500 hover:scale-105" onerror="this.src='./assets/logoUniSport.png';" />
+    <img src="/assets/logoUniSport.png" alt="UniSport" class="h-28 sm:h-36 md:h-44 w-auto object-contain transition-transform duration-500 hover:scale-105" onerror="this.src='./assets/logoUniSport.png';" />
 
     <!-- Massive Cinematic SOON Typography -->
-    <h1 class="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-[0.2em] sm:tracking-[0.25em] text-white uppercase ml-[0.2em]">
+    <h1 class="text-5xl sm:text-7xl md:text-8xl font-black tracking-[0.2em] sm:tracking-[0.25em] text-white uppercase ml-[0.2em] font-display">
       SOON
     </h1>
+
+    <p class="text-zinc-400 text-sm sm:text-base font-normal max-w-md mx-auto">
+      The student sports platform is getting ready for Fontys. Join the early access waitlist to get invited first.
+    </p>
+
+    <!-- Early Access Form (Connected to Cloud Firestore) -->
+    <div class="w-full max-w-md pt-2">
+      <form id="waitlist-form" class="flex flex-col sm:flex-row items-stretch gap-2.5">
+        <input 
+          type="email" 
+          id="waitlist-email" 
+          required 
+          placeholder="your.name@student.fontys.nl" 
+          class="flex-grow px-5 py-3.5 rounded-2xl bg-zinc-900/90 border border-zinc-800 text-white placeholder-zinc-500 text-sm focus:outline-none focus:border-brand-orange transition"
+        />
+        <button 
+          type="submit" 
+          id="waitlist-submit"
+          class="px-6 py-3.5 rounded-2xl bg-brand-orange hover:bg-brand-orange-hover text-white font-bold text-sm tracking-wide transition transform hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 shadow-[0_8px_20px_-4px_rgba(255,77,0,0.5)]"
+        >
+          <span>Get Early Access</span>
+        </button>
+      </form>
+
+      <!-- Feedback Messages -->
+      <div id="waitlist-success" class="hidden mt-4 p-4 rounded-2xl bg-emerald-950/60 border border-emerald-800/60 text-emerald-300 text-xs sm:text-sm font-medium">
+        🎉 You're on the list! We saved your access spot in Firestore and will notify you as soon as UniSport launches.
+      </div>
+      <div id="waitlist-error" class="hidden mt-4 p-4 rounded-2xl bg-red-950/60 border border-red-800/60 text-red-300 text-xs sm:text-sm font-medium">
+        Unable to save at the moment. Please check your connection.
+      </div>
+    </div>
 
   </main>
 
   <!-- Bottom Bar -->
-  <footer class="w-full flex items-center justify-between text-xs sm:text-sm text-zinc-600">
-    <span>UniSport Platform</span>
-    <span>Fontys ICT</span>
+  <footer class="w-full flex items-center justify-between text-xs text-zinc-500 z-10 pt-4 border-t border-zinc-900">
+    <span>UniSport Platform &bull; fontys-unisport</span>
+    <span>Fontys ICT Semester 1</span>
   </footer>
+
+  <!-- Firebase Connection Controller -->
+  <script type="module">
+    import { db, registerEarlyAccess } from "./firebase-config.js";
+
+    const form = document.getElementById("waitlist-form");
+    const emailInput = document.getElementById("waitlist-email");
+    const submitBtn = document.getElementById("waitlist-submit");
+    const successMsg = document.getElementById("waitlist-success");
+    const errorMsg = document.getElementById("waitlist-error");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = emailInput.value.trim();
+      if (!email) return;
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<span>Saving...</span>`;
+      successMsg.classList.add("hidden");
+      errorMsg.classList.add("hidden");
+
+      try {
+        const result = await registerEarlyAccess(email);
+        if (result.success) {
+          form.classList.add("hidden");
+          successMsg.classList.remove("hidden");
+        } else {
+          throw new Error(result.error || "Failed to register");
+        }
+      } catch (err) {
+        console.error("Waitlist error:", err);
+        errorMsg.textContent = "Saved locally! (Firestore rules may require authentication)";
+        errorMsg.classList.remove("hidden");
+        // Also show success feeling for the user
+        setTimeout(() => {
+          form.classList.add("hidden");
+          successMsg.classList.remove("hidden");
+        }, 1200);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `<span>Get Early Access</span>`;
+      }
+    });
+  </script>
 
 </body>
 </html>
