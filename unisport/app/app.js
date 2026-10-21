@@ -25,7 +25,7 @@ import {
   sanitize 
 } from "./auth.js";
 
-import { getAvatarById } from "./avatars.js";
+import { getAvatarById, UNISPORT_AVATARS } from "./avatars.js";
 
 // Application State
 const state = {
@@ -224,18 +224,20 @@ function updateAuthUI(user, profile) {
     if (userDropdown) {
       const dropName = document.getElementById("dropdown-name");
       const dropEmail = document.getElementById("dropdown-email");
+      const dropSchoolBadge = document.getElementById("dropdown-school-badge");
+      const dropSchoolFull = document.getElementById("dropdown-school-full");
+      const isTue = uni.includes("TU") || email.endsWith("@student.tue.nl");
+
       if (dropName) dropName.textContent = displayName;
       if (dropEmail) dropEmail.textContent = email;
+      if (dropSchoolBadge) dropSchoolBadge.textContent = isTue ? "TU/e" : "Fontys";
+      if (dropSchoolFull) dropSchoolFull.textContent = isTue ? "TU Eindhoven" : "Fontys UAS";
     }
 
+    // auth-status-pill was removed per user request for minimalist header
     if (authStatusPill) {
-      authStatusPill.innerHTML = `
-        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-        <span class="font-medium text-zinc-900 dark:text-white">${escapeHtml(displayName)}</span>
-        <span class="text-[10px] uppercase font-bold text-zinc-500 px-1.5 py-0.5 rounded bg-zinc-200 dark:bg-zinc-800">${uni.includes("TU") ? "TU/e" : "Fontys"}</span>
-      `;
-      authStatusPill.classList.remove("hidden");
-      authStatusPill.style.setProperty("display", "inline-flex", "important");
+      authStatusPill.classList.add("hidden");
+      authStatusPill.style.setProperty("display", "none", "important");
     }
 
     try {
@@ -687,13 +689,111 @@ function renderMyActivities() {
 
 function populateProfileTab() {
   if (!state.userProfile && !state.currentUser) return;
+  const user = state.currentUser;
+  const profile = state.userProfile || user;
+
+  const email = profile.email || user.email || "";
+  const displayName = profile.displayName || user.displayName || (email ? email.split("@")[0] : "Student");
+  const uni = profile.university || (email.endsWith("@student.tue.nl") ? "TU Eindhoven" : "Fontys UAS");
+  const isTue = uni.includes("TU") || email.endsWith("@student.tue.nl");
+  let currentAvatarId = profile.avatarId || user.avatarId || "footballer";
+  if (currentAvatarId === "bolt" || currentAvatarId === "flame" || currentAvatarId === "cyber") {
+    currentAvatarId = "footballer";
+  }
+  const avatar = getAvatarById(currentAvatarId);
+
+  // Hero Card Elements
+  const heroName = document.getElementById("profile-hero-name");
+  const heroEmail = document.getElementById("profile-hero-email");
+  const heroSchool = document.getElementById("profile-hero-school");
+  const heroInner = document.getElementById("profile-hero-avatar-inner");
+  const heroAvatar = document.getElementById("profile-hero-avatar");
+
+  if (heroName) heroName.textContent = displayName;
+  if (heroEmail) heroEmail.textContent = email;
+  if (heroSchool) heroSchool.textContent = isTue ? "TU Eindhoven" : "Fontys UAS";
+  if (heroAvatar) heroAvatar.className = `w-24 h-24 sm:w-28 sm:h-28 rounded-full p-1 bg-gradient-to-tr ${avatar.bg} shadow-xl flex items-center justify-center`;
+  if (heroInner) {
+    heroInner.innerHTML = `<img src="${avatar.image}" alt="${avatar.name}" class="w-full h-full object-cover rounded-full" onerror="this.src='./assets/avatars/footballer.png'" />`;
+  }
+
+  // Quick Stats
+  const statActivities = document.getElementById("profile-stat-activities");
+  const statSport = document.getElementById("profile-stat-sport");
+  if (statActivities) {
+    const myCount = state.activities.filter(a => {
+      const isJoined = (a.participants || []).some(p => p.uid === user.uid);
+      const isCreator = a.creatorId === user.uid;
+      return isJoined || isCreator;
+    }).length;
+    statActivities.textContent = myCount;
+  }
+  if (statSport) {
+    statSport.textContent = profile.sport || "Football";
+  }
+
+  // Render Mascot Avatar Switcher
+  const pickerContainer = document.getElementById("profile-avatar-picker");
+  if (pickerContainer) {
+    pickerContainer.innerHTML = UNISPORT_AVATARS.map(av => {
+      const isSelected = av.id === currentAvatarId;
+      return `
+        <button 
+          type="button" 
+          data-avatar-id="${av.id}"
+          class="profile-avatar-option group relative flex flex-col items-center gap-2 p-3 rounded-2xl border-2 transition-all cursor-pointer ${isSelected ? 'border-brand-orange bg-orange-500/10 shadow-sm' : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600'}"
+        >
+          <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden bg-gradient-to-tr ${av.bg} p-0.5 shadow-md flex items-center justify-center">
+            <div class="w-full h-full rounded-full overflow-hidden bg-zinc-950 flex items-center justify-center">
+              <img src="${av.image}" alt="${av.name}" class="w-full h-full object-cover rounded-full" onerror="this.src='./assets/avatars/footballer.png'" />
+            </div>
+          </div>
+          <span class="text-xs font-bold text-zinc-950 dark:text-white truncate w-full text-center">${av.name}</span>
+          ${isSelected ? `<span class="text-[10px] uppercase font-bold text-brand-orange">Selected</span>` : `<span class="text-[10px] text-zinc-400 group-hover:text-zinc-600">Select</span>`}
+        </button>
+      `;
+    }).join('');
+
+    // Attach click events to avatar buttons
+    pickerContainer.querySelectorAll(".profile-avatar-option").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const newAvId = btn.dataset.avatarId;
+        pickerContainer.querySelectorAll(".profile-avatar-option").forEach(b => {
+          b.classList.remove("border-brand-orange", "bg-orange-500/10", "shadow-sm");
+          b.classList.add("border-zinc-200", "dark:border-zinc-800");
+          const label = b.querySelector("span:last-child");
+          if (label) {
+            label.className = "text-[10px] text-zinc-400 group-hover:text-zinc-600";
+            label.textContent = "Select";
+          }
+        });
+        btn.classList.add("border-brand-orange", "bg-orange-500/10", "shadow-sm");
+        btn.classList.remove("border-zinc-200", "dark:border-zinc-800");
+        const activeLabel = btn.querySelector("span:last-child");
+        if (activeLabel) {
+          activeLabel.className = "text-[10px] uppercase font-bold text-brand-orange";
+          activeLabel.textContent = "Selected";
+        }
+
+        // Live update active session and firestore
+        await updateStudentProfile(user.uid, { avatarId: newAvId });
+        state.currentUser.avatarId = newAvId;
+        state.userProfile.avatarId = newAvId;
+        updateAuthUI(state.currentUser, state.userProfile);
+      });
+    });
+  }
+
+  // Form inputs
   const nameInput = document.getElementById("profile-name");
   const emailInput = document.getElementById("profile-email");
   const uniInput = document.getElementById("profile-university");
+  const sportInput = document.getElementById("profile-sport");
 
-  if (nameInput) nameInput.value = state.userProfile?.displayName || "";
-  if (emailInput) emailInput.value = state.currentUser?.email || "";
-  if (uniInput) uniInput.value = state.userProfile?.university || "";
+  if (nameInput) nameInput.value = displayName;
+  if (emailInput) emailInput.value = email;
+  if (uniInput) uniInput.value = isTue ? "TU Eindhoven" : "Fontys UAS";
+  if (sportInput && profile.sport) sportInput.value = profile.sport;
 }
 
 function setupProfileForm() {
@@ -703,12 +803,23 @@ function setupProfileForm() {
       e.preventDefault();
       if (!state.currentUser) return;
 
-      const displayName = sanitize(document.getElementById("profile-name").value);
+      const displayName = sanitize(document.getElementById("profile-name").value.trim());
+      const sportEl = document.getElementById("profile-sport");
+      const sport = sportEl ? sportEl.value : "Football";
       const btn = document.getElementById("profile-save-btn");
+
       btn.disabled = true;
       btn.textContent = "Saving...";
 
-      await updateStudentProfile(state.currentUser.uid, { displayName });
+      await updateStudentProfile(state.currentUser.uid, { displayName, sport });
+      state.currentUser.displayName = displayName;
+      state.currentUser.sport = sport;
+      if (state.userProfile) {
+        state.userProfile.displayName = displayName;
+        state.userProfile.sport = sport;
+      }
+
+      updateAuthUI(state.currentUser, state.userProfile);
       btn.disabled = false;
       btn.textContent = "Save Profile";
       alert("Profile updated successfully!");
