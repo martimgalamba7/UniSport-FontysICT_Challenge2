@@ -1,4 +1,4 @@
-// UniSport Firebase Configuration & Services
+// UniSport Firebase Configuration & Modular Services
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { 
   getFirestore, 
@@ -18,9 +18,8 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { 
   getAuth, 
-  sendSignInLinkToEmail,
-  isSignInWithEmailLink,
-  signInWithEmailLink,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
   signOut, 
   onAuthStateChanged,
   updateProfile
@@ -40,7 +39,7 @@ export const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const auth = getAuth(app);
 
-// Export firestore & passwordless auth helpers
+// Export firestore & standard email/password auth helpers
 export {
   collection,
   doc,
@@ -55,9 +54,8 @@ export {
   orderBy,
   onSnapshot,
   serverTimestamp,
-  sendSignInLinkToEmail,
-  isSignInWithEmailLink,
-  signInWithEmailLink,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
   updateProfile

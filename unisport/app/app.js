@@ -200,6 +200,13 @@ function updateAuthUI(user, profile) {
       googleAvatarBtn.classList.remove("hidden");
     }
 
+    if (userDropdown) {
+      const dropName = document.getElementById("dropdown-name");
+      const dropEmail = document.getElementById("dropdown-email");
+      if (dropName) dropName.textContent = displayName;
+      if (dropEmail) dropEmail.textContent = user.email || "";
+    }
+
     if (authStatusPill) {
       authStatusPill.innerHTML = `
         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -209,7 +216,10 @@ function updateAuthUI(user, profile) {
       authStatusPill.classList.remove("hidden");
     }
 
-    if (navAuthBtn) navAuthBtn.classList.add("hidden");
+    if (navAuthBtn) {
+      navAuthBtn.classList.add("hidden");
+      navAuthBtn.style.display = "none";
+    }
 
     populateProfileTab();
   } else {
@@ -741,4 +751,8 @@ window.UniSport = {
   toggleJoinActivity
 };
 
-document.addEventListener("DOMContentLoaded", initApp);
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initApp);
+} else {
+  initApp();
+}
