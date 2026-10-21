@@ -162,9 +162,13 @@ export async function handleIncomingEmailLink() {
       email: val.email,
       displayName: displayName,
       university: university,
+      avatarId: pendingProfile?.avatarId || "bolt",
       sport: pendingProfile?.sport || "Football",
-      skillLevel: pendingProfile?.skillLevel || "Intermediate",
-      avatar: pendingProfile?.avatar || "⚽"
+      sports: pendingProfile?.sports || ["Football"],
+      socialPreference: pendingProfile?.socialPreference || [],
+      intensityPreference: pendingProfile?.intensityPreference || [],
+      schedulePreference: pendingProfile?.schedulePreference || [],
+      preferredLocations: pendingProfile?.preferredLocations || []
     };
 
     if (pendingProfile?.fullName) {

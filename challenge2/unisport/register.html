@@ -34,7 +34,6 @@
   <script src="./theme.js"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
-    /* Clean multi-select pill style */
     .chip-select {
       transition: all 0.12s ease;
       user-select: none;
@@ -48,6 +47,10 @@
       background-color: #ffffff;
       color: #09090b;
       border-color: #ffffff;
+    }
+    .avatar-btn.selected {
+      border-color: #FF4D00;
+      transform: scale(1.08);
     }
   </style>
 </head>
@@ -73,7 +76,7 @@
     </div>
   </header>
 
-  <!-- Centered Minimalist Flow (Cardless, Progressive Form) -->
+  <!-- Centered Minimalist Flow -->
   <main class="flex-grow flex items-center justify-center px-6 py-10">
     <div class="w-full max-w-md space-y-6">
 
@@ -169,28 +172,49 @@
       <div id="step-3" class="hidden space-y-7">
         <div>
           <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-950 dark:text-white">
-            Your athletic habits
+            Your athletic profile
           </h1>
           <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1.5">
-            Select all options that apply in each category.
+            Select your preferences and customize your avatar badge.
           </p>
         </div>
 
-        <!-- Question 1: Sports (Multi-Select) -->
-        <div class="space-y-2">
+        <!-- Question 0: Kick.com-Style Avatar Selection -->
+        <div class="space-y-2.5">
+          <label class="block text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+            Choose your avatar badge
+          </label>
+          <div class="grid grid-cols-4 sm:grid-cols-8 gap-2" id="avatar-grid">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+
+        <!-- Question 1: Sports (Multi-Select + Other with Text Input) -->
+        <div class="space-y-2.5">
           <label class="block text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
             1. Which sports do you play or want to practice?
           </label>
           <div class="flex flex-wrap gap-2" id="group-sports">
-            <button type="button" data-val="Football" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">⚽ Football</button>
-            <button type="button" data-val="Gym & Fitness" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">🏋️ Gym / Fitness</button>
-            <button type="button" data-val="Running" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">🏃 Running</button>
-            <button type="button" data-val="Basketball" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">🏀 Basketball</button>
-            <button type="button" data-val="Bouldering" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">🧗 Bouldering</button>
-            <button type="button" data-val="Padel" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">🎾 Padel / Tennis</button>
-            <button type="button" data-val="Volleyball" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">🏐 Volleyball</button>
-            <button type="button" data-val="Swimming" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">🏊 Swimming</button>
-            <button type="button" data-val="Cycling" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">🚴 Cycling</button>
+            <button type="button" data-val="Football" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">Football</button>
+            <button type="button" data-val="Gym & Fitness" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">Gym / Fitness</button>
+            <button type="button" data-val="Running" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">Running</button>
+            <button type="button" data-val="Basketball" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">Basketball</button>
+            <button type="button" data-val="Bouldering" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">Bouldering</button>
+            <button type="button" data-val="Padel / Tennis" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">Padel / Tennis</button>
+            <button type="button" data-val="Volleyball" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">Volleyball</button>
+            <button type="button" data-val="Swimming" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">Swimming</button>
+            <button type="button" data-val="Cycling" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">Cycling</button>
+            <button type="button" id="btn-sport-other" data-val="Other" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">+ Other</button>
+          </div>
+
+          <!-- Dynamic Text Input for Other Sport -->
+          <div id="sport-other-container" class="hidden pt-2">
+            <input 
+              type="text" 
+              id="inp-sport-other" 
+              placeholder="Specify your sport (e.g. Boxing, Badminton, Calisthenics)..." 
+              class="w-full px-4 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-900 border-0 text-sm text-zinc-950 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition"
+            />
           </div>
         </div>
 
@@ -200,10 +224,10 @@
             2. How do you prefer to exercise?
           </label>
           <div class="flex flex-wrap gap-2" id="group-social">
-            <button type="button" data-val="In a group / team" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">👥 In a team / group</button>
-            <button type="button" data-val="With a 1-on-1 partner" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">🤝 1-on-1 Workout partner</button>
-            <button type="button" data-val="Solo (sometimes want company)" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">🏃 Solo (open to company)</button>
-            <button type="button" data-val="Open to meeting new students" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">⚡ Meet new students</button>
+            <button type="button" data-val="In a group / team" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">In a team / group</button>
+            <button type="button" data-val="With a 1-on-1 partner" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">1-on-1 Workout partner</button>
+            <button type="button" data-val="Solo (open to company)" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">Solo (open to company)</button>
+            <button type="button" data-val="Open to meeting new students" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">Meet new students</button>
           </div>
         </div>
 
@@ -213,9 +237,9 @@
             3. What is your preferred game intensity?
           </label>
           <div class="flex flex-wrap gap-2" id="group-intensity">
-            <button type="button" data-val="Casual & Social" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">🌱 Casual & Social</button>
-            <button type="button" data-val="Moderate / Regular" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">⚡ Regular exercise</button>
-            <button type="button" data-val="Competitive / Intense" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">🔥 Competitive & High Intensity</button>
+            <button type="button" data-val="Casual & Social" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">Casual & Social</button>
+            <button type="button" data-val="Regular exercise" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">Regular exercise</button>
+            <button type="button" data-val="Competitive & High Intensity" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">Competitive & High Intensity</button>
           </div>
         </div>
 
@@ -225,10 +249,10 @@
             4. When do you usually have time for sports?
           </label>
           <div class="flex flex-wrap gap-2" id="group-schedule">
-            <button type="button" data-val="Weekday Evenings" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">🌙 Weekday Evenings</button>
-            <button type="button" data-val="Between / After classes" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">🎒 Between/After classes</button>
-            <button type="button" data-val="Weekends" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">☀️ Weekends</button>
-            <button type="button" data-val="Early Mornings" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">🌅 Early Mornings</button>
+            <button type="button" data-val="Weekday Evenings" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">Weekday Evenings</button>
+            <button type="button" data-val="Between / After classes" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">Between/After classes</button>
+            <button type="button" data-val="Weekends" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">Weekends</button>
+            <button type="button" data-val="Early Mornings" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">Early Mornings</button>
           </div>
         </div>
 
@@ -238,11 +262,11 @@
             5. Locations you frequently visit in Eindhoven
           </label>
           <div class="flex flex-wrap gap-2" id="group-locations">
-            <button type="button" data-val="Student Sports Centre (SSC)" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">📍 SSC Campus</button>
-            <button type="button" data-val="Fontys Rachelsmolen" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">📍 Fontys Rachelsmolen</button>
-            <button type="button" data-val="Strijp-S (Monk/Area51)" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">📍 Strijp-S</button>
-            <button type="button" data-val="Genneper Parken" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">📍 Genneper Parken</button>
-            <button type="button" data-val="Centrum" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">📍 Centrum</button>
+            <button type="button" data-val="Student Sports Centre (SSC)" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">SSC Campus</button>
+            <button type="button" data-val="Fontys Rachelsmolen" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">Fontys Rachelsmolen</button>
+            <button type="button" data-val="Strijp-S (Monk/Area51)" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">Strijp-S</button>
+            <button type="button" data-val="Genneper Parken" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">Genneper Parken</button>
+            <button type="button" data-val="Centrum" class="chip-select px-3.5 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">Centrum</button>
           </div>
         </div>
 
@@ -286,11 +310,17 @@
   <!-- Step Logic & Multi-Selection Collector -->
   <script type="module">
     import { sendStudentMagicLink, validateStudentEmail } from "./auth.js";
+    import { UNISPORT_AVATARS } from "./avatars.js";
 
     let step = 1;
+    let selectedAvatarId = "bolt";
+
     const emailInp = document.getElementById("reg-email");
     const nameInp = document.getElementById("reg-name");
     const errBox = document.getElementById("reg-error");
+    const sportOtherBtn = document.getElementById("btn-sport-other");
+    const sportOtherContainer = document.getElementById("sport-other-container");
+    const sportOtherInput = document.getElementById("inp-sport-other");
 
     function showError(msg) {
       errBox.textContent = msg;
@@ -301,7 +331,27 @@
       errBox.classList.add("hidden");
     }
 
-    // Generic multi-select chip handler for any button group
+    // Render Kick.com-Style Avatar Badges
+    const avatarGrid = document.getElementById("avatar-grid");
+    UNISPORT_AVATARS.forEach(av => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.dataset.id = av.id;
+      btn.className = `avatar-btn p-2 rounded-2xl border-2 border-transparent bg-gradient-to-tr ${av.bg} flex items-center justify-center transition-all ${av.id === selectedAvatarId ? 'selected ring-2 ring-brand-orange ring-offset-2 dark:ring-offset-black' : 'opacity-80 hover:opacity-100'}`;
+      btn.innerHTML = av.svg;
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".avatar-btn").forEach(b => {
+          b.classList.remove("selected", "ring-2", "ring-brand-orange", "ring-offset-2", "dark:ring-offset-black");
+          b.classList.add("opacity-80");
+        });
+        btn.classList.add("selected", "ring-2", "ring-brand-orange", "ring-offset-2", "dark:ring-offset-black");
+        btn.classList.remove("opacity-80");
+        selectedAvatarId = av.id;
+      });
+      avatarGrid.appendChild(btn);
+    });
+
+    // Multi-select chip handler
     function setupChipGroup(groupId) {
       const container = document.getElementById(groupId);
       if (!container) return;
@@ -312,18 +362,29 @@
       });
     }
 
-    // Get selected values from a group
+    // Other sport button toggle
+    sportOtherBtn.addEventListener("click", () => {
+      if (sportOtherBtn.classList.contains("selected")) {
+        sportOtherContainer.classList.remove("hidden");
+        sportOtherInput.focus();
+      } else {
+        sportOtherContainer.classList.add("hidden");
+        sportOtherInput.value = "";
+      }
+    });
+
     function getSelectedChips(groupId) {
       const container = document.getElementById(groupId);
       if (!container) return [];
       const selected = [];
       container.querySelectorAll(".chip-select.selected").forEach(btn => {
-        selected.push(btn.dataset.val);
+        if (btn.dataset.val !== "Other") {
+          selected.push(btn.dataset.val);
+        }
       });
       return selected;
     }
 
-    // Setup all multi-select question groups
     setupChipGroup("group-sports");
     setupChipGroup("group-social");
     setupChipGroup("group-intensity");
@@ -373,13 +434,18 @@
     document.getElementById("btn-back-step3").addEventListener("click", () => updateStepUI(2));
     document.getElementById("btn-finish").addEventListener("click", async () => {
       const sports = getSelectedChips("group-sports");
+      const customSport = sportOtherInput.value.trim();
+      if (customSport) {
+        sports.push(customSport);
+      }
+
       const social = getSelectedChips("group-social");
       const intensity = getSelectedChips("group-intensity");
       const schedule = getSelectedChips("group-schedule");
       const locations = getSelectedChips("group-locations");
 
       if (sports.length === 0) {
-        showError("Please select at least one sport you are interested in.");
+        showError("Please select at least one sport or type your other sport.");
         return;
       }
 
@@ -390,13 +456,13 @@
       const email = emailInp.value.trim();
       const profileData = {
         fullName: nameInp.value.trim(),
+        avatarId: selectedAvatarId,
         sports: sports,
-        sport: sports[0], // primary
+        sport: sports[0],
         socialPreference: social,
         intensityPreference: intensity,
         schedulePreference: schedule,
         preferredLocations: locations,
-        avatar: "⚽",
         completedAnalytics: true,
         submittedAt: new Date().toISOString()
       };
