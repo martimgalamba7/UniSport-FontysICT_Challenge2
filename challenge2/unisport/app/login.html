@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Student Sign In • UniSport Eindhoven</title>
+  <title>UniSport • Student Sign In</title>
   
   <link rel="icon" type="image/png" href="/assets/logoUniSport.png" />
   <link rel="apple-touch-icon" href="/assets/logoUniSport.png" />
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Syne:wght@700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -19,18 +19,12 @@
       theme: {
         extend: {
           fontFamily: {
-            display: ['Syne', 'Plus Jakarta Sans', 'sans-serif'],
             sans: ['Plus Jakarta Sans', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
           },
           colors: {
             brand: {
               orange: '#FF4D00',
               'orange-hover': '#EA4500',
-              'orange-light': '#FFF1EB',
-              cream: '#FAFAF8',
-              card: '#FFFFFF',
-              dark: '#0D0D11',
-              darkCard: '#15151B'
             }
           }
         }
@@ -41,223 +35,173 @@
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
-<body class="bg-[#FAFAF8] text-zinc-900 dark:bg-[#0D0D11] dark:text-zinc-100 min-h-screen flex flex-col font-sans transition-colors duration-200">
+<body class="bg-white text-zinc-900 dark:bg-black dark:text-zinc-100 min-h-screen flex flex-col font-sans transition-colors duration-150">
 
-  <!-- Minimal Header -->
-  <header class="w-full px-6 sm:px-12 py-5 flex items-center justify-between border-b border-zinc-200/60 dark:border-zinc-800/60 bg-white/70 dark:bg-[#0D0D11]/70 backdrop-blur-xl z-20">
-    <a href="/challenge2/unisport" class="flex items-center space-x-3 group">
-      <img src="/assets/logoUniSport.png" alt="UniSport" class="h-9 w-auto object-contain transition group-hover:scale-105" onerror="this.src='./assets/logoUniSport.png';" />
-      <span class="font-display font-black text-xl tracking-tight text-zinc-950 dark:text-white">UniSport</span>
+  <!-- Top Minimal Big-Tech Nav Bar (Like Uber / Google) -->
+  <header class="w-full px-6 sm:px-12 py-5 flex items-center justify-between border-b border-zinc-100 dark:border-zinc-900">
+    <a href="/challenge2/unisport" class="flex items-center space-x-2.5">
+      <img src="/assets/logoUniSport.png" alt="UniSport" class="h-7 w-auto object-contain" onerror="this.src='./assets/logoUniSport.png';" />
+      <span class="font-bold text-lg tracking-tight text-zinc-950 dark:text-white">UniSport</span>
     </a>
 
-    <div class="flex items-center gap-4">
-      <button class="theme-toggle-btn inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold hover:bg-zinc-200 dark:hover:bg-zinc-700 transition" aria-label="Toggle Theme">
-        <i data-lucide="sun" class="icon-sun w-3.5 h-3.5 hidden"></i>
-        <i data-lucide="moon" class="icon-moon w-3.5 h-3.5"></i>
-        <span class="theme-label hidden sm:inline">Dark</span>
+    <div class="flex items-center gap-3">
+      <!-- Minimal Theme Toggle -->
+      <button class="theme-toggle-btn p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-900 text-zinc-600 dark:text-zinc-400 transition" aria-label="Toggle Theme">
+        <i data-lucide="sun" class="icon-sun w-4 h-4 hidden"></i>
+        <i data-lucide="moon" class="icon-moon w-4 h-4"></i>
       </button>
 
-      <a href="./register.html" class="text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:text-brand-orange transition">
-        Get Student Pass &rarr;
+      <a href="/challenge2/unisport/app" class="text-xs font-semibold text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition">
+        App
       </a>
     </div>
   </header>
 
-  <!-- Login Main Stage -->
-  <main class="flex-grow flex flex-col lg:flex-row w-full max-w-5xl mx-auto items-center justify-center p-6 sm:p-10 gap-10 lg:gap-16">
-    
-    <!-- Left Hero Focus -->
-    <div class="w-full lg:w-1/2 space-y-5">
-      <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-orange/10 border border-brand-orange/20 text-brand-orange text-xs font-bold uppercase tracking-wider">
-        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
-        Passwordless Magic Link
-      </span>
-      <h1 class="text-4xl sm:text-5xl font-display font-black text-zinc-950 dark:text-white leading-[1.05] tracking-tight">
-        No passwords to remember.<br />
-        <span class="text-brand-orange">One click to play.</span>
-      </h1>
-      <p class="text-sm sm:text-base text-zinc-600 dark:text-zinc-400 leading-relaxed max-w-md">
-        Enter your student email. We'll send an instant, secure sign-in link straight to your university inbox.
-      </p>
+  <!-- Centered Minimalist Stage (No Card, Seamless Flow) -->
+  <main class="flex-grow flex items-center justify-center px-6 py-12">
+    <div class="w-full max-w-sm space-y-6">
 
-      <div class="pt-4 flex items-center gap-6 text-xs font-semibold text-zinc-500 dark:text-zinc-400">
-        <div class="flex items-center gap-2">
-          <i data-lucide="shield-check" class="w-4 h-4 text-emerald-500"></i>
-          <span>Fontys & TU/e Only</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <i data-lucide="mail-check" class="w-4 h-4 text-brand-orange"></i>
-          <span>Zero Password Friction</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Right Login Card -->
-    <div class="w-full lg:w-1/2 max-w-md">
-      
-      <!-- INCOMING LINK PROCESSING STATE (When clicking link from email) -->
-      <div id="magic-link-verifying" class="hidden p-8 sm:p-10 rounded-[2.5rem] bg-white dark:bg-[#15151B] border border-zinc-200/90 dark:border-zinc-800 shadow-xl text-center space-y-4">
-        <div class="w-16 h-16 mx-auto rounded-2xl bg-brand-orange/15 text-brand-orange flex items-center justify-center text-2xl animate-spin">
-          ⚡
-        </div>
-        <h3 class="text-xl font-display font-black text-zinc-950 dark:text-white">Verifying Magic Link...</h3>
-        <p class="text-xs text-zinc-500 dark:text-zinc-400">Authenticating your student account with Firebase.</p>
+      <!-- Verifying incoming magic link state -->
+      <div id="verifying-state" class="hidden text-center space-y-3 py-6">
+        <div class="w-8 h-8 mx-auto border-2 border-zinc-900 dark:border-white border-t-transparent rounded-full animate-spin"></div>
+        <p class="text-sm font-medium text-zinc-900 dark:text-white">Verifying student link...</p>
       </div>
 
-      <!-- SENT CONFIRMATION STATE -->
-      <div id="magic-link-sent" class="hidden p-8 sm:p-10 rounded-[2.5rem] bg-white dark:bg-[#15151B] border border-zinc-200/90 dark:border-zinc-800 shadow-xl space-y-5 text-center">
-        <div class="w-16 h-16 mx-auto rounded-2xl bg-emerald-500/15 text-emerald-500 flex items-center justify-center text-3xl">
-          ✉️
-        </div>
-        <div class="space-y-1">
-          <h3 class="text-2xl font-display font-black text-zinc-950 dark:text-white">Check Your Inbox</h3>
-          <p class="text-xs text-zinc-500 dark:text-zinc-400">
-            We sent a sign-in link to <span id="sent-email-display" class="font-bold text-zinc-900 dark:text-white"></span>
-          </p>
-        </div>
-        <p class="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed bg-zinc-50 dark:bg-zinc-900 p-4 rounded-2xl border border-zinc-200/60 dark:border-zinc-800">
-          Click the link in the email to automatically sign in. You can close this tab or keep it open.
+      <!-- Sent link state -->
+      <div id="sent-state" class="hidden space-y-4">
+        <h1 class="text-2xl font-bold tracking-tight text-zinc-950 dark:text-white">Check your email</h1>
+        <p class="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
+          We emailed a sign-in link to <span id="sent-email" class="font-semibold text-zinc-950 dark:text-white"></span>. Click the link to complete sign in.
         </p>
-        <button type="button" id="btn-resend" class="text-xs font-bold text-brand-orange hover:underline">
-          Send another link
+        <button type="button" id="btn-resend" class="text-xs font-semibold text-brand-orange hover:underline pt-2">
+          Use a different email
         </button>
       </div>
 
-      <!-- MAIN INPUT FORM -->
-      <div id="login-form-card" class="p-8 sm:p-10 rounded-[2.5rem] bg-white dark:bg-[#15151B] border border-zinc-200/90 dark:border-zinc-800 shadow-xl space-y-6">
-        
+      <!-- Form View -->
+      <div id="form-state" class="space-y-6">
         <div>
-          <h2 class="text-2xl font-display font-black text-zinc-950 dark:text-white">Sign In with Email</h2>
-          <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">We'll email you a secure, passwordless sign-in link.</p>
+          <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-950 dark:text-white">
+            What's your student email?
+          </h1>
+          <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1.5">
+            Only @student.fontys.nl or @student.tue.nl accounts.
+          </p>
         </div>
 
-        <!-- Notification Banner -->
-        <div id="signin-error" class="hidden p-4 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 text-red-600 dark:text-red-400 text-xs font-medium flex items-center gap-2.5">
-          <i data-lucide="alert-circle" class="w-4 h-4 shrink-0"></i>
-          <span id="signin-error-text">Error message</span>
-        </div>
+        <!-- Error Banner -->
+        <div id="signin-error" class="hidden p-3 rounded-xl bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 text-xs font-medium"></div>
 
         <form id="magic-login-form" class="space-y-4">
           <div>
-            <label class="block text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300 mb-2">Student Email</label>
             <input 
               type="email" 
               id="magic-email" 
               required 
-              placeholder="e.g. 591981@student.fontys.nl" 
-              class="w-full px-5 py-4 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-sm text-zinc-950 dark:text-white placeholder-zinc-400 focus:outline-none focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/20 transition"
+              placeholder="name@student.fontys.nl" 
+              class="w-full px-4 py-3.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 border-0 text-sm text-zinc-950 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition"
             />
-            <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1.5 flex items-center gap-1">
-              <i data-lucide="shield" class="w-3.5 h-3.5 text-brand-orange"></i>
-              <span>Must end in @student.fontys.nl or @student.tue.nl</span>
-            </p>
           </div>
 
           <button 
             type="submit" 
-            id="btn-send-link" 
-            class="w-full py-4 rounded-2xl bg-brand-orange hover:bg-brand-orange-hover text-white text-sm font-bold tracking-wide transition transform hover:-translate-y-0.5 active:translate-y-0 shadow-[0_8px_20px_-4px_rgba(255,77,0,0.5)] flex items-center justify-center gap-2"
+            id="btn-continue" 
+            class="w-full py-3.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 text-sm font-semibold transition"
           >
-            <span>Send Magic Sign-In Link</span>
-            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            Continue
           </button>
         </form>
 
-        <p class="text-center text-xs text-zinc-500 dark:text-zinc-400 pt-2 border-t border-zinc-100 dark:border-zinc-800">
-          First time here? <a href="./register.html" class="text-brand-orange font-bold hover:underline">Create your Student Passport &rarr;</a>
+        <div class="pt-6 border-t border-zinc-100 dark:border-zinc-900 text-center">
+          <p class="text-xs text-zinc-500 dark:text-zinc-400">
+            Don't have an account? 
+            <a href="./register.html" class="font-semibold text-zinc-950 dark:text-white hover:underline ml-1">
+              Create account
+            </a>
+          </p>
+        </div>
+
+        <p class="text-[11px] text-zinc-400 dark:text-zinc-600 leading-relaxed text-center">
+          By continuing, you agree to UniSport's student community guidelines for campus activities in Eindhoven.
         </p>
-
       </div>
-    </div>
 
+    </div>
   </main>
 
   <script>
     lucide.createIcons();
   </script>
 
-  <!-- Passwordless Magic Link Sign In Logic -->
+  <!-- Login Logic -->
   <script type="module">
     import { sendStudentMagicLink, handleIncomingEmailLink } from "./auth.js";
 
-    const formCard = document.getElementById("login-form-card");
-    const sentCard = document.getElementById("magic-link-sent");
-    const verifyingCard = document.getElementById("magic-link-verifying");
-    const sentEmailDisplay = document.getElementById("sent-email-display");
+    const formState = document.getElementById("form-state");
+    const sentState = document.getElementById("sent-state");
+    const verifyingState = document.getElementById("verifying-state");
+    const sentEmail = document.getElementById("sent-email");
 
     const form = document.getElementById("magic-login-form");
-    const emailInp = document.getElementById("magic-email");
-    const btn = document.getElementById("btn-send-link");
-    const errBox = document.getElementById("signin-error");
-    const errText = document.getElementById("signin-error-text");
+    const emailInput = document.getElementById("magic-email");
+    const btnContinue = document.getElementById("btn-continue");
+    const errorBox = document.getElementById("signin-error");
 
-    // 1. Check if user arrived by clicking an Email Link
-    async function checkEmailLinkOnLoad() {
+    // Check if arrived via magic link
+    async function checkLink() {
       try {
-        const linkResult = await handleIncomingEmailLink();
-        if (linkResult.isMagicLink) {
-          formCard.classList.add("hidden");
-          verifyingCard.classList.remove("hidden");
-
-          if (linkResult.success) {
-            verifyingCard.innerHTML = `
-              <div class="w-16 h-16 mx-auto rounded-2xl bg-emerald-500/15 text-emerald-500 flex items-center justify-center text-3xl">✓</div>
-              <h3 class="text-xl font-display font-black text-zinc-950 dark:text-white">Authenticated!</h3>
-              <p class="text-xs text-zinc-500 dark:text-zinc-400">Taking you to Eindhoven sports feed...</p>
-            `;
-            setTimeout(() => {
-              window.location.href = "/challenge2/unisport/app";
-            }, 800);
+        const res = await handleIncomingEmailLink();
+        if (res.isMagicLink) {
+          formState.classList.add("hidden");
+          verifyingState.classList.remove("hidden");
+          if (res.success) {
+            window.location.href = "/challenge2/unisport/app";
           } else {
-            verifyingCard.classList.add("hidden");
-            formCard.classList.remove("hidden");
-            errText.textContent = linkResult.error || "The magic link is invalid or expired. Please request a new one.";
-            errBox.classList.remove("hidden");
+            verifyingState.classList.add("hidden");
+            formState.classList.remove("hidden");
+            errorBox.textContent = res.error || "Invalid or expired link. Please enter your email again.";
+            errorBox.classList.remove("hidden");
           }
         }
       } catch (e) {
-        console.warn("Email link check:", e);
+        console.warn(e);
       }
     }
-    checkEmailLinkOnLoad();
+    checkLink();
 
-    // 2. Form submission to send magic link
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      errBox.classList.add("hidden");
-      const email = emailInp.value.trim();
+      errorBox.classList.add("hidden");
+      const email = emailInput.value.trim();
 
-      btn.disabled = true;
-      btn.innerHTML = `<span>Sending Magic Link...</span>`;
+      btnContinue.disabled = true;
+      btnContinue.textContent = "Sending link...";
 
       try {
         const res = await sendStudentMagicLink(email);
         if (res.success) {
-          formCard.classList.add("hidden");
-          sentEmailDisplay.textContent = email;
-          sentCard.classList.remove("hidden");
+          sentEmail.textContent = email;
+          formState.classList.add("hidden");
+          sentState.classList.remove("hidden");
         } else {
-          errText.textContent = res.error || "Failed to send link. Please verify your email domain.";
-          errBox.classList.remove("hidden");
-          btn.disabled = false;
-          btn.innerHTML = `<span>Send Magic Sign-In Link</span> <i data-lucide="arrow-right" class="w-4 h-4"></i>`;
-          lucide.createIcons();
+          errorBox.textContent = res.error || "Unable to send link. Please check your student email.";
+          errorBox.classList.remove("hidden");
+          btnContinue.disabled = false;
+          btnContinue.textContent = "Continue";
         }
       } catch (err) {
-        errText.textContent = "Error: " + err.message;
-        errBox.classList.remove("hidden");
-        btn.disabled = false;
-        btn.innerHTML = `<span>Send Magic Sign-In Link</span> <i data-lucide="arrow-right" class="w-4 h-4"></i>`;
-        lucide.createIcons();
+        errorBox.textContent = err.message;
+        errorBox.classList.remove("hidden");
+        btnContinue.disabled = false;
+        btnContinue.textContent = "Continue";
       }
     });
 
     document.getElementById("btn-resend").addEventListener("click", () => {
-      sentCard.classList.add("hidden");
-      formCard.classList.remove("hidden");
-      btn.disabled = false;
-      btn.innerHTML = `<span>Send Magic Sign-In Link</span> <i data-lucide="arrow-right" class="w-4 h-4"></i>`;
-      lucide.createIcons();
+      sentState.classList.add("hidden");
+      formState.classList.remove("hidden");
+      btnContinue.disabled = false;
+      btnContinue.textContent = "Continue";
     });
   </script>
 
