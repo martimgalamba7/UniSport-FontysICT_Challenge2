@@ -174,6 +174,7 @@ export function initApp() {
 
   try { setupNavigation(); } catch (e) { console.error("setupNav:", e); }
   try { setupRosterModal(); } catch (e) { console.error("setupRoster:", e); }
+  try { setupSettingsModal(); } catch (e) { console.error("setupSettings:", e); }
   try { setupCreateForm(); } catch (e) { console.error("setupCreate:", e); }
   try { setupProfileForm(); } catch (e) { console.error("setupProfile:", e); }
   try { setupFilterSearch(); } catch (e) { console.error("setupFilter:", e); }
@@ -764,9 +765,32 @@ export function openRosterModal(activityId) {
   modal.classList.remove("hidden");
 }
 
+export function openSettingsModal() {
+  const modal = document.getElementById("settings-modal");
+  const dropdown = document.getElementById("user-dropdown");
+  if (dropdown) dropdown.classList.add("hidden");
+  if (modal) modal.classList.remove("hidden");
+}
+
+function setupSettingsModal() {
+  const modal = document.getElementById("settings-modal");
+  const closeBtn = document.getElementById("settings-modal-close");
+  const doneBtn = document.getElementById("settings-modal-done");
+
+  const close = () => { if (modal) modal.classList.add("hidden"); };
+  if (closeBtn) closeBtn.addEventListener("click", close);
+  if (doneBtn) doneBtn.addEventListener("click", close);
+  if (modal) {
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) close();
+    });
+  }
+}
+
 window.UniSport = {
   switchTab,
   openRosterModal,
+  openSettingsModal,
   toggleJoinActivity
 };
 
