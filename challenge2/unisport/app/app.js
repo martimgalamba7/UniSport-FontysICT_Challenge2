@@ -21,6 +21,7 @@ import {
   getStudentProfile, 
   updateStudentProfile,
   getActiveSession,
+  setActiveSession,
   sanitize 
 } from "./auth.js";
 
@@ -158,6 +159,9 @@ function formatDisplayDate(dateStr) {
  * Initializes App
  */
 export function initApp() {
+  // Pre-seed activities so feed renders instantly
+  state.activities = INITIAL_DEMO_ACTIVITIES;
+
   // REQUIRE LOGIN: If not logged in, redirect directly to login page
   const session = getActiveSession();
   if (!session) {
@@ -165,11 +169,16 @@ export function initApp() {
     return;
   }
 
-  setupNavigation();
-  setupRosterModal();
-  setupCreateForm();
-  setupProfileForm();
-  setupFilterSearch();
+  // IMMEDIATELY update UI with session data before anything else
+  updateAuthUI(session, session);
+
+  try { setupNavigation(); } catch (e) { console.error("setupNav:", e); }
+  try { setupRosterModal(); } catch (e) { console.error("setupRoster:", e); }
+  try { setupCreateForm(); } catch (e) { console.error("setupCreate:", e); }
+  try { setupProfileForm(); } catch (e) { console.error("setupProfile:", e); }
+  try { setupFilterSearch(); } catch (e) { console.error("setupFilter:", e); }
+  try { renderFeed(); } catch (e) { console.error("renderFeed:", e); }
+
   listenToAuthChanges();
   listenToActivities();
 }
@@ -194,12 +203,18 @@ function updateAuthUI(user, profile) {
     const avatarId = state.userProfile?.avatarId || user.avatarId || "bolt";
     const avatar = getAvatarById(avatarId);
 
-    // Google-style circular avatar in top right
+    // Force hide Sign in button
+    if (navAuthBtn) {
+      navAuthBtn.classList.add("hidden");
+      navAuthBtn.style.setProperty("display", "none", "important");
+    }
+
+    // Force show Google-style circular avatar in top right
     if (googleAvatarBtn && avatarInner) {
       avatarInner.className = `w-full h-full rounded-full bg-gradient-to-tr ${avatar.bg} flex items-center justify-center text-white`;
       avatarInner.innerHTML = avatar.svg;
       googleAvatarBtn.classList.remove("hidden");
-      googleAvatarBtn.style.display = "inline-flex";
+      googleAvatarBtn.style.setProperty("display", "inline-flex", "important");
     }
 
     if (userDropdown) {
@@ -216,28 +231,23 @@ function updateAuthUI(user, profile) {
         <span class="text-[10px] uppercase font-bold text-zinc-500 px-1.5 py-0.5 rounded bg-zinc-200 dark:bg-zinc-800">${uni.includes("TU") ? "TU/e" : "Fontys"}</span>
       `;
       authStatusPill.classList.remove("hidden");
-      authStatusPill.style.display = "inline-flex";
+      authStatusPill.style.setProperty("display", "inline-flex", "important");
     }
 
-    if (navAuthBtn) {
-      navAuthBtn.classList.add("hidden");
-      navAuthBtn.style.display = "none";
+    try {
+      populateProfileTab();
+    } catch (e) {
+      console.warn("populateProfile error:", e);
     }
-
-    populateProfileTab();
   } else {
     // If auth is completely lost, redirect to login
     window.location.href = "./login.html";
   }
-
-  renderFeed();
 }
 
 function listenToAuthChanges() {
   const activeSession = getActiveSession();
-  if (activeSession) {
-    updateAuthUI(activeSession, activeSession);
-  } else {
+  if (!activeSession) {
     window.location.href = "./login.html";
     return;
   }
@@ -245,20 +255,19 @@ function listenToAuthChanges() {
   try {
     onAuthStateChanged(auth, async (user) => {
       if (user) {
-        const profile = await getStudentProfile(user.uid);
-        const merged = { ...activeSession, ...profile, uid: user.uid, email: user.email };
-        setActiveSession(merged);
-        updateAuthUI(merged, merged);
-      } else {
-        const s = getActiveSession();
-        if (s) {
-          updateAuthUI(s, s);
-        } else {
-          window.location.href = "./login.html";
+        try {
+          const profile = await getStudentProfile(user.uid);
+          const merged = { ...activeSession, ...profile, uid: user.uid, email: user.email };
+          setActiveSession(merged);
+          updateAuthUI(merged, merged);
+        } catch (err) {
+          console.warn("Could not fetch remote profile, keeping active session:", err);
         }
       }
     });
-  } catch {}
+  } catch (e) {
+    console.warn("onAuthStateChanged error:", e);
+  }
 }
 
 function setupNavigation() {
