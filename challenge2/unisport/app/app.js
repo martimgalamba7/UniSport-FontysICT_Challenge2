@@ -211,7 +211,7 @@ function updateAuthUI(user, profile) {
 
     // Force show Google-style circular avatar in top right
     if (googleAvatarBtn && avatarInner) {
-      avatarInner.className = `w-full h-full rounded-full bg-gradient-to-tr ${avatar.bg} flex items-center justify-center text-white`;
+      avatarInner.className = `w-full h-full rounded-full overflow-hidden bg-gradient-to-tr ${avatar.bg} flex items-center justify-center text-white`;
       avatarInner.innerHTML = avatar.svg;
       googleAvatarBtn.classList.remove("hidden");
       googleAvatarBtn.style.setProperty("display", "inline-flex", "important");
@@ -451,7 +451,7 @@ export function renderFeed() {
               ${participants.slice(0, 5).map(p => {
                 const av = getAvatarById(p.avatarId || "bolt");
                 return `
-                  <div class="w-6 h-6 rounded-full bg-gradient-to-tr ${av.bg} border-2 border-white dark:border-zinc-900 text-white flex items-center justify-center p-0.5 shadow-sm" title="${escapeHtml(p.name)} (${escapeHtml(p.university || 'Student')})">
+                  <div class="w-6 h-6 rounded-full overflow-hidden bg-gradient-to-tr ${av.bg} border-2 border-white dark:border-zinc-900 text-white flex items-center justify-center shadow-sm" title="${escapeHtml(p.name)} (${escapeHtml(p.university || 'Student')})">
                     ${av.svg}
                   </div>
                 `;
@@ -748,7 +748,7 @@ export function openRosterModal(activityId) {
     return `
       <div class="flex items-center justify-between p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800">
         <div class="flex items-center gap-2.5">
-          <div class="w-7 h-7 rounded-full bg-gradient-to-tr ${av.bg} flex items-center justify-center p-1 text-white shadow-sm">
+          <div class="w-7 h-7 rounded-full overflow-hidden bg-gradient-to-tr ${av.bg} flex items-center justify-center text-white shadow-sm">
             ${av.svg}
           </div>
           <div>
