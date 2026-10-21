@@ -17,8 +17,6 @@ import {
 } from "./firebase-config.js";
 
 import { 
-  signUpStudent, 
-  signInStudent, 
   signOutStudent, 
   getStudentProfile, 
   updateStudentProfile,
@@ -38,14 +36,14 @@ const state = {
 
 // Sports list with badges and visual icons
 export const SPORTS_CONFIG = {
-  "Football": { icon: "⚽", badge: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" },
-  "Gym": { icon: "🏋️", badge: "bg-amber-500/20 text-amber-400 border-amber-500/30" },
-  "Running": { icon: "🏃", badge: "bg-orange-500/20 text-orange-400 border-orange-500/30" },
-  "Basketball": { icon: "🏀", badge: "bg-blue-500/20 text-blue-400 border-blue-500/30" },
-  "Bouldering": { icon: "🧗", badge: "bg-purple-500/20 text-purple-400 border-purple-500/30" },
-  "Padel": { icon: "🎾", badge: "bg-lime-500/20 text-lime-400 border-lime-500/30" },
-  "Volleyball": { icon: "🏐", badge: "bg-pink-500/20 text-pink-400 border-pink-500/30" },
-  "Other": { icon: "⚡", badge: "bg-zinc-500/20 text-zinc-300 border-zinc-500/30" }
+  "Football": { icon: "⚽", badge: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20" },
+  "Gym": { icon: "🏋️", badge: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20" },
+  "Running": { icon: "🏃", badge: "bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20" },
+  "Basketball": { icon: "🏀", badge: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20" },
+  "Bouldering": { icon: "🧗", badge: "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20" },
+  "Padel": { icon: "🎾", badge: "bg-lime-500/10 text-lime-600 dark:text-lime-400 border-lime-500/20" },
+  "Volleyball": { icon: "🏐", badge: "bg-pink-500/10 text-pink-600 dark:text-pink-400 border-pink-500/20" },
+  "Other": { icon: "⚡", badge: "bg-zinc-500/10 text-zinc-600 dark:text-zinc-300 border-zinc-500/20" }
 };
 
 // Sample seed data if Firestore collection is initially empty
@@ -158,7 +156,7 @@ function formatDisplayDate(dateStr) {
  */
 export function initApp() {
   setupNavigation();
-  setupAuthModals();
+  setupRosterModal();
   setupCreateForm();
   setupProfileForm();
   setupFilterSearch();
@@ -176,7 +174,6 @@ function listenToAuthChanges() {
     const navAuthBtn = document.getElementById("nav-auth-btn");
     const userMenuBtn = document.getElementById("user-menu-btn");
     const userNameSpan = document.getElementById("user-display-name");
-    const userUniBadge = document.getElementById("user-university-badge");
 
     if (user) {
       // User is logged in
@@ -192,8 +189,8 @@ function listenToAuthChanges() {
 
       if (authStatusPill) {
         authStatusPill.innerHTML = `
-          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-          <span class="font-medium text-white">${escapeHtml(state.userProfile.displayName || user.email)}</span>
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span class="font-medium text-zinc-900 dark:text-white">${escapeHtml(state.userProfile.displayName || user.email)}</span>
           <span class="text-[10px] uppercase font-bold text-brand-orange px-1.5 py-0.5 rounded bg-brand-orange/10 border border-brand-orange/20">${state.userProfile.university.includes("TU") ? "TU/e" : "Fontys"}</span>
         `;
         authStatusPill.classList.remove("hidden");
@@ -202,9 +199,7 @@ function listenToAuthChanges() {
       if (navAuthBtn) navAuthBtn.classList.add("hidden");
       if (userMenuBtn) userMenuBtn.classList.remove("hidden");
       if (userNameSpan) userNameSpan.textContent = state.userProfile.displayName;
-      if (userUniBadge) userUniBadge.textContent = state.userProfile.university;
 
-      // Fill profile view fields
       populateProfileTab();
     } else {
       // Signed out
@@ -232,11 +227,6 @@ function setupNavigation() {
     if (btn) btn.addEventListener("click", clickHandler);
     if (mobileBtn) mobileBtn.addEventListener("click", clickHandler);
   });
-
-  const backToFeedBtn = document.getElementById("back-to-feed-btn");
-  if (backToFeedBtn) {
-    backToFeedBtn.addEventListener("click", () => switchTab("feed"));
-  }
 }
 
 export function switchTab(targetTab) {
@@ -252,21 +242,21 @@ export function switchTab(targetTab) {
       if (section) section.classList.remove("hidden");
       if (deskBtn) {
         deskBtn.classList.add("bg-brand-orange", "text-white");
-        deskBtn.classList.remove("text-zinc-400", "hover:text-white");
+        deskBtn.classList.remove("text-zinc-600", "dark:text-zinc-400", "hover:text-zinc-950", "dark:hover:text-white");
       }
       if (mobBtn) {
         mobBtn.classList.add("text-brand-orange");
-        mobBtn.classList.remove("text-zinc-400");
+        mobBtn.classList.remove("text-zinc-500", "dark:text-zinc-400");
       }
     } else {
       if (section) section.classList.add("hidden");
       if (deskBtn) {
         deskBtn.classList.remove("bg-brand-orange", "text-white");
-        deskBtn.classList.add("text-zinc-400", "hover:text-white");
+        deskBtn.classList.add("text-zinc-600", "dark:text-zinc-400", "hover:text-zinc-950", "dark:hover:text-white");
       }
       if (mobBtn) {
         mobBtn.classList.remove("text-brand-orange");
-        mobBtn.classList.add("text-zinc-400");
+        mobBtn.classList.add("text-zinc-500", "dark:text-zinc-400");
       }
     }
   });
@@ -281,7 +271,6 @@ export function switchTab(targetTab) {
  * Real-time activities listener from Firestore (with sample fallback)
  */
 function listenToActivities() {
-  const feedContainer = document.getElementById("activities-feed");
   try {
     const q = query(collection(db, "activities"), orderBy("createdAt", "desc"));
     onSnapshot(q, (snapshot) => {
@@ -293,7 +282,6 @@ function listenToActivities() {
       if (items.length > 0) {
         state.activities = items;
       } else {
-        // Use seed activities if collection hasn't been populated yet
         state.activities = INITIAL_DEMO_ACTIVITIES;
       }
       renderFeed();
@@ -341,12 +329,12 @@ export function renderFeed() {
 
   if (filtered.length === 0) {
     container.innerHTML = `
-      <div class="col-span-full py-16 px-6 text-center rounded-3xl bg-zinc-900/40 border border-zinc-800/80">
-        <div class="w-14 h-14 mx-auto mb-4 rounded-2xl bg-zinc-800/60 flex items-center justify-center text-2xl">
+      <div class="col-span-full py-16 px-6 text-center rounded-3xl bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 shadow-sm">
+        <div class="w-14 h-14 mx-auto mb-4 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-2xl">
           🔍
         </div>
-        <h3 class="text-xl font-bold text-white mb-2">No matching sports sessions found</h3>
-        <p class="text-zinc-400 text-sm max-w-sm mx-auto mb-6">Be the first student to create a session in Eindhoven or adjust your filters.</p>
+        <h3 class="text-xl font-bold text-zinc-950 dark:text-white mb-2">No matching sports sessions found</h3>
+        <p class="text-zinc-600 dark:text-zinc-400 text-sm max-w-sm mx-auto mb-6">Be the first student to create a session in Eindhoven or adjust your filters.</p>
         <button onclick="window.UniSport.switchTab('create')" class="px-5 py-2.5 rounded-xl bg-brand-orange hover:bg-brand-orange-hover text-white text-sm font-semibold transition">
           + Create Session
         </button>
@@ -362,10 +350,9 @@ export function renderFeed() {
     const spotsLeft = Math.max(0, max - participants.length);
     const isFull = spotsLeft === 0;
     const isJoined = state.currentUser && participants.some(p => p.uid === state.currentUser.uid);
-    const isCreator = state.currentUser && activity.creatorId === state.currentUser.uid;
 
     return `
-      <article class="relative flex flex-col justify-between rounded-3xl bg-zinc-900/60 border border-zinc-800/90 hover:border-zinc-700 p-6 transition duration-300 hover:shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)]">
+      <article class="relative flex flex-col justify-between rounded-3xl bg-white dark:bg-zinc-900/70 border border-zinc-200/90 dark:border-zinc-800/90 hover:border-brand-orange/40 dark:hover:border-zinc-700 p-6 transition duration-300 hover:shadow-xl shadow-sm">
         <div>
           <!-- Header: Sport badge + spots -->
           <div class="flex items-center justify-between gap-2 mb-4">
@@ -375,23 +362,23 @@ export function renderFeed() {
             </span>
 
             <div class="flex items-center gap-2">
-              <span class="text-xs font-semibold px-2.5 py-1 rounded-full ${isFull ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'}">
+              <span class="text-xs font-semibold px-2.5 py-1 rounded-full ${isFull ? 'bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20' : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'}">
                 ${isFull ? 'Session Full' : `${spotsLeft} spot${spotsLeft === 1 ? '' : 's'} left`}
               </span>
             </div>
           </div>
 
           <!-- Title -->
-          <h3 class="text-lg sm:text-xl font-bold text-white mb-2 leading-snug">
+          <h3 class="text-lg sm:text-xl font-bold text-zinc-950 dark:text-white mb-2 leading-snug">
             ${escapeHtml(activity.title)}
           </h3>
 
           <!-- Details: Location & Date -->
-          <div class="space-y-1.5 text-xs text-zinc-300 mb-4">
+          <div class="space-y-1.5 text-xs text-zinc-600 dark:text-zinc-300 mb-4">
             <div class="flex items-center gap-2">
               <span class="text-brand-orange font-semibold">📍</span>
               <span class="truncate">${escapeHtml(activity.location)}</span>
-              ${activity.distance ? `<span class="text-zinc-500 text-[11px]">(${escapeHtml(activity.distance)})</span>` : ''}
+              ${activity.distance ? `<span class="text-zinc-400 text-[11px]">(${escapeHtml(activity.distance)})</span>` : ''}
             </div>
             <div class="flex items-center gap-2">
               <span class="text-brand-orange font-semibold">⏰</span>
@@ -401,27 +388,27 @@ export function renderFeed() {
 
           <!-- Description -->
           ${activity.description ? `
-            <p class="text-xs sm:text-sm text-zinc-400 line-clamp-2 mb-5">
+            <p class="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 line-clamp-2 mb-5">
               ${escapeHtml(activity.description)}
             </p>
           ` : ''}
 
           <!-- Roster Avatars -->
-          <div class="mb-5 pt-3 border-t border-zinc-800/80">
+          <div class="mb-5 pt-3 border-t border-zinc-100 dark:border-zinc-800/80">
             <div class="flex items-center justify-between text-xs mb-2">
-              <span class="font-semibold text-zinc-400">Roster (${participants.length}/${max})</span>
-              <button onclick="window.UniSport.openRosterModal('${activity.id}')" class="text-brand-orange hover:underline text-[11px] font-medium">
+              <span class="font-semibold text-zinc-600 dark:text-zinc-400">Roster (${participants.length}/${max})</span>
+              <button onclick="window.UniSport.openRosterModal('${activity.id}')" class="text-brand-orange hover:underline text-[11px] font-semibold">
                 View names &rarr;
               </button>
             </div>
             <div class="flex -space-x-2 overflow-hidden items-center">
               ${participants.slice(0, 5).map(p => `
-                <div class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-zinc-800 border-2 border-zinc-900 text-[10px] font-bold text-white" title="${escapeHtml(p.name)} (${escapeHtml(p.university || 'Student')})">
+                <div class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-zinc-200 dark:bg-zinc-800 border-2 border-white dark:border-zinc-900 text-[10px] font-bold text-zinc-800 dark:text-white" title="${escapeHtml(p.name)} (${escapeHtml(p.university || 'Student')})">
                   ${escapeHtml((p.name || 'S').charAt(0).toUpperCase())}
                 </div>
               `).join('')}
               ${participants.length > 5 ? `
-                <div class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-zinc-800 border-2 border-zinc-900 text-[10px] font-bold text-zinc-400">
+                <div class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-zinc-200 dark:bg-zinc-800 border-2 border-white dark:border-zinc-900 text-[10px] font-bold text-zinc-600 dark:text-zinc-400">
                   +${participants.length - 5}
                 </div>
               ` : ''}
@@ -430,21 +417,21 @@ export function renderFeed() {
         </div>
 
         <!-- Action Buttons -->
-        <div class="pt-3 border-t border-zinc-800/80 flex items-center justify-between gap-3">
-          <div class="text-[11px] text-zinc-400">
-            Host: <span class="font-medium text-zinc-300">${escapeHtml(activity.creatorName || "Student")}</span>
+        <div class="pt-3 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between gap-3">
+          <div class="text-[11px] text-zinc-500 dark:text-zinc-400">
+            Host: <span class="font-medium text-zinc-700 dark:text-zinc-300">${escapeHtml(activity.creatorName || "Student")}</span>
           </div>
 
           <div>
             ${isJoined ? `
-              <button onclick="window.UniSport.toggleJoinActivity('${activity.id}')" class="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-red-950/60 hover:text-red-300 text-xs font-semibold text-zinc-200 transition border border-zinc-700">
+              <button onclick="window.UniSport.toggleJoinActivity('${activity.id}')" class="px-4 py-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-red-50 dark:hover:bg-red-950/60 text-red-600 dark:text-red-300 text-xs font-semibold transition border border-zinc-200 dark:border-zinc-700">
                 Leave Spot
               </button>
             ` : `
               <button 
                 onclick="window.UniSport.toggleJoinActivity('${activity.id}')" 
                 ${isFull ? 'disabled' : ''}
-                class="px-4 py-2 rounded-xl ${isFull ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed' : 'bg-brand-orange hover:bg-brand-orange-hover text-white shadow-[0_4px_12px_rgba(255,77,0,0.3)]'} text-xs font-bold transition flex items-center gap-1.5"
+                class="px-4 py-2 rounded-xl ${isFull ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400 cursor-not-allowed' : 'bg-brand-orange hover:bg-brand-orange-hover text-white shadow-[0_4px_12px_rgba(255,77,0,0.3)]'} text-xs font-bold transition flex items-center gap-1.5"
               >
                 <span>${isFull ? 'Full' : 'Join Session'}</span>
               </button>
@@ -471,11 +458,11 @@ function setupFilterSearch() {
   const chips = document.querySelectorAll(".sport-filter-chip");
   chips.forEach(chip => {
     chip.addEventListener("click", () => {
-      chips.forEach(c => c.classList.remove("bg-brand-orange", "text-white", "border-brand-orange"));
-      chips.forEach(c => c.classList.add("bg-zinc-900", "text-zinc-400", "border-zinc-800"));
+      chips.forEach(c => {
+        c.className = "sport-filter-chip px-3.5 py-1.5 rounded-xl bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-800 text-xs font-semibold whitespace-nowrap hover:text-zinc-950 dark:hover:text-white transition";
+      });
 
-      chip.classList.remove("bg-zinc-900", "text-zinc-400", "border-zinc-800");
-      chip.classList.add("bg-brand-orange", "text-white", "border-brand-orange");
+      chip.className = "sport-filter-chip px-3.5 py-1.5 rounded-xl bg-brand-orange text-white border border-brand-orange text-xs font-semibold whitespace-nowrap transition";
 
       state.filterSport = chip.dataset.sport;
       renderFeed();
@@ -494,8 +481,7 @@ function setupCreateForm() {
     e.preventDefault();
 
     if (!state.currentUser) {
-      openAuthModal("signin");
-      alert("Please sign in with your student email to create an activity.");
+      window.location.href = "./login.html";
       return;
     }
 
@@ -540,12 +526,11 @@ function setupCreateForm() {
     submitBtn.textContent = "Publishing...";
 
     try {
-      const docRef = await addDoc(collection(db, "activities"), newActivity);
+      await addDoc(collection(db, "activities"), newActivity);
       form.reset();
       switchTab("feed");
     } catch (err) {
       console.warn("Could not save to Firestore collection, updating local state:", err);
-      // Fallback local update
       newActivity.id = "local-" + Date.now();
       newActivity.createdAt = Date.now();
       state.activities.unshift(newActivity);
@@ -563,7 +548,7 @@ function setupCreateForm() {
  */
 export async function toggleJoinActivity(activityId) {
   if (!state.currentUser) {
-    openAuthModal("signin");
+    window.location.href = "./login.html";
     return;
   }
 
@@ -588,7 +573,6 @@ export async function toggleJoinActivity(activityId) {
   try {
     const actRef = doc(db, "activities", activityId);
     if (isJoined) {
-      // Find item to remove
       const itemToRemove = participants.find(p => p.uid === state.currentUser.uid) || currentParticipantObj;
       await updateDoc(actRef, {
         participants: arrayRemove(itemToRemove)
@@ -600,7 +584,6 @@ export async function toggleJoinActivity(activityId) {
     }
   } catch (err) {
     console.warn("Firestore write failed, updating local state:", err);
-    // Local fallback
     if (isJoined) {
       activity.participants = participants.filter(p => p.uid !== state.currentUser.uid);
     } else {
@@ -619,11 +602,11 @@ function renderMyActivities() {
 
   if (!state.currentUser) {
     container.innerHTML = `
-      <div class="text-center py-12 rounded-3xl bg-zinc-900/40 border border-zinc-800 p-8">
-        <p class="text-zinc-400 mb-4">Sign in with your student credentials to view your registered matches.</p>
-        <button onclick="window.UniSport.openAuthModal('signin')" class="px-5 py-2.5 rounded-xl bg-brand-orange text-white font-bold text-sm">
+      <div class="text-center py-12 rounded-3xl bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 p-8 shadow-sm">
+        <p class="text-zinc-600 dark:text-zinc-400 mb-4">Sign in with your student credentials to view your registered matches.</p>
+        <a href="./login.html" class="inline-block px-5 py-2.5 rounded-xl bg-brand-orange text-white font-bold text-sm">
           Sign In
-        </button>
+        </a>
       </div>
     `;
     return;
@@ -637,9 +620,9 @@ function renderMyActivities() {
 
   if (myActivities.length === 0) {
     container.innerHTML = `
-      <div class="text-center py-12 rounded-3xl bg-zinc-900/40 border border-zinc-800 p-8">
-        <h4 class="text-white font-bold text-lg mb-2">You haven't joined any activities yet</h4>
-        <p class="text-zinc-400 text-sm mb-6">Explore the Geo Feed to find sports sessions matching your schedule in Eindhoven.</p>
+      <div class="text-center py-12 rounded-3xl bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 p-8 shadow-sm">
+        <h4 class="text-zinc-950 dark:text-white font-bold text-lg mb-2">You haven't joined any activities yet</h4>
+        <p class="text-zinc-600 dark:text-zinc-400 text-sm mb-6">Explore the Geo Feed to find sports sessions matching your schedule in Eindhoven.</p>
         <button onclick="window.UniSport.switchTab('feed')" class="px-5 py-2.5 rounded-xl bg-brand-orange text-white font-bold text-sm">
           Browse Feed
         </button>
@@ -652,21 +635,21 @@ function renderMyActivities() {
     const isCreator = a.creatorId === state.currentUser.uid;
     const sportInfo = SPORTS_CONFIG[a.sport] || SPORTS_CONFIG["Other"];
     return `
-      <div class="p-5 rounded-2xl bg-zinc-900/80 border border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div class="p-5 rounded-2xl bg-white dark:bg-zinc-900/80 border border-zinc-200 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
         <div>
           <div class="flex items-center gap-2 mb-1.5">
             <span class="text-sm">${sportInfo.icon}</span>
-            <span class="text-xs font-bold text-zinc-400 uppercase tracking-wider">${escapeHtml(a.sport)}</span>
-            ${isCreator ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded bg-brand-orange/20 text-brand-orange border border-brand-orange/30">Hosted by You</span>` : ''}
+            <span class="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">${escapeHtml(a.sport)}</span>
+            ${isCreator ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded bg-brand-orange/10 text-brand-orange border border-brand-orange/20">Hosted by You</span>` : ''}
           </div>
-          <h4 class="text-base font-bold text-white mb-1">${escapeHtml(a.title)}</h4>
-          <p class="text-xs text-zinc-400">📍 ${escapeHtml(a.location)} &bull; ⏰ ${escapeHtml(formatDisplayDate(a.dateTime))}</p>
+          <h4 class="text-base font-bold text-zinc-950 dark:text-white mb-1">${escapeHtml(a.title)}</h4>
+          <p class="text-xs text-zinc-500 dark:text-zinc-400">📍 ${escapeHtml(a.location)} &bull; ⏰ ${escapeHtml(formatDisplayDate(a.dateTime))}</p>
         </div>
         <div class="flex items-center gap-3">
-          <button onclick="window.UniSport.openRosterModal('${a.id}')" class="px-3.5 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs font-medium text-white transition">
+          <button onclick="window.UniSport.openRosterModal('${a.id}')" class="px-3.5 py-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-xs font-medium text-zinc-900 dark:text-white transition">
             View Roster (${(a.participants || []).length}/${a.maxParticipants})
           </button>
-          <button onclick="window.UniSport.toggleJoinActivity('${a.id}')" class="px-3.5 py-2 rounded-xl bg-red-950/40 hover:bg-red-950 text-red-300 text-xs font-semibold transition border border-red-900/50">
+          <button onclick="window.UniSport.toggleJoinActivity('${a.id}')" class="px-3.5 py-2 rounded-xl bg-red-50 dark:bg-red-950/40 hover:bg-red-100 dark:hover:bg-red-950 text-red-600 dark:text-red-300 text-xs font-semibold transition border border-red-200 dark:border-red-900/50">
             Leave
           </button>
         </div>
@@ -734,62 +717,9 @@ function setupProfileForm() {
 }
 
 /**
- * Authentication Modal Handlers
+ * Roster modal handler
  */
-function setupAuthModals() {
-  const modal = document.getElementById("auth-modal");
-  const closeBtn = document.getElementById("auth-modal-close");
-  const toggleAuthModeBtn = document.getElementById("toggle-auth-mode");
-  const authForm = document.getElementById("auth-form");
-  const navAuthBtn = document.getElementById("nav-auth-btn");
-
-  if (closeBtn) closeBtn.addEventListener("click", () => modal.classList.add("hidden"));
-  if (navAuthBtn) navAuthBtn.addEventListener("click", () => openAuthModal("signin"));
-
-  // Toggle between signin and signup
-  if (toggleAuthModeBtn) {
-    toggleAuthModeBtn.addEventListener("click", () => {
-      const mode = modal.dataset.mode === "signin" ? "signup" : "signin";
-      openAuthModal(mode);
-    });
-  }
-
-  // Handle Auth submission
-  if (authForm) {
-    authForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const mode = modal.dataset.mode;
-      const email = document.getElementById("auth-email").value;
-      const password = document.getElementById("auth-password").value;
-      const name = document.getElementById("auth-name") ? document.getElementById("auth-name").value : "";
-      const errorMsg = document.getElementById("auth-error");
-      const submitBtn = document.getElementById("auth-submit-btn");
-
-      errorMsg.classList.add("hidden");
-      submitBtn.disabled = true;
-      submitBtn.textContent = mode === "signin" ? "Signing In..." : "Registering...";
-
-      let result;
-      if (mode === "signup") {
-        result = await signUpStudent(email, password, name);
-      } else {
-        result = await signInStudent(email, password);
-      }
-
-      submitBtn.disabled = false;
-      submitBtn.textContent = mode === "signin" ? "Sign In" : "Create Student Account";
-
-      if (result.success) {
-        modal.classList.add("hidden");
-        authForm.reset();
-      } else {
-        errorMsg.textContent = result.error || "An error occurred";
-        errorMsg.classList.remove("hidden");
-      }
-    });
-  }
-
-  // Close roster modal
+function setupRosterModal() {
   const closeRosterBtn = document.getElementById("roster-modal-close");
   if (closeRosterBtn) {
     closeRosterBtn.addEventListener("click", () => {
@@ -798,38 +728,6 @@ function setupAuthModals() {
   }
 }
 
-export function openAuthModal(mode = "signin") {
-  const modal = document.getElementById("auth-modal");
-  const title = document.getElementById("auth-modal-title");
-  const sub = document.getElementById("auth-modal-sub");
-  const nameField = document.getElementById("auth-name-container");
-  const submitBtn = document.getElementById("auth-submit-btn");
-  const toggleBtn = document.getElementById("toggle-auth-mode");
-  const errorMsg = document.getElementById("auth-error");
-
-  errorMsg.classList.add("hidden");
-  modal.dataset.mode = mode;
-
-  if (mode === "signup") {
-    title.textContent = "Student Registration";
-    sub.textContent = "Only @student.fontys.nl and @student.tue.nl accounts permitted.";
-    nameField.classList.remove("hidden");
-    submitBtn.textContent = "Create Student Account";
-    toggleBtn.innerHTML = `Already have an account? <span class="text-brand-orange font-bold">Sign In</span>`;
-  } else {
-    title.textContent = "Student Sign In";
-    sub.textContent = "Sign in with your verified Eindhoven student credentials.";
-    nameField.classList.add("hidden");
-    submitBtn.textContent = "Sign In";
-    toggleBtn.innerHTML = `Don't have an account? <span class="text-brand-orange font-bold">Register</span>`;
-  }
-
-  modal.classList.remove("hidden");
-}
-
-/**
- * Open Roster View Modal
- */
 export function openRosterModal(activityId) {
   const modal = document.getElementById("roster-modal");
   const content = document.getElementById("roster-modal-list");
@@ -842,17 +740,17 @@ export function openRosterModal(activityId) {
   const participants = activity.participants || [];
 
   content.innerHTML = participants.map((p, idx) => `
-    <div class="flex items-center justify-between p-3 rounded-2xl bg-zinc-900 border border-zinc-800">
+    <div class="flex items-center justify-between p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
       <div class="flex items-center gap-3">
-        <div class="w-8 h-8 rounded-full bg-brand-orange/20 border border-brand-orange/30 text-brand-orange flex items-center justify-center font-bold text-xs">
+        <div class="w-8 h-8 rounded-full bg-brand-orange/15 border border-brand-orange/20 text-brand-orange flex items-center justify-center font-bold text-xs">
           ${escapeHtml((p.name || 'S').charAt(0).toUpperCase())}
         </div>
         <div>
-          <p class="text-sm font-semibold text-white">${escapeHtml(p.name)}</p>
-          <p class="text-xs text-zinc-400">${escapeHtml(p.university || 'Student')}</p>
+          <p class="text-sm font-semibold text-zinc-900 dark:text-white">${escapeHtml(p.name)}</p>
+          <p class="text-xs text-zinc-500 dark:text-zinc-400">${escapeHtml(p.university || 'Student')}</p>
         </div>
       </div>
-      <span class="text-xs font-semibold px-2 py-0.5 rounded bg-zinc-800 text-zinc-400">#${idx + 1}</span>
+      <span class="text-xs font-semibold px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">#${idx + 1}</span>
     </div>
   `).join('');
 
@@ -862,7 +760,6 @@ export function openRosterModal(activityId) {
 // Global attachment for inline onclick calls
 window.UniSport = {
   switchTab,
-  openAuthModal,
   openRosterModal,
   toggleJoinActivity
 };
