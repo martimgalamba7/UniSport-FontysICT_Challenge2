@@ -27,6 +27,14 @@ import {
 
 import { getAvatarById, UNISPORT_AVATARS } from "./avatars.js";
 
+// Expose UniSport global helpers immediately
+window.UniSport = window.UniSport || {};
+window.UniSport.switchTab = switchTab;
+window.UniSport.populateProfileTab = populateProfileTab;
+window.UniSport.openRosterModal = openRosterModal;
+window.UniSport.openSettingsModal = openSettingsModal;
+window.UniSport.toggleJoinActivity = toggleJoinActivity;
+
 // Application State
 const state = {
   currentUser: null,
@@ -693,10 +701,21 @@ function renderMyActivities() {
   }).join('');
 }
 
-function populateProfileTab() {
-  if (!state.userProfile && !state.currentUser) return;
-  const user = state.currentUser;
-  const profile = state.userProfile || user;
+export function populateProfileTab() {
+  let user = state.currentUser;
+  let profile = state.userProfile || user;
+
+  if (!user) {
+    const session = getActiveSession();
+    if (session) {
+      user = session;
+      profile = session;
+      state.currentUser = session;
+      state.userProfile = session;
+    }
+  }
+
+  if (!user) return;
 
   const email = profile.email || user.email || "";
   const displayName = profile.displayName || user.displayName || (email ? email.split("@")[0] : "Student");

@@ -225,12 +225,17 @@ export async function signOutStudent() {
 
 export async function getStudentProfile(uid) {
   const session = getActiveSession();
-  if (session && session.uid === uid) return session;
-
   try {
     const snap = await getDoc(doc(db, "users", uid));
-    if (snap.exists()) return snap.data();
-  } catch {}
+    if (snap.exists()) {
+      const data = snap.data();
+      const merged = { ...session, ...data, uid };
+      setActiveSession(merged);
+      return merged;
+    }
+  } catch (err) {
+    console.warn("getStudentProfile error:", err);
+  }
 
   return session;
 }
