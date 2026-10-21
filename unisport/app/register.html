@@ -3,16 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Student Registration • UniSport Eindhoven</title>
+  <title>Join UniSport • Eindhoven Student Athletic Network</title>
   
   <link rel="icon" type="image/png" href="/assets/logoUniSport.png" />
   <link rel="apple-touch-icon" href="/assets/logoUniSport.png" />
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Syne:wght@700;800;900&display=swap" rel="stylesheet">
   
-  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -39,322 +38,442 @@
     }
   </script>
   <script src="./theme.js"></script>
-  <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
 <body class="bg-[#FAFAF8] text-zinc-900 dark:bg-[#0D0D11] dark:text-zinc-100 min-h-screen flex flex-col font-sans transition-colors duration-200">
 
-  <!-- Top Bar -->
-  <header class="w-full px-6 sm:px-12 py-5 flex items-center justify-between border-b border-zinc-200/80 dark:border-zinc-800/80 bg-white/70 dark:bg-[#0D0D11]/70 backdrop-blur-xl z-20">
-    <a href="/challenge2/unisport/app" class="flex items-center space-x-3 group">
+  <!-- Minimal Header -->
+  <header class="w-full px-6 sm:px-12 py-5 flex items-center justify-between border-b border-zinc-200/60 dark:border-zinc-800/60 bg-white/70 dark:bg-[#0D0D11]/70 backdrop-blur-xl z-20">
+    <a href="/challenge2/unisport" class="flex items-center space-x-3 group">
       <img src="/assets/logoUniSport.png" alt="UniSport" class="h-9 w-auto object-contain transition group-hover:scale-105" onerror="this.src='./assets/logoUniSport.png';" />
-      <span class="font-display font-extrabold text-xl tracking-tight text-zinc-950 dark:text-white">UniSport</span>
+      <span class="font-display font-black text-xl tracking-tight text-zinc-950 dark:text-white">UniSport</span>
     </a>
 
-    <div class="flex items-center gap-3">
-      <!-- Theme Switcher Button -->
-      <button class="theme-toggle-btn inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-zinc-100 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 text-xs font-semibold hover:bg-zinc-200 dark:hover:bg-zinc-700 transition" aria-label="Toggle Theme">
+    <div class="flex items-center gap-4">
+      <!-- Theme Switcher -->
+      <button class="theme-toggle-btn inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold hover:bg-zinc-200 dark:hover:bg-zinc-700 transition" aria-label="Toggle Theme">
         <i data-lucide="sun" class="icon-sun w-3.5 h-3.5 hidden"></i>
         <i data-lucide="moon" class="icon-moon w-3.5 h-3.5"></i>
         <span class="theme-label hidden sm:inline">Dark</span>
       </button>
 
-      <a href="./login.html" class="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:text-brand-orange transition">
-        <span>Already have an account? Sign In</span>
-        <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+      <a href="./login.html" class="text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:text-brand-orange transition">
+        Sign In &rarr;
       </a>
     </div>
   </header>
 
-  <!-- Split Screen Container -->
-  <div class="flex-grow flex flex-col lg:flex-row w-full max-w-7xl mx-auto items-stretch justify-center p-4 sm:p-8 lg:p-12 gap-8 lg:gap-12">
+  <!-- Main Multi-Step Workspace -->
+  <main class="flex-grow flex flex-col lg:flex-row w-full max-w-6xl mx-auto items-stretch justify-center p-6 sm:p-10 lg:p-12 gap-8 lg:gap-14">
     
-    <!-- Left Hero Interactive Split Visual -->
-    <div class="w-full lg:w-1/2 rounded-[2.5rem] bg-gradient-to-br from-amber-500/15 via-[#FAFAF8] to-brand-orange/10 dark:from-brand-orange/15 dark:via-[#15151B] dark:to-zinc-900 border border-zinc-200 dark:border-zinc-800 p-8 sm:p-12 flex flex-col justify-between relative overflow-hidden shadow-xl">
+    <!-- Left Stage: Dynamic Identity Preview (Editorial, Clean, Interactive) -->
+    <div class="w-full lg:w-5/12 flex flex-col justify-between p-8 sm:p-10 rounded-[2.5rem] bg-zinc-100/80 dark:bg-[#15151B] border border-zinc-200/80 dark:border-zinc-800/80 relative overflow-hidden">
       
-      <!-- Ambient Glow -->
-      <div class="absolute -right-20 -top-20 w-80 h-80 bg-brand-orange/20 rounded-full blur-3xl pointer-events-none"></div>
-      <div class="absolute -left-16 -bottom-16 w-72 h-72 bg-amber-500/15 rounded-full blur-3xl pointer-events-none"></div>
-
-      <!-- Tagline & Heading -->
       <div class="relative z-10 space-y-3">
-        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white dark:bg-zinc-800/90 border border-zinc-200 dark:border-zinc-700 text-xs font-bold text-brand-orange uppercase tracking-wider shadow-sm">
-          <span>🎓</span>
-          <span>Students Only &bull; Fontys & TU/e</span>
-        </div>
-        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-display font-extrabold text-zinc-950 dark:text-white leading-[1.08] tracking-tight">
-          Join Eindhoven’s<br />
-          <span class="text-brand-orange">Student Sports Squad.</span>
-        </h1>
-        <p class="text-zinc-600 dark:text-zinc-400 text-sm sm:text-base leading-relaxed">
-          Create your verified profile in 30 seconds. Pick your favorite sports, coordinate games, and find workout partners across campus.
+        <span class="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-widest text-brand-orange">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+          <span>Student Passport</span>
+        </span>
+        <h2 class="text-2xl sm:text-3xl font-display font-black text-zinc-950 dark:text-white tracking-tight leading-snug">
+          Your Campus Sports Pass
+        </h2>
+        <p class="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">
+          As you type, your student identity badge is generated and verified for the Eindhoven network.
         </p>
       </div>
 
-      <!-- Creative Split Screen Interactive Avatar Selector -->
-      <div class="relative z-10 my-8 p-6 rounded-3xl bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border border-zinc-200/80 dark:border-zinc-800 shadow-lg space-y-4">
+      <!-- Athletic Card Pass Preview -->
+      <div class="relative z-10 my-8 p-6 rounded-3xl bg-white dark:bg-[#0D0D11] border border-zinc-200 dark:border-zinc-800/80 shadow-xl space-y-5 transition-all">
         
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Choose your sports identity</span>
-          <span class="text-xs font-semibold text-brand-orange">Interactive Avatar</span>
+        <div class="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span id="badge-campus" class="text-[11px] font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">Fontys UAS / TU Eindhoven</span>
+          </div>
+          <span class="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded bg-brand-orange/10 text-brand-orange border border-brand-orange/20">
+            Semester 1
+          </span>
         </div>
 
-        <!-- Dynamic Avatar Preview -->
         <div class="flex items-center gap-4">
-          <div id="preview-avatar" class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-brand-orange to-amber-500 text-white flex items-center justify-center font-display font-black text-2xl shadow-md border-2 border-white dark:border-zinc-800 transition-all transform hover:scale-105">
+          <div id="badge-avatar" class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-brand-orange to-amber-500 text-white flex items-center justify-center text-3xl shadow-lg border-2 border-white dark:border-zinc-800 transition-transform">
             ⚽
           </div>
-          <div>
-            <h4 id="preview-name" class="font-bold text-zinc-900 dark:text-white text-base">Your Student Profile</h4>
-            <p id="preview-uni" class="text-xs text-zinc-500 dark:text-zinc-400">Fontys UAS or TU Eindhoven</p>
-            <div id="preview-tags" class="flex items-center gap-1.5 mt-2">
-              <span class="px-2 py-0.5 rounded-md bg-brand-orange/10 text-brand-orange border border-brand-orange/20 text-[11px] font-semibold">Active Member</span>
-            </div>
+          <div class="space-y-1">
+            <h3 id="badge-name" class="font-display font-black text-lg text-zinc-950 dark:text-white">
+              Student Athlete
+            </h3>
+            <p id="badge-email" class="text-xs text-zinc-500 dark:text-zinc-400 font-mono">
+              student@university.nl
+            </p>
           </div>
         </div>
 
-        <!-- Sport Icon Selector -->
-        <div class="pt-3 border-t border-zinc-200/80 dark:border-zinc-800/80">
-          <label class="block text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2">Pick your main passion:</label>
-          <div class="flex items-center gap-2 overflow-x-auto pb-1">
-            <button type="button" data-icon="⚽" data-label="Football" class="avatar-icon-btn px-3 py-1.5 rounded-xl bg-brand-orange text-white text-xs font-semibold shadow-sm transition">⚽ Football</button>
-            <button type="button" data-icon="🏋️" data-label="Fitness" class="avatar-icon-btn px-3 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold hover:bg-zinc-200 dark:hover:bg-zinc-700 transition">🏋️ Gym</button>
-            <button type="button" data-icon="🏃" data-label="Running" class="avatar-icon-btn px-3 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold hover:bg-zinc-200 dark:hover:bg-zinc-700 transition">🏃 Running</button>
-            <button type="button" data-icon="🧗" data-label="Bouldering" class="avatar-icon-btn px-3 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold hover:bg-zinc-200 dark:hover:bg-zinc-700 transition">🧗 Boulder</button>
-            <button type="button" data-icon="🎾" data-label="Padel" class="avatar-icon-btn px-3 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold hover:bg-zinc-200 dark:hover:bg-zinc-700 transition">🎾 Padel</button>
-          </div>
+        <div class="pt-3 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between text-xs">
+          <span class="text-zinc-500 dark:text-zinc-400">Preferred Sport:</span>
+          <span id="badge-sport" class="font-bold text-zinc-900 dark:text-white">⚽ Football (Intermediate)</span>
         </div>
 
       </div>
 
-      <!-- Trust Badges -->
-      <div class="relative z-10 flex items-center gap-6 pt-4 text-xs font-semibold text-zinc-500 dark:text-zinc-400">
-        <div class="flex items-center gap-2">
-          <i data-lucide="lock" class="w-4 h-4 text-brand-orange"></i>
-          <span>No spam, guaranteed</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <i data-lucide="check-circle" class="w-4 h-4 text-brand-orange"></i>
-          <span>Strict Domain Verification</span>
+      <!-- Bottom Step Tracker Indicator -->
+      <div class="relative z-10 flex items-center justify-between text-xs font-semibold text-zinc-500 dark:text-zinc-400">
+        <span id="step-counter-text">Step 1 of 3: University Email</span>
+        <div class="flex items-center gap-1.5">
+          <span id="dot-1" class="w-6 h-1.5 rounded-full bg-brand-orange transition-all"></span>
+          <span id="dot-2" class="w-2 h-1.5 rounded-full bg-zinc-300 dark:bg-zinc-700 transition-all"></span>
+          <span id="dot-3" class="w-2 h-1.5 rounded-full bg-zinc-300 dark:bg-zinc-700 transition-all"></span>
         </div>
       </div>
 
     </div>
 
-    <!-- Right Side: Clean Modern Registration Form -->
-    <div class="w-full lg:w-1/2 flex flex-col justify-center max-w-md mx-auto">
+    <!-- Right Stage: Clean Multi-Step Form Flow -->
+    <div class="w-full lg:w-7/12 flex flex-col justify-center max-w-xl mx-auto">
       
-      <div class="rounded-3xl bg-white dark:bg-brand-darkCard border border-zinc-200 dark:border-zinc-800 p-8 sm:p-10 shadow-xl space-y-6">
-        
+      <!-- Error Notification -->
+      <div id="step-error" class="hidden mb-6 p-4 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 text-red-600 dark:text-red-400 text-xs font-medium flex items-center gap-2.5">
+        <i data-lucide="alert-circle" class="w-4 h-4 shrink-0"></i>
+        <span id="step-error-text">Error message</span>
+      </div>
+
+      <!-- STEP 1: EMAIL & PASSWORD -->
+      <div id="step-pane-1" class="space-y-6">
         <div>
-          <h2 class="text-2xl sm:text-3xl font-display font-extrabold text-zinc-950 dark:text-white">
-            Create Student Account
-          </h2>
-          <p class="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-1">
-            Sign up with your official university email.
+          <span class="text-xs font-bold text-brand-orange uppercase tracking-wider">Step 1 &bull; Account Verification</span>
+          <h1 class="text-3xl sm:text-4xl font-display font-black text-zinc-950 dark:text-white mt-1">
+            Let's start with your student email.
+          </h1>
+          <p class="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-2">
+            UniSport is exclusive to students in Eindhoven. Please use your official university account.
           </p>
         </div>
 
-        <!-- Error Notification Banner -->
-        <div id="auth-error" class="hidden p-4 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 text-red-600 dark:text-red-400 text-xs font-medium flex items-center gap-2">
-          <i data-lucide="alert-circle" class="w-4 h-4 shrink-0"></i>
-          <span id="auth-error-text">Error message</span>
-        </div>
-
-        <!-- Success Notification Banner -->
-        <div id="auth-success" class="hidden p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/60 text-emerald-600 dark:text-emerald-400 text-xs font-medium flex items-center gap-2">
-          <i data-lucide="check-circle" class="w-4 h-4 shrink-0"></i>
-          <span>Account created successfully! Redirecting...</span>
-        </div>
-
-        <!-- Registration Form -->
-        <form id="signup-form" class="space-y-4">
-          
+        <div class="space-y-4">
           <div>
-            <label class="block text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300 mb-2">
-              Full Name *
-            </label>
-            <div class="relative">
-              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400">
-                <i data-lucide="user" class="w-4 h-4"></i>
-              </span>
-              <input 
-                type="text" 
-                id="signup-name" 
-                required 
-                placeholder="e.g. Liam de Jong" 
-                class="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-900/80 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder-zinc-400 text-sm focus:outline-none focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/20 transition"
-              />
-            </div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300 mb-2">Student Email *</label>
+            <input 
+              type="email" 
+              id="inp-email" 
+              placeholder="e.g. 591981@student.fontys.nl" 
+              class="w-full px-5 py-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-sm text-zinc-950 dark:text-white placeholder-zinc-400 focus:outline-none focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/20 transition shadow-sm"
+            />
+            <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1.5 flex items-center gap-1">
+              <i data-lucide="check" class="w-3.5 h-3.5 text-brand-orange"></i>
+              <span>Must end in @student.fontys.nl or @student.tue.nl</span>
+            </p>
           </div>
 
           <div>
-            <label class="block text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300 mb-2">
-              Student Email *
-            </label>
+            <label class="block text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300 mb-2">Create Password *</label>
             <div class="relative">
-              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400">
-                <i data-lucide="mail" class="w-4 h-4"></i>
-              </span>
-              <input 
-                type="email" 
-                id="signup-email" 
-                required 
-                placeholder="your.name@student.fontys.nl" 
-                class="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-900/80 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder-zinc-400 text-sm focus:outline-none focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/20 transition"
-              />
-            </div>
-            <div class="mt-1.5 flex items-center justify-between text-[11px] text-zinc-500 dark:text-zinc-400">
-              <span class="flex items-center gap-1">
-                <i data-lucide="shield" class="w-3 h-3 text-brand-orange"></i>
-                <span>Must be @student.fontys.nl or @student.tue.nl</span>
-              </span>
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300 mb-2">
-              Create Password *
-            </label>
-            <div class="relative">
-              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400">
-                <i data-lucide="lock" class="w-4 h-4"></i>
-              </span>
               <input 
                 type="password" 
-                id="signup-password" 
-                required 
-                minlength="6"
-                placeholder="Minimum 6 characters" 
-                class="w-full pl-11 pr-11 py-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-900/80 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder-zinc-400 text-sm focus:outline-none focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/20 transition"
+                id="inp-password" 
+                placeholder="At least 6 characters" 
+                class="w-full px-5 pr-12 py-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-sm text-zinc-950 dark:text-white placeholder-zinc-400 focus:outline-none focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/20 transition shadow-sm"
               />
-              <button type="button" id="toggle-password-visibility" class="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition">
+              <button type="button" id="btn-toggle-pass" class="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition">
                 <i data-lucide="eye" class="w-4 h-4"></i>
               </button>
             </div>
           </div>
+        </div>
 
-          <button 
-            type="submit" 
-            id="signup-btn" 
-            class="w-full py-4 rounded-2xl bg-brand-orange hover:bg-brand-orange-hover text-white text-sm font-bold tracking-wide transition transform hover:-translate-y-0.5 active:translate-y-0 shadow-[0_8px_20px_-4px_rgba(255,77,0,0.5)] flex items-center justify-center gap-2"
-          >
-            <span>Complete Registration</span>
-            <i data-lucide="arrow-right" class="w-4 h-4"></i>
-          </button>
+        <button type="button" id="btn-next-1" class="w-full py-4 rounded-2xl bg-brand-orange hover:bg-brand-orange-hover text-white text-sm font-bold tracking-wide transition transform hover:-translate-y-0.5 active:translate-y-0 shadow-[0_8px_20px_-4px_rgba(255,77,0,0.5)] flex items-center justify-center gap-2">
+          <span>Continue to Identity</span>
+          <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </button>
 
-        </form>
+        <p class="text-center text-xs text-zinc-500 dark:text-zinc-400 pt-2">
+          Already have an account? <a href="./login.html" class="text-brand-orange font-bold hover:underline">Sign In &rarr;</a>
+        </p>
+      </div>
 
-        <!-- Redirect to Sign In -->
-        <div class="pt-4 border-t border-zinc-200 dark:border-zinc-800 text-center">
-          <p class="text-xs text-zinc-500 dark:text-zinc-400">
-            Already have an account? 
-            <a href="./login.html" class="text-brand-orange font-bold hover:underline ml-1">
-              Sign In here &rarr;
-            </a>
+      <!-- STEP 2: FULL NAME & CAMPUS -->
+      <div id="step-pane-2" class="hidden space-y-6">
+        <div>
+          <span class="text-xs font-bold text-brand-orange uppercase tracking-wider">Step 2 &bull; Identity</span>
+          <h1 class="text-3xl sm:text-4xl font-display font-black text-zinc-950 dark:text-white mt-1">
+            What should peers call you?
+          </h1>
+          <p class="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-2">
+            Your name is displayed to teammates on match rosters to reduce awkwardness.
           </p>
         </div>
 
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300 mb-2">Full Name *</label>
+            <input 
+              type="text" 
+              id="inp-name" 
+              placeholder="e.g. Martim Ferreira Galamba" 
+              class="w-full px-5 py-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-sm text-zinc-950 dark:text-white placeholder-zinc-400 focus:outline-none focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/20 transition shadow-sm"
+            />
+          </div>
+
+          <div class="p-4 rounded-2xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
+            <div>
+              <span class="text-xs font-bold text-zinc-700 dark:text-zinc-300">Verified Institution</span>
+              <p id="institution-detected-text" class="text-sm font-semibold text-brand-orange">Fontys University of Applied Sciences</p>
+            </div>
+            <i data-lucide="shield-check" class="w-5 h-5 text-emerald-500"></i>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <button type="button" id="btn-back-2" class="w-1/3 py-4 rounded-2xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-sm font-bold transition">
+            Back
+          </button>
+          <button type="button" id="btn-next-2" class="w-2/3 py-4 rounded-2xl bg-brand-orange hover:bg-brand-orange-hover text-white text-sm font-bold tracking-wide transition shadow-[0_8px_20px_-4px_rgba(255,77,0,0.5)] flex items-center justify-center gap-2">
+            <span>Choose Sports & Avatar</span>
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 3: ATHLETIC PREFERENCES & AVATAR -->
+      <div id="step-pane-3" class="hidden space-y-6">
+        <div>
+          <span class="text-xs font-bold text-brand-orange uppercase tracking-wider">Step 3 &bull; Athletic Profile</span>
+          <h1 class="text-3xl sm:text-4xl font-display font-black text-zinc-950 dark:text-white mt-1">
+            Pick your sport & avatar.
+          </h1>
+          <p class="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-2">
+            Select your main athletic focus to be matched with students of compatible fitness levels.
+          </p>
+        </div>
+
+        <!-- Avatar Icons Picker -->
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300 mb-2">Avatar Icon</label>
+          <div class="grid grid-cols-5 gap-2.5">
+            <button type="button" data-icon="⚽" class="avatar-option p-3 rounded-2xl border-2 border-brand-orange bg-brand-orange/10 text-2xl transition hover:scale-105">⚽</button>
+            <button type="button" data-icon="🏋️" class="avatar-option p-3 rounded-2xl border-2 border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-2xl transition hover:scale-105">🏋️</button>
+            <button type="button" data-icon="🏃" class="avatar-option p-3 rounded-2xl border-2 border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-2xl transition hover:scale-105">🏃</button>
+            <button type="button" data-icon="🏀" class="avatar-option p-3 rounded-2xl border-2 border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-2xl transition hover:scale-105">🏀</button>
+            <button type="button" data-icon="🧗" class="avatar-option p-3 rounded-2xl border-2 border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-2xl transition hover:scale-105">🧗</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300 mb-2">Favorite Sport</label>
+            <select id="sel-sport" class="w-full px-4 py-3.5 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-sm text-zinc-900 dark:text-white focus:outline-none focus:border-brand-orange transition">
+              <option value="Football">⚽ Football</option>
+              <option value="Gym & Fitness">🏋️ Gym & Fitness</option>
+              <option value="Running">🏃 Running</option>
+              <option value="Basketball">🏀 Basketball</option>
+              <option value="Bouldering">🧗 Bouldering</option>
+              <option value="Padel">🎾 Padel</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300 mb-2">Skill Level</label>
+            <select id="sel-skill" class="w-full px-4 py-3.5 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-sm text-zinc-900 dark:text-white focus:outline-none focus:border-brand-orange transition">
+              <option value="Beginner">Beginner (Casual fun)</option>
+              <option value="Intermediate" selected>Intermediate (Regular player)</option>
+              <option value="Advanced">Advanced (Competitive)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 pt-2">
+          <button type="button" id="btn-back-3" class="w-1/3 py-4 rounded-2xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-sm font-bold transition">
+            Back
+          </button>
+          <button type="button" id="btn-finish" class="w-2/3 py-4 rounded-2xl bg-brand-orange hover:bg-brand-orange-hover text-white text-sm font-bold tracking-wide transition transform hover:-translate-y-0.5 shadow-[0_8px_20px_-4px_rgba(255,77,0,0.5)] flex items-center justify-center gap-2">
+            <span>Complete Registration</span>
+            <i data-lucide="check" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- SUCCESS SCREEN -->
+      <div id="step-pane-success" class="hidden text-center py-12 space-y-5">
+        <div class="w-20 h-20 mx-auto rounded-3xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-4xl">
+          🎉
+        </div>
+        <h2 class="text-3xl font-display font-black text-zinc-950 dark:text-white">
+          Welcome to UniSport!
+        </h2>
+        <p class="text-sm text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto">
+          Your student account is active. Redirecting you to the Eindhoven live sports feed...
+        </p>
       </div>
 
     </div>
 
-  </div>
+  </main>
 
-  <!-- Lucide icons runner -->
   <script>
     lucide.createIcons();
   </script>
 
-  <!-- Interactive Avatar & Signup Logic Script -->
+  <!-- Multi-Step Registration Controller -->
   <script type="module">
-    import { signUpStudent } from "./auth.js";
+    import { signUpStudentMultiStep, validateStudentEmail } from "./auth.js";
 
-    const form = document.getElementById("signup-form");
-    const nameInput = document.getElementById("signup-name");
-    const emailInput = document.getElementById("signup-email");
-    const passInput = document.getElementById("signup-password");
-    const submitBtn = document.getElementById("signup-btn");
-    const errorBox = document.getElementById("auth-error");
-    const errorText = document.getElementById("auth-error-text");
-    const successBox = document.getElementById("auth-success");
-    const togglePass = document.getElementById("toggle-password-visibility");
+    let currentStep = 1;
+    let selectedAvatar = "⚽";
 
-    // Dynamic Avatar update
-    const previewAvatar = document.getElementById("preview-avatar");
-    const previewName = document.getElementById("preview-name");
-    const previewUni = document.getElementById("preview-uni");
+    const emailInp = document.getElementById("inp-email");
+    const passInp = document.getElementById("inp-password");
+    const nameInp = document.getElementById("inp-name");
+    const sportSel = document.getElementById("sel-sport");
+    const skillSel = document.getElementById("sel-skill");
 
-    nameInput.addEventListener("input", (e) => {
-      previewName.textContent = e.target.value.trim() || "Your Student Profile";
-    });
+    const badgeName = document.getElementById("badge-name");
+    const badgeEmail = document.getElementById("badge-email");
+    const badgeCampus = document.getElementById("badge-campus");
+    const badgeSport = document.getElementById("badge-sport");
+    const badgeAvatar = document.getElementById("badge-avatar");
+    const instDetected = document.getElementById("institution-detected-text");
 
-    emailInput.addEventListener("input", (e) => {
+    const errBox = document.getElementById("step-error");
+    const errText = document.getElementById("step-error-text");
+
+    function showError(msg) {
+      errText.textContent = msg;
+      errBox.classList.remove("hidden");
+    }
+
+    function clearError() {
+      errBox.classList.add("hidden");
+    }
+
+    // Dynamic Live Preview Bindings
+    emailInp.addEventListener("input", (e) => {
       const email = e.target.value.trim().toLowerCase();
+      badgeEmail.textContent = email || "student@university.nl";
       if (email.endsWith("@student.tue.nl")) {
-        previewUni.textContent = "TU Eindhoven Student";
+        badgeCampus.textContent = "TU Eindhoven";
+        instDetected.textContent = "TU Eindhoven (TU/e)";
       } else if (email.endsWith("@student.fontys.nl")) {
-        previewUni.textContent = "Fontys UAS Student";
+        badgeCampus.textContent = "Fontys UAS";
+        instDetected.textContent = "Fontys University of Applied Sciences";
       } else {
-        previewUni.textContent = "Fontys UAS or TU Eindhoven";
+        badgeCampus.textContent = "Fontys / TU Eindhoven";
+        instDetected.textContent = "Fontys or TU Eindhoven";
       }
     });
 
-    // Avatar Icon Switchers
-    document.querySelectorAll(".avatar-icon-btn").forEach(btn => {
+    nameInp.addEventListener("input", (e) => {
+      badgeName.textContent = e.target.value.trim() || "Student Athlete";
+    });
+
+    function updateSportBadge() {
+      badgeSport.textContent = `${selectedAvatar} ${sportSel.value} (${skillSel.value})`;
+    }
+    sportSel.addEventListener("change", updateSportBadge);
+    skillSel.addEventListener("change", updateSportBadge);
+
+    // Avatar Icon Buttons
+    document.querySelectorAll(".avatar-option").forEach(btn => {
       btn.addEventListener("click", () => {
-        document.querySelectorAll(".avatar-icon-btn").forEach(b => {
-          b.className = "avatar-icon-btn px-3 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold hover:bg-zinc-200 dark:hover:bg-zinc-700 transition";
+        document.querySelectorAll(".avatar-option").forEach(b => {
+          b.className = "avatar-option p-3 rounded-2xl border-2 border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-2xl transition hover:scale-105";
         });
-        btn.className = "avatar-icon-btn px-3 py-1.5 rounded-xl bg-brand-orange text-white text-xs font-semibold shadow-sm transition";
-        previewAvatar.textContent = btn.dataset.icon;
+        btn.className = "avatar-option p-3 rounded-2xl border-2 border-brand-orange bg-brand-orange/10 text-2xl transition hover:scale-105";
+        selectedAvatar = btn.dataset.icon;
+        badgeAvatar.textContent = selectedAvatar;
+        updateSportBadge();
       });
     });
 
-    // Toggle password view
-    if (togglePass) {
-      togglePass.addEventListener("click", () => {
-        const type = passInput.getAttribute("type") === "password" ? "text" : "password";
-        passInput.setAttribute("type", type);
-      });
+    // Password toggle
+    document.getElementById("btn-toggle-pass").addEventListener("click", () => {
+      const type = passInp.type === "password" ? "text" : "password";
+      passInp.type = type;
+    });
+
+    function setStep(step) {
+      currentStep = step;
+      clearError();
+
+      document.getElementById("step-pane-1").classList.toggle("hidden", step !== 1);
+      document.getElementById("step-pane-2").classList.toggle("hidden", step !== 2);
+      document.getElementById("step-pane-3").classList.toggle("hidden", step !== 3);
+
+      document.getElementById("dot-1").className = step >= 1 ? "w-6 h-1.5 rounded-full bg-brand-orange transition-all" : "w-2 h-1.5 rounded-full bg-zinc-300 dark:bg-zinc-700 transition-all";
+      document.getElementById("dot-2").className = step >= 2 ? "w-6 h-1.5 rounded-full bg-brand-orange transition-all" : "w-2 h-1.5 rounded-full bg-zinc-300 dark:bg-zinc-700 transition-all";
+      document.getElementById("dot-3").className = step >= 3 ? "w-6 h-1.5 rounded-full bg-brand-orange transition-all" : "w-2 h-1.5 rounded-full bg-zinc-300 dark:bg-zinc-700 transition-all";
+
+      const labels = {
+        1: "Step 1 of 3: University Email",
+        2: "Step 2 of 3: Name & Campus",
+        3: "Step 3 of 3: Athletic Profile"
+      };
+      document.getElementById("step-counter-text").textContent = labels[step];
+      lucide.createIcons();
     }
 
-    // Form submit
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      errorBox.classList.add("hidden");
-      successBox.classList.add("hidden");
+    // Step 1 Next
+    document.getElementById("btn-next-1").addEventListener("click", () => {
+      const email = emailInp.value.trim();
+      const val = validateStudentEmail(email);
+      if (!val.isValid) {
+        showError(val.error);
+        return;
+      }
+      if (!passInp.value || passInp.value.length < 6) {
+        showError("Password must be at least 6 characters long.");
+        return;
+      }
+      setStep(2);
+    });
 
-      const name = nameInput.value.trim();
-      const email = emailInput.value.trim();
-      const password = passInput.value;
+    // Step 2 Back & Next
+    document.getElementById("btn-back-2").addEventListener("click", () => setStep(1));
+    document.getElementById("btn-next-2").addEventListener("click", () => {
+      const name = nameInp.value.trim();
+      if (!name || name.length < 2) {
+        showError("Please enter your full name (at least 2 characters).");
+        return;
+      }
+      setStep(3);
+    });
 
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = `<span>Creating Account...</span>`;
+    // Step 3 Back & Finish
+    document.getElementById("btn-back-3").addEventListener("click", () => setStep(2));
+    document.getElementById("btn-finish").addEventListener("click", async () => {
+      const finishBtn = document.getElementById("btn-finish");
+      finishBtn.disabled = true;
+      finishBtn.innerHTML = `<span>Activating Passport...</span>`;
 
       try {
-        const res = await signUpStudent(email, password, name);
+        const res = await signUpStudentMultiStep({
+          email: emailInp.value.trim(),
+          password: passInp.value,
+          fullName: nameInp.value.trim(),
+          sport: sportSel.value,
+          skillLevel: skillSel.value,
+          avatar: selectedAvatar
+        });
+
         if (res.success) {
-          successBox.classList.remove("hidden");
+          document.getElementById("step-pane-3").classList.add("hidden");
+          document.getElementById("step-pane-success").classList.remove("hidden");
           setTimeout(() => {
             window.location.href = "/challenge2/unisport/app";
-          }, 800);
+          }, 900);
         } else {
-          errorText.textContent = res.error || "Unable to register. Please check your data.";
-          errorBox.classList.remove("hidden");
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = `<span>Complete Registration</span> <i data-lucide="arrow-right" class="w-4 h-4"></i>`;
+          showError(res.error || "Unable to register. Please check your data.");
+          finishBtn.disabled = false;
+          finishBtn.innerHTML = `<span>Complete Registration</span> <i data-lucide="check" class="w-4 h-4"></i>`;
           lucide.createIcons();
         }
       } catch (err) {
-        errorText.textContent = "Connection error. Please try again.";
-        errorBox.classList.remove("hidden");
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = `<span>Complete Registration</span> <i data-lucide="arrow-right" class="w-4 h-4"></i>`;
+        showError("Registration error: " + err.message);
+        finishBtn.disabled = false;
+        finishBtn.innerHTML = `<span>Complete Registration</span> <i data-lucide="check" class="w-4 h-4"></i>`;
         lucide.createIcons();
       }
     });
+
   </script>
 
 </body>

@@ -20,6 +20,7 @@ import {
   signOutStudent, 
   getStudentProfile, 
   updateStudentProfile,
+  getActiveSession,
   sanitize 
 } from "./auth.js";
 
@@ -167,50 +168,63 @@ export function initApp() {
 /**
  * Listen to Firebase Auth state
  */
-function listenToAuthChanges() {
-  onAuthStateChanged(auth, async (user) => {
-    state.currentUser = user;
-    const authStatusPill = document.getElementById("auth-status-pill");
-    const navAuthBtn = document.getElementById("nav-auth-btn");
-    const userMenuBtn = document.getElementById("user-menu-btn");
-    const userNameSpan = document.getElementById("user-display-name");
+function updateAuthUI(user, profile) {
+  state.currentUser = user;
+  state.userProfile = profile || user;
 
-    if (user) {
-      // User is logged in
-      const profile = await getStudentProfile(user.uid);
-      state.userProfile = profile || {
-        uid: user.uid,
-        email: user.email,
-        displayName: user.displayName || user.email.split("@")[0],
-        university: user.email.endsWith("@student.tue.nl") ? "TU Eindhoven" : "Fontys UAS",
-        sports: ["Football", "Gym"],
-        skillLevel: "Intermediate"
-      };
+  const authStatusPill = document.getElementById("auth-status-pill");
+  const navAuthBtn = document.getElementById("nav-auth-btn");
+  const userMenuBtn = document.getElementById("user-menu-btn");
+  const userNameSpan = document.getElementById("user-display-name");
 
-      if (authStatusPill) {
-        authStatusPill.innerHTML = `
-          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span class="font-medium text-zinc-900 dark:text-white">${escapeHtml(state.userProfile.displayName || user.email)}</span>
-          <span class="text-[10px] uppercase font-bold text-brand-orange px-1.5 py-0.5 rounded bg-brand-orange/10 border border-brand-orange/20">${state.userProfile.university.includes("TU") ? "TU/e" : "Fontys"}</span>
-        `;
-        authStatusPill.classList.remove("hidden");
-      }
+  if (user) {
+    const displayName = state.userProfile?.displayName || user.displayName || user.email.split("@")[0];
+    const uni = state.userProfile?.university || (user.email.endsWith("@student.tue.nl") ? "TU Eindhoven" : "Fontys UAS");
 
-      if (navAuthBtn) navAuthBtn.classList.add("hidden");
-      if (userMenuBtn) userMenuBtn.classList.remove("hidden");
-      if (userNameSpan) userNameSpan.textContent = state.userProfile.displayName;
-
-      populateProfileTab();
-    } else {
-      // Signed out
-      state.userProfile = null;
-      if (authStatusPill) authStatusPill.classList.add("hidden");
-      if (navAuthBtn) navAuthBtn.classList.remove("hidden");
-      if (userMenuBtn) userMenuBtn.classList.add("hidden");
+    if (authStatusPill) {
+      authStatusPill.innerHTML = `
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span class="font-medium text-zinc-900 dark:text-white">${escapeHtml(displayName)}</span>
+        <span class="text-[10px] uppercase font-bold text-brand-orange px-1.5 py-0.5 rounded bg-brand-orange/10 border border-brand-orange/20">${uni.includes("TU") ? "TU/e" : "Fontys"}</span>
+      `;
+      authStatusPill.classList.remove("hidden");
     }
 
-    renderFeed();
-  });
+    if (navAuthBtn) navAuthBtn.classList.add("hidden");
+    if (userMenuBtn) userMenuBtn.classList.remove("hidden");
+    if (userNameSpan) userNameSpan.textContent = displayName;
+
+    populateProfileTab();
+  } else {
+    state.userProfile = null;
+    if (authStatusPill) authStatusPill.classList.add("hidden");
+    if (navAuthBtn) navAuthBtn.classList.remove("hidden");
+    if (userMenuBtn) userMenuBtn.classList.add("hidden");
+  }
+
+  renderFeed();
+}
+
+/**
+ * Listen to Auth state (Both Firebase and Resilient Local Session)
+ */
+function listenToAuthChanges() {
+  // Check instant local session first
+  const activeSession = getActiveSession();
+  if (activeSession) {
+    updateAuthUI(activeSession, activeSession);
+  }
+
+  try {
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const profile = await getStudentProfile(user.uid);
+        updateAuthUI(user, profile);
+      } else if (!getActiveSession()) {
+        updateAuthUI(null, null);
+      }
+    });
+  } catch {}
 }
 
 /**
