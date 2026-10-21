@@ -188,8 +188,9 @@ function updateAuthUI(user, profile) {
   const userDropdown = document.getElementById("user-dropdown");
 
   if (user) {
-    const displayName = state.userProfile?.displayName || user.displayName || user.email.split("@")[0];
-    const uni = state.userProfile?.university || (user.email.endsWith("@student.tue.nl") ? "TU Eindhoven" : "Fontys UAS");
+    const email = user.email || state.userProfile?.email || "";
+    const displayName = state.userProfile?.displayName || user.displayName || (email ? email.split("@")[0] : "Student");
+    const uni = state.userProfile?.university || (email.endsWith("@student.tue.nl") ? "TU Eindhoven" : "Fontys UAS");
     const avatarId = state.userProfile?.avatarId || user.avatarId || "bolt";
     const avatar = getAvatarById(avatarId);
 
@@ -198,13 +199,14 @@ function updateAuthUI(user, profile) {
       avatarInner.className = `w-full h-full rounded-full bg-gradient-to-tr ${avatar.bg} flex items-center justify-center text-white`;
       avatarInner.innerHTML = avatar.svg;
       googleAvatarBtn.classList.remove("hidden");
+      googleAvatarBtn.style.display = "inline-flex";
     }
 
     if (userDropdown) {
       const dropName = document.getElementById("dropdown-name");
       const dropEmail = document.getElementById("dropdown-email");
       if (dropName) dropName.textContent = displayName;
-      if (dropEmail) dropEmail.textContent = user.email || "";
+      if (dropEmail) dropEmail.textContent = email;
     }
 
     if (authStatusPill) {
@@ -214,6 +216,7 @@ function updateAuthUI(user, profile) {
         <span class="text-[10px] uppercase font-bold text-zinc-500 px-1.5 py-0.5 rounded bg-zinc-200 dark:bg-zinc-800">${uni.includes("TU") ? "TU/e" : "Fontys"}</span>
       `;
       authStatusPill.classList.remove("hidden");
+      authStatusPill.style.display = "inline-flex";
     }
 
     if (navAuthBtn) {
@@ -243,9 +246,16 @@ function listenToAuthChanges() {
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         const profile = await getStudentProfile(user.uid);
-        updateAuthUI(user, profile);
-      } else if (!getActiveSession()) {
-        window.location.href = "./login.html";
+        const merged = { ...activeSession, ...profile, uid: user.uid, email: user.email };
+        setActiveSession(merged);
+        updateAuthUI(merged, merged);
+      } else {
+        const s = getActiveSession();
+        if (s) {
+          updateAuthUI(s, s);
+        } else {
+          window.location.href = "./login.html";
+        }
       }
     });
   } catch {}

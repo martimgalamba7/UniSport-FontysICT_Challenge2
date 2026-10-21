@@ -76,7 +76,7 @@ export async function registerStudentWithPassword({ email, password, fullName, a
 
     await updateProfile(user, { displayName: cleanName });
 
-    const sessionUser = {
+    const firestoreData = {
       uid: user.uid,
       email: emailVal.email,
       displayName: cleanName,
@@ -93,10 +93,27 @@ export async function registerStudentWithPassword({ email, password, fullName, a
 
     // Save profile to Cloud Firestore
     try {
-      await setDoc(doc(db, "users", user.uid), sessionUser, { merge: true });
+      console.log("Writing user to Firestore...", user.uid, firestoreData);
+      await setDoc(doc(db, "users", user.uid), firestoreData, { merge: true });
+      console.log("Firestore user profile created successfully!");
     } catch (fsErr) {
-      console.warn("Firestore save deferred:", fsErr);
+      console.error("Firestore user creation error:", fsErr);
     }
+
+    const sessionUser = {
+      uid: user.uid,
+      email: emailVal.email,
+      displayName: cleanName,
+      university: university,
+      avatarId: avatarId || "bolt",
+      sport: sports && sports.length > 0 ? sports[0] : "Football",
+      sports: sports || ["Football"],
+      socialPreference: socialPreference || [],
+      intensityPreference: intensityPreference || [],
+      schedulePreference: schedulePreference || [],
+      preferredLocations: preferredLocations || [],
+      createdAt: Date.now()
+    };
 
     setActiveSession(sessionUser);
     return { success: true, user: sessionUser };
@@ -135,8 +152,29 @@ export async function loginStudentWithPassword(email, password) {
     let profile = null;
     try {
       const snap = await getDoc(doc(db, "users", user.uid));
-      if (snap.exists()) profile = snap.data();
-    } catch {}
+      if (snap.exists()) {
+        profile = snap.data();
+      } else {
+        // If user document does not exist yet in Firestore, create it now!
+        const newProfile = {
+          uid: user.uid,
+          email: user.email,
+          displayName: user.displayName || emailVal.email.split("@")[0],
+          university: emailVal.email.endsWith("@student.tue.nl") ? "TU Eindhoven" : "Fontys UAS",
+          avatarId: "bolt",
+          sport: "Football",
+          sports: ["Football"],
+          socialPreference: ["Casual"],
+          intensityPreference: ["Medium"],
+          schedulePreference: ["Evenings"],
+          preferredLocations: ["SSC Eindhoven"]
+        };
+        await setDoc(doc(db, "users", user.uid), newProfile, { merge: true });
+        profile = newProfile;
+      }
+    } catch (e) {
+      console.warn("Firestore profile fetch/write notice:", e);
+    }
 
     const sessionUser = profile || {
       uid: user.uid,
