@@ -470,6 +470,10 @@
       try {
         const res = await sendStudentMagicLink(email, profileData);
         if (res.success) {
+          if (res.method === "instant") {
+            window.location.href = "./welcome.html";
+            return;
+          }
           document.getElementById("step-3").classList.add("hidden");
           document.getElementById("bar-1").parentElement.classList.add("hidden");
           document.getElementById("success-email").textContent = email;

@@ -180,6 +180,10 @@
       try {
         const res = await sendStudentMagicLink(email);
         if (res.success) {
+          if (res.method === "instant") {
+            window.location.href = "./welcome.html";
+            return;
+          }
           sentEmail.textContent = email;
           formState.classList.add("hidden");
           sentState.classList.remove("hidden");
