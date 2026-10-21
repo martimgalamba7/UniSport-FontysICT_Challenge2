@@ -270,8 +270,10 @@ function listenToAuthChanges() {
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         try {
+          const currentLocal = getActiveSession() || activeSession;
           const profile = await getStudentProfile(user.uid);
-          const merged = { ...activeSession, ...profile, uid: user.uid, email: user.email };
+          // Preserve local edits if newer
+          const merged = { ...profile, ...currentLocal, uid: user.uid, email: user.email };
           setActiveSession(merged);
           updateAuthUI(merged, merged);
         } catch (err) {
@@ -757,7 +759,7 @@ export function populateProfileTab() {
     statSport.textContent = profile.sport || "Football";
   }
 
-  // Render Mascot Avatar Switcher
+  // Render Mascot Avatar Switcher (Sync state and attach handlers)
   const pickerContainer = document.getElementById("profile-avatar-picker");
   if (pickerContainer) {
     pickerContainer.innerHTML = UNISPORT_AVATARS.map(av => {
@@ -766,47 +768,19 @@ export function populateProfileTab() {
         <button 
           type="button" 
           data-avatar-id="${av.id}"
-          class="profile-avatar-option group relative flex flex-col items-center gap-2 p-3 rounded-2xl border-2 transition-all cursor-pointer ${isSelected ? 'border-brand-orange bg-orange-500/10 shadow-sm' : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600'}"
+          onclick="window.UniSport.selectAvatar('${av.id}')"
+          class="profile-avatar-option group relative flex flex-col items-center gap-3 p-4 sm:p-6 rounded-2xl border-2 transition-all cursor-pointer hover:scale-[1.01] ${isSelected ? 'border-brand-orange bg-orange-500/10 shadow-sm' : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600'}"
         >
-          <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden bg-gradient-to-tr ${av.bg} p-0.5 shadow-md flex items-center justify-center">
+          <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden bg-gradient-to-tr ${av.bg} p-0.5 shadow-md flex items-center justify-center">
             <div class="w-full h-full rounded-full overflow-hidden bg-zinc-950 flex items-center justify-center">
               <img src="${av.image}" alt="${av.name}" class="w-full h-full object-cover rounded-full" onerror="this.src='./assets/avatars/footballer.png'" />
             </div>
           </div>
-          <span class="text-xs font-bold text-zinc-950 dark:text-white truncate w-full text-center">${av.name}</span>
-          ${isSelected ? `<span class="text-[10px] uppercase font-bold text-brand-orange">Selected</span>` : `<span class="text-[10px] text-zinc-400 group-hover:text-zinc-600">Select</span>`}
+          <span class="text-sm sm:text-base font-bold text-zinc-950 dark:text-white truncate w-full text-center">${av.name}</span>
+          ${isSelected ? `<span class="avatar-status-pill text-xs uppercase font-bold text-brand-orange">Selected</span>` : `<span class="avatar-status-pill text-xs text-zinc-400 group-hover:text-zinc-600">Select</span>`}
         </button>
       `;
     }).join('');
-
-    // Attach click events to avatar buttons
-    pickerContainer.querySelectorAll(".profile-avatar-option").forEach(btn => {
-      btn.addEventListener("click", async () => {
-        const newAvId = btn.dataset.avatarId;
-        pickerContainer.querySelectorAll(".profile-avatar-option").forEach(b => {
-          b.classList.remove("border-brand-orange", "bg-orange-500/10", "shadow-sm");
-          b.classList.add("border-zinc-200", "dark:border-zinc-800");
-          const label = b.querySelector("span:last-child");
-          if (label) {
-            label.className = "text-[10px] text-zinc-400 group-hover:text-zinc-600";
-            label.textContent = "Select";
-          }
-        });
-        btn.classList.add("border-brand-orange", "bg-orange-500/10", "shadow-sm");
-        btn.classList.remove("border-zinc-200", "dark:border-zinc-800");
-        const activeLabel = btn.querySelector("span:last-child");
-        if (activeLabel) {
-          activeLabel.className = "text-[10px] uppercase font-bold text-brand-orange";
-          activeLabel.textContent = "Selected";
-        }
-
-        // Live update active session and firestore
-        await updateStudentProfile(user.uid, { avatarId: newAvId });
-        state.currentUser.avatarId = newAvId;
-        state.userProfile.avatarId = newAvId;
-        updateAuthUI(state.currentUser, state.userProfile);
-      });
-    });
   }
 
   // Form inputs
@@ -821,12 +795,70 @@ export function populateProfileTab() {
   if (sportInput && profile.sport) sportInput.value = profile.sport;
 }
 
+export async function selectAvatar(newAvId) {
+  let user = state.currentUser || getActiveSession();
+  if (!user) return;
+
+  const uid = user.uid || (state.currentUser ? state.currentUser.uid : null);
+  const targetAvatar = getAvatarById(newAvId);
+
+  // 1. Immediately update active state & session
+  if (state.currentUser) state.currentUser.avatarId = newAvId;
+  if (state.userProfile) state.userProfile.avatarId = newAvId;
+  const currentSession = getActiveSession() || {};
+  currentSession.avatarId = newAvId;
+  setActiveSession(currentSession);
+
+  // 2. Update UI elements instantly
+  const heroAvatar = document.getElementById("profile-hero-avatar");
+  const heroInner = document.getElementById("profile-hero-avatar-inner");
+  if (heroAvatar) heroAvatar.className = `w-28 h-28 sm:w-36 sm:h-36 rounded-full p-1.5 bg-gradient-to-tr ${targetAvatar.bg} shadow-xl flex items-center justify-center`;
+  if (heroInner) {
+    heroInner.innerHTML = `<img src="${targetAvatar.image}" alt="${targetAvatar.name}" class="w-full h-full object-cover rounded-full" onerror="this.src='./assets/avatars/footballer.png'" />`;
+  }
+
+  // Top nav google avatar
+  const googleAvatarInner = document.getElementById("google-avatar-inner");
+  if (googleAvatarInner) {
+    googleAvatarInner.className = `w-full h-full rounded-full overflow-hidden bg-gradient-to-tr ${targetAvatar.bg} flex items-center justify-center text-white`;
+    googleAvatarInner.innerHTML = `<img src="${targetAvatar.image}" alt="${targetAvatar.name}" class="w-full h-full object-cover rounded-full" onerror="this.src='./assets/avatars/footballer.png'" />`;
+  }
+
+  // Card outlines and pills
+  const pickerContainer = document.getElementById("profile-avatar-picker");
+  if (pickerContainer) {
+    pickerContainer.querySelectorAll(".profile-avatar-option").forEach(btn => {
+      const isThis = btn.dataset.avatarId === newAvId;
+      const pill = btn.querySelector(".avatar-status-pill");
+      if (isThis) {
+        btn.className = "profile-avatar-option group relative flex flex-col items-center gap-3 p-4 sm:p-6 rounded-2xl border-2 border-brand-orange bg-orange-500/10 transition-all cursor-pointer shadow-sm hover:scale-[1.01]";
+        if (pill) {
+          pill.className = "avatar-status-pill text-xs uppercase font-bold text-brand-orange";
+          pill.textContent = "Selected";
+        }
+      } else {
+        btn.className = "profile-avatar-option group relative flex flex-col items-center gap-3 p-4 sm:p-6 rounded-2xl border-2 border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600 transition-all cursor-pointer hover:scale-[1.01]";
+        if (pill) {
+          pill.className = "avatar-status-pill text-xs text-zinc-400 group-hover:text-zinc-600";
+          pill.textContent = "Select";
+        }
+      }
+    });
+  }
+
+  // 3. Persist to Firestore asynchronously
+  if (uid) {
+    await updateStudentProfile(uid, { avatarId: newAvId });
+  }
+}
+
 function setupProfileForm() {
   const form = document.getElementById("profile-form");
   if (form) {
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      if (!state.currentUser) return;
+      let user = state.currentUser || getActiveSession();
+      if (!user) return;
 
       const displayName = sanitize(document.getElementById("profile-name").value.trim());
       const sportEl = document.getElementById("profile-sport");
@@ -836,15 +868,35 @@ function setupProfileForm() {
       btn.disabled = true;
       btn.textContent = "Saving...";
 
-      await updateStudentProfile(state.currentUser.uid, { displayName, sport });
-      state.currentUser.displayName = displayName;
-      state.currentUser.sport = sport;
+      // 1. Immediately persist locally
+      const uid = user.uid;
+      const currentSession = getActiveSession() || {};
+      currentSession.displayName = displayName;
+      currentSession.sport = sport;
+      setActiveSession(currentSession);
+
+      if (state.currentUser) {
+        state.currentUser.displayName = displayName;
+        state.currentUser.sport = sport;
+      }
       if (state.userProfile) {
         state.userProfile.displayName = displayName;
         state.userProfile.sport = sport;
       }
 
-      updateAuthUI(state.currentUser, state.userProfile);
+      // 2. Update UI stats and hero card
+      const heroName = document.getElementById("profile-hero-name");
+      const statSport = document.getElementById("profile-stat-sport");
+      const dropName = document.getElementById("dropdown-name");
+      if (heroName) heroName.textContent = displayName;
+      if (statSport) statSport.textContent = sport;
+      if (dropName) dropName.textContent = displayName;
+
+      // 3. Persist to Firestore
+      if (uid) {
+        await updateStudentProfile(uid, { displayName, sport });
+      }
+
       btn.disabled = false;
       btn.textContent = "Save Profile";
       alert("Profile updated successfully!");
@@ -928,6 +980,8 @@ function setupSettingsModal() {
 
 window.UniSport = {
   switchTab,
+  selectAvatar,
+  populateProfileTab,
   openRosterModal,
   openSettingsModal,
   toggleJoinActivity
