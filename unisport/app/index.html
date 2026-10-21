@@ -1,17 +1,17 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full">
+<html lang="en" class="h-full bg-black text-white antialiased selection:bg-[#FF4D00] selection:text-white">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>UniSport Web App • Soon</title>
+  <title>UniSport App • Student Sports Community</title>
   
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="/assets/logoUniSport.png" />
   <link rel="apple-touch-icon" href="/assets/logoUniSport.png" />
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Syne:wght@700;800&display=swap" rel="stylesheet">
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -26,131 +26,475 @@
             brand: {
               orange: '#FF4D00',
               'orange-hover': '#EA4500',
+              'orange-light': '#FFF1EB',
+              dark: '#0d0d0f',
+              surface: '#151518'
             }
           }
         }
       }
     }
   </script>
+  <style>
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #09090b;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #27272a;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #3f3f46;
+    }
+  </style>
 </head>
 
-<body class="bg-black text-white min-h-screen flex flex-col justify-between font-sans select-none px-6 sm:px-12 lg:px-20 py-8 relative overflow-hidden">
+<body class="bg-[#09090b] text-zinc-100 min-h-screen flex flex-col font-sans relative overflow-x-hidden pb-20 md:pb-8">
 
-  <!-- Subtle Ambient Glow -->
-  <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-brand-orange/10 rounded-full blur-[140px] pointer-events-none"></div>
+  <!-- Ambient background glow effects -->
+  <div class="fixed top-0 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-brand-orange/10 rounded-full blur-[140px] pointer-events-none -z-10"></div>
+  <div class="fixed bottom-0 right-0 w-[400px] h-[400px] bg-amber-500/5 rounded-full blur-[120px] pointer-events-none -z-10"></div>
 
-  <!-- Top Header Navigation -->
-  <header class="w-full flex items-center justify-between z-10">
-    <a href="/challenge2/unisport" class="text-xs sm:text-sm font-semibold text-zinc-400 hover:text-white transition flex items-center space-x-2">
-      <span class="text-brand-orange font-bold text-base">&larr;</span>
-      <span>Back to UniSport</span>
-    </a>
+  <!-- Top Navigation Header -->
+  <header class="sticky top-0 z-40 w-full backdrop-blur-xl bg-black/60 border-b border-zinc-800/80 px-4 sm:px-8 py-3.5 flex items-center justify-between">
+    <div class="flex items-center gap-6">
+      <a href="/challenge2/unisport" class="flex items-center gap-2 group">
+        <img src="/assets/logoUniSport.png" alt="UniSport" class="h-8 w-auto object-contain transition group-hover:scale-105" onerror="this.src='./assets/logoUniSport.png';" />
+        <span class="font-display font-black text-lg tracking-wider text-white">UNISPORT</span>
+      </a>
 
-    <!-- Database Status Indicator -->
-    <div id="db-status-pill" class="inline-flex items-center space-x-2 px-3 py-1.5 rounded-full bg-zinc-900 border border-zinc-800 text-xs text-zinc-400">
-      <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-      <span class="font-medium">Firebase Firestore Connected</span>
+      <!-- Desktop Tab Bar -->
+      <nav class="hidden md:flex items-center gap-1.5 p-1 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 text-xs font-semibold">
+        <button id="tab-btn-feed" class="px-4 py-2 rounded-xl bg-brand-orange text-white transition">
+          Geo Feed
+        </button>
+        <button id="tab-btn-create" class="px-4 py-2 rounded-xl text-zinc-400 hover:text-white transition">
+          + Create Activity
+        </button>
+        <button id="tab-btn-my-activities" class="px-4 py-2 rounded-xl text-zinc-400 hover:text-white transition">
+          My Sessions
+        </button>
+        <button id="tab-btn-profile" class="px-4 py-2 rounded-xl text-zinc-400 hover:text-white transition">
+          Profile
+        </button>
+      </nav>
     </div>
 
-    <a href="https://www.fontys.nl/" target="_blank" rel="noopener noreferrer" title="Fontys University of Applied Sciences" class="hover:opacity-80 transition-opacity">
-      <img src="/assets/logoFontys.png" alt="Fontys" class="h-8 sm:h-9 w-auto object-contain" onerror="this.src='./assets/logoFontys.png';" />
-    </a>
+    <!-- Right Header controls -->
+    <div class="flex items-center gap-3">
+      <!-- Verified Auth Pill (Shows when logged in) -->
+      <div id="auth-status-pill" class="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-zinc-900/80 border border-zinc-800 text-xs text-zinc-300">
+        <!-- Rendered dynamically via app.js -->
+      </div>
+
+      <!-- Sign In Button (Shows when logged out) -->
+      <button id="nav-auth-btn" class="px-4 py-2 rounded-xl bg-brand-orange hover:bg-brand-orange-hover text-white text-xs font-bold transition shadow-[0_4px_14px_rgba(255,77,0,0.35)]">
+        Student Sign In
+      </button>
+
+      <!-- User Menu Shortcut -->
+      <button id="user-menu-btn" onclick="window.UniSport.switchTab('profile')" class="hidden flex items-center gap-2 px-3 py-1.5 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-zinc-700 transition">
+        <div class="w-6 h-6 rounded-full bg-brand-orange text-white text-[10px] font-black flex items-center justify-center">
+          U
+        </div>
+        <span id="user-display-name" class="text-xs font-semibold text-zinc-200">Account</span>
+      </button>
+
+      <!-- Fontys Logo link -->
+      <a href="https://www.fontys.nl/" target="_blank" rel="noopener noreferrer" class="hidden sm:block opacity-75 hover:opacity-100 transition">
+        <img src="/assets/logoFontys.png" alt="Fontys" class="h-6 w-auto object-contain" onerror="this.src='./assets/logoFontys.png';" />
+      </a>
+    </div>
   </header>
 
-  <!-- Large Bold Center Stage -->
-  <main class="flex-grow flex flex-col items-center justify-center space-y-6 sm:space-y-8 text-center py-10 z-10 max-w-2xl mx-auto w-full">
-    
-    <!-- Large Natural UniSport Logo -->
-    <img src="/assets/logoUniSport.png" alt="UniSport" class="h-28 sm:h-36 md:h-44 w-auto object-contain transition-transform duration-500 hover:scale-105" onerror="this.src='./assets/logoUniSport.png';" />
+  <!-- Main Container -->
+  <main class="flex-grow max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
-    <!-- Massive Cinematic SOON Typography -->
-    <h1 class="text-5xl sm:text-7xl md:text-8xl font-black tracking-[0.2em] sm:tracking-[0.25em] text-white uppercase ml-[0.2em] font-display">
-      SOON
-    </h1>
+    <!-- ========================================== -->
+    <!-- SECTION 1: GEO FEED & DISCOVERY (FR03)     -->
+    <!-- ========================================== -->
+    <section id="section-feed" class="space-y-6">
+      
+      <!-- Eindhoven Campus Banner -->
+      <div class="rounded-3xl bg-gradient-to-r from-zinc-900/90 via-zinc-900/60 to-zinc-900/90 border border-zinc-800/80 p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden">
+        <div class="space-y-2 z-10 max-w-xl">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-orange/10 border border-brand-orange/20 text-brand-orange text-xs font-bold uppercase tracking-wider">
+            <span>📍</span> Eindhoven Student Sports Network
+          </div>
+          <h1 class="text-2xl sm:text-3xl font-display font-black text-white tracking-tight">
+            Find pickup matches & workout partners
+          </h1>
+          <p class="text-zinc-400 text-xs sm:text-sm">
+            Live activities from verified Fontys & TU/e students. Pick a match, join the roster, and play.
+          </p>
+        </div>
 
-    <p class="text-zinc-400 text-sm sm:text-base font-normal max-w-md mx-auto">
-      The student sports platform is getting ready for Fontys. Join the early access waitlist to get invited first.
-    </p>
+        <div class="flex items-center gap-3 z-10">
+          <button onclick="window.UniSport.switchTab('create')" class="px-5 py-3 rounded-2xl bg-brand-orange hover:bg-brand-orange-hover text-white text-xs sm:text-sm font-bold tracking-wide transition shadow-[0_8px_20px_-4px_rgba(255,77,0,0.5)] flex items-center gap-2">
+            <span>+</span>
+            <span>Host Session</span>
+          </button>
+        </div>
+      </div>
 
-    <!-- Early Access Form (Connected to Cloud Firestore) -->
-    <div class="w-full max-w-md pt-2">
-      <form id="waitlist-form" class="flex flex-col sm:flex-row items-stretch gap-2.5">
-        <input 
-          type="email" 
-          id="waitlist-email" 
-          required 
-          placeholder="your.name@student.fontys.nl" 
-          class="flex-grow px-5 py-3.5 rounded-2xl bg-zinc-900/90 border border-zinc-800 text-white placeholder-zinc-500 text-sm focus:outline-none focus:border-brand-orange transition"
-        />
-        <button 
-          type="submit" 
-          id="waitlist-submit"
-          class="px-6 py-3.5 rounded-2xl bg-brand-orange hover:bg-brand-orange-hover text-white font-bold text-sm tracking-wide transition transform hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 shadow-[0_8px_20px_-4px_rgba(255,77,0,0.5)]"
-        >
-          <span>Get Early Access</span>
-        </button>
+      <!-- Filters & Search Bar -->
+      <div class="space-y-4">
+        <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
+          
+          <!-- Search Input -->
+          <div class="relative flex-grow max-w-md">
+            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 text-sm">🔍</span>
+            <input 
+              type="text" 
+              id="search-activities" 
+              placeholder="Search by title, location (SSC, Genneper Parken)..." 
+              class="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-zinc-900/90 border border-zinc-800 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-brand-orange transition"
+            />
+          </div>
+
+          <!-- Total count indicator -->
+          <div id="activity-count-badge" class="text-xs text-zinc-400 font-medium self-center sm:self-auto">
+            Loading active sessions...
+          </div>
+        </div>
+
+        <!-- Sports Filter Chips -->
+        <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+          <button data-sport="all" class="sport-filter-chip px-3.5 py-1.5 rounded-xl bg-brand-orange text-white border border-brand-orange text-xs font-semibold whitespace-nowrap transition">
+            All Sports
+          </button>
+          <button data-sport="Football" class="sport-filter-chip px-3.5 py-1.5 rounded-xl bg-zinc-900 text-zinc-400 border border-zinc-800 text-xs font-semibold whitespace-nowrap hover:text-white transition">
+            ⚽ Football
+          </button>
+          <button data-sport="Gym" class="sport-filter-chip px-3.5 py-1.5 rounded-xl bg-zinc-900 text-zinc-400 border border-zinc-800 text-xs font-semibold whitespace-nowrap hover:text-white transition">
+            🏋️ Gym & Fitness
+          </button>
+          <button data-sport="Running" class="sport-filter-chip px-3.5 py-1.5 rounded-xl bg-zinc-900 text-zinc-400 border border-zinc-800 text-xs font-semibold whitespace-nowrap hover:text-white transition">
+            🏃 Running
+          </button>
+          <button data-sport="Basketball" class="sport-filter-chip px-3.5 py-1.5 rounded-xl bg-zinc-900 text-zinc-400 border border-zinc-800 text-xs font-semibold whitespace-nowrap hover:text-white transition">
+            🏀 Basketball
+          </button>
+          <button data-sport="Bouldering" class="sport-filter-chip px-3.5 py-1.5 rounded-xl bg-zinc-900 text-zinc-400 border border-zinc-800 text-xs font-semibold whitespace-nowrap hover:text-white transition">
+            🧗 Bouldering
+          </button>
+          <button data-sport="Padel" class="sport-filter-chip px-3.5 py-1.5 rounded-xl bg-zinc-900 text-zinc-400 border border-zinc-800 text-xs font-semibold whitespace-nowrap hover:text-white transition">
+            🎾 Padel
+          </button>
+        </div>
+      </div>
+
+      <!-- Dynamic Cards Grid (FR03 / FR05) -->
+      <div id="activities-feed" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <!-- Live content dynamically populated by app.js -->
+        <div class="col-span-full py-12 text-center text-zinc-500 text-sm">
+          Loading Eindhoven live sports feed...
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ========================================== -->
+    <!-- SECTION 2: QUICK CREATION (FR04)           -->
+    <!-- ========================================== -->
+    <section id="section-create" class="hidden max-w-2xl mx-auto space-y-6">
+      <div class="text-center space-y-2">
+        <h2 class="text-2xl sm:text-3xl font-display font-black text-white">Create a Sports Session</h2>
+        <p class="text-xs sm:text-sm text-zinc-400">Set up a game in 30 seconds. Your match will appear live on student feeds.</p>
+      </div>
+
+      <form id="create-activity-form" class="rounded-3xl bg-zinc-900/80 border border-zinc-800 p-6 sm:p-8 space-y-5">
+        
+        <div>
+          <label class="block text-xs font-bold text-zinc-300 uppercase tracking-wider mb-2">Activity Title *</label>
+          <input 
+            type="text" 
+            id="create-title" 
+            required 
+            placeholder="e.g. 5v5 Casual Football, 5km Dommel Run, Gym Push Day" 
+            class="w-full px-4 py-3 rounded-2xl bg-zinc-950 border border-zinc-800 text-sm text-white focus:outline-none focus:border-brand-orange transition"
+          />
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-zinc-300 uppercase tracking-wider mb-2">Sport *</label>
+            <select id="create-sport" required class="w-full px-4 py-3 rounded-2xl bg-zinc-950 border border-zinc-800 text-sm text-white focus:outline-none focus:border-brand-orange transition">
+              <option value="Football">⚽ Football</option>
+              <option value="Gym">🏋️ Gym & Fitness</option>
+              <option value="Running">🏃 Running</option>
+              <option value="Basketball">🏀 Basketball</option>
+              <option value="Bouldering">🧗 Bouldering</option>
+              <option value="Padel">🎾 Padel</option>
+              <option value="Volleyball">🏐 Volleyball</option>
+              <option value="Other">⚡ Other</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-zinc-300 uppercase tracking-wider mb-2">Spots Available *</label>
+            <input 
+              type="number" 
+              id="create-max" 
+              min="2" 
+              max="50" 
+              value="10" 
+              required 
+              class="w-full px-4 py-3 rounded-2xl bg-zinc-950 border border-zinc-800 text-sm text-white focus:outline-none focus:border-brand-orange transition"
+            />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-zinc-300 uppercase tracking-wider mb-2">Location in Eindhoven *</label>
+            <input 
+              type="text" 
+              id="create-location" 
+              required 
+              placeholder="e.g. SSC Field 2, Monk Strijp-S, Genneper Parken" 
+              class="w-full px-4 py-3 rounded-2xl bg-zinc-950 border border-zinc-800 text-sm text-white focus:outline-none focus:border-brand-orange transition"
+            />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-zinc-300 uppercase tracking-wider mb-2">Date & Time *</label>
+            <input 
+              type="datetime-local" 
+              id="create-datetime" 
+              required 
+              class="w-full px-4 py-3 rounded-2xl bg-zinc-950 border border-zinc-800 text-sm text-white focus:outline-none focus:border-brand-orange transition"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-zinc-300 uppercase tracking-wider mb-2">Notes & Guidelines (Optional)</label>
+          <textarea 
+            id="create-desc" 
+            rows="3" 
+            placeholder="Rules, what to bring (e.g. indoor shoes, ball, water bottle), skill expectations..."
+            class="w-full px-4 py-3 rounded-2xl bg-zinc-950 border border-zinc-800 text-sm text-white focus:outline-none focus:border-brand-orange transition resize-none"
+          ></textarea>
+        </div>
+
+        <div class="pt-2 flex items-center justify-between gap-4">
+          <button type="button" onclick="window.UniSport.switchTab('feed')" class="px-5 py-3 rounded-2xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-bold transition">
+            Cancel
+          </button>
+          <button type="submit" id="create-submit-btn" class="px-6 py-3 rounded-2xl bg-brand-orange hover:bg-brand-orange-hover text-white text-xs font-bold transition shadow-[0_4px_14px_rgba(255,77,0,0.4)]">
+            Publish Activity
+          </button>
+        </div>
+
       </form>
+    </section>
 
-      <!-- Feedback Messages -->
-      <div id="waitlist-success" class="hidden mt-4 p-4 rounded-2xl bg-emerald-950/60 border border-emerald-800/60 text-emerald-300 text-xs sm:text-sm font-medium">
-        🎉 You're on the list! We saved your access spot in Firestore and will notify you as soon as UniSport launches.
+    <!-- ========================================== -->
+    <!-- SECTION 3: MY SESSIONS                     -->
+    <!-- ========================================== -->
+    <section id="section-my-activities" class="hidden max-w-3xl mx-auto space-y-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-2xl font-display font-black text-white">My Active Sessions</h2>
+          <p class="text-xs text-zinc-400">Sports activities you created or joined.</p>
+        </div>
+        <button onclick="window.UniSport.switchTab('create')" class="px-4 py-2 rounded-xl bg-brand-orange text-white text-xs font-bold transition">
+          + New Activity
+        </button>
       </div>
-      <div id="waitlist-error" class="hidden mt-4 p-4 rounded-2xl bg-red-950/60 border border-red-800/60 text-red-300 text-xs sm:text-sm font-medium">
-        Unable to save at the moment. Please check your connection.
+
+      <div id="my-activities-list" class="space-y-4">
+        <!-- Rendered by app.js -->
       </div>
-    </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- SECTION 4: STUDENT PROFILE (FR02)          -->
+    <!-- ========================================== -->
+    <section id="section-profile" class="hidden max-w-xl mx-auto space-y-6">
+      <div class="text-center space-y-2">
+        <h2 class="text-2xl font-display font-black text-white">Student Profile</h2>
+        <p class="text-xs text-zinc-400">Set your athletic preferences to connect with matching peers.</p>
+      </div>
+
+      <form id="profile-form" class="rounded-3xl bg-zinc-900/80 border border-zinc-800 p-6 sm:p-8 space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-zinc-300 uppercase tracking-wider mb-2">Full Name</label>
+          <input 
+            type="text" 
+            id="profile-name" 
+            required 
+            class="w-full px-4 py-3 rounded-2xl bg-zinc-950 border border-zinc-800 text-sm text-white focus:outline-none focus:border-brand-orange transition"
+          />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-zinc-300 uppercase tracking-wider mb-2">Verified Student Email</label>
+          <input 
+            type="email" 
+            id="profile-email" 
+            disabled 
+            class="w-full px-4 py-3 rounded-2xl bg-zinc-950/50 border border-zinc-800/60 text-sm text-zinc-500 cursor-not-allowed"
+          />
+          <p class="text-[11px] text-zinc-500 mt-1">Bound to Fontys / TU Eindhoven authentication.</p>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-zinc-300 uppercase tracking-wider mb-2">Institution</label>
+          <input 
+            type="text" 
+            id="profile-university" 
+            disabled 
+            class="w-full px-4 py-3 rounded-2xl bg-zinc-950/50 border border-zinc-800/60 text-sm text-zinc-500 cursor-not-allowed"
+          />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-zinc-300 uppercase tracking-wider mb-2">Experience / Skill Level</label>
+          <select id="profile-skill" class="w-full px-4 py-3 rounded-2xl bg-zinc-950 border border-zinc-800 text-sm text-white focus:outline-none focus:border-brand-orange transition">
+            <option value="Beginner">Beginner (Learning & Casual fun)</option>
+            <option value="Intermediate" selected>Intermediate (Regular player, decent fitness)</option>
+            <option value="Advanced">Advanced (Competitive / Club level)</option>
+          </select>
+        </div>
+
+        <div class="pt-4 flex items-center justify-between gap-4 border-t border-zinc-800">
+          <button type="button" id="profile-signout-btn" class="px-4 py-2.5 rounded-xl bg-red-950/40 hover:bg-red-950 text-red-300 text-xs font-bold transition border border-red-900/40">
+            Sign Out
+          </button>
+          <button type="submit" id="profile-save-btn" class="px-5 py-2.5 rounded-xl bg-brand-orange hover:bg-brand-orange-hover text-white text-xs font-bold transition shadow-[0_4px_12px_rgba(255,77,0,0.3)]">
+            Save Profile
+          </button>
+        </div>
+      </form>
+    </section>
 
   </main>
 
-  <!-- Bottom Bar -->
-  <footer class="w-full flex items-center justify-between text-xs text-zinc-500 z-10 pt-4 border-t border-zinc-900">
-    <span>UniSport Platform &bull; fontys-unisport</span>
-    <span>Fontys ICT Semester 1</span>
-  </footer>
+  <!-- ========================================== -->
+  <!-- MOBILE BOTTOM NAVIGATION (Fixed bar)       -->
+  <!-- ========================================== -->
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-black/90 backdrop-blur-lg border-t border-zinc-800 px-6 py-2.5 flex items-center justify-around text-xs">
+    <button id="mobile-tab-feed" class="flex flex-col items-center gap-1 text-brand-orange">
+      <span class="text-base">📍</span>
+      <span class="text-[10px] font-semibold">Feed</span>
+    </button>
+    <button id="mobile-tab-create" class="flex flex-col items-center gap-1 text-zinc-400">
+      <span class="text-base">➕</span>
+      <span class="text-[10px] font-semibold">Create</span>
+    </button>
+    <button id="mobile-tab-my-activities" class="flex flex-col items-center gap-1 text-zinc-400">
+      <span class="text-base">⚽</span>
+      <span class="text-[10px] font-semibold">My Spots</span>
+    </button>
+    <button id="mobile-tab-profile" class="flex flex-col items-center gap-1 text-zinc-400">
+      <span class="text-base">👤</span>
+      <span class="text-[10px] font-semibold">Profile</span>
+    </button>
+  </nav>
 
-  <!-- Firebase Connection Controller -->
-  <script type="module">
-    import { db, registerEarlyAccess } from "./firebase-config.js";
+  <!-- ========================================== -->
+  <!-- MODAL: SECURE AUTH (Email / Password)      -->
+  <!-- ========================================== -->
+  <div id="auth-modal" data-mode="signin" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+    <div class="relative w-full max-w-md rounded-3xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8 shadow-2xl">
+      <button id="auth-modal-close" class="absolute top-5 right-5 text-zinc-400 hover:text-white text-lg font-bold">
+        &times;
+      </button>
 
-    const form = document.getElementById("waitlist-form");
-    const emailInput = document.getElementById("waitlist-email");
-    const submitBtn = document.getElementById("waitlist-submit");
-    const successMsg = document.getElementById("waitlist-success");
-    const errorMsg = document.getElementById("waitlist-error");
+      <div class="text-center mb-6">
+        <img src="/assets/logoUniSport.png" alt="UniSport" class="h-12 w-auto mx-auto mb-3 object-contain" onerror="this.src='./assets/logoUniSport.png';" />
+        <h3 id="auth-modal-title" class="text-xl sm:text-2xl font-display font-black text-white">Student Sign In</h3>
+        <p id="auth-modal-sub" class="text-xs text-zinc-400 mt-1">
+          Only @student.fontys.nl and @student.tue.nl accounts permitted.
+        </p>
+      </div>
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const email = emailInput.value.trim();
-      if (!email) return;
+      <!-- Error banner -->
+      <div id="auth-error" class="hidden mb-4 p-3 rounded-2xl bg-red-950/60 border border-red-800/80 text-red-300 text-xs font-medium"></div>
 
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = `<span>Saving...</span>`;
-      successMsg.classList.add("hidden");
-      errorMsg.classList.add("hidden");
+      <!-- Auth Form -->
+      <form id="auth-form" class="space-y-4">
+        <div id="auth-name-container" class="hidden">
+          <label class="block text-xs font-bold text-zinc-300 uppercase tracking-wider mb-1.5">Full Name</label>
+          <input 
+            type="text" 
+            id="auth-name" 
+            placeholder="e.g. Liam de Jong" 
+            class="w-full px-4 py-3 rounded-2xl bg-zinc-950 border border-zinc-800 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-brand-orange transition"
+          />
+        </div>
 
-      try {
-        const result = await registerEarlyAccess(email);
-        if (result.success) {
-          form.classList.add("hidden");
-          successMsg.classList.remove("hidden");
-        } else {
-          throw new Error(result.error || "Failed to register");
-        }
-      } catch (err) {
-        console.error("Waitlist error:", err);
-        errorMsg.textContent = "Saved locally! (Firestore rules may require authentication)";
-        errorMsg.classList.remove("hidden");
-        // Also show success feeling for the user
-        setTimeout(() => {
-          form.classList.add("hidden");
-          successMsg.classList.remove("hidden");
-        }, 1200);
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = `<span>Get Early Access</span>`;
-      }
-    });
-  </script>
+        <div>
+          <label class="block text-xs font-bold text-zinc-300 uppercase tracking-wider mb-1.5">Student Email</label>
+          <input 
+            type="email" 
+            id="auth-email" 
+            required 
+            placeholder="your.name@student.fontys.nl" 
+            class="w-full px-4 py-3 rounded-2xl bg-zinc-950 border border-zinc-800 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-brand-orange transition"
+          />
+          <p class="text-[10px] text-zinc-500 mt-1">Must end in @student.fontys.nl or @student.tue.nl</p>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-zinc-300 uppercase tracking-wider mb-1.5">Password</label>
+          <input 
+            type="password" 
+            id="auth-password" 
+            required 
+            minlength="6"
+            placeholder="••••••••" 
+            class="w-full px-4 py-3 rounded-2xl bg-zinc-950 border border-zinc-800 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-brand-orange transition"
+          />
+        </div>
+
+        <button 
+          type="submit" 
+          id="auth-submit-btn" 
+          class="w-full py-3.5 rounded-2xl bg-brand-orange hover:bg-brand-orange-hover text-white text-sm font-bold transition shadow-[0_4px_16px_rgba(255,77,0,0.4)]"
+        >
+          Sign In
+        </button>
+      </form>
+
+      <!-- Toggle mode -->
+      <div class="mt-6 text-center text-xs text-zinc-400">
+        <button id="toggle-auth-mode" class="hover:underline">
+          Don't have an account? <span class="text-brand-orange font-bold">Register</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: ROSTER VIEWER                       -->
+  <!-- ========================================== -->
+  <div id="roster-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+    <div class="relative w-full max-w-md rounded-3xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8 shadow-2xl">
+      <button id="roster-modal-close" class="absolute top-5 right-5 text-zinc-400 hover:text-white text-lg font-bold">
+        &times;
+      </button>
+
+      <div class="mb-4">
+        <span class="text-xs font-bold text-brand-orange uppercase tracking-wider">Registered Participants</span>
+        <h3 id="roster-modal-title" class="text-lg font-bold text-white mt-1"></h3>
+      </div>
+
+      <div id="roster-modal-list" class="space-y-2 max-h-72 overflow-y-auto pr-1">
+        <!-- Rendered via app.js -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Application script entry -->
+  <script type="module" src="./app.js"></script>
 
 </body>
 </html>
