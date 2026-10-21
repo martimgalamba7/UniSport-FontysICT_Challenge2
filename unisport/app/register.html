@@ -110,6 +110,26 @@
             class="w-full px-4 py-3.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 border-0 text-sm text-zinc-950 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition"
           />
 
+          <div class="relative">
+            <input 
+              type="password" 
+              id="reg-password" 
+              required 
+              minlength="6"
+              placeholder="Create a password (min. 6 characters)" 
+              class="w-full px-4 py-3.5 pr-11 rounded-xl bg-zinc-100 dark:bg-zinc-900 border-0 text-sm text-zinc-950 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition"
+            />
+            <button 
+              type="button" 
+              id="toggle-password" 
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition"
+              aria-label="Toggle password visibility"
+            >
+              <i data-lucide="eye" id="icon-eye" class="w-4 h-4"></i>
+              <i data-lucide="eye-off" id="icon-eye-off" class="w-4 h-4 hidden"></i>
+            </button>
+          </div>
+
           <button 
             type="button" 
             id="btn-step1" 
@@ -284,20 +304,9 @@
             id="btn-finish" 
             class="w-2/3 py-3.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 text-sm font-semibold transition"
           >
-            Complete & Send Link
+            Create Account
           </button>
         </div>
-      </div>
-
-      <!-- ================= SUCCESS STATE ================= -->
-      <div id="step-success" class="hidden space-y-4">
-        <h1 class="text-2xl font-bold tracking-tight text-zinc-950 dark:text-white">Check your student email</h1>
-        <p class="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
-          We emailed your sign-in link to <span id="success-email" class="font-semibold text-zinc-950 dark:text-white"></span>. Click the link in the email to activate your account and start playing.
-        </p>
-        <p class="text-xs text-zinc-400 dark:text-zinc-600">
-          No password needed.
-        </p>
       </div>
 
     </div>
@@ -309,18 +318,32 @@
 
   <!-- Step Logic & Multi-Selection Collector -->
   <script type="module">
-    import { sendStudentMagicLink, validateStudentEmail } from "./auth.js";
+    import { registerStudentWithPassword, validateStudentEmail } from "./auth.js";
     import { UNISPORT_AVATARS } from "./avatars.js";
 
     let step = 1;
     let selectedAvatarId = "bolt";
 
     const emailInp = document.getElementById("reg-email");
+    const passwordInp = document.getElementById("reg-password");
+    const togglePasswordBtn = document.getElementById("toggle-password");
+    const iconEye = document.getElementById("icon-eye");
+    const iconEyeOff = document.getElementById("icon-eye-off");
     const nameInp = document.getElementById("reg-name");
     const errBox = document.getElementById("reg-error");
     const sportOtherBtn = document.getElementById("btn-sport-other");
     const sportOtherContainer = document.getElementById("sport-other-container");
     const sportOtherInput = document.getElementById("inp-sport-other");
+
+    // Toggle password visibility
+    if (togglePasswordBtn) {
+      togglePasswordBtn.addEventListener("click", () => {
+        const isPassword = passwordInp.type === "password";
+        passwordInp.type = isPassword ? "text" : "password";
+        iconEye.classList.toggle("hidden", isPassword);
+        iconEyeOff.classList.toggle("hidden", !isPassword);
+      });
+    }
 
     function showError(msg) {
       errBox.textContent = msg;
@@ -408,12 +431,17 @@
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
-    // Step 1: Email
+    // Step 1: Email + Password
     document.getElementById("btn-step1").addEventListener("click", () => {
       const email = emailInp.value.trim();
       const val = validateStudentEmail(email);
       if (!val.isValid) {
         showError(val.error);
+        return;
+      }
+      const pwd = passwordInp.value;
+      if (!pwd || pwd.length < 6) {
+        showError("Please enter a password with at least 6 characters.");
         return;
       }
       updateStepUI(2);
@@ -451,42 +479,36 @@
 
       const btn = document.getElementById("btn-finish");
       btn.disabled = true;
-      btn.textContent = "Sending link...";
+      btn.textContent = "Creating account...";
 
       const email = emailInp.value.trim();
-      const profileData = {
-        fullName: nameInp.value.trim(),
-        avatarId: selectedAvatarId,
-        sports: sports,
-        sport: sports[0],
-        socialPreference: social,
-        intensityPreference: intensity,
-        schedulePreference: schedule,
-        preferredLocations: locations,
-        completedAnalytics: true,
-        submittedAt: new Date().toISOString()
-      };
+      const password = passwordInp.value;
+      const fullName = nameInp.value.trim();
 
       try {
-        const res = await sendStudentMagicLink(email, profileData);
+        const res = await registerStudentWithPassword({
+          email,
+          password,
+          fullName,
+          avatarId: selectedAvatarId,
+          sports,
+          socialPreference: social,
+          intensityPreference: intensity,
+          schedulePreference: schedule,
+          preferredLocations: locations
+        });
+
         if (res.success) {
-          if (res.method === "instant") {
-            window.location.href = "./welcome.html";
-            return;
-          }
-          document.getElementById("step-3").classList.add("hidden");
-          document.getElementById("bar-1").parentElement.classList.add("hidden");
-          document.getElementById("success-email").textContent = email;
-          document.getElementById("step-success").classList.remove("hidden");
+          window.location.href = "./welcome.html";
         } else {
-          showError(res.error || "Unable to send link.");
+          showError(res.error || "Unable to create account.");
           btn.disabled = false;
-          btn.textContent = "Complete & Send Link";
+          btn.textContent = "Create Account";
         }
       } catch (err) {
-        showError(err.message);
+        showError(err.message || "An unexpected error occurred.");
         btn.disabled = false;
-        btn.textContent = "Complete & Send Link";
+        btn.textContent = "Create Account";
       }
     });
 
