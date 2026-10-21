@@ -33,6 +33,20 @@
   </script>
   <script src="./theme.js"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    // Immediate pre-render Auth & Avatar resolution
+    (function() {
+      try {
+        var raw = localStorage.getItem("unisport_active_session");
+        if (raw) {
+          var user = JSON.parse(raw);
+          if (user && (user.email || user.uid)) {
+            window.__PRELOADED_USER__ = user;
+          }
+        }
+      } catch (e) {}
+    })();
+  </script>
 </head>
 
 <body class="bg-white text-zinc-900 dark:bg-black dark:text-zinc-100 min-h-screen flex flex-col font-sans transition-colors duration-150 pb-16 md:pb-8">
@@ -113,6 +127,45 @@
 
     </div>
   </header>
+
+  <script>
+    // Immediate synchronous avatar render to avoid ANY flash or delay
+    (function() {
+      try {
+        var user = window.__PRELOADED_USER__;
+        if (!user) {
+          var raw = localStorage.getItem("unisport_active_session");
+          if (raw) user = JSON.parse(raw);
+        }
+        if (user && (user.email || user.uid)) {
+          var navAuthBtn = document.getElementById("nav-auth-btn");
+          var googleAvatarBtn = document.getElementById("google-avatar-btn");
+          var avatarInner = document.getElementById("google-avatar-inner");
+          var authStatusPill = document.getElementById("auth-status-pill");
+          var dropName = document.getElementById("dropdown-name");
+          var dropEmail = document.getElementById("dropdown-email");
+
+          if (navAuthBtn) {
+            navAuthBtn.style.setProperty("display", "none", "important");
+            navAuthBtn.classList.add("hidden");
+          }
+          if (googleAvatarBtn) {
+            googleAvatarBtn.style.setProperty("display", "inline-flex", "important");
+            googleAvatarBtn.classList.remove("hidden");
+          }
+          if (authStatusPill) {
+            var dName = user.displayName || (user.email ? user.email.split("@")[0] : "Student");
+            var uni = (user.university || (user.email && user.email.includes("tue.nl") ? "TU/e" : "Fontys"));
+            authStatusPill.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span><span class="font-medium text-zinc-900 dark:text-white">' + dName + '</span><span class="text-[10px] uppercase font-bold text-zinc-500 px-1.5 py-0.5 rounded bg-zinc-200 dark:bg-zinc-800">' + (uni.indexOf("TU") !== -1 ? "TU/e" : "Fontys") + '</span>';
+            authStatusPill.style.setProperty("display", "inline-flex", "important");
+            authStatusPill.classList.remove("hidden");
+          }
+          if (dropName) dropName.textContent = user.displayName || user.email || "Student";
+          if (dropEmail) dropEmail.textContent = user.email || "";
+        }
+      } catch (err) {}
+    })();
+  </script>
 
   <!-- Main Container -->
   <main class="flex-grow max-w-5xl w-full mx-auto px-4 sm:px-6 py-6">
