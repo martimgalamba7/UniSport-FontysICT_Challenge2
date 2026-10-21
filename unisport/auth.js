@@ -1,10 +1,11 @@
-// UniSport Storage & Sync Adapter (Firestore + Ultra-Reliable Local Storage Engine)
+// UniSport Passwordless Magic Link & Student Identity Engine
 import { 
   app, 
   auth, 
   db, 
-  createUserWithEmailAndPassword, 
-  signInWithEmailAndPassword, 
+  sendSignInLinkToEmail,
+  isSignInWithEmailLink,
+  signInWithEmailLink,
   signOut, 
   onAuthStateChanged,
   updateProfile,
@@ -25,13 +26,14 @@ import {
 // Allowed student email domains
 const ALLOWED_DOMAINS = ["student.fontys.nl", "student.tue.nl"];
 
-// Local DB Keys
-const STORAGE_USERS_KEY = "unisport_students_db";
-const STORAGE_SESSION_KEY = "unisport_active_session";
-const STORAGE_ACTIVITIES_KEY = "unisport_activities_db";
+// Local Storage Keys
+const EMAIL_FOR_SIGN_IN_KEY = "unisport_email_for_sign_in";
+const PENDING_PROFILE_KEY = "unisport_pending_profile";
+const ACTIVE_SESSION_KEY = "unisport_active_session";
+const LOCAL_USERS_KEY = "unisport_students_db";
 
 /**
- * Sanitizes input
+ * Sanitizes string input
  */
 export function sanitize(str) {
   if (typeof str !== "string") return "";
@@ -39,7 +41,7 @@ export function sanitize(str) {
 }
 
 /**
- * Validates student email format and domain
+ * Validates student email format and university domain
  */
 export function validateStudentEmail(email) {
   const cleanEmail = (email || "").trim().toLowerCase();
@@ -53,7 +55,7 @@ export function validateStudentEmail(email) {
   if (!ALLOWED_DOMAINS.includes(domain)) {
     return { 
       isValid: false, 
-      error: "Only @student.fontys.nl and @student.tue.nl accounts are allowed." 
+      error: "Only @student.fontys.nl and @student.tue.nl student emails are allowed." 
     };
   }
 
@@ -61,46 +63,140 @@ export function validateStudentEmail(email) {
 }
 
 /**
- * Hash password locally for storage security
+ * Action Code Settings for Firebase Email Link Sign-in
  */
-async function hashPassword(str) {
+function getActionCodeSettings() {
+  const origin = window.location.origin;
+  // Always redirect to login page where email link confirmation is handled
+  const url = `${origin}/challenge2/unisport/login`;
+  
+  return {
+    url: url,
+    handleCodeInApp: true
+  };
+}
+
+/**
+ * Sends a passwordless sign-in Magic Link to the student's email
+ * @param {string} email 
+ * @param {object} optionalProfileData (Used when signing up with sport, name, avatar)
+ * @returns {Promise<{success: boolean, error?: string}>}
+ */
+export async function sendStudentMagicLink(email, optionalProfileData = null) {
+  const val = validateStudentEmail(email);
+  if (!val.isValid) {
+    return { success: false, error: val.error };
+  }
+
+  const actionCodeSettings = getActionCodeSettings();
+
   try {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(str + "_unisport_salt_2026");
-    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-  } catch {
-    return btoa(str);
+    await sendSignInLinkToEmail(auth, val.email, actionCodeSettings);
+
+    // Save email locally so student doesn't need to retype when clicking the email link
+    window.localStorage.setItem(EMAIL_FOR_SIGN_IN_KEY, val.email);
+
+    if (optionalProfileData) {
+      window.localStorage.setItem(PENDING_PROFILE_KEY, JSON.stringify(optionalProfileData));
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.warn("Firebase sendSignInLinkToEmail note:", error);
+
+    // Fallback simulate instant direct login for local testing / development
+    window.localStorage.setItem(EMAIL_FOR_SIGN_IN_KEY, val.email);
+    if (optionalProfileData) {
+      window.localStorage.setItem(PENDING_PROFILE_KEY, JSON.stringify(optionalProfileData));
+    }
+
+    let msg = error.message;
+    if (error.code === "auth/invalid-email") msg = "Invalid email address.";
+    if (error.code === "auth/unauthorized-continue-uri") {
+      msg = "Please add your domain to Authorized Domains in Firebase Console.";
+    }
+
+    return { success: false, error: msg, fallbackReady: true };
   }
 }
 
 /**
- * Load all registered local users
+ * Completes sign in when student clicks the link from their email
+ * Checks isSignInWithEmailLink(auth, window.location.href)
+ * @returns {Promise<{success: boolean, user?: any, isMagicLink: boolean, error?: string}>}
  */
-function getLocalUsers() {
+export async function handleIncomingEmailLink() {
+  if (!isSignInWithEmailLink(auth, window.location.href)) {
+    return { success: false, isMagicLink: false };
+  }
+
+  let email = window.localStorage.getItem(EMAIL_FOR_SIGN_IN_KEY);
+  if (!email) {
+    // If opened on another device/browser, prompt student for email
+    email = window.prompt("Please confirm your student email (@student.fontys.nl or @student.tue.nl):");
+  }
+
+  const val = validateStudentEmail(email);
+  if (!val.isValid) {
+    return { success: false, isMagicLink: true, error: val.error };
+  }
+
   try {
-    return JSON.parse(localStorage.getItem(STORAGE_USERS_KEY)) || {};
-  } catch {
-    return {};
+    const result = await signInWithEmailLink(auth, val.email, window.location.href);
+    window.localStorage.removeItem(EMAIL_FOR_SIGN_IN_KEY);
+
+    const user = result.user;
+    
+    // Check if there was pending profile data from registration steps
+    let pendingProfile = null;
+    try {
+      const p = window.localStorage.getItem(PENDING_PROFILE_KEY);
+      if (p) pendingProfile = JSON.parse(p);
+    } catch {}
+
+    const university = val.email.endsWith("@student.tue.nl") ? "TU Eindhoven" : "Fontys UAS";
+    const displayName = pendingProfile?.fullName || user.displayName || val.email.split("@")[0];
+
+    const sessionUser = {
+      uid: user.uid,
+      email: val.email,
+      displayName: displayName,
+      university: university,
+      sport: pendingProfile?.sport || "Football",
+      skillLevel: pendingProfile?.skillLevel || "Intermediate",
+      avatar: pendingProfile?.avatar || "⚽"
+    };
+
+    if (pendingProfile?.fullName) {
+      await updateProfile(user, { displayName });
+    }
+
+    // Save profile to Firestore
+    try {
+      await setDoc(doc(db, "users", user.uid), {
+        ...sessionUser,
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+    } catch (e) {
+      console.warn("Firestore sync deferred:", e);
+    }
+
+    setActiveSession(sessionUser);
+    window.localStorage.removeItem(PENDING_PROFILE_KEY);
+
+    return { success: true, isMagicLink: true, user: sessionUser };
+  } catch (error) {
+    console.error("Error signing in with email link:", error);
+    return { success: false, isMagicLink: true, error: error.message };
   }
 }
 
 /**
- * Save user to local storage
- */
-function saveLocalUser(userRecord) {
-  const users = getLocalUsers();
-  users[userRecord.email] = userRecord;
-  localStorage.setItem(STORAGE_USERS_KEY, JSON.stringify(users));
-}
-
-/**
- * Get active student session
+ * Instant local session manager
  */
 export function getActiveSession() {
   try {
-    const s = localStorage.getItem(STORAGE_SESSION_KEY);
+    const s = localStorage.getItem(ACTIVE_SESSION_KEY);
     return s ? JSON.parse(s) : null;
   } catch {
     return null;
@@ -109,135 +205,14 @@ export function getActiveSession() {
 
 export function setActiveSession(user) {
   if (user) {
-    localStorage.setItem(STORAGE_SESSION_KEY, JSON.stringify(user));
+    localStorage.setItem(ACTIVE_SESSION_KEY, JSON.stringify(user));
   } else {
-    localStorage.removeItem(STORAGE_SESSION_KEY);
+    localStorage.removeItem(ACTIVE_SESSION_KEY);
   }
 }
 
 /**
- * Multi-Step Student Registration
- * Supports Cloud Firebase with automatic resilient local persistence fallback
- */
-export async function signUpStudentMultiStep({ email, password, fullName, sport, skillLevel, avatar }) {
-  const emailVal = validateStudentEmail(email);
-  if (!emailVal.isValid) {
-    return { success: false, error: emailVal.error };
-  }
-
-  if (!password || password.length < 6) {
-    return { success: false, error: "Password must be at least 6 characters long." };
-  }
-
-  const cleanName = sanitize(fullName);
-  if (!cleanName || cleanName.length < 2) {
-    return { success: false, error: "Please enter your full name." };
-  }
-
-  const university = emailVal.email.endsWith("@student.tue.nl") ? "TU Eindhoven" : "Fontys UAS";
-  const passHash = await hashPassword(password);
-
-  // Check local collision first
-  const existingUsers = getLocalUsers();
-  if (existingUsers[emailVal.email]) {
-    return { success: false, error: "This student email is already registered. Please sign in." };
-  }
-
-  let finalUser = {
-    uid: "student_" + Math.random().toString(36).substring(2, 10),
-    email: emailVal.email,
-    displayName: cleanName,
-    university: university,
-    sport: sport || "Football",
-    skillLevel: skillLevel || "Intermediate",
-    avatar: avatar || "⚽",
-    createdAt: Date.now()
-  };
-
-  // Attempt Firebase Auth (if available/configured in console)
-  try {
-    const cred = await createUserWithEmailAndPassword(auth, emailVal.email, password);
-    finalUser.uid = cred.user.uid;
-    await updateProfile(cred.user, { displayName: cleanName });
-    
-    // Save to Firestore
-    try {
-      await setDoc(doc(db, "users", cred.user.uid), {
-        ...finalUser,
-        serverCreated: serverTimestamp()
-      }, { merge: true });
-    } catch (fsErr) {
-      console.warn("Firestore write skipped:", fsErr.message);
-    }
-  } catch (fbErr) {
-    console.warn("Firebase Auth bypassed with secure local engine:", fbErr.message);
-  }
-
-  // Persist locally for 100% reliable login
-  saveLocalUser({
-    ...finalUser,
-    passHash: passHash
-  });
-
-  setActiveSession(finalUser);
-  return { success: true, user: finalUser };
-}
-
-/**
- * Student Sign In
- */
-export async function signInStudent(email, password) {
-  const emailVal = validateStudentEmail(email);
-  if (!emailVal.isValid) {
-    return { success: false, error: emailVal.error };
-  }
-
-  if (!password) {
-    return { success: false, error: "Please enter your password." };
-  }
-
-  // Try Firebase Auth first
-  try {
-    const cred = await signInWithEmailAndPassword(auth, emailVal.email, password);
-    const profile = await getStudentProfile(cred.user.uid);
-    const sessionUser = profile || {
-      uid: cred.user.uid,
-      email: cred.user.email,
-      displayName: cred.user.displayName || emailVal.email.split("@")[0],
-      university: emailVal.email.endsWith("@student.tue.nl") ? "TU Eindhoven" : "Fontys UAS",
-      avatar: "⚽",
-      sport: "Football",
-      skillLevel: "Intermediate"
-    };
-    setActiveSession(sessionUser);
-    return { success: true, user: sessionUser };
-  } catch (fbErr) {
-    console.warn("Firebase signin attempted, checking local engine:", fbErr.message);
-  }
-
-  // Check local storage engine
-  const users = getLocalUsers();
-  const localRecord = users[emailVal.email];
-
-  if (localRecord) {
-    const enteredHash = await hashPassword(password);
-    if (localRecord.passHash === enteredHash) {
-      const { passHash, ...safeUser } = localRecord;
-      setActiveSession(safeUser);
-      return { success: true, user: safeUser };
-    } else {
-      return { success: false, error: "Incorrect password. Please verify your credentials." };
-    }
-  }
-
-  return { 
-    success: false, 
-    error: "No account found for this student email. Please complete registration first." 
-  };
-}
-
-/**
- * Sign out student
+ * Student Sign Out
  */
 export async function signOutStudent() {
   try {
@@ -258,14 +233,7 @@ export async function getStudentProfile(uid) {
     if (snap.exists()) return snap.data();
   } catch {}
 
-  const all = getLocalUsers();
-  for (const email in all) {
-    if (all[email].uid === uid) {
-      const { passHash, ...safe } = all[email];
-      return safe;
-    }
-  }
-  return null;
+  return session;
 }
 
 /**
@@ -275,12 +243,6 @@ export async function updateStudentProfile(uid, profileData) {
   const session = getActiveSession() || {};
   const updated = { ...session, ...profileData, updatedAt: Date.now() };
   setActiveSession(updated);
-
-  const users = getLocalUsers();
-  if (updated.email && users[updated.email]) {
-    users[updated.email] = { ...users[updated.email], ...profileData };
-    localStorage.setItem(STORAGE_USERS_KEY, JSON.stringify(users));
-  }
 
   try {
     await setDoc(doc(db, "users", uid), profileData, { merge: true });

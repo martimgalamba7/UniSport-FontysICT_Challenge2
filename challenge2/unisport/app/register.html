@@ -67,7 +67,7 @@
   <!-- Main Multi-Step Workspace -->
   <main class="flex-grow flex flex-col lg:flex-row w-full max-w-6xl mx-auto items-stretch justify-center p-6 sm:p-10 lg:p-12 gap-8 lg:gap-14">
     
-    <!-- Left Stage: Dynamic Identity Preview (Editorial, Clean, Interactive) -->
+    <!-- Left Stage: Dynamic Identity Preview -->
     <div class="w-full lg:w-5/12 flex flex-col justify-between p-8 sm:p-10 rounded-[2.5rem] bg-zinc-100/80 dark:bg-[#15151B] border border-zinc-200/80 dark:border-zinc-800/80 relative overflow-hidden">
       
       <div class="relative z-10 space-y-3">
@@ -79,7 +79,7 @@
           Your Campus Sports Pass
         </h2>
         <p class="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">
-          As you type, your student identity badge is generated and verified for the Eindhoven network.
+          No passwords required. Your verified pass is connected to your university email.
         </p>
       </div>
 
@@ -138,15 +138,15 @@
         <span id="step-error-text">Error message</span>
       </div>
 
-      <!-- STEP 1: EMAIL & PASSWORD -->
+      <!-- STEP 1: EMAIL (PASSWORDLESS) -->
       <div id="step-pane-1" class="space-y-6">
         <div>
-          <span class="text-xs font-bold text-brand-orange uppercase tracking-wider">Step 1 &bull; Account Verification</span>
+          <span class="text-xs font-bold text-brand-orange uppercase tracking-wider">Step 1 &bull; Student Email</span>
           <h1 class="text-3xl sm:text-4xl font-display font-black text-zinc-950 dark:text-white mt-1">
             Let's start with your student email.
           </h1>
           <p class="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-2">
-            UniSport is exclusive to students in Eindhoven. Please use your official university account.
+            No password needed! You'll receive a passwordless sign-in link in your student inbox.
           </p>
         </div>
 
@@ -163,21 +163,6 @@
               <i data-lucide="check" class="w-3.5 h-3.5 text-brand-orange"></i>
               <span>Must end in @student.fontys.nl or @student.tue.nl</span>
             </p>
-          </div>
-
-          <div>
-            <label class="block text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300 mb-2">Create Password *</label>
-            <div class="relative">
-              <input 
-                type="password" 
-                id="inp-password" 
-                placeholder="At least 6 characters" 
-                class="w-full px-5 pr-12 py-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-sm text-zinc-950 dark:text-white placeholder-zinc-400 focus:outline-none focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/20 transition shadow-sm"
-              />
-              <button type="button" id="btn-toggle-pass" class="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition">
-                <i data-lucide="eye" class="w-4 h-4"></i>
-              </button>
-            </div>
           </div>
         </div>
 
@@ -199,7 +184,7 @@
             What should peers call you?
           </h1>
           <p class="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-2">
-            Your name is displayed to teammates on match rosters to reduce awkwardness.
+            Your name is displayed to teammates on match rosters.
           </p>
         </div>
 
@@ -286,22 +271,27 @@
             Back
           </button>
           <button type="button" id="btn-finish" class="w-2/3 py-4 rounded-2xl bg-brand-orange hover:bg-brand-orange-hover text-white text-sm font-bold tracking-wide transition transform hover:-translate-y-0.5 shadow-[0_8px_20px_-4px_rgba(255,77,0,0.5)] flex items-center justify-center gap-2">
-            <span>Complete Registration</span>
-            <i data-lucide="check" class="w-4 h-4"></i>
+            <span>Send Activation Link</span>
+            <i data-lucide="send" class="w-4 h-4"></i>
           </button>
         </div>
       </div>
 
-      <!-- SUCCESS SCREEN -->
-      <div id="step-pane-success" class="hidden text-center py-12 space-y-5">
+      <!-- SUCCESS / EMAIL SENT SCREEN -->
+      <div id="step-pane-success" class="hidden text-center py-10 space-y-5">
         <div class="w-20 h-20 mx-auto rounded-3xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-4xl">
-          🎉
+          ✉️
         </div>
-        <h2 class="text-3xl font-display font-black text-zinc-950 dark:text-white">
-          Welcome to UniSport!
-        </h2>
-        <p class="text-sm text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto">
-          Your student account is active. Redirecting you to the Eindhoven live sports feed...
+        <div class="space-y-1">
+          <h2 class="text-3xl font-display font-black text-zinc-950 dark:text-white">
+            Check Your Student Email!
+          </h2>
+          <p class="text-sm text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto">
+            We sent a passwordless activation link to <span id="success-email" class="font-bold text-zinc-950 dark:text-white"></span>.
+          </p>
+        </div>
+        <p class="text-xs text-zinc-500 dark:text-zinc-400 max-w-md mx-auto leading-relaxed bg-zinc-100 dark:bg-zinc-900 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800">
+          Click the link in the email to activate your account and jump straight into the live sports feed.
         </p>
       </div>
 
@@ -313,15 +303,14 @@
     lucide.createIcons();
   </script>
 
-  <!-- Multi-Step Registration Controller -->
+  <!-- Passwordless Multi-Step Registration Controller -->
   <script type="module">
-    import { signUpStudentMultiStep, validateStudentEmail } from "./auth.js";
+    import { sendStudentMagicLink, validateStudentEmail } from "./auth.js";
 
     let currentStep = 1;
     let selectedAvatar = "⚽";
 
     const emailInp = document.getElementById("inp-email");
-    const passInp = document.getElementById("inp-password");
     const nameInp = document.getElementById("inp-name");
     const sportSel = document.getElementById("sel-sport");
     const skillSel = document.getElementById("sel-skill");
@@ -384,12 +373,6 @@
       });
     });
 
-    // Password toggle
-    document.getElementById("btn-toggle-pass").addEventListener("click", () => {
-      const type = passInp.type === "password" ? "text" : "password";
-      passInp.type = type;
-    });
-
     function setStep(step) {
       currentStep = step;
       clearError();
@@ -419,10 +402,6 @@
         showError(val.error);
         return;
       }
-      if (!passInp.value || passInp.value.length < 6) {
-        showError("Password must be at least 6 characters long.");
-        return;
-      }
       setStep(2);
     });
 
@@ -442,34 +421,32 @@
     document.getElementById("btn-finish").addEventListener("click", async () => {
       const finishBtn = document.getElementById("btn-finish");
       finishBtn.disabled = true;
-      finishBtn.innerHTML = `<span>Activating Passport...</span>`;
+      finishBtn.innerHTML = `<span>Sending Activation Link...</span>`;
+
+      const email = emailInp.value.trim();
+      const profileData = {
+        fullName: nameInp.value.trim(),
+        sport: sportSel.value,
+        skillLevel: skillSel.value,
+        avatar: selectedAvatar
+      };
 
       try {
-        const res = await signUpStudentMultiStep({
-          email: emailInp.value.trim(),
-          password: passInp.value,
-          fullName: nameInp.value.trim(),
-          sport: sportSel.value,
-          skillLevel: skillSel.value,
-          avatar: selectedAvatar
-        });
-
+        const res = await sendStudentMagicLink(email, profileData);
         if (res.success) {
           document.getElementById("step-pane-3").classList.add("hidden");
+          document.getElementById("success-email").textContent = email;
           document.getElementById("step-pane-success").classList.remove("hidden");
-          setTimeout(() => {
-            window.location.href = "/challenge2/unisport/app";
-          }, 900);
         } else {
-          showError(res.error || "Unable to register. Please check your data.");
+          showError(res.error || "Unable to send activation email.");
           finishBtn.disabled = false;
-          finishBtn.innerHTML = `<span>Complete Registration</span> <i data-lucide="check" class="w-4 h-4"></i>`;
+          finishBtn.innerHTML = `<span>Send Activation Link</span> <i data-lucide="send" class="w-4 h-4"></i>`;
           lucide.createIcons();
         }
       } catch (err) {
         showError("Registration error: " + err.message);
         finishBtn.disabled = false;
-        finishBtn.innerHTML = `<span>Complete Registration</span> <i data-lucide="check" class="w-4 h-4"></i>`;
+        finishBtn.innerHTML = `<span>Send Activation Link</span> <i data-lucide="send" class="w-4 h-4"></i>`;
         lucide.createIcons();
       }
     });
