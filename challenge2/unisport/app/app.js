@@ -201,7 +201,10 @@ function updateAuthUI(user, profile) {
     const email = user.email || state.userProfile?.email || "";
     const displayName = state.userProfile?.displayName || user.displayName || (email ? email.split("@")[0] : "Student");
     const uni = state.userProfile?.university || (email.endsWith("@student.tue.nl") ? "TU Eindhoven" : "Fontys UAS");
-    const avatarId = state.userProfile?.avatarId || user.avatarId || "bodybuilder";
+    let avatarId = state.userProfile?.avatarId || user.avatarId || "footballer";
+    if (avatarId === "bolt" || avatarId === "flame" || avatarId === "cyber") {
+      avatarId = "footballer";
+    }
     const avatar = getAvatarById(avatarId);
 
     // Force hide Sign in button
@@ -213,7 +216,7 @@ function updateAuthUI(user, profile) {
     // Force show Google-style circular avatar in top right
     if (googleAvatarBtn && avatarInner) {
       avatarInner.className = `w-full h-full rounded-full overflow-hidden bg-gradient-to-tr ${avatar.bg} flex items-center justify-center text-white`;
-      avatarInner.innerHTML = avatar.svg;
+      avatarInner.innerHTML = `<img src="${avatar.image}" alt="${avatar.name}" class="w-full h-full object-cover rounded-full" onerror="this.src='./assets/avatars/footballer.png'" />`;
       googleAvatarBtn.classList.remove("hidden");
       googleAvatarBtn.style.setProperty("display", "inline-flex", "important");
     }
