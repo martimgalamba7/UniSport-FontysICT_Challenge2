@@ -67,10 +67,10 @@ const INITIAL_DEMO_ACTIVITIES = [
     creatorUniversity: "Fontys UAS",
     description: "Looking for 10 players for a fun, relaxed game after lectures. All skill levels welcome! Bring white or dark shirts.",
     participants: [
-      { uid: "fontys-student-rep", name: "Thomas van Dijk", university: "Fontys UAS", avatarId: "bolt" },
-      { uid: "demo-p1", name: "Sara Martins", university: "TU Eindhoven", avatarId: "flame" },
-      { uid: "demo-p2", name: "Lars Bakker", university: "Fontys UAS", avatarId: "cyber" },
-      { uid: "demo-p3", name: "Elena Costa", university: "Fontys UAS", avatarId: "vortex" }
+      { uid: "fontys-student-rep", name: "Thomas van Dijk", university: "Fontys UAS", avatarId: "footballer" },
+      { uid: "demo-p1", name: "Sara Martins", university: "TU Eindhoven", avatarId: "runner" },
+      { uid: "demo-p2", name: "Lars Bakker", university: "Fontys UAS", avatarId: "bodybuilder" },
+      { uid: "demo-p3", name: "Elena Costa", university: "Fontys UAS", avatarId: "runner" }
     ],
     createdAt: Date.now() - 3600000
   },
@@ -87,9 +87,9 @@ const INITIAL_DEMO_ACTIVITIES = [
     creatorUniversity: "TU Eindhoven",
     description: "Pace around 5:30 min/km. Great way to de-stress before exam week. Coffee afterwards at Strijp-S!",
     participants: [
-      { uid: "tue-runner-rep", name: "Sophie de Vries", university: "TU Eindhoven", avatarId: "zen" },
-      { uid: "demo-p4", name: "Ruben V.", university: "Fontys UAS", avatarId: "pulse" },
-      { uid: "demo-p5", name: "Noor Janssen", university: "TU Eindhoven", avatarId: "ninja" }
+      { uid: "tue-runner-rep", name: "Sophie de Vries", university: "TU Eindhoven", avatarId: "runner" },
+      { uid: "demo-p4", name: "Ruben V.", university: "Fontys UAS", avatarId: "footballer" },
+      { uid: "demo-p5", name: "Noor Janssen", university: "TU Eindhoven", avatarId: "bodybuilder" }
     ],
     createdAt: Date.now() - 7200000
   },
@@ -106,8 +106,8 @@ const INITIAL_DEMO_ACTIVITIES = [
     creatorUniversity: "Fontys UAS",
     description: "Working on 5C-6B circuits. Beginners welcome to tag along! We can share tips and chalk.",
     participants: [
-      { uid: "climb-lover", name: "Matas K.", university: "Fontys UAS", avatarId: "shield" },
-      { uid: "demo-p6", name: "Anouk S.", university: "TU Eindhoven", avatarId: "cyber" }
+      { uid: "climb-lover", name: "Matas K.", university: "Fontys UAS", avatarId: "bodybuilder" },
+      { uid: "demo-p6", name: "Anouk S.", university: "TU Eindhoven", avatarId: "runner" }
     ],
     createdAt: Date.now() - 10800000
   },
@@ -124,7 +124,7 @@ const INITIAL_DEMO_ACTIVITIES = [
     creatorUniversity: "Fontys UAS",
     description: "Need someone to spot heavy sets and push each other. Chest and back day focus.",
     participants: [
-      { uid: "gym-bro", name: "Liam O'Connor", university: "Fontys UAS", avatarId: "bolt" }
+      { uid: "gym-bro", name: "Liam O'Connor", university: "Fontys UAS", avatarId: "bodybuilder" }
     ],
     createdAt: Date.now() - 14400000
   }
@@ -200,7 +200,7 @@ function updateAuthUI(user, profile) {
     const email = user.email || state.userProfile?.email || "";
     const displayName = state.userProfile?.displayName || user.displayName || (email ? email.split("@")[0] : "Student");
     const uni = state.userProfile?.university || (email.endsWith("@student.tue.nl") ? "TU Eindhoven" : "Fontys UAS");
-    const avatarId = state.userProfile?.avatarId || user.avatarId || "bolt";
+    const avatarId = state.userProfile?.avatarId || user.avatarId || "bodybuilder";
     const avatar = getAvatarById(avatarId);
 
     // Force hide Sign in button
@@ -540,7 +540,7 @@ function setupCreateForm() {
 
     const creatorName = state.userProfile?.displayName || state.currentUser.displayName || "Student";
     const creatorUniversity = state.userProfile?.university || (state.currentUser.email.endsWith("@student.tue.nl") ? "TU Eindhoven" : "Fontys UAS");
-    const avatarId = state.userProfile?.avatarId || state.currentUser.avatarId || "bolt";
+    const avatarId = state.userProfile?.avatarId || state.currentUser.avatarId || "bodybuilder";
 
     const newActivity = {
       sport,
@@ -607,7 +607,7 @@ export async function toggleJoinActivity(activityId) {
     uid: state.currentUser.uid,
     name: state.userProfile?.displayName || state.currentUser.displayName || "Student",
     university: state.userProfile?.university || (state.currentUser.email.endsWith("@student.tue.nl") ? "TU Eindhoven" : "Fontys UAS"),
-    avatarId: state.userProfile?.avatarId || state.currentUser.avatarId || "bolt"
+    avatarId: state.userProfile?.avatarId || state.currentUser.avatarId || "bodybuilder"
   };
 
   try {
@@ -744,7 +744,7 @@ export function openRosterModal(activityId) {
   const participants = activity.participants || [];
 
   content.innerHTML = participants.map((p, idx) => {
-    const av = getAvatarById(p.avatarId || "bolt");
+    const av = getAvatarById(p.avatarId || "bodybuilder");
     return `
       <div class="flex items-center justify-between p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800">
         <div class="flex items-center gap-2.5">

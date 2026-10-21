@@ -161,7 +161,7 @@ export async function loginStudentWithPassword(email, password) {
           email: user.email,
           displayName: user.displayName || emailVal.email.split("@")[0],
           university: emailVal.email.endsWith("@student.tue.nl") ? "TU Eindhoven" : "Fontys UAS",
-          avatarId: "bolt",
+          avatarId: "bodybuilder",
           sport: "Football",
           sports: ["Football"],
           socialPreference: ["Casual"],
@@ -181,7 +181,7 @@ export async function loginStudentWithPassword(email, password) {
       email: user.email,
       displayName: user.displayName || emailVal.email.split("@")[0],
       university: emailVal.email.endsWith("@student.tue.nl") ? "TU Eindhoven" : "Fontys UAS",
-      avatarId: "bolt",
+      avatarId: "bodybuilder",
       sport: "Football"
     };
 
