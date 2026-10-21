@@ -91,30 +91,25 @@
       <div id="user-dropdown" class="hidden absolute right-0 top-14 w-64 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-2xl p-2.5 z-50 text-xs transition-all">
         <!-- User Info Header with School & Status -->
         <div class="px-3 py-3 border-b border-zinc-100 dark:border-zinc-800">
-          <div class="flex items-center justify-between gap-2 mb-1">
-            <p id="dropdown-name" class="font-bold text-sm text-zinc-950 dark:text-white truncate">Student</p>
-            <span id="dropdown-school-badge" class="text-[10px] uppercase font-bold text-zinc-600 dark:text-zinc-300 px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 whitespace-nowrap">
-              Fontys
-            </span>
-          </div>
-          <p id="dropdown-email" class="text-xs text-zinc-500 dark:text-zinc-400 truncate">student@fontys.nl</p>
-          <div class="mt-2 flex items-center gap-1.5 text-[11px] text-zinc-500 dark:text-zinc-400">
+          <p id="dropdown-name" class="font-bold text-sm text-zinc-950 dark:text-white truncate">Student</p>
+          <p id="dropdown-email" class="text-xs text-zinc-500 dark:text-zinc-400 truncate mt-0.5">student@fontys.nl</p>
+          <div class="mt-2.5 flex items-center gap-1.5 text-[11px] text-zinc-500 dark:text-zinc-400">
             <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-brand-orange"></i>
             <span id="dropdown-school-full" class="truncate font-medium">Fontys UAS</span>
           </div>
         </div>
 
-        <!-- Options: Profile, Settings -->
+        <!-- Options: Profile, My Sessions, Settings -->
         <div class="py-1.5 space-y-0.5">
-          <button onclick="if(window.UniSport) window.UniSport.switchTab('profile'); document.getElementById('user-dropdown').classList.add('hidden');" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-semibold transition text-left cursor-pointer">
+          <button id="dropdown-profile-btn" onclick="window.switchTabGlobal('profile');" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-semibold transition text-left cursor-pointer">
             <i data-lucide="user" class="w-4 h-4 text-zinc-500"></i>
             <span>Profile</span>
           </button>
-          <button onclick="if(window.UniSport) window.UniSport.switchTab('my-activities'); document.getElementById('user-dropdown').classList.add('hidden');" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-semibold transition text-left cursor-pointer">
+          <button id="dropdown-sessions-btn" onclick="window.switchTabGlobal('my-activities');" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-semibold transition text-left cursor-pointer">
             <i data-lucide="calendar" class="w-4 h-4 text-zinc-500"></i>
             <span>My Sessions</span>
           </button>
-          <button onclick="if(window.UniSport) window.UniSport.openSettingsModal(); document.getElementById('user-dropdown').classList.add('hidden');" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-semibold transition text-left cursor-pointer">
+          <button id="dropdown-settings-btn" onclick="window.openSettingsGlobal();" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-semibold transition text-left cursor-pointer">
             <i data-lucide="settings" class="w-4 h-4 text-zinc-500"></i>
             <span>Settings</span>
           </button>
@@ -168,7 +163,6 @@
           var isTue = uni.indexOf("TU") !== -1 || (user.email && user.email.includes("tue.nl"));
           if (dropName) dropName.textContent = user.displayName || user.email || "Student";
           if (dropEmail) dropEmail.textContent = user.email || "";
-          if (dropSchoolBadge) dropSchoolBadge.textContent = isTue ? "TU/e" : "Fontys";
           if (dropSchoolFull) dropSchoolFull.textContent = isTue ? "TU Eindhoven" : "Fontys UAS";
         }
       } catch (err) {}
@@ -184,6 +178,42 @@
         }
       });
     })();
+
+    // Synchronous resilient tab switcher for instant profile / sessions navigation
+    window.switchTabGlobal = function(tabId) {
+      var dd = document.getElementById("user-dropdown");
+      if (dd) dd.classList.add("hidden");
+
+      if (window.UniSport && typeof window.UniSport.switchTab === "function") {
+        window.UniSport.switchTab(tabId);
+        return;
+      }
+
+      // Instant fallback if module is initializing
+      var tabs = ["feed", "create", "my-activities", "profile"];
+      for (var i = 0; i < tabs.length; i++) {
+        var sec = document.getElementById("section-" + tabs[i]);
+        if (sec) {
+          if (tabs[i] === tabId) {
+            sec.classList.remove("hidden");
+          } else {
+            sec.classList.add("hidden");
+          }
+        }
+      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    window.openSettingsGlobal = function() {
+      var dd = document.getElementById("user-dropdown");
+      if (dd) dd.classList.add("hidden");
+      if (window.UniSport && typeof window.UniSport.openSettingsModal === "function") {
+        window.UniSport.openSettingsModal();
+        return;
+      }
+      var modal = document.getElementById("settings-modal");
+      if (modal) modal.classList.remove("hidden");
+    };
   </script>
 
   <!-- Main Container -->

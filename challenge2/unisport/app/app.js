@@ -338,6 +338,12 @@ export function switchTab(targetTab) {
   if (targetTab === "my-activities") {
     renderMyActivities();
   }
+  if (targetTab === "profile") {
+    populateProfileTab();
+  }
+  if (window.lucide && typeof window.lucide.createIcons === "function") {
+    window.lucide.createIcons();
+  }
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
