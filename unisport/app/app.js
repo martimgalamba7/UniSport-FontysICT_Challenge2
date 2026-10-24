@@ -472,9 +472,9 @@ export function renderFeed() {
             </div>
             <div class="flex -space-x-1.5 overflow-hidden items-center">
               ${participants.slice(0, 5).map(p => {
-                const av = getAvatarById(p.avatarId || "bolt");
+                const av = getAvatarById(p.avatarId || "footballer");
                 return `
-                  <div class="w-6 h-6 rounded-full overflow-hidden bg-gradient-to-tr ${av.bg} border-2 border-white dark:border-zinc-900 text-white flex items-center justify-center shadow-sm" title="${escapeHtml(p.name)} (${escapeHtml(p.university || 'Student')})">
+                  <div class="w-6 h-6 rounded-full overflow-hidden border-2 border-white dark:border-zinc-900 bg-zinc-100 dark:bg-zinc-800 text-white flex items-center justify-center shadow-sm" title="${escapeHtml(p.name)} (${escapeHtml(p.university || 'Student')})">
                     ${av.svg}
                   </div>
                 `;
@@ -813,7 +813,7 @@ export async function selectAvatar(newAvId) {
   // 2. Update UI elements instantly
   const heroAvatar = document.getElementById("profile-hero-avatar");
   const heroInner = document.getElementById("profile-hero-avatar-inner");
-  if (heroAvatar) heroAvatar.className = `w-28 h-28 sm:w-36 sm:h-36 rounded-full p-1.5 bg-gradient-to-tr ${targetAvatar.bg} shadow-xl flex items-center justify-center`;
+  if (heroAvatar) heroAvatar.className = "w-28 h-28 sm:w-36 sm:h-36 rounded-full p-1 bg-white dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-800 shadow-sm flex items-center justify-center";
   if (heroInner) {
     heroInner.innerHTML = `<img src="${targetAvatar.image}" alt="${targetAvatar.name}" class="w-full h-full object-cover rounded-full" onerror="this.src='./assets/avatars/footballer.png'" />`;
   }
@@ -821,7 +821,7 @@ export async function selectAvatar(newAvId) {
   // Top nav google avatar
   const googleAvatarInner = document.getElementById("google-avatar-inner");
   if (googleAvatarInner) {
-    googleAvatarInner.className = `w-full h-full rounded-full overflow-hidden bg-gradient-to-tr ${targetAvatar.bg} flex items-center justify-center text-white`;
+    googleAvatarInner.className = "w-full h-full rounded-full overflow-hidden flex items-center justify-center pointer-events-none";
     googleAvatarInner.innerHTML = `<img src="${targetAvatar.image}" alt="${targetAvatar.name}" class="w-full h-full object-cover rounded-full" onerror="this.src='./assets/avatars/footballer.png'" />`;
   }
 
@@ -941,7 +941,7 @@ export function openRosterModal(activityId) {
     return `
       <div class="flex items-center justify-between p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800">
         <div class="flex items-center gap-2.5">
-          <div class="w-7 h-7 rounded-full overflow-hidden bg-gradient-to-tr ${av.bg} flex items-center justify-center text-white shadow-sm">
+          <div class="w-8 h-8 rounded-full overflow-hidden border border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-white shadow-sm">
             ${av.svg}
           </div>
           <div>
