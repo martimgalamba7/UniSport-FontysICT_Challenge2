@@ -51,38 +51,123 @@
 
 <body class="bg-white text-zinc-900 dark:bg-black dark:text-zinc-100 min-h-screen flex flex-col font-sans transition-colors duration-150 pb-16 md:pb-8">
 
-  <!-- Top Navigation Header (Uber Minimalist Style & Full Responsive Width) -->
-  <header class="sticky top-0 z-40 w-full backdrop-blur-md bg-white/90 dark:bg-black/90 border-b border-zinc-100 dark:border-zinc-900 px-4 sm:px-8 lg:px-12 py-3 flex items-center justify-between">
-    <!-- Brand Logo -->
-    <div class="flex items-center gap-8">
-      <a href="/challenge2/unisport" class="flex items-center gap-2.5 group">
-        <img src="/assets/logoUniSport.png" alt="UniSport" class="h-7 w-auto object-contain transition group-hover:scale-105" onerror="this.src='./assets/logoUniSport.png';" />
-        <span class="font-extrabold text-xl tracking-tight text-zinc-950 dark:text-white">UNISPORT</span>
+  <!-- Desktop Instagram-Style Sidebar Navigation (Hidden on Mobile) -->
+  <aside class="hidden md:flex fixed top-0 bottom-0 left-0 w-64 z-40 bg-white dark:bg-black border-r border-zinc-200 dark:border-zinc-800 flex-col justify-between p-4 xl:p-5 select-none transition-colors">
+    <!-- Top: Brand Logo + Main Nav Links -->
+    <div class="space-y-6">
+      <!-- UniSport Brand Logo -->
+      <a href="/challenge2/unisport" class="flex items-center gap-3 px-3 py-2 group">
+        <img src="/assets/logoUniSport.png" alt="UniSport" class="h-8 w-auto object-contain transition group-hover:scale-105" onerror="this.src='./assets/logoUniSport.png';" />
+        <span class="font-black text-2xl tracking-tight text-zinc-950 dark:text-white">UNISPORT</span>
       </a>
 
-      <!-- Adaptive Desktop Navigation (Uber / Big Tech Pill Tabs) -->
-      <nav class="hidden md:flex items-center gap-1.5 p-1 rounded-2xl bg-zinc-100/80 dark:bg-zinc-900/80 border border-zinc-200/60 dark:border-zinc-800/60">
-        <button id="tab-btn-feed" onclick="window.switchTabGlobal('feed')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 transition cursor-pointer">
-          Feed
+      <!-- Instagram-Style Vertical Navigation List -->
+      <nav class="space-y-1">
+        <!-- Feed / Home -->
+        <button 
+          id="tab-btn-feed" 
+          onclick="window.switchTabGlobal('feed')" 
+          class="nav-sidebar-btn w-full flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-sm font-bold bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 transition cursor-pointer group"
+        >
+          <i data-lucide="compass" class="w-5 h-5 shrink-0 transition group-hover:scale-110"></i>
+          <span>Feed</span>
         </button>
-        <button id="tab-btn-community" onclick="window.switchTabGlobal('community')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer">
-          Students
+
+        <!-- Campus Students / Community -->
+        <button 
+          id="tab-btn-community" 
+          onclick="window.switchTabGlobal('community')" 
+          class="nav-sidebar-btn w-full flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-sm font-semibold text-zinc-700 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer group"
+        >
+          <i data-lucide="users" class="w-5 h-5 shrink-0 transition group-hover:scale-110"></i>
+          <span>Students</span>
         </button>
-        <button id="tab-btn-create" onclick="window.switchTabGlobal('create')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer">
-          Host Match
+
+        <!-- Host Match / Create -->
+        <button 
+          id="tab-btn-create" 
+          onclick="window.switchTabGlobal('create')" 
+          class="nav-sidebar-btn w-full flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-sm font-semibold text-zinc-700 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer group"
+        >
+          <i data-lucide="plus-circle" class="w-5 h-5 shrink-0 transition group-hover:scale-110"></i>
+          <span>Host Match</span>
         </button>
-        <button id="tab-btn-my-activities" onclick="window.switchTabGlobal('my-activities')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer">
-          My Sessions
+
+        <!-- My Sessions / Spots -->
+        <button 
+          id="tab-btn-my-activities" 
+          onclick="window.switchTabGlobal('my-activities')" 
+          class="nav-sidebar-btn w-full flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-sm font-semibold text-zinc-700 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer group"
+        >
+          <i data-lucide="calendar" class="w-5 h-5 shrink-0 transition group-hover:scale-110"></i>
+          <span>My Sessions</span>
         </button>
-        <button id="tab-btn-profile" onclick="window.switchTabGlobal('profile')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer">
-          Profile
+
+        <!-- Notifications Bell -->
+        <button 
+          id="sidebar-notif-btn" 
+          onclick="window.toggleNotificationsGlobal(event)" 
+          class="w-full flex items-center justify-between px-3.5 py-3 rounded-2xl text-sm font-semibold text-zinc-700 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer group"
+        >
+          <div class="flex items-center gap-3.5">
+            <div class="relative">
+              <i data-lucide="bell" class="w-5 h-5 shrink-0 transition group-hover:scale-110"></i>
+              <span id="sidebar-notif-badge" class="hidden absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-brand-orange rounded-full ring-2 ring-white dark:ring-black"></span>
+            </div>
+            <span>Notifications</span>
+          </div>
+          <span id="sidebar-notif-count" class="text-xs font-bold text-zinc-400 dark:text-zinc-500"></span>
+        </button>
+
+        <!-- Profile -->
+        <button 
+          id="tab-btn-profile" 
+          onclick="window.switchTabGlobal('profile')" 
+          class="nav-sidebar-btn w-full flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-sm font-semibold text-zinc-700 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer group"
+        >
+          <div class="w-5 h-5 rounded-full overflow-hidden shrink-0 ring-1 ring-zinc-300 dark:ring-zinc-700">
+            <div id="sidebar-profile-avatar-inner" class="w-full h-full">
+              <img src="./assets/avatars/footballer.png" alt="Avatar" class="w-full h-full object-cover" />
+            </div>
+          </div>
+          <span id="sidebar-profile-name" class="truncate">Profile</span>
         </button>
       </nav>
     </div>
 
-    <!-- Right Controls -->
-    <div class="flex items-center gap-2 sm:gap-3 relative">
-      
+    <!-- Bottom: Theme Toggle, Settings & User Menu -->
+    <div class="space-y-1.5 pt-4 border-t border-zinc-200 dark:border-zinc-800">
+      <!-- Theme Switcher -->
+      <button class="theme-toggle-btn w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-2xl text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer">
+        <i data-lucide="sun" class="icon-sun w-4 h-4 hidden"></i>
+        <i data-lucide="moon" class="icon-moon w-4 h-4"></i>
+        <span>Switch Theme</span>
+      </button>
+
+      <!-- Settings Button -->
+      <button onclick="window.openSettingsGlobal()" class="w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-2xl text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer">
+        <i data-lucide="settings" class="w-4 h-4"></i>
+        <span>Settings</span>
+      </button>
+
+      <!-- Sign Out Button -->
+      <button onclick="window.handleSignOutGlobal()" class="w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-2xl text-xs font-bold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 transition cursor-pointer">
+        <i data-lucide="log-out" class="w-4 h-4"></i>
+        <span>Sign out</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Mobile Top Header (Visible on Mobile only) -->
+  <header class="md:hidden sticky top-0 z-40 w-full backdrop-blur-md bg-white/90 dark:bg-black/90 border-b border-zinc-100 dark:border-zinc-900 px-4 py-3 flex items-center justify-between">
+    <!-- Brand Logo -->
+    <a href="/challenge2/unisport" class="flex items-center gap-2 group">
+      <img src="/assets/logoUniSport.png" alt="UniSport" class="h-6 w-auto object-contain" onerror="this.src='./assets/logoUniSport.png';" />
+      <span class="font-extrabold text-lg tracking-tight text-zinc-950 dark:text-white">UNISPORT</span>
+    </a>
+
+    <!-- Mobile Top Right Controls -->
+    <div class="flex items-center gap-1.5 relative">
       <!-- Notifications Bell Button with Live Badge -->
       <button 
         id="notif-bell-btn" 
@@ -94,101 +179,97 @@
         <span id="notif-badge" class="hidden absolute top-1 right-1 w-2.5 h-2.5 bg-brand-orange rounded-full ring-2 ring-white dark:ring-black"></span>
       </button>
 
-      <!-- Theme Switcher (Clean Icon, No background container) -->
+      <!-- Theme Switcher -->
       <button class="theme-toggle-btn p-2 text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer" aria-label="Toggle Theme">
         <i data-lucide="sun" class="icon-sun w-4 h-4 hidden"></i>
         <i data-lucide="moon" class="icon-moon w-4 h-4"></i>
       </button>
 
       <!-- Sign In Button (Shown if logged out) -->
-      <a href="./login.html" id="nav-auth-btn" class="px-4 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 text-xs font-semibold transition">
+      <a href="./login.html" id="nav-auth-btn" class="px-3 py-1.5 rounded-xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 text-xs font-semibold">
         Sign in
       </a>
 
-      <!-- Uber/Google-Style Avatar Circle Button (Clean Minimalist Ring, No Gradient BG) -->
+      <!-- Google-Style Avatar Circle Button (Mobile) -->
       <button 
         id="google-avatar-btn" 
         class="hidden relative p-0.5 rounded-full ring-2 ring-zinc-200 dark:ring-zinc-800 hover:ring-brand-orange transition cursor-pointer select-none" 
         aria-label="Open User Menu"
         onclick="event.stopPropagation(); var dd = document.getElementById('user-dropdown'); if (dd) dd.classList.toggle('hidden');"
       >
-        <div class="w-9 h-9 rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden flex items-center justify-center pointer-events-none">
+        <div class="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden flex items-center justify-center pointer-events-none">
           <div id="google-avatar-inner" class="w-full h-full rounded-full overflow-hidden flex items-center justify-center pointer-events-none">
-            <!-- Dynamic Avatar Image -->
+            <img src="./assets/avatars/footballer.png" alt="Avatar" class="w-full h-full object-cover" />
           </div>
         </div>
       </button>
-
-      <!-- Notifications Dropdown Panel (Uber Big Tech Style) -->
-      <div id="notifications-dropdown" class="hidden absolute right-12 sm:right-14 top-14 w-80 sm:w-96 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-2xl p-4 z-50 text-xs transition-all max-h-[85vh] overflow-y-auto">
-        <div class="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800">
-          <div class="flex items-center gap-2">
-            <h4 class="font-bold text-sm text-zinc-950 dark:text-white">Notifications</h4>
-            <span id="notif-count-text" class="text-[11px] font-semibold text-zinc-400">0</span>
-          </div>
-          <button onclick="window.clearAllNotifsGlobal()" class="text-[11px] text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition">Clear all</button>
-        </div>
-
-        <!-- Friend Requests Top Section -->
-        <div class="pt-3 pb-2 space-y-2">
-          <p class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Friend Requests</p>
-          <div id="notif-friend-requests-list" class="space-y-2">
-            <p class="text-zinc-400 text-xs py-1">No pending requests.</p>
-          </div>
-        </div>
-
-        <!-- General Notifications Section -->
-        <div class="pt-2 border-t border-zinc-100 dark:border-zinc-800 space-y-2">
-          <p class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Activity & Match Alerts</p>
-          <div id="notif-general-list" class="space-y-2">
-            <p class="text-zinc-400 text-xs py-1">All caught up!</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Uber-Style Clean User Dropdown Menu -->
-      <div id="user-dropdown" class="hidden absolute right-0 top-14 w-64 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-2xl p-2.5 z-50 text-xs transition-all">
-        <!-- User Info Header with School & Status -->
-        <div class="px-3 py-3 border-b border-zinc-100 dark:border-zinc-800">
-          <p id="dropdown-name" class="font-bold text-sm text-zinc-950 dark:text-white truncate">Student</p>
-          <p id="dropdown-email" class="text-xs text-zinc-500 dark:text-zinc-400 truncate mt-0.5">student@fontys.nl</p>
-          <div class="mt-2.5 flex items-center gap-1.5 text-[11px] text-zinc-500 dark:text-zinc-400">
-            <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-brand-orange"></i>
-            <span id="dropdown-school-full" class="truncate font-medium">Fontys UAS</span>
-          </div>
-        </div>
-
-        <!-- Options: Profile, Students/Friends, My Sessions, Settings -->
-        <div class="py-1.5 space-y-0.5">
-          <button id="dropdown-profile-btn" onclick="window.switchTabGlobal('profile');" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-semibold transition text-left cursor-pointer">
-            <i data-lucide="user" class="w-4 h-4 text-zinc-500"></i>
-            <span>Profile</span>
-          </button>
-          <button id="dropdown-community-btn" onclick="window.switchTabGlobal('community');" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-semibold transition text-left cursor-pointer">
-            <i data-lucide="users" class="w-4 h-4 text-zinc-500"></i>
-            <span>Campus Students</span>
-          </button>
-          <button id="dropdown-sessions-btn" onclick="window.switchTabGlobal('my-activities');" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-semibold transition text-left cursor-pointer">
-            <i data-lucide="calendar" class="w-4 h-4 text-zinc-500"></i>
-            <span>My Sessions</span>
-          </button>
-          <button id="dropdown-settings-btn" onclick="window.openSettingsGlobal();" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-semibold transition text-left cursor-pointer">
-            <i data-lucide="settings" class="w-4 h-4 text-zinc-500"></i>
-            <span>Settings</span>
-          </button>
-        </div>
-
-        <!-- Sign Out -->
-        <div class="pt-1.5 border-t border-zinc-100 dark:border-zinc-800">
-          <button id="dropdown-signout-btn" onclick="window.handleSignOutGlobal()" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-red-50 dark:hover:bg-red-950/40 text-red-600 dark:text-red-400 font-bold transition text-left cursor-pointer">
-            <i data-lucide="log-out" class="w-4 h-4 text-red-600 dark:text-red-400"></i>
-            <span>Sign out</span>
-          </button>
-        </div>
-      </div>
-
     </div>
   </header>
+
+  <!-- Notifications Dropdown Panel (Works across desktop & mobile) -->
+  <div id="notifications-dropdown" class="hidden fixed top-16 right-4 md:left-68 md:right-auto md:top-20 w-80 sm:w-96 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-2xl p-4 z-50 text-xs transition-all max-h-[85vh] overflow-y-auto">
+    <div class="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800">
+      <div class="flex items-center gap-2">
+        <h4 class="font-bold text-sm text-zinc-950 dark:text-white">Notifications</h4>
+        <span id="notif-count-text" class="text-[11px] font-semibold text-zinc-400">0</span>
+      </div>
+      <button onclick="window.clearAllNotifsGlobal()" class="text-[11px] text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition">Clear all</button>
+    </div>
+
+    <!-- Friend Requests Top Section -->
+    <div class="pt-3 pb-2 space-y-2">
+      <p class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Friend Requests</p>
+      <div id="notif-friend-requests-list" class="space-y-2">
+        <p class="text-zinc-400 text-xs py-1">No pending requests.</p>
+      </div>
+    </div>
+
+    <!-- General Notifications Section -->
+    <div class="pt-2 border-t border-zinc-100 dark:border-zinc-800 space-y-2">
+      <p class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Activity & Match Alerts</p>
+      <div id="notif-general-list" class="space-y-2">
+        <p class="text-zinc-400 text-xs py-1">All caught up!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile User Dropdown Menu -->
+  <div id="user-dropdown" class="hidden fixed top-16 right-4 w-64 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-2xl p-2.5 z-50 text-xs transition-all">
+    <div class="px-3 py-3 border-b border-zinc-100 dark:border-zinc-800">
+      <p id="dropdown-name" class="font-bold text-sm text-zinc-950 dark:text-white truncate">Student</p>
+      <p id="dropdown-email" class="text-xs text-zinc-500 dark:text-zinc-400 truncate mt-0.5">student@fontys.nl</p>
+      <div class="mt-2.5 flex items-center gap-1.5 text-[11px] text-zinc-500 dark:text-zinc-400">
+        <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-brand-orange"></i>
+        <span id="dropdown-school-full" class="truncate font-medium">Fontys UAS</span>
+      </div>
+    </div>
+
+    <div class="py-1.5 space-y-0.5">
+      <button id="dropdown-profile-btn" onclick="window.switchTabGlobal('profile');" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-semibold transition text-left cursor-pointer">
+        <i data-lucide="user" class="w-4 h-4 text-zinc-500"></i>
+        <span>Profile</span>
+      </button>
+      <button id="dropdown-community-btn" onclick="window.switchTabGlobal('community');" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-semibold transition text-left cursor-pointer">
+        <i data-lucide="users" class="w-4 h-4 text-zinc-500"></i>
+        <span>Campus Students</span>
+      </button>
+      <button id="dropdown-sessions-btn" onclick="window.switchTabGlobal('my-activities');" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-semibold transition text-left cursor-pointer">
+        <i data-lucide="calendar" class="w-4 h-4 text-zinc-500"></i>
+        <span>My Sessions</span>
+      </button>
+      <button id="dropdown-settings-btn" onclick="window.openSettingsGlobal();" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-semibold transition text-left cursor-pointer">
+        <i data-lucide="settings" class="w-4 h-4 text-zinc-500"></i>
+        <span>Settings</span>
+      </button>
+    </div>
+
+    <div class="pt-1.5 border-t border-zinc-100 dark:border-zinc-800">
+      <button id="dropdown-signout-btn" onclick="window.handleSignOutGlobal()" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-red-50 dark:hover:bg-red-950/40 text-red-600 dark:text-red-400 font-bold transition text-left cursor-pointer">
+        <i data-lucide="log-out" class="w-4 h-4 text-red-600 dark:text-red-400"></i>
+        <span>Sign out</span>
+      </button>
+    </div>
+  </div>
 
   <script>
     // Immediate synchronous avatar and UI render to avoid ANY flash or delay
@@ -227,6 +308,16 @@
           if (dropName) dropName.textContent = user.displayName || user.email || "Student";
           if (dropEmail) dropEmail.textContent = user.email || "";
           if (dropSchoolFull) dropSchoolFull.textContent = isTue ? "TU Eindhoven" : "Fontys UAS";
+
+          // Immediate hydration for Instagram Sidebar Profile button
+          var sidebarAvatar = document.getElementById("sidebar-profile-avatar-inner");
+          var sidebarName = document.getElementById("sidebar-profile-name");
+          if (sidebarAvatar) {
+            sidebarAvatar.innerHTML = '<img src="' + avSrc + '" alt="Avatar" class="w-full h-full object-cover rounded-full" onerror="this.src=\'./assets/avatars/footballer.png\'" />';
+          }
+          if (sidebarName) {
+            sidebarName.textContent = user.displayName || (user.email ? user.email.split("@")[0] : "Profile");
+          }
         }
       } catch (err) {}
 
@@ -250,12 +341,26 @@
       // Switch section visibility
       var tabs = ["feed", "community", "create", "my-activities", "profile"];
       for (var i = 0; i < tabs.length; i++) {
-        var sec = document.getElementById("section-" + tabs[i]);
-        if (sec) {
-          if (tabs[i] === tabId) {
-            sec.classList.remove("hidden");
-          } else {
-            sec.classList.add("hidden");
+        var t = tabs[i];
+        var sec = document.getElementById("section-" + t);
+        var deskBtn = document.getElementById("tab-btn-" + t);
+        var mobBtn = document.getElementById("mobile-tab-" + t);
+
+        if (t === tabId) {
+          if (sec) sec.classList.remove("hidden");
+          if (deskBtn) {
+            deskBtn.className = "nav-sidebar-btn w-full flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-sm font-bold bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 transition cursor-pointer group";
+          }
+          if (mobBtn) {
+            mobBtn.className = "flex flex-col items-center gap-1 text-zinc-950 dark:text-white transition cursor-pointer";
+          }
+        } else {
+          if (sec) sec.classList.add("hidden");
+          if (deskBtn) {
+            deskBtn.className = "nav-sidebar-btn w-full flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-sm font-semibold text-zinc-700 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer group";
+          }
+          if (mobBtn) {
+            mobBtn.className = "flex flex-col items-center gap-1 text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer";
           }
         }
       }
@@ -318,12 +423,50 @@
       if (m) m.classList.add("hidden");
     };
 
+    // Early definition for student filters so they work instantly
+    window.filterStudentsGlobal = window.filterStudentsGlobal || function(val) {
+      if (window.UniSport && typeof window.filterStudentsGlobal === "function") {
+        window.filterStudentsGlobal(val);
+      }
+    };
+
+    window.filterStudentsByUni = window.filterStudentsByUni || function(uni) {
+      document.querySelectorAll(".student-uni-chip").forEach(function(chip) {
+        if (chip.getAttribute("data-uni-filter") === uni) {
+          chip.className = "student-uni-chip px-3.5 py-2 rounded-xl bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 text-xs font-bold whitespace-nowrap transition cursor-pointer";
+        } else {
+          chip.className = "student-uni-chip px-3.5 py-2 rounded-xl bg-white dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs font-semibold whitespace-nowrap hover:text-zinc-950 dark:hover:text-white transition cursor-pointer";
+        }
+      });
+      if (window.UniSport && typeof window.filterStudentsByUni === "function") {
+        window.filterStudentsByUni(uni);
+      }
+    };
+
+    window.setCommunityView = window.setCommunityView || function(view) {
+      var btnAll = document.getElementById("community-tab-all");
+      var btnFriends = document.getElementById("community-tab-friends");
+      var activeCls = "px-4 py-2 rounded-lg text-xs font-bold bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 transition cursor-pointer flex items-center gap-2";
+      var inactiveCls = "px-4 py-2 rounded-lg text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer flex items-center gap-2";
+      if (view === "all") {
+        if (btnAll) btnAll.className = activeCls;
+        if (btnFriends) btnFriends.className = inactiveCls;
+      } else {
+        if (btnFriends) btnFriends.className = activeCls;
+        if (btnAll) btnAll.className = inactiveCls;
+      }
+      if (window.UniSport && typeof window.setCommunityView === "function") {
+        window.setCommunityView(view);
+      }
+    };
+
     // Close notifications panel on click outside
     document.addEventListener("click", function(e) {
       var notifDd = document.getElementById("notifications-dropdown");
       var notifBtn = document.getElementById("notif-bell-btn");
+      var sidebarNotifBtn = document.getElementById("sidebar-notif-btn");
       if (notifDd && !notifDd.classList.contains("hidden")) {
-        if (!notifDd.contains(e.target) && !notifBtn.contains(e.target)) {
+        if (!notifDd.contains(e.target) && (!notifBtn || !notifBtn.contains(e.target)) && (!sidebarNotifBtn || !sidebarNotifBtn.contains(e.target))) {
           notifDd.classList.add("hidden");
         }
       }
@@ -461,8 +604,8 @@
     };
   </script>
 
-  <!-- Main Container (Responsive Full Desktop Viewport) -->
-  <main class="flex-grow max-w-full lg:max-w-7xl 2xl:max-w-[1536px] w-full mx-auto px-4 sm:px-8 lg:px-12 py-8">
+  <!-- Main Container (Responsive Full Desktop Viewport with Instagram-Style Sidebar offset) -->
+  <main class="md:pl-64 flex-grow w-full max-w-full lg:max-w-7xl 2xl:max-w-[1536px] mx-auto px-4 sm:px-8 lg:px-12 py-8">
 
     <!-- ================= SECTION 1: GEO FEED ================= -->
     <section id="section-feed" class="space-y-6">
@@ -644,45 +787,17 @@
       </div>
     </section>
 
-    <!-- ================= SECTION 5: CAMPUS ATHLETE DIRECTORY & SOCIAL NETWORK (BIG-TECH ENTERPRISE HUB) ================= -->
-    <section id="section-community" class="hidden w-full max-w-7xl mx-auto space-y-8">
+    <!-- ================= SECTION 5: CAMPUS ATHLETE DIRECTORY & SOCIAL NETWORK ================= -->
+    <section id="section-community" class="hidden w-full max-w-7xl mx-auto space-y-6">
       
-      <!-- Big-Tech Corporate Brand Banner Hero -->
-      <div class="relative rounded-3xl overflow-hidden border border-zinc-200 dark:border-zinc-800 bg-zinc-950 text-white p-6 sm:p-10 lg:p-12 shadow-2xl">
-        <!-- Background Ambient Graphic & Illumination -->
-        <div class="absolute inset-0 opacity-30 mix-blend-luminosity bg-cover bg-center pointer-events-none" style="background-image: url('./assets/campus_hub_hero.jpg');"></div>
-        <div class="absolute inset-0 bg-gradient-to-r from-zinc-950 via-zinc-950/90 to-transparent"></div>
-
-        <div class="relative z-10 max-w-2xl space-y-4">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-widest bg-brand-orange/20 text-brand-orange border border-brand-orange/30">
-            <span class="w-1.5 h-1.5 rounded-full bg-brand-orange animate-ping"></span>
-            Campus Verified Athlete Network
-          </div>
-          
-          <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight">
-            Eindhoven Student Athlete Community
-          </h1>
-          
-          <p class="text-sm text-zinc-300 leading-relaxed max-w-xl">
-            Directly discover, connect, and team up with active students across Fontys University of Applied Sciences and TU Eindhoven.
-          </p>
-
-          <!-- Key Metrics Ticker -->
-          <div class="pt-4 grid grid-cols-3 gap-3 sm:gap-6 border-t border-zinc-800/80">
-            <div>
-              <p class="text-xl sm:text-2xl lg:text-3xl font-black text-white" id="community-stat-students">8+</p>
-              <p class="text-[10px] sm:text-xs text-zinc-400 font-bold uppercase tracking-wider mt-0.5">Active Athletes</p>
-            </div>
-            <div>
-              <p class="text-xl sm:text-2xl lg:text-3xl font-black text-brand-orange">2</p>
-              <p class="text-[10px] sm:text-xs text-zinc-400 font-bold uppercase tracking-wider mt-0.5">Campuses Synced</p>
-            </div>
-            <div>
-              <p class="text-xl sm:text-2xl lg:text-3xl font-black text-white" id="community-stat-matches">100%</p>
-              <p class="text-[10px] sm:text-xs text-zinc-400 font-bold uppercase tracking-wider mt-0.5">Verified Students</p>
-            </div>
-          </div>
-        </div>
+      <!-- Minimalist Header (Title & Subtitle only) -->
+      <div class="border-b border-zinc-100 dark:border-zinc-900 pb-5">
+        <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-zinc-950 dark:text-white">
+          Campus Students & Social
+        </h1>
+        <p class="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+          Discover athletes, workout partners, and connect with friends across Fontys & TU/e.
+        </p>
       </div>
 
       <!-- Enterprise Navigation & Search Command Bar -->
@@ -984,23 +1099,23 @@
 
   <!-- Mobile Bottom Nav -->
   <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/90 dark:bg-black/90 backdrop-blur-md border-t border-zinc-100 dark:border-zinc-900 px-4 py-2.5 flex items-center justify-around text-xs">
-    <button id="mobile-tab-feed" class="flex flex-col items-center gap-1 text-zinc-950 dark:text-white">
+    <button id="mobile-tab-feed" onclick="window.switchTabGlobal('feed')" class="flex flex-col items-center gap-1 text-zinc-950 dark:text-white transition cursor-pointer">
       <i data-lucide="compass" class="w-4 h-4"></i>
       <span class="text-[10px] font-semibold">Feed</span>
     </button>
-    <button id="mobile-tab-community" class="flex flex-col items-center gap-1 text-zinc-400">
+    <button id="mobile-tab-community" onclick="window.switchTabGlobal('community')" class="flex flex-col items-center gap-1 text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer">
       <i data-lucide="users" class="w-4 h-4"></i>
       <span class="text-[10px] font-semibold">Students</span>
     </button>
-    <button id="mobile-tab-create" class="flex flex-col items-center gap-1 text-zinc-400">
+    <button id="mobile-tab-create" onclick="window.switchTabGlobal('create')" class="flex flex-col items-center gap-1 text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer">
       <i data-lucide="plus-circle" class="w-4 h-4"></i>
       <span class="text-[10px] font-semibold">Create</span>
     </button>
-    <button id="mobile-tab-my-activities" class="flex flex-col items-center gap-1 text-zinc-400">
+    <button id="mobile-tab-my-activities" onclick="window.switchTabGlobal('my-activities')" class="flex flex-col items-center gap-1 text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer">
       <i data-lucide="calendar" class="w-4 h-4"></i>
       <span class="text-[10px] font-semibold">Spots</span>
     </button>
-    <button id="mobile-tab-profile" class="flex flex-col items-center gap-1 text-zinc-400">
+    <button id="mobile-tab-profile" onclick="window.switchTabGlobal('profile')" class="flex flex-col items-center gap-1 text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer">
       <i data-lucide="user" class="w-4 h-4"></i>
       <span class="text-[10px] font-semibold">Profile</span>
     </button>

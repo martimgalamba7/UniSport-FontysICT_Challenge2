@@ -37,6 +37,98 @@ window.UniSport.openRosterModal = openRosterModal;
 window.UniSport.openSettingsModal = openSettingsModal;
 window.UniSport.toggleJoinActivity = toggleJoinActivity;
 
+// Demo verified students across Fontys & TU/e campuses for rich instant discovery
+export const DEMO_CAMPUS_STUDENTS = [
+  {
+    uid: "fontys-student-rep",
+    displayName: "Thomas van Dijk",
+    email: "t.vandijk@student.fontys.nl",
+    university: "Fontys UAS",
+    avatarId: "footballer",
+    sport: "Football",
+    location: "Fontys Rachelsmolen, Eindhoven",
+    sports: ["Football", "Futsal", "Gym & Fitness"],
+    sessionsCount: 14
+  },
+  {
+    uid: "tue-runner-rep",
+    displayName: "Sophie de Vries",
+    email: "s.devries@student.tue.nl",
+    university: "TU Eindhoven",
+    avatarId: "runner",
+    sport: "Running",
+    location: "TU/e Campus, Eindhoven",
+    sports: ["Running", "CrossFit", "Yoga & Pilates"],
+    sessionsCount: 22
+  },
+  {
+    uid: "demo-p1",
+    displayName: "Sara Martins",
+    email: "s.martins@student.tue.nl",
+    university: "TU Eindhoven",
+    avatarId: "runner",
+    sport: "Padel",
+    location: "Strijp-S, Eindhoven",
+    sports: ["Padel", "Tennis", "Running"],
+    sessionsCount: 9
+  },
+  {
+    uid: "demo-p2",
+    displayName: "Lars Bakker",
+    email: "l.bakker@student.fontys.nl",
+    university: "Fontys UAS",
+    avatarId: "bodybuilder",
+    sport: "Gym & Fitness",
+    location: "Fontys Rachelsmolen, Eindhoven",
+    sports: ["Gym & Fitness", "Powerlifting", "Calisthenics"],
+    sessionsCount: 31
+  },
+  {
+    uid: "demo-p3",
+    displayName: "Elena Costa",
+    email: "e.costa@student.fontys.nl",
+    university: "Fontys UAS",
+    avatarId: "runner",
+    sport: "Volleyball",
+    location: "Eindhoven Centrum",
+    sports: ["Volleyball", "Running", "Swimming"],
+    sessionsCount: 7
+  },
+  {
+    uid: "climb-lover",
+    displayName: "Matas K.",
+    email: "m.kalnin@student.fontys.nl",
+    university: "Fontys UAS",
+    avatarId: "bodybuilder",
+    sport: "Bouldering",
+    location: "Strijp-S, Eindhoven",
+    sports: ["Bouldering", "Calisthenics", "Cycling"],
+    sessionsCount: 18
+  },
+  {
+    uid: "gym-bro",
+    displayName: "Liam O'Connor",
+    email: "l.oconnor@student.fontys.nl",
+    university: "Fontys UAS",
+    avatarId: "bodybuilder",
+    sport: "Gym & Fitness",
+    location: "Stratum, Eindhoven",
+    sports: ["Gym & Fitness", "Basketball", "Boxing"],
+    sessionsCount: 25
+  },
+  {
+    uid: "demo-tue-basketball",
+    displayName: "Daan Wouters",
+    email: "d.wouters@student.tue.nl",
+    university: "TU Eindhoven",
+    avatarId: "footballer",
+    sport: "Basketball",
+    location: "TU/e Student Sports Centre",
+    sports: ["Basketball", "Futsal", "Gym & Fitness"],
+    sessionsCount: 12
+  }
+];
+
 // Application State
 const state = {
   currentUser: null,
@@ -48,7 +140,7 @@ const state = {
   selectedActivity: null,
   
   // Social & Community State
-  students: [],
+  students: [...DEMO_CAMPUS_STUDENTS],
   communityView: "all", // "all" | "friends"
   communityUniFilter: "all", // "all" | "Fontys" | "TU/e"
   studentSearchQuery: "",
@@ -149,97 +241,6 @@ const INITIAL_DEMO_ACTIVITIES = [
   }
 ];
 
-// Demo verified students across Fontys & TU/e campuses for rich instant discovery
-const DEMO_CAMPUS_STUDENTS = [
-  {
-    uid: "fontys-student-rep",
-    displayName: "Thomas van Dijk",
-    email: "t.vandijk@student.fontys.nl",
-    university: "Fontys UAS",
-    avatarId: "footballer",
-    sport: "Football",
-    location: "Fontys Rachelsmolen, Eindhoven",
-    sports: ["Football", "Futsal", "Gym & Fitness"],
-    sessionsCount: 14
-  },
-  {
-    uid: "tue-runner-rep",
-    displayName: "Sophie de Vries",
-    email: "s.devries@student.tue.nl",
-    university: "TU Eindhoven",
-    avatarId: "runner",
-    sport: "Running",
-    location: "TU/e Campus, Eindhoven",
-    sports: ["Running", "CrossFit", "Yoga & Pilates"],
-    sessionsCount: 22
-  },
-  {
-    uid: "demo-p1",
-    displayName: "Sara Martins",
-    email: "s.martins@student.tue.nl",
-    university: "TU Eindhoven",
-    avatarId: "runner",
-    sport: "Padel",
-    location: "Strijp-S, Eindhoven",
-    sports: ["Padel", "Tennis", "Running"],
-    sessionsCount: 9
-  },
-  {
-    uid: "demo-p2",
-    displayName: "Lars Bakker",
-    email: "l.bakker@student.fontys.nl",
-    university: "Fontys UAS",
-    avatarId: "bodybuilder",
-    sport: "Gym & Fitness",
-    location: "Fontys Rachelsmolen, Eindhoven",
-    sports: ["Gym & Fitness", "Powerlifting", "Calisthenics"],
-    sessionsCount: 31
-  },
-  {
-    uid: "demo-p3",
-    displayName: "Elena Costa",
-    email: "e.costa@student.fontys.nl",
-    university: "Fontys UAS",
-    avatarId: "runner",
-    sport: "Volleyball",
-    location: "Eindhoven Centrum",
-    sports: ["Volleyball", "Running", "Swimming"],
-    sessionsCount: 7
-  },
-  {
-    uid: "climb-lover",
-    displayName: "Matas K.",
-    email: "m.kalnin@student.fontys.nl",
-    university: "Fontys UAS",
-    avatarId: "bodybuilder",
-    sport: "Bouldering",
-    location: "Strijp-S, Eindhoven",
-    sports: ["Bouldering", "Calisthenics", "Cycling"],
-    sessionsCount: 18
-  },
-  {
-    uid: "gym-bro",
-    displayName: "Liam O'Connor",
-    email: "l.oconnor@student.fontys.nl",
-    university: "Fontys UAS",
-    avatarId: "bodybuilder",
-    sport: "Gym & Fitness",
-    location: "Stratum, Eindhoven",
-    sports: ["Gym & Fitness", "Basketball", "Boxing"],
-    sessionsCount: 25
-  },
-  {
-    uid: "demo-tue-basketball",
-    displayName: "Daan Wouters",
-    email: "d.wouters@student.tue.nl",
-    university: "TU Eindhoven",
-    avatarId: "footballer",
-    sport: "Basketball",
-    location: "TU/e Student Sports Centre",
-    sports: ["Basketball", "Futsal", "Gym & Fitness"],
-    sessionsCount: 12
-  }
-];
 
 function escapeHtml(str) {
   if (!str) return "";
@@ -345,6 +346,16 @@ function updateAuthUI(user, profile) {
       if (dropSchoolFull) dropSchoolFull.textContent = isTue ? "TU Eindhoven" : "Fontys UAS";
     }
 
+    // Update Instagram-style sidebar profile button
+    const sidebarAvatar = document.getElementById("sidebar-profile-avatar-inner");
+    const sidebarName = document.getElementById("sidebar-profile-name");
+    if (sidebarAvatar) {
+      sidebarAvatar.innerHTML = `<img src="${avatar.image}" alt="${avatar.name}" class="w-full h-full object-cover rounded-full" onerror="this.src='./assets/avatars/footballer.png'" />`;
+    }
+    if (sidebarName) {
+      sidebarName.textContent = displayName;
+    }
+
     // auth-status-pill was removed per user request for minimalist header
     if (authStatusPill) {
       authStatusPill.classList.add("hidden");
@@ -428,22 +439,18 @@ export function switchTab(targetTab) {
     if (t === targetTab) {
       if (section) section.classList.remove("hidden");
       if (deskBtn) {
-        deskBtn.classList.add("bg-zinc-950", "text-white", "dark:bg-white", "dark:text-zinc-950");
-        deskBtn.classList.remove("text-zinc-600", "dark:text-zinc-400");
+        deskBtn.className = "nav-sidebar-btn w-full flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-sm font-bold bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 transition cursor-pointer group";
       }
       if (mobBtn) {
-        mobBtn.classList.add("text-zinc-950", "dark:text-white");
-        mobBtn.classList.remove("text-zinc-400");
+        mobBtn.className = "flex flex-col items-center gap-1 text-zinc-950 dark:text-white transition cursor-pointer";
       }
     } else {
       if (section) section.classList.add("hidden");
       if (deskBtn) {
-        deskBtn.classList.remove("bg-zinc-950", "text-white", "dark:bg-white", "dark:text-zinc-950");
-        deskBtn.classList.add("text-zinc-600", "dark:text-zinc-400");
+        deskBtn.className = "nav-sidebar-btn w-full flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-sm font-semibold text-zinc-700 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer group";
       }
       if (mobBtn) {
-        mobBtn.classList.remove("text-zinc-950", "dark:text-white");
-        mobBtn.classList.add("text-zinc-400");
+        mobBtn.className = "flex flex-col items-center gap-1 text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer";
       }
     }
   });
@@ -1253,14 +1260,25 @@ function saveStoredSocialData() {
 export function updateNotifBadge() {
   const badge = document.getElementById("notif-badge");
   const countText = document.getElementById("notif-count-text");
+  const sidebarBadge = document.getElementById("sidebar-notif-badge");
+  const sidebarCount = document.getElementById("sidebar-notif-count");
   const total = (state.friendRequests || []).length + (state.notifications || []).length;
 
   if (countText) countText.textContent = total;
+  if (sidebarCount) sidebarCount.textContent = total > 0 ? String(total) : "";
+
   if (badge) {
     if (total > 0) {
       badge.classList.remove("hidden");
     } else {
       badge.classList.add("hidden");
+    }
+  }
+  if (sidebarBadge) {
+    if (total > 0) {
+      sidebarBadge.classList.remove("hidden");
+    } else {
+      sidebarBadge.classList.add("hidden");
     }
   }
 }
@@ -1643,12 +1661,15 @@ window.setCommunityView = function(view) {
   const btnAll = document.getElementById("community-tab-all");
   const btnFriends = document.getElementById("community-tab-friends");
 
+  const activeClasses = "px-4 py-2 rounded-lg text-xs font-bold bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 transition cursor-pointer flex items-center gap-2";
+  const inactiveClasses = "px-4 py-2 rounded-lg text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer flex items-center gap-2";
+
   if (view === "all") {
-    if (btnAll) btnAll.className = "px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 transition cursor-pointer";
-    if (btnFriends) btnFriends.className = "px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer";
+    if (btnAll) btnAll.className = activeClasses;
+    if (btnFriends) btnFriends.className = inactiveClasses;
   } else {
-    if (btnFriends) btnFriends.className = "px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 transition cursor-pointer";
-    if (btnAll) btnAll.className = "px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer";
+    if (btnFriends) btnFriends.className = activeClasses;
+    if (btnAll) btnAll.className = inactiveClasses;
   }
   renderCommunity();
 };
@@ -1656,17 +1677,17 @@ window.setCommunityView = function(view) {
 window.filterStudentsByUni = function(uni) {
   state.communityUniFilter = uni;
   document.querySelectorAll(".student-uni-chip").forEach(chip => {
-    if (chip.dataset.uniFilter === uni) {
-      chip.className = "student-uni-chip px-3 py-1.5 rounded-xl bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 text-xs font-semibold whitespace-nowrap transition cursor-pointer";
+    if (chip.getAttribute("data-uni-filter") === uni) {
+      chip.className = "student-uni-chip px-3.5 py-2 rounded-xl bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 text-xs font-bold whitespace-nowrap transition cursor-pointer";
     } else {
-      chip.className = "student-uni-chip px-3 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 text-xs font-semibold whitespace-nowrap hover:text-zinc-950 dark:hover:text-white transition cursor-pointer";
+      chip.className = "student-uni-chip px-3.5 py-2 rounded-xl bg-white dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs font-semibold whitespace-nowrap hover:text-zinc-950 dark:hover:text-white transition cursor-pointer";
     }
   });
   renderCommunity();
 };
 
 window.filterStudentsGlobal = function(val) {
-  state.studentSearchQuery = val;
+  state.studentSearchQuery = (val || "").trim();
   renderCommunity();
 };
 
