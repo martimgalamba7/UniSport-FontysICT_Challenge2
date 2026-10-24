@@ -1426,51 +1426,94 @@ export function renderCommunity() {
     return;
   }
 
-  container.innerHTML = list.map(student => {
+  // Update ticker numbers
+  const statStudents = document.getElementById("community-stat-students");
+  if (statStudents) statStudents.textContent = `${(state.students || []).length}+`;
+
+  container.innerHTML = list.map((student, idx) => {
     const av = getAvatarById(student.avatarId || "footballer");
     const isFriend = state.friends.includes(student.uid);
-    const hasRequested = (state.friendRequests || []).some(r => r.fromUid === student.uid);
+    const isTue = (student.university || "").includes("TU") || (student.email || "").includes("tue.nl");
+    const sports = student.sports || [student.sport || "Football"];
 
     return `
-      <div class="p-5 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800/90 flex flex-col justify-between gap-4 transition hover:border-zinc-400 dark:hover:border-zinc-700 shadow-sm">
-        <div>
-          <!-- Student Avatar & Status -->
-          <div class="flex items-start justify-between gap-3">
-            <div class="relative shrink-0 cursor-pointer" onclick="window.openStudentProfileModal('${student.uid}')">
-              <div class="w-12 h-12 rounded-full overflow-hidden border border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-white">
-                ${av.svg}
-              </div>
-              <span class="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white dark:border-zinc-900"></span>
+      <div class="p-4 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-5 transition hover:bg-zinc-50/70 dark:hover:bg-zinc-800/40">
+        
+        <!-- Left: Avatar, Verified Name, University & Contact -->
+        <div class="flex items-center gap-4 min-w-0">
+          <div class="relative shrink-0 cursor-pointer" onclick="window.openStudentProfileModal('${student.uid}')">
+            <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl overflow-hidden border border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-white shadow-sm">
+              ${av.svg}
+            </div>
+            <span class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white dark:border-zinc-900 shadow-sm" title="Active Verified Student"></span>
+          </div>
+
+          <div class="min-w-0 flex-grow space-y-1">
+            <div class="flex items-center gap-2 flex-wrap">
+              <h3 class="font-extrabold text-sm sm:text-base text-zinc-950 dark:text-white truncate cursor-pointer hover:underline" onclick="window.openStudentProfileModal('${student.uid}')">
+                ${escapeHtml(student.displayName)}
+              </h3>
+              
+              <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${isTue ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20' : 'bg-orange-500/10 text-brand-orange border border-orange-500/20'}">
+                <i data-lucide="graduation-cap" class="w-3 h-3"></i>
+                ${isTue ? 'TU Eindhoven' : 'Fontys UAS'}
+              </span>
+
+              ${isFriend ? `
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                  <i data-lucide="check" class="w-3 h-3"></i>
+                  Friend
+                </span>
+              ` : ''}
             </div>
 
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-[11px] font-semibold ${student.university.includes('TU') ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400' : 'bg-orange-500/10 text-brand-orange'}">
-              ${escapeHtml(student.university.includes('TU') ? 'TU/e' : 'Fontys')}
-            </span>
-          </div>
-
-          <!-- Student Name & Sport Info -->
-          <div class="mt-3 cursor-pointer" onclick="window.openStudentProfileModal('${student.uid}')">
-            <h4 class="font-bold text-sm text-zinc-950 dark:text-white truncate hover:underline">${escapeHtml(student.displayName)}</h4>
-            <p class="text-xs text-zinc-500 truncate mt-0.5">${escapeHtml(student.sport)} • ${student.sessionsCount || 0} sessions</p>
+            <!-- Student Email & Campus Location -->
+            <div class="flex items-center gap-3 text-xs text-zinc-500 dark:text-zinc-400 truncate">
+              <span class="font-medium truncate text-zinc-700 dark:text-zinc-300">${escapeHtml(student.email || 'campus.student@fontys.nl')}</span>
+              <span>•</span>
+              <span class="truncate">${escapeHtml(student.location || 'Eindhoven Campus')}</span>
+            </div>
           </div>
         </div>
 
-        <!-- Action Buttons -->
-        <div class="pt-3 border-t border-zinc-100 dark:border-zinc-800 flex items-center gap-2">
-          <button onclick="window.openStudentProfileModal('${student.uid}')" class="flex-1 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-xs font-semibold text-zinc-900 dark:text-white transition">
-            View Profile
-          </button>
-          ${isFriend ? `
-            <span class="px-3 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold text-xs inline-flex items-center gap-1">
-              <i data-lucide="check" class="w-3.5 h-3.5"></i>
-              Friends
+        <!-- Center: Preferred Sports Pills -->
+        <div class="hidden lg:flex items-center gap-1.5 shrink-0">
+          ${sports.slice(0, 3).map(sp => `
+            <span class="px-3 py-1 rounded-xl text-xs font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200/50 dark:border-zinc-700/50">
+              ${escapeHtml(sp)}
             </span>
-          ` : `
-            <button onclick="window.toggleFriendship('${student.uid}')" class="px-3 py-1.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 font-semibold text-xs transition">
-              Connect
+          `).join('')}
+          ${sports.length > 3 ? `
+            <span class="px-2 py-1 rounded-xl text-xs font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-400">
+              +${sports.length - 3}
+            </span>
+          ` : ''}
+        </div>
+
+        <!-- Right: Activity Stats & Direct Actions -->
+        <div class="flex items-center justify-between md:justify-end gap-3 shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-zinc-100 dark:border-zinc-800/60">
+          <div class="text-left md:text-right pr-2">
+            <span class="block text-xs font-extrabold text-zinc-950 dark:text-white">${student.sessionsCount || 0} matches</span>
+            <span class="block text-[10px] text-zinc-400 uppercase font-semibold">Attendance</span>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button onclick="window.openStudentProfileModal('${student.uid}')" class="px-4 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-xs font-bold text-zinc-900 dark:text-white transition cursor-pointer">
+              Profile
             </button>
-          `}
+
+            ${isFriend ? `
+              <button onclick="window.removeFriend('${student.uid}')" class="px-3.5 py-2 rounded-xl bg-red-50 hover:bg-red-100 dark:bg-red-950/40 dark:hover:bg-red-900/60 text-xs font-bold text-red-600 dark:text-red-400 transition cursor-pointer" title="Remove Friend">
+                Remove
+              </button>
+            ` : `
+              <button onclick="window.toggleFriendship('${student.uid}')" class="px-4 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 font-bold text-xs transition cursor-pointer shadow-sm">
+                Connect
+              </button>
+            `}
+          </div>
         </div>
+
       </div>
     `;
   }).join('');
