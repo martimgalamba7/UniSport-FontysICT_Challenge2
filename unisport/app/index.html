@@ -65,6 +65,9 @@
         <button id="tab-btn-feed" onclick="window.switchTabGlobal('feed')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 transition cursor-pointer">
           Feed
         </button>
+        <button id="tab-btn-community" onclick="window.switchTabGlobal('community')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer">
+          Students
+        </button>
         <button id="tab-btn-create" onclick="window.switchTabGlobal('create')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer">
           Host Match
         </button>
@@ -80,6 +83,17 @@
     <!-- Right Controls -->
     <div class="flex items-center gap-2 sm:gap-3 relative">
       
+      <!-- Notifications Bell Button with Live Badge -->
+      <button 
+        id="notif-bell-btn" 
+        onclick="window.toggleNotificationsGlobal(event)" 
+        class="relative p-2 text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer" 
+        aria-label="Notifications"
+      >
+        <i data-lucide="bell" class="w-5 h-5"></i>
+        <span id="notif-badge" class="hidden absolute top-1 right-1 w-2.5 h-2.5 bg-brand-orange rounded-full ring-2 ring-white dark:ring-black"></span>
+      </button>
+
       <!-- Theme Switcher (Clean Icon, No background container) -->
       <button class="theme-toggle-btn p-2 text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer" aria-label="Toggle Theme">
         <i data-lucide="sun" class="icon-sun w-4 h-4 hidden"></i>
@@ -105,6 +119,33 @@
         </div>
       </button>
 
+      <!-- Notifications Dropdown Panel (Uber Big Tech Style) -->
+      <div id="notifications-dropdown" class="hidden absolute right-12 sm:right-14 top-14 w-80 sm:w-96 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-2xl p-4 z-50 text-xs transition-all max-h-[85vh] overflow-y-auto">
+        <div class="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800">
+          <div class="flex items-center gap-2">
+            <h4 class="font-bold text-sm text-zinc-950 dark:text-white">Notifications</h4>
+            <span id="notif-count-text" class="text-[11px] font-semibold text-zinc-400">0</span>
+          </div>
+          <button onclick="window.clearAllNotifsGlobal()" class="text-[11px] text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition">Clear all</button>
+        </div>
+
+        <!-- Friend Requests Top Section -->
+        <div class="pt-3 pb-2 space-y-2">
+          <p class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Friend Requests</p>
+          <div id="notif-friend-requests-list" class="space-y-2">
+            <p class="text-zinc-400 text-xs py-1">No pending requests.</p>
+          </div>
+        </div>
+
+        <!-- General Notifications Section -->
+        <div class="pt-2 border-t border-zinc-100 dark:border-zinc-800 space-y-2">
+          <p class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Activity & Match Alerts</p>
+          <div id="notif-general-list" class="space-y-2">
+            <p class="text-zinc-400 text-xs py-1">All caught up!</p>
+          </div>
+        </div>
+      </div>
+
       <!-- Uber-Style Clean User Dropdown Menu -->
       <div id="user-dropdown" class="hidden absolute right-0 top-14 w-64 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-2xl p-2.5 z-50 text-xs transition-all">
         <!-- User Info Header with School & Status -->
@@ -117,11 +158,15 @@
           </div>
         </div>
 
-        <!-- Options: Profile, My Sessions, Settings -->
+        <!-- Options: Profile, Students/Friends, My Sessions, Settings -->
         <div class="py-1.5 space-y-0.5">
           <button id="dropdown-profile-btn" onclick="window.switchTabGlobal('profile');" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-semibold transition text-left cursor-pointer">
             <i data-lucide="user" class="w-4 h-4 text-zinc-500"></i>
             <span>Profile</span>
+          </button>
+          <button id="dropdown-community-btn" onclick="window.switchTabGlobal('community');" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-semibold transition text-left cursor-pointer">
+            <i data-lucide="users" class="w-4 h-4 text-zinc-500"></i>
+            <span>Campus Students</span>
           </button>
           <button id="dropdown-sessions-btn" onclick="window.switchTabGlobal('my-activities');" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-semibold transition text-left cursor-pointer">
             <i data-lucide="calendar" class="w-4 h-4 text-zinc-500"></i>
@@ -203,7 +248,7 @@
       if (dd) dd.classList.add("hidden");
 
       // Switch section visibility
-      var tabs = ["feed", "create", "my-activities", "profile"];
+      var tabs = ["feed", "community", "create", "my-activities", "profile"];
       for (var i = 0; i < tabs.length; i++) {
         var sec = document.getElementById("section-" + tabs[i]);
         if (sec) {
@@ -257,9 +302,38 @@
       window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
+    window.toggleNotificationsGlobal = function(e) {
+      if (e) e.stopPropagation();
+      var notifDd = document.getElementById("notifications-dropdown");
+      var userDd = document.getElementById("user-dropdown");
+      if (userDd) userDd.classList.add("hidden");
+      if (notifDd) notifDd.classList.toggle("hidden");
+      if (window.UniSport && typeof window.UniSport.renderNotifications === "function") {
+        window.UniSport.renderNotifications();
+      }
+    };
+
+    window.closeStudentProfileModal = function() {
+      var m = document.getElementById("student-profile-modal");
+      if (m) m.classList.add("hidden");
+    };
+
+    // Close notifications panel on click outside
+    document.addEventListener("click", function(e) {
+      var notifDd = document.getElementById("notifications-dropdown");
+      var notifBtn = document.getElementById("notif-bell-btn");
+      if (notifDd && !notifDd.classList.contains("hidden")) {
+        if (!notifDd.contains(e.target) && !notifBtn.contains(e.target)) {
+          notifDd.classList.add("hidden");
+        }
+      }
+    });
+
     window.openSettingsGlobal = function() {
       var dd = document.getElementById("user-dropdown");
       if (dd) dd.classList.add("hidden");
+      var notifDd = document.getElementById("notifications-dropdown");
+      if (notifDd) notifDd.classList.add("hidden");
       if (window.UniSport && typeof window.UniSport.openSettingsModal === "function") {
         window.UniSport.openSettingsModal();
         return;
@@ -558,6 +632,64 @@
       </div>
     </section>
 
+    <!-- ================= SECTION 5: CAMPUS STUDENTS & SOCIAL (PROFILE SEARCH & FRIENDS) ================= -->
+    <section id="section-community" class="hidden w-full max-w-7xl mx-auto space-y-6">
+      
+      <!-- Community Header -->
+      <div class="border-b border-zinc-100 dark:border-zinc-900 pb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-bold text-zinc-950 dark:text-white tracking-tight">
+            Campus Students & Social
+          </h1>
+          <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
+            Discover athletes, workout partners, and connect with friends across Fontys & TU/e.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button id="community-tab-all" onclick="window.setCommunityView('all')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 transition cursor-pointer">
+            Explore All
+          </button>
+          <button id="community-tab-friends" onclick="window.setCommunityView('friends')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer">
+            My Friends (<span id="community-friends-count">0</span>)
+          </button>
+        </div>
+      </div>
+
+      <!-- Student Search Bar & University Filter -->
+      <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
+        <div class="relative flex-grow max-w-md">
+          <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400">
+            <i data-lucide="search" class="w-4 h-4"></i>
+          </span>
+          <input 
+            type="text" 
+            id="search-students" 
+            oninput="window.filterStudentsGlobal(this.value)" 
+            placeholder="Search students by name, sport, or university..." 
+            class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 border-0 text-xs text-zinc-950 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition"
+          />
+        </div>
+
+        <div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+          <button data-uni-filter="all" onclick="window.filterStudentsByUni('all')" class="student-uni-chip px-3 py-1.5 rounded-xl bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 text-xs font-semibold whitespace-nowrap transition cursor-pointer">
+            All Campuses
+          </button>
+          <button data-uni-filter="Fontys" onclick="window.filterStudentsByUni('Fontys')" class="student-uni-chip px-3 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 text-xs font-semibold whitespace-nowrap hover:text-zinc-950 dark:hover:text-white transition cursor-pointer">
+            Fontys UAS
+          </button>
+          <button data-uni-filter="TU/e" onclick="window.filterStudentsByUni('TU/e')" class="student-uni-chip px-3 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 text-xs font-semibold whitespace-nowrap hover:text-zinc-950 dark:hover:text-white transition cursor-pointer">
+            TU Eindhoven
+          </button>
+        </div>
+      </div>
+
+      <!-- Students Grid Container -->
+      <div id="students-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
+
     <!-- ================= SECTION 4: ATHLETE PROFILE (UBER MINIMALIST & FULL WIDTH RESPONSIVE) ================= -->
     <section id="section-profile" class="hidden w-full max-w-7xl mx-auto space-y-6">
       
@@ -796,10 +928,14 @@
   </main>
 
   <!-- Mobile Bottom Nav -->
-  <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/90 dark:bg-black/90 backdrop-blur-md border-t border-zinc-100 dark:border-zinc-900 px-6 py-2.5 flex items-center justify-around text-xs">
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/90 dark:bg-black/90 backdrop-blur-md border-t border-zinc-100 dark:border-zinc-900 px-4 py-2.5 flex items-center justify-around text-xs">
     <button id="mobile-tab-feed" class="flex flex-col items-center gap-1 text-zinc-950 dark:text-white">
       <i data-lucide="compass" class="w-4 h-4"></i>
       <span class="text-[10px] font-semibold">Feed</span>
+    </button>
+    <button id="mobile-tab-community" class="flex flex-col items-center gap-1 text-zinc-400">
+      <i data-lucide="users" class="w-4 h-4"></i>
+      <span class="text-[10px] font-semibold">Students</span>
     </button>
     <button id="mobile-tab-create" class="flex flex-col items-center gap-1 text-zinc-400">
       <i data-lucide="plus-circle" class="w-4 h-4"></i>
@@ -995,6 +1131,96 @@
           Done
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- Roster Modal (Clean Uber Style) -->
+  <div id="roster-modal" onclick="if (event.target === this) this.classList.add('hidden')" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md">
+    <div class="relative w-full max-w-md rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-2xl p-6 space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800">
+        <div>
+          <h3 id="roster-modal-title" class="font-bold text-base text-zinc-950 dark:text-white">Match Roster</h3>
+          <p class="text-xs text-zinc-500">Confirmed student participants</p>
+        </div>
+        <button id="roster-modal-close" onclick="document.getElementById('roster-modal').classList.add('hidden')" class="p-1.5 text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <div id="roster-modal-list" class="space-y-2 max-h-80 overflow-y-auto">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Student Profile View Modal (View Other Student Profiles & Social Connect) -->
+  <div id="student-profile-modal" onclick="if (event.target === this) window.closeStudentProfileModal();" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md overflow-y-auto">
+    <div class="relative w-full max-w-lg rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-2xl overflow-hidden my-auto">
+      
+      <!-- Modal Header -->
+      <div class="p-4 sm:p-5 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between bg-white dark:bg-zinc-900">
+        <span class="text-xs font-bold text-zinc-400 uppercase tracking-wider">Campus Athlete Profile</span>
+        <button onclick="window.closeStudentProfileModal();" class="p-2 text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Profile View Content -->
+      <div class="p-6 sm:p-8 space-y-6">
+        
+        <!-- Hero Card -->
+        <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5 text-center sm:text-left">
+          <div class="relative shrink-0">
+            <div id="view-profile-avatar" class="w-24 h-24 rounded-full p-1 bg-white dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-800 shadow-sm flex items-center justify-center">
+              <div id="view-profile-avatar-inner" class="w-full h-full rounded-full overflow-hidden bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-white">
+                <img src="./assets/avatars/footballer.png" alt="Avatar" class="w-full h-full object-cover rounded-full" />
+              </div>
+            </div>
+            <span class="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-emerald-500 border-2 border-white dark:border-zinc-900"></span>
+          </div>
+
+          <div class="flex-grow space-y-1.5">
+            <h3 id="view-profile-name" class="text-2xl font-black text-zinc-950 dark:text-white">Student Name</h3>
+            <p id="view-profile-email" class="text-xs text-zinc-500">student@fontys.nl</p>
+            <div class="pt-1 flex flex-wrap items-center justify-center sm:justify-start gap-2">
+              <span id="view-profile-uni" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-orange-500/10 text-brand-orange border border-orange-500/20">
+                <i data-lucide="graduation-cap" class="w-3.5 h-3.5"></i>
+                <span>Fontys UAS</span>
+              </span>
+              <span id="view-profile-sport" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
+                Football
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Social Relationship Action Button -->
+        <div id="view-profile-social-actions" class="pt-2">
+          <!-- Dynamic Friendship Action: Add Friend, Pending, Friends, Self -->
+        </div>
+
+        <!-- Student Preferences & Info Grid -->
+        <div class="grid grid-cols-2 gap-3 pt-2">
+          <div class="p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800">
+            <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Campus Location</span>
+            <p id="view-profile-location" class="text-xs font-bold text-zinc-950 dark:text-white mt-1">Eindhoven, NL</p>
+          </div>
+          <div class="p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800">
+            <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Sessions Attended</span>
+            <p id="view-profile-sessions-count" class="text-xs font-bold text-zinc-950 dark:text-white mt-1">0 matches</p>
+          </div>
+        </div>
+
+        <!-- Bio or Sports Interest Tags -->
+        <div class="space-y-2">
+          <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Sports & Activities</span>
+          <div id="view-profile-sports-tags" class="flex flex-wrap gap-1.5">
+            <span class="px-2.5 py-1 rounded-lg text-xs bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">Football</span>
+            <span class="px-2.5 py-1 rounded-lg text-xs bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">Running</span>
+          </div>
+        </div>
+
+      </div>
+
     </div>
   </div>
 

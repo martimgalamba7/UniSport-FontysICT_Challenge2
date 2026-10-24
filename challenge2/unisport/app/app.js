@@ -6,6 +6,7 @@ import {
   doc, 
   addDoc, 
   setDoc,
+  getDocs,
   updateDoc, 
   arrayUnion, 
   arrayRemove, 
@@ -41,10 +42,19 @@ const state = {
   currentUser: null,
   userProfile: null,
   activities: [],
-  activeTab: "feed", // "feed" | "create" | "my-activities" | "profile"
+  activeTab: "feed", // "feed" | "community" | "create" | "my-activities" | "profile"
   filterSport: "all",
   searchQuery: "",
-  selectedActivity: null
+  selectedActivity: null,
+  
+  // Social & Community State
+  students: [],
+  communityView: "all", // "all" | "friends"
+  communityUniFilter: "all", // "all" | "Fontys" | "TU/e"
+  studentSearchQuery: "",
+  friends: [], // array of friend uids
+  friendRequests: [], // array of { id, fromUid, fromName, fromUni, fromAvatar, timestamp }
+  notifications: [] // array of { id, title, desc, type, read, timestamp }
 };
 
 // Sports list styling without emojis
@@ -136,6 +146,98 @@ const INITIAL_DEMO_ACTIVITIES = [
       { uid: "gym-bro", name: "Liam O'Connor", university: "Fontys UAS", avatarId: "bodybuilder" }
     ],
     createdAt: Date.now() - 14400000
+  }
+];
+
+// Demo verified students across Fontys & TU/e campuses for rich instant discovery
+const DEMO_CAMPUS_STUDENTS = [
+  {
+    uid: "fontys-student-rep",
+    displayName: "Thomas van Dijk",
+    email: "t.vandijk@student.fontys.nl",
+    university: "Fontys UAS",
+    avatarId: "footballer",
+    sport: "Football",
+    location: "Fontys Rachelsmolen, Eindhoven",
+    sports: ["Football", "Futsal", "Gym & Fitness"],
+    sessionsCount: 14
+  },
+  {
+    uid: "tue-runner-rep",
+    displayName: "Sophie de Vries",
+    email: "s.devries@student.tue.nl",
+    university: "TU Eindhoven",
+    avatarId: "runner",
+    sport: "Running",
+    location: "TU/e Campus, Eindhoven",
+    sports: ["Running", "CrossFit", "Yoga & Pilates"],
+    sessionsCount: 22
+  },
+  {
+    uid: "demo-p1",
+    displayName: "Sara Martins",
+    email: "s.martins@student.tue.nl",
+    university: "TU Eindhoven",
+    avatarId: "runner",
+    sport: "Padel",
+    location: "Strijp-S, Eindhoven",
+    sports: ["Padel", "Tennis", "Running"],
+    sessionsCount: 9
+  },
+  {
+    uid: "demo-p2",
+    displayName: "Lars Bakker",
+    email: "l.bakker@student.fontys.nl",
+    university: "Fontys UAS",
+    avatarId: "bodybuilder",
+    sport: "Gym & Fitness",
+    location: "Fontys Rachelsmolen, Eindhoven",
+    sports: ["Gym & Fitness", "Powerlifting", "Calisthenics"],
+    sessionsCount: 31
+  },
+  {
+    uid: "demo-p3",
+    displayName: "Elena Costa",
+    email: "e.costa@student.fontys.nl",
+    university: "Fontys UAS",
+    avatarId: "runner",
+    sport: "Volleyball",
+    location: "Eindhoven Centrum",
+    sports: ["Volleyball", "Running", "Swimming"],
+    sessionsCount: 7
+  },
+  {
+    uid: "climb-lover",
+    displayName: "Matas K.",
+    email: "m.kalnin@student.fontys.nl",
+    university: "Fontys UAS",
+    avatarId: "bodybuilder",
+    sport: "Bouldering",
+    location: "Strijp-S, Eindhoven",
+    sports: ["Bouldering", "Calisthenics", "Cycling"],
+    sessionsCount: 18
+  },
+  {
+    uid: "gym-bro",
+    displayName: "Liam O'Connor",
+    email: "l.oconnor@student.fontys.nl",
+    university: "Fontys UAS",
+    avatarId: "bodybuilder",
+    sport: "Gym & Fitness",
+    location: "Stratum, Eindhoven",
+    sports: ["Gym & Fitness", "Basketball", "Boxing"],
+    sessionsCount: 25
+  },
+  {
+    uid: "demo-tue-basketball",
+    displayName: "Daan Wouters",
+    email: "d.wouters@student.tue.nl",
+    university: "TU Eindhoven",
+    avatarId: "footballer",
+    sport: "Basketball",
+    location: "TU/e Student Sports Centre",
+    sports: ["Basketball", "Futsal", "Gym & Fitness"],
+    sessionsCount: 12
   }
 ];
 
@@ -288,7 +390,7 @@ function listenToAuthChanges() {
 }
 
 function setupNavigation() {
-  const tabs = ["feed", "create", "my-activities", "profile"];
+  const tabs = ["feed", "community", "create", "my-activities", "profile"];
   
   tabs.forEach(tabId => {
     const btn = document.getElementById(`tab-btn-${tabId}`);
@@ -316,7 +418,7 @@ function setupNavigation() {
 
 export function switchTab(targetTab) {
   state.activeTab = targetTab;
-  const tabs = ["feed", "create", "my-activities", "profile"];
+  const tabs = ["feed", "community", "create", "my-activities", "profile"];
 
   tabs.forEach(t => {
     const section = document.getElementById(`section-${t}`);
@@ -346,6 +448,9 @@ export function switchTab(targetTab) {
     }
   });
 
+  if (targetTab === "community") {
+    renderCommunity();
+  }
   if (targetTab === "my-activities") {
     renderMyActivities();
   }
@@ -1085,6 +1190,450 @@ export async function deleteAccount() {
   }
 }
 
+// ==========================================
+// CAMPUS COMMUNITY, PROFILE SEARCH & SOCIALS
+// ==========================================
+
+function getStoredSocialData() {
+  try {
+    const rawFriends = localStorage.getItem("unisport_friends");
+    const rawRequests = localStorage.getItem("unisport_friend_requests");
+    const rawNotifs = localStorage.getItem("unisport_notifications");
+
+    state.friends = rawFriends ? JSON.parse(rawFriends) : ["demo-p1"];
+    state.friendRequests = rawRequests ? JSON.parse(rawRequests) : [
+      {
+        id: "req-1",
+        fromUid: "fontys-student-rep",
+        fromName: "Thomas van Dijk",
+        fromUni: "Fontys UAS",
+        fromAvatar: "footballer",
+        timestamp: Date.now() - 3600000
+      },
+      {
+        id: "req-2",
+        fromUid: "tue-runner-rep",
+        fromName: "Sophie de Vries",
+        fromUni: "TU Eindhoven",
+        fromAvatar: "runner",
+        timestamp: Date.now() - 7200000
+      }
+    ];
+    state.notifications = rawNotifs ? JSON.parse(rawNotifs) : [
+      {
+        id: "notif-1",
+        title: "Match Kickoff Reminder",
+        desc: "Casual 5v5 Match starts in 1 hour at SSC Field 1.",
+        time: "1h ago"
+      },
+      {
+        id: "notif-2",
+        title: "New Student Joined",
+        desc: "Sara Martins joined your hosted Dommel Run session.",
+        time: "3h ago"
+      }
+    ];
+  } catch(e) {
+    state.friends = ["demo-p1"];
+    state.friendRequests = [];
+    state.notifications = [];
+  }
+  updateNotifBadge();
+}
+
+function saveStoredSocialData() {
+  try {
+    localStorage.setItem("unisport_friends", JSON.stringify(state.friends));
+    localStorage.setItem("unisport_friend_requests", JSON.stringify(state.friendRequests));
+    localStorage.setItem("unisport_notifications", JSON.stringify(state.notifications));
+  } catch(e) {}
+  updateNotifBadge();
+}
+
+export function updateNotifBadge() {
+  const badge = document.getElementById("notif-badge");
+  const countText = document.getElementById("notif-count-text");
+  const total = (state.friendRequests || []).length + (state.notifications || []).length;
+
+  if (countText) countText.textContent = total;
+  if (badge) {
+    if (total > 0) {
+      badge.classList.remove("hidden");
+    } else {
+      badge.classList.add("hidden");
+    }
+  }
+}
+
+export function renderNotifications() {
+  const reqList = document.getElementById("notif-friend-requests-list");
+  const genList = document.getElementById("notif-general-list");
+
+  if (reqList) {
+    if (!state.friendRequests || state.friendRequests.length === 0) {
+      reqList.innerHTML = `<p class="text-zinc-400 text-xs py-1">No pending friend requests.</p>`;
+    } else {
+      reqList.innerHTML = state.friendRequests.map(req => {
+        const av = getAvatarById(req.fromAvatar || "footballer");
+        return `
+          <div class="p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-100 dark:border-zinc-800 space-y-2">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-full overflow-hidden border border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0">
+                ${av.svg}
+              </div>
+              <div class="min-w-0 flex-grow">
+                <p class="font-bold text-xs text-zinc-950 dark:text-white truncate">${escapeHtml(req.fromName)}</p>
+                <p class="text-[11px] text-zinc-500 truncate">${escapeHtml(req.fromUni)}</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 pt-1">
+              <button onclick="window.acceptFriendRequest('${req.id}', '${req.fromUid}')" class="flex-1 py-1.5 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-bold text-[11px] transition hover:opacity-90">
+                Accept
+              </button>
+              <button onclick="window.declineFriendRequest('${req.id}')" class="flex-1 py-1.5 rounded-lg bg-zinc-200 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-200 font-semibold text-[11px] transition hover:bg-zinc-300">
+                Decline
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+  }
+
+  if (genList) {
+    if (!state.notifications || state.notifications.length === 0) {
+      genList.innerHTML = `<p class="text-zinc-400 text-xs py-1">All caught up!</p>`;
+    } else {
+      genList.innerHTML = state.notifications.map(n => `
+        <div class="p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800">
+          <div class="flex items-center justify-between gap-2">
+            <p class="font-bold text-xs text-zinc-950 dark:text-white">${escapeHtml(n.title)}</p>
+            <span class="text-[10px] text-zinc-400">${escapeHtml(n.time || '')}</span>
+          </div>
+          <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">${escapeHtml(n.desc)}</p>
+        </div>
+      `).join('');
+    }
+  }
+
+  if (window.lucide && typeof window.lucide.createIcons === "function") {
+    window.lucide.createIcons();
+  }
+}
+
+export function acceptFriendRequest(reqId, fromUid) {
+  state.friendRequests = state.friendRequests.filter(r => r.id !== reqId);
+  if (!state.friends.includes(fromUid)) {
+    state.friends.push(fromUid);
+  }
+  saveStoredSocialData();
+  renderNotifications();
+  if (state.activeTab === "community") renderCommunity();
+}
+
+export function declineFriendRequest(reqId) {
+  state.friendRequests = state.friendRequests.filter(r => r.id !== reqId);
+  saveStoredSocialData();
+  renderNotifications();
+}
+
+export function clearAllNotifsGlobal() {
+  state.notifications = [];
+  saveStoredSocialData();
+  renderNotifications();
+}
+
+export async function fetchCampusStudents() {
+  const currentUid = state.currentUser?.uid || (getActiveSession() || {}).uid;
+  let remoteStudents = [];
+
+  try {
+    const snap = await getDocs(collection(db, "users"));
+    snap.forEach(docSnap => {
+      const data = docSnap.data();
+      if (docSnap.id !== currentUid) {
+        remoteStudents.push({
+          uid: docSnap.id,
+          displayName: data.displayName || "Student",
+          email: data.email || "",
+          university: data.university || (data.email?.endsWith("@student.tue.nl") ? "TU Eindhoven" : "Fontys UAS"),
+          avatarId: data.avatarId || "footballer",
+          sport: data.sport || "Football",
+          location: data.location || "Eindhoven Campus",
+          sports: data.sports || [data.sport || "Football"],
+          sessionsCount: data.sessionsCount || Math.floor(Math.random() * 15) + 2
+        });
+      }
+    });
+  } catch(e) {
+    console.warn("fetchCampusStudents error:", e);
+  }
+
+  // Merge demo students to provide an active campus social community
+  const map = new Map();
+  DEMO_CAMPUS_STUDENTS.forEach(s => {
+    if (s.uid !== currentUid) map.set(s.uid, s);
+  });
+  remoteStudents.forEach(s => map.set(s.uid, s));
+
+  state.students = Array.from(map.values());
+}
+
+export function renderCommunity() {
+  const container = document.getElementById("students-grid");
+  const countFriends = document.getElementById("community-friends-count");
+  if (countFriends) countFriends.textContent = (state.friends || []).length;
+  if (!container) return;
+
+  let list = [...(state.students || [])];
+
+  // Filter by community view (All vs Friends)
+  if (state.communityView === "friends") {
+    list = list.filter(s => state.friends.includes(s.uid));
+  }
+
+  // Filter by university
+  if (state.communityUniFilter && state.communityUniFilter !== "all") {
+    list = list.filter(s => s.university && s.university.includes(state.communityUniFilter));
+  }
+
+  // Filter by search query
+  if (state.studentSearchQuery) {
+    const q = state.studentSearchQuery.toLowerCase();
+    list = list.filter(s => 
+      (s.displayName || "").toLowerCase().includes(q) ||
+      (s.university || "").toLowerCase().includes(q) ||
+      (s.sport || "").toLowerCase().includes(q) ||
+      (s.email || "").toLowerCase().includes(q) ||
+      (s.sports || []).some(sp => sp.toLowerCase().includes(q))
+    );
+  }
+
+  if (list.length === 0) {
+    container.innerHTML = `
+      <div class="col-span-full py-16 px-6 text-center rounded-2xl bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800">
+        <h3 class="text-base font-bold text-zinc-950 dark:text-white mb-1">No campus students found</h3>
+        <p class="text-zinc-500 dark:text-zinc-400 text-xs max-w-sm mx-auto mb-4">
+          ${state.communityView === 'friends' ? "You haven't connected with any friends yet. Explore all campus students to send requests!" : "Try searching for a different name, university, or sport."}
+        </p>
+        ${state.communityView === 'friends' ? `
+          <button onclick="window.setCommunityView('all')" class="px-4 py-2 rounded-xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 text-xs font-semibold">
+            Explore All Students
+          </button>
+        ` : ''}
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = list.map(student => {
+    const av = getAvatarById(student.avatarId || "footballer");
+    const isFriend = state.friends.includes(student.uid);
+    const hasRequested = (state.friendRequests || []).some(r => r.fromUid === student.uid);
+
+    return `
+      <div class="p-5 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800/90 flex flex-col justify-between gap-4 transition hover:border-zinc-400 dark:hover:border-zinc-700 shadow-sm">
+        <div>
+          <!-- Student Avatar & Status -->
+          <div class="flex items-start justify-between gap-3">
+            <div class="relative shrink-0 cursor-pointer" onclick="window.openStudentProfileModal('${student.uid}')">
+              <div class="w-12 h-12 rounded-full overflow-hidden border border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-white">
+                ${av.svg}
+              </div>
+              <span class="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white dark:border-zinc-900"></span>
+            </div>
+
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-[11px] font-semibold ${student.university.includes('TU') ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400' : 'bg-orange-500/10 text-brand-orange'}">
+              ${escapeHtml(student.university.includes('TU') ? 'TU/e' : 'Fontys')}
+            </span>
+          </div>
+
+          <!-- Student Name & Sport Info -->
+          <div class="mt-3 cursor-pointer" onclick="window.openStudentProfileModal('${student.uid}')">
+            <h4 class="font-bold text-sm text-zinc-950 dark:text-white truncate hover:underline">${escapeHtml(student.displayName)}</h4>
+            <p class="text-xs text-zinc-500 truncate mt-0.5">${escapeHtml(student.sport)} • ${student.sessionsCount || 0} sessions</p>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="pt-3 border-t border-zinc-100 dark:border-zinc-800 flex items-center gap-2">
+          <button onclick="window.openStudentProfileModal('${student.uid}')" class="flex-1 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-xs font-semibold text-zinc-900 dark:text-white transition">
+            View Profile
+          </button>
+          ${isFriend ? `
+            <span class="px-3 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold text-xs inline-flex items-center gap-1">
+              <i data-lucide="check" class="w-3.5 h-3.5"></i>
+              Friends
+            </span>
+          ` : `
+            <button onclick="window.toggleFriendship('${student.uid}')" class="px-3 py-1.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 font-semibold text-xs transition">
+              Connect
+            </button>
+          `}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  if (window.lucide && typeof window.lucide.createIcons === "function") {
+    window.lucide.createIcons();
+  }
+}
+
+export function openStudentProfileModal(uid) {
+  const currentUid = state.currentUser?.uid || (getActiveSession() || {}).uid;
+  const modal = document.getElementById("student-profile-modal");
+  if (!modal) return;
+
+  let student = (state.students || []).find(s => s.uid === uid);
+  if (!student && uid === currentUid) {
+    const user = state.currentUser || getActiveSession() || {};
+    student = {
+      uid: currentUid,
+      displayName: user.displayName || "You",
+      email: user.email || "",
+      university: user.university || (user.email?.includes("tue.nl") ? "TU Eindhoven" : "Fontys UAS"),
+      avatarId: user.avatarId || "footballer",
+      sport: user.sport || "Football",
+      location: "Eindhoven Campus",
+      sports: [user.sport || "Football"],
+      sessionsCount: state.activities.filter(a => (a.participants || []).some(p => p.uid === currentUid)).length
+    };
+  }
+
+  if (!student) return;
+
+  const av = getAvatarById(student.avatarId || "footballer");
+  const isSelf = student.uid === currentUid;
+  const isFriend = state.friends.includes(student.uid);
+
+  const nameEl = document.getElementById("view-profile-name");
+  const emailEl = document.getElementById("view-profile-email");
+  const uniEl = document.getElementById("view-profile-uni");
+  const sportEl = document.getElementById("view-profile-sport");
+  const locEl = document.getElementById("view-profile-location");
+  const countEl = document.getElementById("view-profile-sessions-count");
+  const avatarInner = document.getElementById("view-profile-avatar-inner");
+  const tagsEl = document.getElementById("view-profile-sports-tags");
+  const actionsEl = document.getElementById("view-profile-social-actions");
+
+  if (nameEl) nameEl.textContent = student.displayName;
+  if (emailEl) emailEl.textContent = student.email;
+  if (uniEl) uniEl.innerHTML = `<i data-lucide="graduation-cap" class="w-3.5 h-3.5"></i> <span>${escapeHtml(student.university)}</span>`;
+  if (sportEl) sportEl.textContent = student.sport;
+  if (locEl) locEl.textContent = student.location || "Eindhoven, NL";
+  if (countEl) countEl.textContent = `${student.sessionsCount || 0} matches`;
+  if (avatarInner) avatarInner.innerHTML = `<img src="${av.image}" class="w-full h-full object-cover rounded-full" onerror="this.src='./assets/avatars/footballer.png'" />`;
+
+  if (tagsEl) {
+    const sports = student.sports || [student.sport || "Football"];
+    tagsEl.innerHTML = sports.map(sp => `
+      <span class="px-2.5 py-1 rounded-lg text-xs bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-medium">
+        ${escapeHtml(sp)}
+      </span>
+    `).join('');
+  }
+
+  if (actionsEl) {
+    if (isSelf) {
+      actionsEl.innerHTML = `
+        <button onclick="window.closeStudentProfileModal(); window.switchTabGlobal('profile')" class="w-full py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white font-semibold text-xs transition">
+          Edit Your Profile
+        </button>
+      `;
+    } else if (isFriend) {
+      actionsEl.innerHTML = `
+        <div class="flex items-center gap-2">
+          <span class="flex-1 py-2 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold text-xs text-center border border-emerald-500/20">
+            You are friends
+          </span>
+          <button onclick="window.removeFriend('${student.uid}')" class="px-4 py-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-red-50 dark:hover:bg-red-950/40 text-red-600 dark:text-red-400 font-semibold text-xs transition">
+            Remove
+          </button>
+        </div>
+      `;
+    } else {
+      actionsEl.innerHTML = `
+        <button onclick="window.toggleFriendship('${student.uid}')" class="w-full py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 font-bold text-xs transition shadow-sm">
+          Send Friend Request
+        </button>
+      `;
+    }
+  }
+
+  modal.classList.remove("hidden");
+  if (window.lucide && typeof window.lucide.createIcons === "function") {
+    window.lucide.createIcons();
+  }
+}
+
+export function toggleFriendship(uid) {
+  const currentUid = state.currentUser?.uid || (getActiveSession() || {}).uid;
+  if (!state.friends.includes(uid)) {
+    state.friends.push(uid);
+    // Add confirmation notification
+    const student = (state.students || []).find(s => s.uid === uid);
+    if (student) {
+      state.notifications.unshift({
+        id: "conn-" + Date.now(),
+        title: "Friend Connected",
+        desc: `You and ${student.displayName} are now connected on UniSport.`,
+        time: "Just now"
+      });
+    }
+  }
+  saveStoredSocialData();
+  renderCommunity();
+  openStudentProfileModal(uid);
+}
+
+export function removeFriend(uid) {
+  state.friends = state.friends.filter(f => f !== uid);
+  saveStoredSocialData();
+  renderCommunity();
+  openStudentProfileModal(uid);
+}
+
+// Global window helpers for community & socials
+window.setCommunityView = function(view) {
+  state.communityView = view;
+  const btnAll = document.getElementById("community-tab-all");
+  const btnFriends = document.getElementById("community-tab-friends");
+
+  if (view === "all") {
+    if (btnAll) btnAll.className = "px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 transition cursor-pointer";
+    if (btnFriends) btnFriends.className = "px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer";
+  } else {
+    if (btnFriends) btnFriends.className = "px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 transition cursor-pointer";
+    if (btnAll) btnAll.className = "px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer";
+  }
+  renderCommunity();
+};
+
+window.filterStudentsByUni = function(uni) {
+  state.communityUniFilter = uni;
+  document.querySelectorAll(".student-uni-chip").forEach(chip => {
+    if (chip.dataset.uniFilter === uni) {
+      chip.className = "student-uni-chip px-3 py-1.5 rounded-xl bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 text-xs font-semibold whitespace-nowrap transition cursor-pointer";
+    } else {
+      chip.className = "student-uni-chip px-3 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 text-xs font-semibold whitespace-nowrap hover:text-zinc-950 dark:hover:text-white transition cursor-pointer";
+    }
+  });
+  renderCommunity();
+};
+
+window.filterStudentsGlobal = function(val) {
+  state.studentSearchQuery = val;
+  renderCommunity();
+};
+
+window.openStudentProfileModal = openStudentProfileModal;
+window.toggleFriendship = toggleFriendship;
+window.removeFriend = removeFriend;
+window.acceptFriendRequest = acceptFriendRequest;
+window.declineFriendRequest = declineFriendRequest;
+window.clearAllNotifsGlobal = clearAllNotifsGlobal;
+
 window.UniSport = {
   switchTab,
   selectAvatar,
@@ -1093,11 +1642,24 @@ window.UniSport = {
   openSettingsModal,
   toggleJoinActivity,
   clearCache,
-  deleteAccount
+  deleteAccount,
+  renderCommunity,
+  renderNotifications,
+  openStudentProfileModal
 };
 
 if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", initApp);
+  document.addEventListener("DOMContentLoaded", () => {
+    getStoredSocialData();
+    fetchCampusStudents().then(() => {
+      initApp();
+      renderCommunity();
+    });
+  });
 } else {
-  initApp();
+  getStoredSocialData();
+  fetchCampusStudents().then(() => {
+    initApp();
+    renderCommunity();
+  });
 }
