@@ -595,26 +595,56 @@
       var countFriends = document.getElementById("community-friends-count");
       if (countFriends) countFriends.textContent = friends.length;
 
-      // Combine cached / current user with seed list
+      // Combine cached students from Firestore, current session, and seed list
       var list = [];
       var seenUids = {};
 
+      // 1. First add any cached remote students retrieved from Firestore
+      try {
+        var rawCache = localStorage.getItem("unisport_students_cache");
+        if (rawCache) {
+          var parsedCache = JSON.parse(rawCache);
+          if (Array.isArray(parsedCache)) {
+            parsedCache.forEach(function(cs) {
+              if (cs && cs.uid && !seenUids[cs.uid]) {
+                list.push(Object.assign({}, cs, { isSelf: cs.uid === currentUid }));
+                seenUids[cs.uid] = true;
+              }
+            });
+          }
+        }
+      } catch(e) {}
+
+      // 2. Ensure current session user is included with up-to-date email and info
       if (currentSession && currentSession.uid) {
-        list.push({
-          uid: currentSession.uid,
-          isSelf: true,
-          displayName: currentSession.displayName || "Student",
-          email: currentSession.email || "campus.student@fontys.nl",
-          university: currentSession.university || "Fontys UAS",
-          avatarId: currentSession.avatarId || "footballer",
-          sport: currentSession.sport || "Football",
-          location: "Eindhoven Campus",
-          sports: [currentSession.sport || "Football"],
-          sessionsCount: 4
-        });
-        seenUids[currentSession.uid] = true;
+        if (!seenUids[currentSession.uid]) {
+          list.push({
+            uid: currentSession.uid,
+            isSelf: true,
+            displayName: currentSession.displayName || "Student",
+            email: currentSession.email || "",
+            university: currentSession.university || "Fontys UAS",
+            avatarId: currentSession.avatarId || "footballer",
+            sport: currentSession.sport || "Football",
+            location: "Eindhoven Campus",
+            sports: [currentSession.sport || "Football"],
+            sessionsCount: 4
+          });
+          seenUids[currentSession.uid] = true;
+        } else {
+          // Update the existing entry for the current user with exact session email/displayName if available
+          list.forEach(function(item) {
+            if (item.uid === currentSession.uid) {
+              if (currentSession.email) item.email = currentSession.email;
+              if (currentSession.displayName) item.displayName = currentSession.displayName;
+              if (currentSession.university) item.university = currentSession.university;
+              if (currentSession.avatarId) item.avatarId = currentSession.avatarId;
+            }
+          });
+        }
       }
 
+      // 3. Fallback to seed students so directory is always full
       window.CAMPUS_STUDENTS_SEED.forEach(function(s) {
         if (!seenUids[s.uid]) {
           list.push(Object.assign({}, s, { isSelf: s.uid === currentUid }));

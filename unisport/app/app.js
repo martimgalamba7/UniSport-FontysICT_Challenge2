@@ -1473,6 +1473,10 @@ export async function fetchCampusStudents() {
   try {
     localStorage.setItem("unisport_students_cache", JSON.stringify(state.students));
   } catch(e) {}
+
+  if (typeof window.renderCommunityInstant === "function") {
+    window.renderCommunityInstant();
+  }
 }
 
 export function renderCommunity() {
