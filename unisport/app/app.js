@@ -36,6 +36,48 @@ window.UniSport.populateProfileTab = populateProfileTab;
 window.UniSport.openRosterModal = openRosterModal;
 window.UniSport.openSettingsModal = openSettingsModal;
 window.UniSport.toggleJoinActivity = toggleJoinActivity;
+window.UniSport.renderCommunity = renderCommunity;
+window.UniSport.renderNotifications = renderNotifications;
+window.UniSport.openStudentProfileModal = openStudentProfileModal;
+window.UniSport.signOut = signOutStudent;
+
+// Expose global filter and social handlers immediately
+window.filterStudentsGlobal = function(val) {
+  state.studentSearchQuery = (val || "").trim();
+  renderCommunity();
+};
+window.filterStudentsByUni = function(uni) {
+  state.communityUniFilter = uni;
+  document.querySelectorAll(".student-uni-chip").forEach(chip => {
+    if (chip.getAttribute("data-uni-filter") === uni) {
+      chip.className = "student-uni-chip px-3.5 py-2 rounded-xl bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 text-xs font-bold whitespace-nowrap transition cursor-pointer";
+    } else {
+      chip.className = "student-uni-chip px-3.5 py-2 rounded-xl bg-white dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs font-semibold whitespace-nowrap hover:text-zinc-950 dark:hover:text-white transition cursor-pointer";
+    }
+  });
+  renderCommunity();
+};
+window.setCommunityView = function(view) {
+  state.communityView = view;
+  const btnAll = document.getElementById("community-tab-all");
+  const btnFriends = document.getElementById("community-tab-friends");
+  const activeClasses = "px-4 py-2 rounded-lg text-xs font-bold bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 transition cursor-pointer flex items-center gap-2";
+  const inactiveClasses = "px-4 py-2 rounded-lg text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer flex items-center gap-2";
+  if (view === "all") {
+    if (btnAll) btnAll.className = activeClasses;
+    if (btnFriends) btnFriends.className = inactiveClasses;
+  } else {
+    if (btnFriends) btnFriends.className = activeClasses;
+    if (btnAll) btnAll.className = inactiveClasses;
+  }
+  renderCommunity();
+};
+window.openStudentProfileModal = openStudentProfileModal;
+window.toggleFriendship = toggleFriendship;
+window.removeFriend = removeFriend;
+window.acceptFriendRequest = acceptFriendRequest;
+window.declineFriendRequest = declineFriendRequest;
+window.clearAllNotifsGlobal = clearAllNotifsGlobal;
 
 // Demo verified students across Fontys & TU/e campuses for rich instant discovery
 export const DEMO_CAMPUS_STUDENTS = [
