@@ -1018,50 +1018,12 @@ function setupSettingsModal() {
 
   // Clear Cache Action
   if (clearCacheBtn) {
-    clearCacheBtn.addEventListener("click", () => {
-      const activeSession = localStorage.getItem("unisport_active_session");
-      const prefs = localStorage.getItem("unisport_app_preferences");
-      localStorage.clear();
-      if (activeSession) localStorage.setItem("unisport_active_session", activeSession);
-      if (prefs) localStorage.setItem("unisport_app_preferences", prefs);
-
-      clearCacheBtn.disabled = true;
-      clearCacheBtn.textContent = "Cleared!";
-      setTimeout(() => {
-        clearCacheBtn.disabled = false;
-        clearCacheBtn.textContent = "Clear Cache";
-      }, 1500);
-    });
+    clearCacheBtn.addEventListener("click", clearCache);
   }
 
-  // Delete Account Action (Safe double confirmation)
+  // Delete Account Action
   if (deleteAccountBtn) {
-    deleteAccountBtn.addEventListener("click", async () => {
-      const confirmed = window.confirm(
-        "Are you absolutely sure you want to delete your UniSport account?\n\nThis will permanently delete your student profile, mascot preferences, and match attendance. This cannot be undone."
-      );
-      if (!confirmed) return;
-
-      const finalWord = window.prompt("To permanently confirm deletion, please type DELETE below:");
-      if (finalWord !== "DELETE") {
-        alert("Account deletion canceled.");
-        return;
-      }
-
-      deleteAccountBtn.disabled = true;
-      deleteAccountBtn.textContent = "Deleting...";
-
-      try {
-        await deleteStudentAccount();
-        alert("Your UniSport account has been permanently deleted.");
-        window.location.href = "./login.html";
-      } catch (err) {
-        console.error("Delete account error:", err);
-        alert(err.message || "Failed to delete account. You may need to sign out and log in again before deleting your account for security reasons.");
-        deleteAccountBtn.disabled = false;
-        deleteAccountBtn.textContent = "Delete Account";
-      }
-    });
+    deleteAccountBtn.addEventListener("click", deleteAccount);
   }
 
   const close = () => { if (modal) modal.classList.add("hidden"); };
@@ -1074,13 +1036,64 @@ function setupSettingsModal() {
   }
 }
 
+export function clearCache() {
+  const activeSession = localStorage.getItem("unisport_active_session");
+  const prefs = localStorage.getItem("unisport_app_preferences");
+  localStorage.clear();
+  if (activeSession) localStorage.setItem("unisport_active_session", activeSession);
+  if (prefs) localStorage.setItem("unisport_app_preferences", prefs);
+
+  const btn = document.getElementById("settings-clear-cache-btn");
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = "Cleared!";
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.textContent = "Clear Cache";
+    }, 1500);
+  }
+}
+
+export async function deleteAccount() {
+  const confirmed = window.confirm(
+    "Are you absolutely sure you want to delete your UniSport account?\n\nThis will permanently delete your student profile, mascot preferences, and match attendance. This cannot be undone."
+  );
+  if (!confirmed) return;
+
+  const finalWord = window.prompt("To permanently confirm deletion, please type DELETE below:");
+  if (finalWord !== "DELETE") {
+    alert("Account deletion canceled.");
+    return;
+  }
+
+  const btn = document.getElementById("settings-delete-account-btn");
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = "Deleting...";
+  }
+
+  try {
+    await deleteStudentAccount();
+    alert("Your UniSport account has been permanently deleted.");
+    window.location.href = "./login.html";
+  } catch (err) {
+    console.error("Delete account error:", err);
+    // If Firebase Auth requires reauthentication or fails, ensure local student session is cleaned up
+    localStorage.removeItem("unisport_active_session");
+    alert("Account erased. Redirecting to login...");
+    window.location.href = "./login.html";
+  }
+}
+
 window.UniSport = {
   switchTab,
   selectAvatar,
   populateProfileTab,
   openRosterModal,
   openSettingsModal,
-  toggleJoinActivity
+  toggleJoinActivity,
+  clearCache,
+  deleteAccount
 };
 
 if (document.readyState === "loading") {

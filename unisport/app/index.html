@@ -268,6 +268,65 @@
       if (modal) modal.classList.remove("hidden");
     };
 
+    window.closeSettingsGlobal = function() {
+      var modal = document.getElementById("settings-modal");
+      if (modal) modal.classList.add("hidden");
+    };
+
+    window.clearCacheGlobal = function() {
+      if (window.UniSport && typeof window.UniSport.clearCache === "function") {
+        window.UniSport.clearCache();
+        return;
+      }
+      try {
+        var activeSession = localStorage.getItem("unisport_active_session");
+        var prefs = localStorage.getItem("unisport_app_preferences");
+        localStorage.clear();
+        if (activeSession) localStorage.setItem("unisport_active_session", activeSession);
+        if (prefs) localStorage.setItem("unisport_app_preferences", prefs);
+
+        var btn = document.getElementById("settings-clear-cache-btn");
+        if (btn) {
+          btn.disabled = true;
+          btn.textContent = "Cleared!";
+          setTimeout(function() {
+            btn.disabled = false;
+            btn.textContent = "Clear Cache";
+          }, 1500);
+        }
+      } catch(e) {
+        console.error("clearCache error:", e);
+      }
+    };
+
+    window.deleteAccountGlobal = function() {
+      if (window.UniSport && typeof window.UniSport.deleteAccount === "function") {
+        window.UniSport.deleteAccount();
+        return;
+      }
+      var confirmed = window.confirm(
+        "Are you absolutely sure you want to delete your UniSport account?\n\nThis will permanently delete your student profile, mascot preferences, and match attendance. This cannot be undone."
+      );
+      if (!confirmed) return;
+
+      var finalWord = window.prompt("To permanently confirm deletion, please type DELETE below:");
+      if (finalWord !== "DELETE") {
+        alert("Account deletion canceled.");
+        return;
+      }
+
+      var btn = document.getElementById("settings-delete-account-btn");
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = "Deleting...";
+      }
+
+      localStorage.removeItem("unisport_active_session");
+      localStorage.removeItem("unisport_app_preferences");
+      alert("Your UniSport account has been permanently deleted.");
+      window.location.href = "./login.html";
+    };
+
     // Instant Mascot Selection Helper that works globally
     window.selectAvatarOption = function(avatarId) {
       if (window.UniSport && typeof window.UniSport.selectAvatar === "function") {
@@ -757,7 +816,7 @@
   </nav>
 
   <!-- Comprehensive App Settings Modal (Uber-Style App Settings) -->
-  <div id="settings-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/75 backdrop-blur-md overflow-y-auto">
+  <div id="settings-modal" onclick="if (event.target === this) window.closeSettingsGlobal();" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/75 backdrop-blur-md overflow-y-auto">
     <div class="relative w-full max-w-2xl max-h-[92vh] flex flex-col rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-2xl overflow-hidden my-auto">
       
       <!-- Modal Header -->
@@ -769,7 +828,7 @@
             <p class="text-xs text-zinc-500">Preferences, security, notifications & privacy.</p>
           </div>
         </div>
-        <button id="settings-modal-close" class="p-2 text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer">
+        <button id="settings-modal-close" onclick="window.closeSettingsGlobal();" class="p-2 text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
@@ -905,7 +964,7 @@
               <p class="font-bold text-zinc-950 dark:text-white">Clear Offline Cache</p>
               <p class="text-xs text-zinc-500">Clear cached matches and refresh student live state</p>
             </div>
-            <button id="settings-clear-cache-btn" class="px-4 py-2 rounded-xl bg-zinc-200 hover:bg-zinc-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-xs font-semibold text-zinc-900 dark:text-white transition cursor-pointer self-start sm:self-auto">
+            <button id="settings-clear-cache-btn" onclick="window.clearCacheGlobal()" class="px-4 py-2 rounded-xl bg-zinc-200 hover:bg-zinc-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-xs font-semibold text-zinc-900 dark:text-white transition cursor-pointer self-start sm:self-auto">
               Clear Cache
             </button>
           </div>
@@ -921,7 +980,7 @@
                 <p class="font-bold text-red-600 dark:text-red-400">Delete Account</p>
                 <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Permanently erase your student profile, mascot preferences, and match memberships. This action cannot be reversed.</p>
               </div>
-              <button id="settings-delete-account-btn" class="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs transition cursor-pointer self-start sm:self-auto shrink-0 shadow-sm">
+              <button id="settings-delete-account-btn" onclick="window.deleteAccountGlobal()" class="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs transition cursor-pointer self-start sm:self-auto shrink-0 shadow-sm">
                 Delete Account
               </button>
             </div>
@@ -931,9 +990,8 @@
       </div>
 
       <!-- Modal Footer -->
-      <div class="p-5 sm:p-6 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between shrink-0 bg-white dark:bg-zinc-900">
-        <span class="text-[11px] text-zinc-400">UniSport v2.4 • Eindhoven Campus</span>
-        <button id="settings-modal-done" class="px-6 py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 font-bold text-xs transition cursor-pointer">
+      <div class="p-5 sm:p-6 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-end shrink-0 bg-white dark:bg-zinc-900">
+        <button id="settings-modal-done" onclick="window.closeSettingsGlobal();" class="px-6 py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 font-bold text-xs transition cursor-pointer">
           Done
         </button>
       </div>
