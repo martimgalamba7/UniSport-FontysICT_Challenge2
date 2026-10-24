@@ -473,97 +473,22 @@
       if (m) m.classList.add("hidden");
     };
 
-    // Robust Seed of Campus Students directly inside index.html for instant render
-    window.CAMPUS_STUDENTS_SEED = [
-      {
-        uid: "fontys-student-rep",
-        displayName: "Thomas van Dijk",
-        email: "t.vandijk@student.fontys.nl",
-        university: "Fontys UAS",
-        avatarId: "footballer",
-        sport: "Football",
-        location: "Fontys Rachelsmolen, Eindhoven",
-        sports: ["Football", "Futsal", "Gym & Fitness"],
-        sessionsCount: 14
-      },
-      {
-        uid: "tue-runner-rep",
-        displayName: "Sophie de Vries",
-        email: "s.devries@student.tue.nl",
-        university: "TU Eindhoven",
-        avatarId: "runner",
-        sport: "Running",
-        location: "TU/e Campus, Eindhoven",
-        sports: ["Running", "CrossFit", "Yoga & Pilates"],
-        sessionsCount: 22
-      },
-      {
-        uid: "demo-p1",
-        displayName: "Sara Martins",
-        email: "s.martins@student.tue.nl",
-        university: "TU Eindhoven",
-        avatarId: "runner",
-        sport: "Padel",
-        location: "Strijp-S, Eindhoven",
-        sports: ["Padel", "Tennis", "Running"],
-        sessionsCount: 9
-      },
-      {
-        uid: "demo-p2",
-        displayName: "Lars Bakker",
-        email: "l.bakker@student.fontys.nl",
-        university: "Fontys UAS",
-        avatarId: "bodybuilder",
-        sport: "Gym & Fitness",
-        location: "Fontys Rachelsmolen, Eindhoven",
-        sports: ["Gym & Fitness", "Powerlifting", "Calisthenics"],
-        sessionsCount: 31
-      },
-      {
-        uid: "demo-p3",
-        displayName: "Elena Costa",
-        email: "e.costa@student.fontys.nl",
-        university: "Fontys UAS",
-        avatarId: "runner",
-        sport: "Volleyball",
-        location: "Eindhoven Centrum",
-        sports: ["Volleyball", "Running", "Swimming"],
-        sessionsCount: 7
-      },
-      {
-        uid: "climb-lover",
-        displayName: "Matas K.",
-        email: "m.kalnin@student.fontys.nl",
-        university: "Fontys UAS",
-        avatarId: "bodybuilder",
-        sport: "Bouldering",
-        location: "Strijp-S, Eindhoven",
-        sports: ["Bouldering", "Calisthenics", "Cycling"],
-        sessionsCount: 18
-      },
-      {
-        uid: "gym-bro",
-        displayName: "Liam O'Connor",
-        email: "l.oconnor@student.fontys.nl",
-        university: "Fontys UAS",
-        avatarId: "bodybuilder",
-        sport: "Gym & Fitness",
-        location: "Stratum, Eindhoven",
-        sports: ["Gym & Fitness", "Basketball", "Boxing"],
-        sessionsCount: 25
-      },
-      {
-        uid: "demo-tue-basketball",
-        displayName: "Daan Wouters",
-        email: "d.wouters@student.tue.nl",
-        university: "TU Eindhoven",
-        avatarId: "footballer",
-        sport: "Basketball",
-        location: "TU/e Student Sports Centre",
-        sports: ["Basketball", "Futsal", "Gym & Fitness"],
-        sessionsCount: 12
+    // Purge any old cached fake demo accounts from local storage immediately
+    try {
+      var rawCacheCheck = localStorage.getItem("unisport_students_cache");
+      if (rawCacheCheck) {
+        var parsedCacheCheck = JSON.parse(rawCacheCheck);
+        if (Array.isArray(parsedCacheCheck)) {
+          var cleanCache = parsedCacheCheck.filter(function(cs) {
+            return cs && cs.uid && !cs.uid.startsWith("demo-") && !cs.uid.includes("-rep") && cs.uid !== "climb-lover" && cs.uid !== "gym-bro";
+          });
+          localStorage.setItem("unisport_students_cache", JSON.stringify(cleanCache));
+        }
       }
-    ];
+    } catch(e) {}
+
+    // Empty seed list - Only real Firestore users are displayed
+    window.CAMPUS_STUDENTS_SEED = [];
 
     window.communityStateInline = {
       searchQuery: "",
@@ -586,7 +511,7 @@
         }
       } catch(e) {}
 
-      var friends = ["demo-p1"];
+      var friends = [];
       try {
         var rawFriends = localStorage.getItem("unisport_friends");
         if (rawFriends) friends = JSON.parse(rawFriends);
@@ -595,7 +520,7 @@
       var countFriends = document.getElementById("community-friends-count");
       if (countFriends) countFriends.textContent = friends.length;
 
-      // Combine cached students from Firestore, current session, and seed list
+      // Combine cached students from Firestore and current session
       var list = [];
       var seenUids = {};
 
@@ -606,7 +531,7 @@
           var parsedCache = JSON.parse(rawCache);
           if (Array.isArray(parsedCache)) {
             parsedCache.forEach(function(cs) {
-              if (cs && cs.uid && !seenUids[cs.uid]) {
+              if (cs && cs.uid && !seenUids[cs.uid] && !cs.uid.startsWith("demo-") && !cs.uid.includes("-rep") && cs.uid !== "climb-lover" && cs.uid !== "gym-bro") {
                 list.push(Object.assign({}, cs, { isSelf: cs.uid === currentUid }));
                 seenUids[cs.uid] = true;
               }
@@ -628,7 +553,7 @@
             sport: currentSession.sport || "Football",
             location: "Eindhoven Campus",
             sports: [currentSession.sport || "Football"],
-            sessionsCount: 4
+            sessionsCount: 3
           });
           seenUids[currentSession.uid] = true;
         } else {
@@ -643,14 +568,6 @@
           });
         }
       }
-
-      // 3. Fallback to seed students so directory is always full
-      window.CAMPUS_STUDENTS_SEED.forEach(function(s) {
-        if (!seenUids[s.uid]) {
-          list.push(Object.assign({}, s, { isSelf: s.uid === currentUid }));
-          seenUids[s.uid] = true;
-        }
-      });
 
       // Filter by view
       if (window.communityStateInline.view === "friends") {

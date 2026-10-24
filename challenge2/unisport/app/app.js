@@ -85,97 +85,8 @@ window.acceptFriendRequest = acceptFriendRequest;
 window.declineFriendRequest = declineFriendRequest;
 window.clearAllNotifsGlobal = clearAllNotifsGlobal;
 
-// Demo verified students across Fontys & TU/e campuses for rich instant discovery
-export const DEMO_CAMPUS_STUDENTS = [
-  {
-    uid: "fontys-student-rep",
-    displayName: "Thomas van Dijk",
-    email: "t.vandijk@student.fontys.nl",
-    university: "Fontys UAS",
-    avatarId: "footballer",
-    sport: "Football",
-    location: "Fontys Rachelsmolen, Eindhoven",
-    sports: ["Football", "Futsal", "Gym & Fitness"],
-    sessionsCount: 14
-  },
-  {
-    uid: "tue-runner-rep",
-    displayName: "Sophie de Vries",
-    email: "s.devries@student.tue.nl",
-    university: "TU Eindhoven",
-    avatarId: "runner",
-    sport: "Running",
-    location: "TU/e Campus, Eindhoven",
-    sports: ["Running", "CrossFit", "Yoga & Pilates"],
-    sessionsCount: 22
-  },
-  {
-    uid: "demo-p1",
-    displayName: "Sara Martins",
-    email: "s.martins@student.tue.nl",
-    university: "TU Eindhoven",
-    avatarId: "runner",
-    sport: "Padel",
-    location: "Strijp-S, Eindhoven",
-    sports: ["Padel", "Tennis", "Running"],
-    sessionsCount: 9
-  },
-  {
-    uid: "demo-p2",
-    displayName: "Lars Bakker",
-    email: "l.bakker@student.fontys.nl",
-    university: "Fontys UAS",
-    avatarId: "bodybuilder",
-    sport: "Gym & Fitness",
-    location: "Fontys Rachelsmolen, Eindhoven",
-    sports: ["Gym & Fitness", "Powerlifting", "Calisthenics"],
-    sessionsCount: 31
-  },
-  {
-    uid: "demo-p3",
-    displayName: "Elena Costa",
-    email: "e.costa@student.fontys.nl",
-    university: "Fontys UAS",
-    avatarId: "runner",
-    sport: "Volleyball",
-    location: "Eindhoven Centrum",
-    sports: ["Volleyball", "Running", "Swimming"],
-    sessionsCount: 7
-  },
-  {
-    uid: "climb-lover",
-    displayName: "Matas K.",
-    email: "m.kalnin@student.fontys.nl",
-    university: "Fontys UAS",
-    avatarId: "bodybuilder",
-    sport: "Bouldering",
-    location: "Strijp-S, Eindhoven",
-    sports: ["Bouldering", "Calisthenics", "Cycling"],
-    sessionsCount: 18
-  },
-  {
-    uid: "gym-bro",
-    displayName: "Liam O'Connor",
-    email: "l.oconnor@student.fontys.nl",
-    university: "Fontys UAS",
-    avatarId: "bodybuilder",
-    sport: "Gym & Fitness",
-    location: "Stratum, Eindhoven",
-    sports: ["Gym & Fitness", "Basketball", "Boxing"],
-    sessionsCount: 25
-  },
-  {
-    uid: "demo-tue-basketball",
-    displayName: "Daan Wouters",
-    email: "d.wouters@student.tue.nl",
-    university: "TU Eindhoven",
-    avatarId: "footballer",
-    sport: "Basketball",
-    location: "TU/e Student Sports Centre",
-    sports: ["Basketball", "Futsal", "Gym & Fitness"],
-    sessionsCount: 12
-  }
-];
+// Verified students directory (populated strictly from Firestore)
+export const DEMO_CAMPUS_STUDENTS = [];
 
 // Application State
 const state = {
@@ -188,7 +99,7 @@ const state = {
   selectedActivity: null,
   
   // Social & Community State
-  students: [...DEMO_CAMPUS_STUDENTS],
+  students: [],
   communityView: "all", // "all" | "friends"
   communityUniFilter: "all", // "all" | "Fontys" | "TU/e"
   studentSearchQuery: "",
@@ -1433,6 +1344,7 @@ export async function fetchCampusStudents() {
 
   try {
     const snap = await getDocs(collection(db, "users"));
+    console.log("[UniSport Firestore] Users snapshot count:", snap.size);
     snap.forEach(docSnap => {
       const data = docSnap.data();
       remoteStudents.push({
@@ -1449,10 +1361,10 @@ export async function fetchCampusStudents() {
       });
     });
   } catch(e) {
-    console.warn("fetchCampusStudents Firestore fetch warning:", e);
+    console.error("[UniSport Firestore] fetchCampusStudents error:", e);
   }
 
-  // Ensure current user is in directory if not returned by Firestore
+  // Ensure current logged-in user is in directory if not returned by Firestore query yet
   if (currentSession && currentSession.uid && !remoteStudents.some(s => s.uid === currentSession.uid)) {
     remoteStudents.push({
       uid: currentSession.uid,
@@ -1468,12 +1380,14 @@ export async function fetchCampusStudents() {
     });
   }
 
-  // Merge remote students with demo students (remote students take precedence)
+  // Strictly real Firestore accounts (no fake demo entries)
   const map = new Map();
-  DEMO_CAMPUS_STUDENTS.forEach(s => {
-    map.set(s.uid, { ...s, isSelf: s.uid === currentUid });
+  remoteStudents.forEach(s => {
+    // Exclude any obsolete demo uids
+    if (!s.uid.startsWith("demo-") && !s.uid.includes("-rep") && s.uid !== "climb-lover" && s.uid !== "gym-bro") {
+      map.set(s.uid, s);
+    }
   });
-  remoteStudents.forEach(s => map.set(s.uid, s));
 
   state.students = Array.from(map.values());
   try {
@@ -1509,11 +1423,28 @@ export function listenToCampusStudents() {
         });
       });
 
+      // Ensure logged-in user is included
+      if (currentSession && currentSession.uid && !remote.some(s => s.uid === currentSession.uid)) {
+        remote.push({
+          uid: currentSession.uid,
+          isSelf: true,
+          displayName: currentSession.displayName || "Student",
+          email: currentSession.email || "",
+          university: currentSession.university || "Fontys UAS",
+          avatarId: currentSession.avatarId || "footballer",
+          sport: currentSession.sport || "Football",
+          location: "Eindhoven Campus",
+          sports: [currentSession.sport || "Football"],
+          sessionsCount: 3
+        });
+      }
+
       const map = new Map();
-      DEMO_CAMPUS_STUDENTS.forEach(s => {
-        map.set(s.uid, { ...s, isSelf: s.uid === currentUid });
+      remote.forEach(s => {
+        if (!s.uid.startsWith("demo-") && !s.uid.includes("-rep") && s.uid !== "climb-lover" && s.uid !== "gym-bro") {
+          map.set(s.uid, s);
+        }
       });
-      remote.forEach(s => map.set(s.uid, s));
 
       state.students = Array.from(map.values());
       try {
@@ -1884,7 +1815,8 @@ function bootUniSport() {
       try {
         const parsed = JSON.parse(cachedStudents);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          state.students = parsed;
+          // Filter out obsolete fake accounts
+          state.students = parsed.filter(s => s && s.uid && !s.uid.startsWith("demo-") && !s.uid.includes("-rep") && s.uid !== "climb-lover" && s.uid !== "gym-bro");
         }
       } catch(e) {}
     }
