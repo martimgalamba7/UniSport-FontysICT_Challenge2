@@ -1468,7 +1468,7 @@ export async function fetchCampusStudents() {
     });
   }
 
-  // Merge demo students to guarantee rich active discovery
+  // Merge remote students with demo students (remote students take precedence)
   const map = new Map();
   DEMO_CAMPUS_STUDENTS.forEach(s => {
     map.set(s.uid, { ...s, isSelf: s.uid === currentUid });
@@ -1483,6 +1483,52 @@ export async function fetchCampusStudents() {
   renderCommunity();
   if (typeof window.renderCommunityInstant === "function") {
     window.renderCommunityInstant();
+  }
+}
+
+// Set up real-time listener for users collection so new signups appear instantly
+export function listenToCampusStudents() {
+  try {
+    onSnapshot(collection(db, "users"), (snapshot) => {
+      const currentUid = state.currentUser?.uid || (getActiveSession() || {}).uid;
+      const currentSession = getActiveSession() || state.currentUser || {};
+      const remote = [];
+      snapshot.forEach(docSnap => {
+        const data = docSnap.data();
+        remote.push({
+          uid: docSnap.id,
+          isSelf: docSnap.id === currentUid,
+          displayName: data.displayName || (docSnap.id === currentUid ? (currentSession.displayName || "Student") : "Student"),
+          email: data.email || (docSnap.id === currentUid ? (currentSession.email || "") : ""),
+          university: data.university || (data.email?.endsWith("@student.tue.nl") ? "TU Eindhoven" : "Fontys UAS"),
+          avatarId: data.avatarId || (docSnap.id === currentUid ? (currentSession.avatarId || "footballer") : "footballer"),
+          sport: data.sport || (docSnap.id === currentUid ? (currentSession.sport || "Football") : "Football"),
+          location: data.location || "Eindhoven Campus",
+          sports: data.sports || [data.sport || "Football"],
+          sessionsCount: data.sessionsCount || Math.floor(Math.random() * 15) + 2
+        });
+      });
+
+      const map = new Map();
+      DEMO_CAMPUS_STUDENTS.forEach(s => {
+        map.set(s.uid, { ...s, isSelf: s.uid === currentUid });
+      });
+      remote.forEach(s => map.set(s.uid, s));
+
+      state.students = Array.from(map.values());
+      try {
+        localStorage.setItem("unisport_students_cache", JSON.stringify(state.students));
+      } catch(e) {}
+
+      renderCommunity();
+      if (typeof window.renderCommunityInstant === "function") {
+        window.renderCommunityInstant();
+      }
+    }, (err) => {
+      console.warn("listenToCampusStudents notice:", err);
+    });
+  } catch(e) {
+    console.warn("listenToCampusStudents error:", e);
   }
 }
 
@@ -1799,6 +1845,13 @@ window.filterStudentsGlobal = function(val) {
   }
 };
 
+window.executeStudentSearch = function() {
+  const inp = document.getElementById("search-students");
+  const val = inp ? inp.value : "";
+  window.filterStudentsGlobal(val);
+  fetchCampusStudents();
+};
+
 window.openStudentProfileModal = openStudentProfileModal;
 window.toggleFriendship = toggleFriendship;
 window.removeFriend = removeFriend;
@@ -1818,6 +1871,7 @@ window.UniSport = {
   renderCommunity,
   renderNotifications,
   openStudentProfileModal,
+  fetchCampusStudents,
   signOut: signOutStudent
 };
 
@@ -1841,13 +1895,14 @@ function bootUniSport() {
   renderCommunity();
   renderNotifications();
 
-  // Then fetch live students from Firestore in background and re-render seamlessly
+  // Then fetch live students from Firestore in background and listen to changes
   fetchCampusStudents().then(() => {
     renderCommunity();
     renderNotifications();
   }).catch(err => {
     console.warn("fetchCampusStudents background error:", err);
   });
+  listenToCampusStudents();
 }
 
 if (document.readyState === "loading") {

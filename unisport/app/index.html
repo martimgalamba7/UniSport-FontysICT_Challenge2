@@ -776,6 +776,15 @@
       }
     };
 
+    window.executeStudentSearch = function() {
+      var inp = document.getElementById("search-students");
+      var val = inp ? inp.value : "";
+      window.filterStudentsGlobal(val);
+      if (window.UniSport && typeof window.UniSport.fetchCampusStudents === "function") {
+        try { window.UniSport.fetchCampusStudents(); } catch(e) {}
+      }
+    };
+
     window.filterStudentsByUni = function(uni) {
       window.communityStateInline.uniFilter = uni;
       document.querySelectorAll(".student-uni-chip").forEach(function(chip) {
@@ -1181,24 +1190,36 @@
         </div>
 
         <!-- Advanced Search Command Line: Instant match on Name or Email -->
-        <div class="relative w-full">
-          <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400">
-            <i data-lucide="search" class="w-4 h-4"></i>
-          </span>
-          <input 
-            type="text" 
-            id="search-students" 
-            oninput="window.filterStudentsGlobal(this.value)" 
-            placeholder="Search by student name, student email (@student.fontys.nl, @student.tue.nl), or sport..." 
-            class="w-full pl-11 pr-10 py-3.5 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-xs sm:text-sm text-zinc-950 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition shadow-sm"
-          />
+        <div class="flex flex-col sm:flex-row items-center gap-2.5 w-full">
+          <div class="relative w-full flex-grow">
+            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400">
+              <i data-lucide="search" class="w-4 h-4"></i>
+            </span>
+            <input 
+              type="text" 
+              id="search-students" 
+              oninput="window.filterStudentsGlobal(this.value)" 
+              onkeydown="if(event.key === 'Enter') { event.preventDefault(); window.executeStudentSearch(); }"
+              placeholder="Search by student name, student email (@student.fontys.nl, @student.tue.nl), or sport..." 
+              class="w-full pl-11 pr-14 py-3.5 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-xs sm:text-sm text-zinc-950 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition shadow-sm"
+            />
+            <button 
+              type="button" 
+              onclick="var inp = document.getElementById('search-students'); if(inp){ inp.value=''; window.filterStudentsGlobal(''); }"
+              class="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-900 dark:hover:text-white text-xs font-medium cursor-pointer"
+              title="Clear search"
+            >
+              Clear
+            </button>
+          </div>
           <button 
-            type="button" 
-            onclick="var inp = document.getElementById('search-students'); if(inp){ inp.value=''; window.filterStudentsGlobal(''); }"
-            class="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-900 dark:hover:text-white text-xs"
-            title="Clear search"
+            type="button"
+            id="btn-search-students-submit"
+            onclick="window.executeStudentSearch()" 
+            class="w-full sm:w-auto px-5 py-3.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 shrink-0 shadow-sm cursor-pointer"
           >
-            Clear
+            <i data-lucide="search" class="w-4 h-4"></i>
+            <span>Search</span>
           </button>
         </div>
 
