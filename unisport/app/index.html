@@ -206,32 +206,49 @@
     </div>
   </header>
 
-  <!-- Notifications Dropdown Panel (Works across desktop & mobile) -->
-  <div id="notifications-dropdown" class="hidden fixed top-16 right-4 md:left-68 md:right-auto md:top-20 w-80 sm:w-96 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-2xl p-4 z-50 text-xs transition-all max-h-[85vh] overflow-y-auto">
-    <div class="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800">
+  <!-- Instagram-Style Desktop Notifications Slide-Out Side Menu (Width: 384px, Fixed left-64) -->
+  <aside 
+    id="notifications-desktop-drawer" 
+    class="hidden md:flex flex-col fixed top-0 bottom-0 left-64 w-96 bg-white dark:bg-black border-r border-zinc-200 dark:border-zinc-800 z-30 shadow-2xl transition-transform duration-300 ease-in-out -translate-x-full"
+    aria-label="Notifications Drawer"
+  >
+    <!-- Drawer Header (Instagram style) -->
+    <div class="p-6 border-b border-zinc-100 dark:border-zinc-900 flex items-center justify-between">
+      <div>
+        <h2 class="text-2xl font-black tracking-tight text-zinc-950 dark:text-white">Notifications</h2>
+        <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5"><span id="drawer-notif-count-text">0</span> pending updates</p>
+      </div>
       <div class="flex items-center gap-2">
-        <h4 class="font-bold text-sm text-zinc-950 dark:text-white">Notifications</h4>
-        <span id="notif-count-text" class="text-[11px] font-semibold text-zinc-400">0</span>
-      </div>
-      <button onclick="window.clearAllNotifsGlobal()" class="text-[11px] text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition">Clear all</button>
-    </div>
-
-    <!-- Friend Requests Top Section -->
-    <div class="pt-3 pb-2 space-y-2">
-      <p class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Friend Requests</p>
-      <div id="notif-friend-requests-list" class="space-y-2">
-        <p class="text-zinc-400 text-xs py-1">No pending requests.</p>
+        <button onclick="window.clearAllNotifsGlobal()" class="text-xs font-semibold text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition">
+          Clear all
+        </button>
+        <button onclick="window.closeNotificationsDrawer()" class="p-2 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-900 text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer" title="Close Drawer">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
       </div>
     </div>
 
-    <!-- General Notifications Section -->
-    <div class="pt-2 border-t border-zinc-100 dark:border-zinc-800 space-y-2">
-      <p class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Activity & Match Alerts</p>
-      <div id="notif-general-list" class="space-y-2">
-        <p class="text-zinc-400 text-xs py-1">All caught up!</p>
+    <!-- Scrollable Drawer Body -->
+    <div class="p-6 space-y-6 overflow-y-auto flex-grow text-xs">
+      <!-- Section 1: Campus Friend Requests -->
+      <div class="space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-zinc-400 uppercase tracking-wider">Friend Requests</span>
+        </div>
+        <div id="notif-friend-requests-list" class="space-y-2.5">
+          <p class="text-zinc-400 text-xs py-3 text-center">No pending friend requests.</p>
+        </div>
+      </div>
+
+      <!-- Section 2: Activity & Match Alerts -->
+      <div class="space-y-3 pt-4 border-t border-zinc-100 dark:border-zinc-900">
+        <span class="text-xs font-bold text-zinc-400 uppercase tracking-wider">Activity & Match Alerts</span>
+        <div id="notif-general-list" class="space-y-2.5">
+          <p class="text-zinc-400 text-xs py-3 text-center">All caught up!</p>
+        </div>
       </div>
     </div>
-  </div>
+  </aside>
 
   <!-- Mobile User Dropdown Menu -->
   <div id="user-dropdown" class="hidden fixed top-16 right-4 w-64 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-2xl p-2.5 z-50 text-xs transition-all">
@@ -333,13 +350,17 @@
       });
     })();
 
-    // Synchronous resilient tab switcher for instant profile / sessions navigation
+    // Synchronous resilient tab switcher for instant profile / sessions / notifications navigation
     window.switchTabGlobal = function(tabId) {
       var dd = document.getElementById("user-dropdown");
       if (dd) dd.classList.add("hidden");
+      var drawer = document.getElementById("notifications-desktop-drawer");
+      if (drawer && tabId !== "notifications") {
+        drawer.classList.add("-translate-x-full");
+      }
 
       // Switch section visibility
-      var tabs = ["feed", "community", "create", "my-activities", "profile"];
+      var tabs = ["feed", "community", "create", "my-activities", "profile", "notifications"];
       for (var i = 0; i < tabs.length; i++) {
         var t = tabs[i];
         var sec = document.getElementById("section-" + t);
@@ -375,7 +396,6 @@
             var hEmail = document.getElementById("profile-hero-email");
             var hSchool = document.getElementById("profile-hero-school");
             var hInner = document.getElementById("profile-hero-avatar-inner");
-            var hAvatar = document.getElementById("profile-hero-avatar");
             var pName = document.getElementById("profile-name");
             var pEmail = document.getElementById("profile-email");
             var pUni = document.getElementById("profile-university");
@@ -384,7 +404,6 @@
             var dName = u.displayName || (u.email ? u.email.split("@")[0] : "Student");
             var isTue = (u.university && u.university.indexOf("TU") !== -1) || (u.email && u.email.indexOf("tue.nl") !== -1);
             var avId = u.avatarId || "footballer";
-            if (avId === "bolt" || avId === "flame" || avId === "cyber") avId = "footballer";
 
             if (hName) hName.textContent = dName;
             if (hEmail) hEmail.textContent = u.email || "";
@@ -398,6 +417,14 @@
         } catch(e) {}
       }
 
+      // If switching to community or notifications, render immediately
+      if (tabId === "community" && window.UniSport && typeof window.UniSport.renderCommunity === "function") {
+        window.UniSport.renderCommunity();
+      }
+      if (tabId === "notifications" && window.UniSport && typeof window.UniSport.renderNotifications === "function") {
+        window.UniSport.renderNotifications();
+      }
+
       if (window.UniSport && typeof window.UniSport.switchTab === "function") {
         window.UniSport.switchTab(tabId);
       }
@@ -407,14 +434,32 @@
       window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
+    // Instagram-style notifications drawer on desktop, dedicated page on mobile
     window.toggleNotificationsGlobal = function(e) {
       if (e) e.stopPropagation();
-      var notifDd = document.getElementById("notifications-dropdown");
       var userDd = document.getElementById("user-dropdown");
       if (userDd) userDd.classList.add("hidden");
-      if (notifDd) notifDd.classList.toggle("hidden");
+
+      if (window.innerWidth < 768) {
+        // Mobile: Open dedicated notifications page
+        window.switchTabGlobal('notifications');
+      } else {
+        // Laptop / Desktop: Open Instagram-style side drawer next to sidebar
+        var drawer = document.getElementById("notifications-desktop-drawer");
+        if (drawer) {
+          drawer.classList.toggle("-translate-x-full");
+        }
+      }
+
       if (window.UniSport && typeof window.UniSport.renderNotifications === "function") {
         window.UniSport.renderNotifications();
+      }
+    };
+
+    window.closeNotificationsDrawer = function() {
+      var drawer = document.getElementById("notifications-desktop-drawer");
+      if (drawer) {
+        drawer.classList.add("-translate-x-full");
       }
     };
 
@@ -1091,6 +1136,50 @@
             </button>
           </div>
         </form>
+      </div>
+
+    </section>
+
+    <!-- ================= SECTION 6: DEDICATED NOTIFICATIONS PAGE (MOBILE FULL VIEW) ================= -->
+    <section id="section-notifications" class="hidden w-full max-w-4xl mx-auto space-y-6">
+      
+      <!-- Minimalist Header -->
+      <div class="flex items-center justify-between pb-4 border-b border-zinc-100 dark:border-zinc-900">
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-zinc-950 dark:text-white">
+            Notifications
+          </h1>
+          <p class="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+            Stay updated with friend requests, campus session invites, and match alerts.
+          </p>
+        </div>
+        <button onclick="window.clearAllNotifsGlobal()" class="px-3.5 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition">
+          Clear all
+        </button>
+      </div>
+
+      <!-- Friend Requests Section -->
+      <div class="p-5 sm:p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 space-y-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <i data-lucide="user-plus" class="w-4 h-4 text-brand-orange"></i>
+            <h2 class="text-sm font-bold text-zinc-950 dark:text-white">Friend Requests</h2>
+          </div>
+        </div>
+        <div id="mobile-notif-requests-list" class="space-y-3">
+          <p class="text-zinc-400 text-xs py-3 text-center">No pending friend requests.</p>
+        </div>
+      </div>
+
+      <!-- Campus Alerts Section -->
+      <div class="p-5 sm:p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 space-y-4">
+        <div class="flex items-center gap-2">
+          <i data-lucide="bell" class="w-4 h-4 text-zinc-400"></i>
+          <h2 class="text-sm font-bold text-zinc-950 dark:text-white">Activity & Match Alerts</h2>
+        </div>
+        <div id="mobile-notif-general-list" class="space-y-3">
+          <p class="text-zinc-400 text-xs py-3 text-center">All caught up! No recent alerts.</p>
+        </div>
       </div>
 
     </section>

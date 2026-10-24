@@ -429,7 +429,7 @@ function setupNavigation() {
 
 export function switchTab(targetTab) {
   state.activeTab = targetTab;
-  const tabs = ["feed", "community", "create", "my-activities", "profile"];
+  const tabs = ["feed", "community", "create", "my-activities", "profile", "notifications"];
 
   tabs.forEach(t => {
     const section = document.getElementById(`section-${t}`);
@@ -463,6 +463,9 @@ export function switchTab(targetTab) {
   }
   if (targetTab === "profile") {
     populateProfileTab();
+  }
+  if (targetTab === "notifications") {
+    renderNotifications();
   }
   if (window.lucide && typeof window.lucide.createIcons === "function") {
     window.lucide.createIcons();
@@ -1286,53 +1289,67 @@ export function updateNotifBadge() {
 export function renderNotifications() {
   const reqList = document.getElementById("notif-friend-requests-list");
   const genList = document.getElementById("notif-general-list");
+  const mobileReqList = document.getElementById("mobile-notif-requests-list");
+  const mobileGenList = document.getElementById("mobile-notif-general-list");
+  const pageNotifCount = document.getElementById("notifications-page-count");
+  const drawerNotifCount = document.getElementById("drawer-notif-count-text");
 
-  if (reqList) {
+  const total = (state.friendRequests || []).length + (state.notifications || []).length;
+  if (pageNotifCount) pageNotifCount.textContent = `${total} new`;
+  if (drawerNotifCount) drawerNotifCount.textContent = total;
+
+  const renderRequestsHtml = () => {
     if (!state.friendRequests || state.friendRequests.length === 0) {
-      reqList.innerHTML = `<p class="text-zinc-400 text-xs py-1">No pending friend requests.</p>`;
-    } else {
-      reqList.innerHTML = state.friendRequests.map(req => {
-        const av = getAvatarById(req.fromAvatar || "footballer");
-        return `
-          <div class="p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-100 dark:border-zinc-800 space-y-2">
-            <div class="flex items-center gap-2.5">
-              <div class="w-8 h-8 rounded-full overflow-hidden border border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0">
-                ${av.svg}
-              </div>
-              <div class="min-w-0 flex-grow">
-                <p class="font-bold text-xs text-zinc-950 dark:text-white truncate">${escapeHtml(req.fromName)}</p>
-                <p class="text-[11px] text-zinc-500 truncate">${escapeHtml(req.fromUni)}</p>
-              </div>
-            </div>
-            <div class="flex items-center gap-2 pt-1">
-              <button onclick="window.acceptFriendRequest('${req.id}', '${req.fromUid}')" class="flex-1 py-1.5 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-bold text-[11px] transition hover:opacity-90">
-                Accept
-              </button>
-              <button onclick="window.declineFriendRequest('${req.id}')" class="flex-1 py-1.5 rounded-lg bg-zinc-200 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-200 font-semibold text-[11px] transition hover:bg-zinc-300">
-                Decline
-              </button>
-            </div>
-          </div>
-        `;
-      }).join('');
+      return `<p class="text-zinc-400 text-xs py-3 text-center">No pending friend requests.</p>`;
     }
-  }
-
-  if (genList) {
-    if (!state.notifications || state.notifications.length === 0) {
-      genList.innerHTML = `<p class="text-zinc-400 text-xs py-1">All caught up!</p>`;
-    } else {
-      genList.innerHTML = state.notifications.map(n => `
-        <div class="p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800">
-          <div class="flex items-center justify-between gap-2">
-            <p class="font-bold text-xs text-zinc-950 dark:text-white">${escapeHtml(n.title)}</p>
-            <span class="text-[10px] text-zinc-400">${escapeHtml(n.time || '')}</span>
+    return state.friendRequests.map(req => {
+      const av = getAvatarById(req.fromAvatar || "footballer");
+      return `
+        <div class="p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-800 space-y-3">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full overflow-hidden border border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0">
+              ${av.svg}
+            </div>
+            <div class="min-w-0 flex-grow">
+              <p class="font-bold text-xs sm:text-sm text-zinc-950 dark:text-white truncate">${escapeHtml(req.fromName)}</p>
+              <p class="text-[11px] text-zinc-500 truncate">${escapeHtml(req.fromUni)}</p>
+            </div>
           </div>
-          <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">${escapeHtml(n.desc)}</p>
+          <div class="flex items-center gap-2">
+            <button onclick="window.acceptFriendRequest('${req.id}', '${req.fromUid}')" class="flex-1 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 font-bold text-xs transition shadow-sm cursor-pointer">
+              Accept
+            </button>
+            <button onclick="window.declineFriendRequest('${req.id}')" class="flex-1 py-2 rounded-xl bg-zinc-200 hover:bg-zinc-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 font-semibold text-xs transition cursor-pointer">
+              Decline
+            </button>
+          </div>
         </div>
-      `).join('');
+      `;
+    }).join('');
+  };
+
+  const renderGeneralHtml = () => {
+    if (!state.notifications || state.notifications.length === 0) {
+      return `<p class="text-zinc-400 text-xs py-3 text-center">All caught up! No recent alerts.</p>`;
     }
-  }
+    return state.notifications.map(n => `
+      <div class="p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/60 dark:border-zinc-800/80 space-y-1">
+        <div class="flex items-center justify-between gap-2">
+          <p class="font-bold text-xs sm:text-sm text-zinc-950 dark:text-white">${escapeHtml(n.title)}</p>
+          <span class="text-[10px] text-zinc-400 font-medium whitespace-nowrap">${escapeHtml(n.time || '')}</span>
+        </div>
+        <p class="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">${escapeHtml(n.desc)}</p>
+      </div>
+    `).join('');
+  };
+
+  const reqHtml = renderRequestsHtml();
+  const genHtml = renderGeneralHtml();
+
+  if (reqList) reqList.innerHTML = reqHtml;
+  if (genList) genList.innerHTML = genHtml;
+  if (mobileReqList) mobileReqList.innerHTML = reqHtml;
+  if (mobileGenList) mobileGenList.innerHTML = genHtml;
 
   if (window.lucide && typeof window.lucide.createIcons === "function") {
     window.lucide.createIcons();
@@ -1363,38 +1380,57 @@ export function clearAllNotifsGlobal() {
 
 export async function fetchCampusStudents() {
   const currentUid = state.currentUser?.uid || (getActiveSession() || {}).uid;
+  const currentSession = getActiveSession() || state.currentUser || {};
   let remoteStudents = [];
 
   try {
     const snap = await getDocs(collection(db, "users"));
     snap.forEach(docSnap => {
       const data = docSnap.data();
-      if (docSnap.id !== currentUid) {
-        remoteStudents.push({
-          uid: docSnap.id,
-          displayName: data.displayName || "Student",
-          email: data.email || "",
-          university: data.university || (data.email?.endsWith("@student.tue.nl") ? "TU Eindhoven" : "Fontys UAS"),
-          avatarId: data.avatarId || "footballer",
-          sport: data.sport || "Football",
-          location: data.location || "Eindhoven Campus",
-          sports: data.sports || [data.sport || "Football"],
-          sessionsCount: data.sessionsCount || Math.floor(Math.random() * 15) + 2
-        });
-      }
+      remoteStudents.push({
+        uid: docSnap.id,
+        isSelf: docSnap.id === currentUid,
+        displayName: data.displayName || (docSnap.id === currentUid ? (currentSession.displayName || "Student") : "Student"),
+        email: data.email || (docSnap.id === currentUid ? (currentSession.email || "") : ""),
+        university: data.university || (data.email?.endsWith("@student.tue.nl") ? "TU Eindhoven" : "Fontys UAS"),
+        avatarId: data.avatarId || (docSnap.id === currentUid ? (currentSession.avatarId || "footballer") : "footballer"),
+        sport: data.sport || (docSnap.id === currentUid ? (currentSession.sport || "Football") : "Football"),
+        location: data.location || "Eindhoven Campus",
+        sports: data.sports || [data.sport || "Football"],
+        sessionsCount: data.sessionsCount || Math.floor(Math.random() * 15) + 2
+      });
     });
   } catch(e) {
-    console.warn("fetchCampusStudents error:", e);
+    console.warn("fetchCampusStudents Firestore fetch warning:", e);
   }
 
-  // Merge demo students to provide an active campus social community
+  // Ensure current user is in directory if not returned by Firestore
+  if (currentSession && currentSession.uid && !remoteStudents.some(s => s.uid === currentSession.uid)) {
+    remoteStudents.push({
+      uid: currentSession.uid,
+      isSelf: true,
+      displayName: currentSession.displayName || "Student",
+      email: currentSession.email || "",
+      university: currentSession.university || "Fontys UAS",
+      avatarId: currentSession.avatarId || "footballer",
+      sport: currentSession.sport || "Football",
+      location: "Eindhoven Campus",
+      sports: [currentSession.sport || "Football"],
+      sessionsCount: 3
+    });
+  }
+
+  // Merge demo students to guarantee rich active discovery
   const map = new Map();
   DEMO_CAMPUS_STUDENTS.forEach(s => {
-    if (s.uid !== currentUid) map.set(s.uid, s);
+    map.set(s.uid, { ...s, isSelf: s.uid === currentUid });
   });
   remoteStudents.forEach(s => map.set(s.uid, s));
 
   state.students = Array.from(map.values());
+  try {
+    localStorage.setItem("unisport_students_cache", JSON.stringify(state.students));
+  } catch(e) {}
 }
 
 export function renderCommunity() {
@@ -1448,8 +1484,11 @@ export function renderCommunity() {
   const statStudents = document.getElementById("community-stat-students");
   if (statStudents) statStudents.textContent = `${(state.students || []).length}+`;
 
+  const currentUid = state.currentUser?.uid || (getActiveSession() || {}).uid;
+
   container.innerHTML = list.map((student, idx) => {
     const av = getAvatarById(student.avatarId || "footballer");
+    const isSelf = student.uid === currentUid || student.isSelf;
     const isFriend = state.friends.includes(student.uid);
     const isTue = (student.university || "").includes("TU") || (student.email || "").includes("tue.nl");
     const sports = student.sports || [student.sport || "Football"];
@@ -1471,6 +1510,12 @@ export function renderCommunity() {
               <h3 class="font-extrabold text-sm sm:text-base text-zinc-950 dark:text-white truncate cursor-pointer hover:underline" onclick="window.openStudentProfileModal('${student.uid}')">
                 ${escapeHtml(student.displayName)}
               </h3>
+
+              ${isSelf ? `
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-950 text-white dark:bg-white dark:text-zinc-950">
+                  You
+                </span>
+              ` : ''}
               
               <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${isTue ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20' : 'bg-orange-500/10 text-brand-orange border border-orange-500/20'}">
                 <i data-lucide="graduation-cap" class="w-3 h-3"></i>
@@ -1520,7 +1565,11 @@ export function renderCommunity() {
               Profile
             </button>
 
-            ${isFriend ? `
+            ${isSelf ? `
+              <button onclick="window.switchTabGlobal('profile')" class="px-4 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 font-bold text-xs transition cursor-pointer shadow-sm">
+                Edit
+              </button>
+            ` : isFriend ? `
               <button onclick="window.removeFriend('${student.uid}')" class="px-3.5 py-2 rounded-xl bg-red-50 hover:bg-red-100 dark:bg-red-950/40 dark:hover:bg-red-900/60 text-xs font-bold text-red-600 dark:text-red-400 transition cursor-pointer" title="Remove Friend">
                 Remove
               </button>
@@ -1713,18 +1762,37 @@ window.UniSport = {
   signOut: signOutStudent
 };
 
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", () => {
+// Bootstrapping: Load local/cached students, initialize app immediately, and fetch remote updates asynchronously
+function bootUniSport() {
+  try {
     getStoredSocialData();
-    fetchCampusStudents().then(() => {
-      initApp();
-      renderCommunity();
-    });
-  });
-} else {
-  getStoredSocialData();
+    const cachedStudents = localStorage.getItem("unisport_students_cache");
+    if (cachedStudents) {
+      try {
+        const parsed = JSON.parse(cachedStudents);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          state.students = parsed;
+        }
+      } catch(e) {}
+    }
+  } catch(e) {}
+
+  // Initialize UI immediately
+  initApp();
+  renderCommunity();
+  renderNotifications();
+
+  // Then fetch live students from Firestore in background and re-render seamlessly
   fetchCampusStudents().then(() => {
-    initApp();
     renderCommunity();
+    renderNotifications();
+  }).catch(err => {
+    console.warn("fetchCampusStudents background error:", err);
   });
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", bootUniSport);
+} else {
+  bootUniSport();
 }
