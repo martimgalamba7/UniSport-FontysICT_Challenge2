@@ -9,6 +9,7 @@ import {
   getDocs, 
   addDoc, 
   updateDoc, 
+  deleteDoc,
   arrayUnion, 
   arrayRemove, 
   query, 
@@ -21,6 +22,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut, 
+  deleteUser,
   onAuthStateChanged,
   updateProfile
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
@@ -48,6 +50,7 @@ export {
   getDocs,
   addDoc,
   updateDoc,
+  deleteDoc,
   arrayUnion,
   arrayRemove,
   query,
@@ -57,6 +60,7 @@ export {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
+  deleteUser,
   onAuthStateChanged,
   updateProfile
 };

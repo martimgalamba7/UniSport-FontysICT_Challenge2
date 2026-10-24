@@ -18,6 +18,7 @@ import {
 
 import { 
   signOutStudent, 
+  deleteStudentAccount,
   getStudentProfile, 
   updateStudentProfile,
   getActiveSession,
@@ -960,13 +961,108 @@ export function openSettingsModal() {
   const modal = document.getElementById("settings-modal");
   const dropdown = document.getElementById("user-dropdown");
   if (dropdown) dropdown.classList.add("hidden");
-  if (modal) modal.classList.remove("hidden");
+  if (modal) {
+    modal.classList.remove("hidden");
+    if (window.lucide && typeof window.lucide.createIcons === "function") {
+      window.lucide.createIcons();
+    }
+  }
 }
 
 function setupSettingsModal() {
   const modal = document.getElementById("settings-modal");
   const closeBtn = document.getElementById("settings-modal-close");
   const doneBtn = document.getElementById("settings-modal-done");
+  const clearCacheBtn = document.getElementById("settings-clear-cache-btn");
+  const deleteAccountBtn = document.getElementById("settings-delete-account-btn");
+  const unitSelect = document.getElementById("settings-unit-select");
+  const hapticsToggle = document.getElementById("settings-haptics");
+  const notifRoster = document.getElementById("settings-notif-roster");
+  const notifActivities = document.getElementById("settings-notif-activities");
+  const notifReminders = document.getElementById("settings-notif-reminders");
+  const privacyPublic = document.getElementById("settings-privacy-public");
+  const showUni = document.getElementById("settings-show-uni");
+
+  // Load preferences from localStorage
+  try {
+    const savedPrefs = JSON.parse(localStorage.getItem("unisport_app_preferences") || "{}");
+    if (unitSelect && savedPrefs.unit) unitSelect.value = savedPrefs.unit;
+    if (hapticsToggle && typeof savedPrefs.haptics === "boolean") hapticsToggle.checked = savedPrefs.haptics;
+    if (notifRoster && typeof savedPrefs.notifRoster === "boolean") notifRoster.checked = savedPrefs.notifRoster;
+    if (notifActivities && typeof savedPrefs.notifActivities === "boolean") notifActivities.checked = savedPrefs.notifActivities;
+    if (notifReminders && typeof savedPrefs.notifReminders === "boolean") notifReminders.checked = savedPrefs.notifReminders;
+    if (privacyPublic && typeof savedPrefs.privacyPublic === "boolean") privacyPublic.checked = savedPrefs.privacyPublic;
+    if (showUni && typeof savedPrefs.showUni === "boolean") showUni.checked = savedPrefs.showUni;
+  } catch (e) {}
+
+  const savePreferences = () => {
+    try {
+      const prefs = {
+        unit: unitSelect ? unitSelect.value : "metric",
+        haptics: hapticsToggle ? hapticsToggle.checked : true,
+        notifRoster: notifRoster ? notifRoster.checked : true,
+        notifActivities: notifActivities ? notifActivities.checked : true,
+        notifReminders: notifReminders ? notifReminders.checked : true,
+        privacyPublic: privacyPublic ? privacyPublic.checked : true,
+        showUni: showUni ? showUni.checked : true,
+        updatedAt: Date.now()
+      };
+      localStorage.setItem("unisport_app_preferences", JSON.stringify(prefs));
+    } catch (e) {}
+  };
+
+  // Attach change listeners to save preferences on toggle
+  [unitSelect, hapticsToggle, notifRoster, notifActivities, notifReminders, privacyPublic, showUni].forEach(el => {
+    if (el) el.addEventListener("change", savePreferences);
+  });
+
+  // Clear Cache Action
+  if (clearCacheBtn) {
+    clearCacheBtn.addEventListener("click", () => {
+      const activeSession = localStorage.getItem("unisport_active_session");
+      const prefs = localStorage.getItem("unisport_app_preferences");
+      localStorage.clear();
+      if (activeSession) localStorage.setItem("unisport_active_session", activeSession);
+      if (prefs) localStorage.setItem("unisport_app_preferences", prefs);
+
+      clearCacheBtn.disabled = true;
+      clearCacheBtn.textContent = "Cleared!";
+      setTimeout(() => {
+        clearCacheBtn.disabled = false;
+        clearCacheBtn.textContent = "Clear Cache";
+      }, 1500);
+    });
+  }
+
+  // Delete Account Action (Safe double confirmation)
+  if (deleteAccountBtn) {
+    deleteAccountBtn.addEventListener("click", async () => {
+      const confirmed = window.confirm(
+        "Are you absolutely sure you want to delete your UniSport account?\n\nThis will permanently delete your student profile, mascot preferences, and match attendance. This cannot be undone."
+      );
+      if (!confirmed) return;
+
+      const finalWord = window.prompt("To permanently confirm deletion, please type DELETE below:");
+      if (finalWord !== "DELETE") {
+        alert("Account deletion canceled.");
+        return;
+      }
+
+      deleteAccountBtn.disabled = true;
+      deleteAccountBtn.textContent = "Deleting...";
+
+      try {
+        await deleteStudentAccount();
+        alert("Your UniSport account has been permanently deleted.");
+        window.location.href = "./login.html";
+      } catch (err) {
+        console.error("Delete account error:", err);
+        alert(err.message || "Failed to delete account. You may need to sign out and log in again before deleting your account for security reasons.");
+        deleteAccountBtn.disabled = false;
+        deleteAccountBtn.textContent = "Delete Account";
+      }
+    });
+  }
 
   const close = () => { if (modal) modal.classList.add("hidden"); };
   if (closeBtn) closeBtn.addEventListener("click", close);
