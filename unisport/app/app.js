@@ -1110,17 +1110,35 @@ function setupSettingsModal() {
   }
 }
 
-export function clearCache() {
+export async function clearCache() {
   const activeSession = localStorage.getItem("unisport_active_session");
   const prefs = localStorage.getItem("unisport_app_preferences");
   localStorage.clear();
   if (activeSession) localStorage.setItem("unisport_active_session", activeSession);
   if (prefs) localStorage.setItem("unisport_app_preferences", prefs);
 
+  state.students = [];
+  state.friends = [];
+  state.friendRequests = [];
+  state.notifications = [];
+
   const btn = document.getElementById("settings-clear-cache-btn");
   if (btn) {
     btn.disabled = true;
-    btn.textContent = "Cleared!";
+    btn.textContent = "Updating...";
+  }
+
+  try {
+    await fetchCampusStudents();
+    renderCommunity();
+    renderNotifications();
+    renderFeed();
+  } catch(e) {
+    console.warn("clearCache sync notice:", e);
+  }
+
+  if (btn) {
+    btn.textContent = "Cleared & Updated!";
     setTimeout(() => {
       btn.disabled = false;
       btn.textContent = "Clear Cache";

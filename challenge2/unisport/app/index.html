@@ -793,12 +793,22 @@
         var btn = document.getElementById("settings-clear-cache-btn");
         if (btn) {
           btn.disabled = true;
-          btn.textContent = "Cleared!";
-          setTimeout(function() {
-            btn.disabled = false;
-            btn.textContent = "Clear Cache";
-          }, 1500);
+          btn.textContent = "Updating...";
         }
+
+        if (typeof window.renderCommunityInstant === "function") {
+          window.renderCommunityInstant();
+        }
+
+        setTimeout(function() {
+          if (btn) {
+            btn.textContent = "Cleared & Updated!";
+            setTimeout(function() {
+              btn.disabled = false;
+              btn.textContent = "Clear Cache";
+            }, 1200);
+          }
+        }, 600);
       } catch(e) {
         console.error("clearCache error:", e);
       }
