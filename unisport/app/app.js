@@ -1688,7 +1688,8 @@ window.UniSport = {
   deleteAccount,
   renderCommunity,
   renderNotifications,
-  openStudentProfileModal
+  openStudentProfileModal,
+  signOut: signOutStudent
 };
 
 if (document.readyState === "loading") {
