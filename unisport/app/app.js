@@ -44,7 +44,13 @@ window.UniSport.signOut = signOutStudent;
 // Expose global filter and social handlers immediately
 window.filterStudentsGlobal = function(val) {
   state.studentSearchQuery = (val || "").trim();
+  if (window.communityStateInline) {
+    window.communityStateInline.searchQuery = state.studentSearchQuery;
+  }
   renderCommunity();
+  if (typeof window.renderCommunityInstant === "function") {
+    window.renderCommunityInstant();
+  }
 };
 window.filterStudentsByUni = function(uni) {
   state.communityUniFilter = uni;
@@ -1474,6 +1480,7 @@ export async function fetchCampusStudents() {
     localStorage.setItem("unisport_students_cache", JSON.stringify(state.students));
   } catch(e) {}
 
+  renderCommunity();
   if (typeof window.renderCommunityInstant === "function") {
     window.renderCommunityInstant();
   }
@@ -1783,7 +1790,13 @@ window.filterStudentsByUni = function(uni) {
 
 window.filterStudentsGlobal = function(val) {
   state.studentSearchQuery = (val || "").trim();
+  if (window.communityStateInline) {
+    window.communityStateInline.searchQuery = state.studentSearchQuery;
+  }
   renderCommunity();
+  if (typeof window.renderCommunityInstant === "function") {
+    window.renderCommunityInstant();
+  }
 };
 
 window.openStudentProfileModal = openStudentProfileModal;
