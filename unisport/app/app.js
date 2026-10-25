@@ -1113,9 +1113,10 @@ function setupSettingsModal() {
 export async function clearCache() {
   const activeSession = localStorage.getItem("unisport_active_session");
   const prefs = localStorage.getItem("unisport_app_preferences");
-  localStorage.clear();
-  if (activeSession) localStorage.setItem("unisport_active_session", activeSession);
-  if (prefs) localStorage.setItem("unisport_app_preferences", prefs);
+  localStorage.removeItem("unisport_students_cache");
+  localStorage.removeItem("unisport_friends");
+  localStorage.removeItem("unisport_friend_requests");
+  localStorage.removeItem("unisport_notifications");
 
   state.students = [];
   state.friends = [];
@@ -1142,7 +1143,9 @@ export async function clearCache() {
     setTimeout(() => {
       btn.disabled = false;
       btn.textContent = "Clear Cache";
-    }, 1500);
+      // Auto-reload to guarantee fresh runtime state
+      window.location.reload();
+    }, 1000);
   }
 }
 
@@ -1366,8 +1369,9 @@ export async function fetchCampusStudents() {
     snap.forEach(docSnap => {
       const data = docSnap.data();
       const isSelf = docSnap.id === currentUid;
-      const dName = data.displayName || (isSelf ? (currentSession.displayName || "Student") : (data.email ? data.email.split("@")[0] : "Student"));
-      const dEmail = data.email || (isSelf ? (currentSession.email || "") : "");
+      // Real Firestore data takes precedence
+      const dName = data.displayName || (data.email ? data.email.split("@")[0] : (isSelf ? currentSession.displayName : "Student")) || "Student";
+      const dEmail = data.email || (isSelf ? currentSession.email : "") || "";
       remoteStudents.push({
         uid: docSnap.id,
         isSelf: isSelf,
@@ -1430,8 +1434,8 @@ export function listenToCampusStudents() {
       snapshot.forEach(docSnap => {
         const data = docSnap.data();
         const isSelf = docSnap.id === currentUid;
-        const dName = data.displayName || (isSelf ? (currentSession.displayName || "Student") : (data.email ? data.email.split("@")[0] : "Student"));
-        const dEmail = data.email || (isSelf ? (currentSession.email || "") : "");
+        const dName = data.displayName || (data.email ? data.email.split("@")[0] : (isSelf ? currentSession.displayName : "Student")) || "Student";
+        const dEmail = data.email || (isSelf ? currentSession.email : "") || "";
         remote.push({
           uid: docSnap.id,
           isSelf: isSelf,
