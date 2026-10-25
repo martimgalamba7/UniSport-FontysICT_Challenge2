@@ -1365,14 +1365,17 @@ export async function fetchCampusStudents() {
     console.log("[UniSport Firestore] Users snapshot count:", snap.size);
     snap.forEach(docSnap => {
       const data = docSnap.data();
+      const isSelf = docSnap.id === currentUid;
+      const dName = data.displayName || (isSelf ? (currentSession.displayName || "Student") : (data.email ? data.email.split("@")[0] : "Student"));
+      const dEmail = data.email || (isSelf ? (currentSession.email || "") : "");
       remoteStudents.push({
         uid: docSnap.id,
-        isSelf: docSnap.id === currentUid,
-        displayName: data.displayName || (docSnap.id === currentUid ? (currentSession.displayName || "Student") : "Student"),
-        email: data.email || (docSnap.id === currentUid ? (currentSession.email || "") : ""),
-        university: data.university || (data.email?.endsWith("@student.tue.nl") ? "TU Eindhoven" : "Fontys UAS"),
-        avatarId: data.avatarId || (docSnap.id === currentUid ? (currentSession.avatarId || "footballer") : "footballer"),
-        sport: data.sport || (docSnap.id === currentUid ? (currentSession.sport || "Football") : "Football"),
+        isSelf: isSelf,
+        displayName: dName,
+        email: dEmail,
+        university: data.university || (dEmail.endsWith("@student.tue.nl") ? "TU Eindhoven" : "Fontys UAS"),
+        avatarId: data.avatarId || (isSelf ? (currentSession.avatarId || "footballer") : "footballer"),
+        sport: data.sport || "Football",
         location: data.location || "Eindhoven Campus",
         sports: data.sports || [data.sport || "Football"],
         sessionsCount: data.sessionsCount || Math.floor(Math.random() * 15) + 2
@@ -1401,7 +1404,6 @@ export async function fetchCampusStudents() {
   // Strictly real Firestore accounts (no fake demo entries)
   const map = new Map();
   remoteStudents.forEach(s => {
-    // Exclude any obsolete demo uids
     if (!s.uid.startsWith("demo-") && !s.uid.includes("-rep") && s.uid !== "climb-lover" && s.uid !== "gym-bro") {
       map.set(s.uid, s);
     }
@@ -1427,14 +1429,17 @@ export function listenToCampusStudents() {
       const remote = [];
       snapshot.forEach(docSnap => {
         const data = docSnap.data();
+        const isSelf = docSnap.id === currentUid;
+        const dName = data.displayName || (isSelf ? (currentSession.displayName || "Student") : (data.email ? data.email.split("@")[0] : "Student"));
+        const dEmail = data.email || (isSelf ? (currentSession.email || "") : "");
         remote.push({
           uid: docSnap.id,
-          isSelf: docSnap.id === currentUid,
-          displayName: data.displayName || (docSnap.id === currentUid ? (currentSession.displayName || "Student") : "Student"),
-          email: data.email || (docSnap.id === currentUid ? (currentSession.email || "") : ""),
-          university: data.university || (data.email?.endsWith("@student.tue.nl") ? "TU Eindhoven" : "Fontys UAS"),
-          avatarId: data.avatarId || (docSnap.id === currentUid ? (currentSession.avatarId || "footballer") : "footballer"),
-          sport: data.sport || (docSnap.id === currentUid ? (currentSession.sport || "Football") : "Football"),
+          isSelf: isSelf,
+          displayName: dName,
+          email: dEmail,
+          university: data.university || (dEmail.endsWith("@student.tue.nl") ? "TU Eindhoven" : "Fontys UAS"),
+          avatarId: data.avatarId || (isSelf ? (currentSession.avatarId || "footballer") : "footballer"),
+          sport: data.sport || "Football",
           location: data.location || "Eindhoven Campus",
           sports: data.sports || [data.sport || "Football"],
           sessionsCount: data.sessionsCount || Math.floor(Math.random() * 15) + 2
