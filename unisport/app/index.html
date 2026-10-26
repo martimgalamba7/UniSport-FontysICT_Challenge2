@@ -2,7 +2,7 @@
 <html lang="en" class="h-full">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>UniSport App • Eindhoven Student Sports Community</title>
   
   <link rel="icon" type="image/png" href="/assets/logoUniSport.png" />
@@ -143,6 +143,24 @@
         left: 4.75rem;
       }
     }
+
+    /* Mobile bottom navbar sizing & iPhone Home Indicator safe-area spacing */
+    #mobile-bottom-nav {
+      padding-top: 0.85rem;
+      padding-bottom: calc(1.75rem + env(safe-area-inset-bottom, 0px));
+    }
+    #mobile-bottom-nav button {
+      gap: 0.35rem !important;
+      padding: 0.2rem 0.35rem;
+    }
+    #mobile-bottom-nav button svg {
+      width: 1.35rem !important;
+      height: 1.35rem !important;
+    }
+    #mobile-bottom-nav button span {
+      font-size: 0.72rem !important;
+      line-height: 1rem !important;
+    }
   </style>
   <script>
     // Immediate fallback helper for filter drawer
@@ -168,7 +186,7 @@
   </script>
 </head>
 
-<body class="bg-white text-zinc-900 dark:bg-black dark:text-zinc-100 min-h-screen flex flex-col font-sans transition-colors duration-150 pb-16 md:pb-8">
+<body class="bg-white text-zinc-900 dark:bg-black dark:text-zinc-100 min-h-screen flex flex-col font-sans transition-colors duration-150 pb-28 md:pb-8">
 
   <!-- Desktop Icon-First Hover-Sliding Sidebar Navigation (Hidden on Mobile) -->
   <aside id="desktop-sidebar" class="hidden md:flex fixed top-0 bottom-0 left-0 z-40 bg-white dark:bg-black border-r border-zinc-200 dark:border-zinc-800 flex-col justify-between p-3 select-none transition-colors">
@@ -2426,37 +2444,37 @@
   </main>
 
   <!-- Mobile Bottom Nav -->
-  <nav class="md:hidden fixed bottom-0 left-0 right-0 z-[60] bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md border-t border-zinc-100 dark:border-zinc-900 px-4 py-2.5 flex items-center justify-around text-xs shadow-lg">
-    <button id="mobile-tab-feed" onclick="window.switchTabGlobal('feed')" class="flex flex-col items-center gap-1 text-zinc-950 dark:text-white transition cursor-pointer">
-      <i data-lucide="compass" class="w-4 h-4"></i>
-      <span class="text-[10px] font-semibold">Feed</span>
+  <nav id="mobile-bottom-nav" class="md:hidden fixed bottom-0 left-0 right-0 z-[60] bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md border-t border-zinc-200/80 dark:border-zinc-900 px-3 pt-3.5 pb-7 flex items-center justify-around text-xs shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
+    <button id="mobile-tab-feed" onclick="window.switchTabGlobal('feed')" class="flex flex-col items-center gap-1.5 text-zinc-950 dark:text-white transition cursor-pointer">
+      <i data-lucide="compass" class="w-5 h-5"></i>
+      <span class="text-[11px] font-semibold">Feed</span>
     </button>
-    <button id="mobile-tab-community" onclick="window.switchTabGlobal('community')" class="flex flex-col items-center gap-1 text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer">
-      <i data-lucide="users" class="w-4 h-4"></i>
-      <span class="text-[10px] font-semibold">Students</span>
+    <button id="mobile-tab-community" onclick="window.switchTabGlobal('community')" class="flex flex-col items-center gap-1.5 text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer">
+      <i data-lucide="users" class="w-5 h-5"></i>
+      <span class="text-[11px] font-semibold">Students</span>
     </button>
-    <button id="mobile-tab-create" onclick="window.switchTabGlobal('create')" class="flex flex-col items-center gap-1 text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer">
-      <i data-lucide="plus-circle" class="w-4 h-4"></i>
-      <span class="text-[10px] font-semibold">Create</span>
+    <button id="mobile-tab-create" onclick="window.switchTabGlobal('create')" class="flex flex-col items-center gap-1.5 text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer">
+      <i data-lucide="plus-circle" class="w-5 h-5"></i>
+      <span class="text-[11px] font-semibold">Create</span>
     </button>
-    <button id="mobile-tab-my-activities" onclick="window.switchTabGlobal('my-activities')" class="flex flex-col items-center gap-1 text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer">
-      <i data-lucide="calendar" class="w-4 h-4"></i>
-      <span class="text-[10px] font-semibold">Spots</span>
+    <button id="mobile-tab-my-activities" onclick="window.switchTabGlobal('my-activities')" class="flex flex-col items-center gap-1.5 text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer">
+      <i data-lucide="calendar" class="w-5 h-5"></i>
+      <span class="text-[11px] font-semibold">Spots</span>
     </button>
-    <button id="mobile-tab-profile" onclick="window.switchTabGlobal('profile')" class="flex flex-col items-center gap-1 text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer">
-      <i data-lucide="user" class="w-4 h-4"></i>
-      <span class="text-[10px] font-semibold">Profile</span>
+    <button id="mobile-tab-profile" onclick="window.switchTabGlobal('profile')" class="flex flex-col items-center gap-1.5 text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer">
+      <i data-lucide="user" class="w-5 h-5"></i>
+      <span class="text-[11px] font-semibold">Profile</span>
     </button>
-    <button id="mobile-tab-settings" onclick="window.openSettingsGlobal()" class="flex flex-col items-center gap-1 text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer">
-      <i data-lucide="settings" class="w-4 h-4"></i>
-      <span class="text-[10px] font-semibold">Settings</span>
+    <button id="mobile-tab-settings" onclick="window.openSettingsGlobal()" class="flex flex-col items-center gap-1.5 text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer">
+      <i data-lucide="settings" class="w-5 h-5"></i>
+      <span class="text-[11px] font-semibold">Settings</span>
     </button>
   </nav>
 
   <!-- Full-Screen Settings Menu (App, Privacy & Account Preferences) -->
   <div 
     id="settings-modal" 
-    class="hidden fixed inset-0 md:left-20 pb-16 md:pb-0 z-40 md:z-30 bg-white dark:bg-zinc-950 flex flex-col overflow-y-auto animate-in fade-in duration-150"
+    class="hidden fixed inset-0 md:left-20 pb-28 md:pb-0 z-40 md:z-30 bg-white dark:bg-zinc-950 flex flex-col overflow-y-auto animate-in fade-in duration-150"
     role="dialog"
     aria-modal="true"
     aria-label="Settings"
