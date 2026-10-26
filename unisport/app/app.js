@@ -231,12 +231,23 @@ function updateAuthUI(user, profile) {
       const dropEmail = document.getElementById("dropdown-email");
       const dropSchoolBadge = document.getElementById("dropdown-school-badge");
       const dropSchoolFull = document.getElementById("dropdown-school-full");
+      const dropSchoolContainer = document.getElementById("dropdown-school-container");
+      const fullScreenAvatarImg = document.getElementById("fullscreen-user-avatar-img");
       const isTue = uni.includes("TU") || email.endsWith("@student.tue.nl");
 
       if (dropName) dropName.textContent = displayName;
       if (dropEmail) dropEmail.textContent = email;
       if (dropSchoolBadge) dropSchoolBadge.textContent = isTue ? "TU/e" : "Fontys";
       if (dropSchoolFull) dropSchoolFull.textContent = isTue ? "TU Eindhoven" : "Fontys UAS";
+      if (fullScreenAvatarImg) fullScreenAvatarImg.src = avatar.image;
+
+      let prefs = {};
+      try { prefs = JSON.parse(localStorage.getItem("unisport_app_preferences") || "{}"); } catch(e){}
+      const showUni = prefs.showUni !== undefined ? prefs.showUni : (state.userProfile?.showUniBadge !== undefined ? state.userProfile.showUniBadge : true);
+      if (dropSchoolContainer) {
+        if (showUni === false) dropSchoolContainer.classList.add("hidden");
+        else dropSchoolContainer.classList.remove("hidden");
+      }
     }
 
     // Update Instagram-style sidebar profile button
@@ -308,16 +319,18 @@ function setupNavigation() {
     if (mobileBtn) mobileBtn.addEventListener("click", clickHandler);
   });
 
-  // Google avatar dropdown click outside close
-  const dropdown = document.getElementById("user-dropdown");
-  if (dropdown) {
-    document.addEventListener("click", (e) => {
-      const avatarBtn = document.getElementById("google-avatar-btn");
-      if (avatarBtn && (avatarBtn === e.target || avatarBtn.contains(e.target))) {
-        return;
-      }
-      if (dropdown && !dropdown.contains(e.target)) {
-        dropdown.classList.add("hidden");
+  // Google avatar button open mobile full-screen user menu
+  const avatarBtn = document.getElementById("google-avatar-btn");
+  if (avatarBtn) {
+    avatarBtn.addEventListener("click", (e) => {
+      if (typeof window.openUserMenuGlobal === "function") {
+        window.openUserMenuGlobal(e);
+      } else {
+        const dd = document.getElementById("user-dropdown");
+        if (dd) {
+          dd.classList.remove("hidden");
+          dd.classList.add("flex");
+        }
       }
     });
   }
@@ -326,6 +339,13 @@ function setupNavigation() {
 export function switchTab(targetTab) {
   state.activeTab = targetTab;
   const tabs = ["feed", "community", "create", "my-activities", "profile", "notifications", "student-profile"];
+
+  const userDropdown = document.getElementById("user-dropdown");
+  if (userDropdown) {
+    userDropdown.classList.add("hidden");
+    userDropdown.classList.remove("flex");
+    document.body.style.overflow = "";
+  }
 
   tabs.forEach(t => {
     const section = document.getElementById(`section-${t}`);
@@ -1133,7 +1153,11 @@ export async function savePrivacySettingsToFirestore(isPublic, showUniBadge) {
 export function openSettingsModal() {
   const modal = document.getElementById("settings-modal");
   const dropdown = document.getElementById("user-dropdown");
-  if (dropdown) dropdown.classList.add("hidden");
+  if (dropdown) {
+    dropdown.classList.add("hidden");
+    dropdown.classList.remove("flex");
+    document.body.style.overflow = "";
+  }
   if (modal) {
     modal.classList.remove("hidden");
     if (window.lucide && typeof window.lucide.createIcons === "function") {
