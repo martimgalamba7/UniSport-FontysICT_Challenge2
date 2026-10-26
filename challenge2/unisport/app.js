@@ -39,6 +39,12 @@ window.UniSport.toggleJoinActivity = toggleJoinActivity;
 window.UniSport.renderCommunity = renderCommunity;
 window.UniSport.renderNotifications = renderNotifications;
 window.UniSport.openStudentProfileModal = openStudentProfileModal;
+window.UniSport.toggleFriendship = toggleFriendship;
+window.UniSport.cancelFriendRequest = cancelFriendRequest;
+window.UniSport.acceptFriendRequest = acceptFriendRequest;
+window.UniSport.declineFriendRequest = declineFriendRequest;
+window.UniSport.removeFriend = removeFriend;
+window.UniSport.syncSocialStateFromStorage = syncSocialStateFromStorage;
 window.UniSport.signOut = signOutStudent;
 
 // Expose global filter and social handlers immediately
@@ -80,6 +86,7 @@ window.setCommunityView = function(view) {
 };
 window.openStudentProfileModal = openStudentProfileModal;
 window.toggleFriendship = toggleFriendship;
+window.cancelFriendRequest = cancelFriendRequest;
 window.removeFriend = removeFriend;
 window.acceptFriendRequest = acceptFriendRequest;
 window.declineFriendRequest = declineFriendRequest;
@@ -93,7 +100,7 @@ const state = {
   currentUser: null,
   userProfile: null,
   activities: [],
-  activeTab: "feed", // "feed" | "community" | "create" | "my-activities" | "profile"
+  activeTab: "feed", // "feed" | "community" | "create" | "my-activities" | "profile" | "student-profile"
   filterSport: "all",
   searchQuery: "",
   selectedActivity: null,
@@ -103,8 +110,10 @@ const state = {
   communityView: "all", // "all" | "friends"
   communityUniFilter: "all", // "all" | "Fontys" | "TU/e"
   studentSearchQuery: "",
-  friends: [], // array of friend uids
-  friendRequests: [], // array of { id, fromUid, fromName, fromUni, fromAvatar, timestamp }
+  friends: [], // array of confirmed friend uids
+  sentRequests: [], // array of target uids to whom currentUser sent a request (Pending)
+  declinedRequests: [], // array of uids whose request currentUser declined
+  friendRequests: [], // array of incoming requests { id, fromUid, fromName, fromUni, fromAvatar, timestamp }
   notifications: [] // array of { id, title, desc, type, read, timestamp }
 };
 
@@ -122,83 +131,8 @@ export const SPORTS_CONFIG = {
   "Other": { badge: "bg-zinc-500/10 text-zinc-700 dark:text-zinc-300 border-zinc-500/20" }
 };
 
-// Seed activities for Eindhoven student community
-const INITIAL_DEMO_ACTIVITIES = [
-  {
-    id: "demo-1",
-    sport: "Football",
-    title: "Casual 5v5 Match at SSC Field 1",
-    location: "Student Sports Centre (SSC) Eindhoven",
-    distance: "On Campus (Fontys / TU/e)",
-    dateTime: "Tomorrow, 18:30",
-    maxParticipants: 10,
-    creatorId: "fontys-student-rep",
-    creatorName: "Thomas van Dijk",
-    creatorUniversity: "Fontys UAS",
-    description: "Looking for 10 players for a fun, relaxed game after lectures. All skill levels welcome! Bring white or dark shirts.",
-    participants: [
-      { uid: "fontys-student-rep", name: "Thomas van Dijk", university: "Fontys UAS", avatarId: "footballer" },
-      { uid: "demo-p1", name: "Sara Martins", university: "TU Eindhoven", avatarId: "runner" },
-      { uid: "demo-p2", name: "Lars Bakker", university: "Fontys UAS", avatarId: "bodybuilder" },
-      { uid: "demo-p3", name: "Elena Costa", university: "Fontys UAS", avatarId: "runner" }
-    ],
-    createdAt: Date.now() - 3600000
-  },
-  {
-    id: "demo-2",
-    sport: "Running",
-    title: "5km Sunset Run along Dommel",
-    location: "Genneper Parken (Meet at Entrance)",
-    distance: "1.2 km from Fontys Rachelsmolen",
-    dateTime: "Thursday, 19:00",
-    maxParticipants: 8,
-    creatorId: "tue-runner-rep",
-    creatorName: "Sophie de Vries",
-    creatorUniversity: "TU Eindhoven",
-    description: "Pace around 5:30 min/km. Great way to de-stress before exam week. Coffee afterwards at Strijp-S!",
-    participants: [
-      { uid: "tue-runner-rep", name: "Sophie de Vries", university: "TU Eindhoven", avatarId: "runner" },
-      { uid: "demo-p4", name: "Ruben V.", university: "Fontys UAS", avatarId: "footballer" },
-      { uid: "demo-p5", name: "Noor Janssen", university: "TU Eindhoven", avatarId: "bodybuilder" }
-    ],
-    createdAt: Date.now() - 7200000
-  },
-  {
-    id: "demo-3",
-    sport: "Bouldering",
-    title: "Evening Session @ Monk Bouldergym",
-    location: "Monk Bouldergym (Strijp-S)",
-    distance: "2.1 km from Fontys Rachelsmolen",
-    dateTime: "Friday, 17:45",
-    maxParticipants: 6,
-    creatorId: "climb-lover",
-    creatorName: "Matas K.",
-    creatorUniversity: "Fontys UAS",
-    description: "Working on 5C-6B circuits. Beginners welcome to tag along! We can share tips and chalk.",
-    participants: [
-      { uid: "climb-lover", name: "Matas K.", university: "Fontys UAS", avatarId: "bodybuilder" },
-      { uid: "demo-p6", name: "Anouk S.", university: "TU Eindhoven", avatarId: "runner" }
-    ],
-    createdAt: Date.now() - 10800000
-  },
-  {
-    id: "demo-4",
-    sport: "Gym & Fitness",
-    title: "Upper Body & Bench Press Partner Needed",
-    location: "Basic-Fit Eindhoven Centrum",
-    distance: "0.8 km from Station",
-    dateTime: "Wednesday, 16:30",
-    maxParticipants: 2,
-    creatorId: "gym-bro",
-    creatorName: "Liam O'Connor",
-    creatorUniversity: "Fontys UAS",
-    description: "Need someone to spot heavy sets and push each other. Chest and back day focus.",
-    participants: [
-      { uid: "gym-bro", name: "Liam O'Connor", university: "Fontys UAS", avatarId: "bodybuilder" }
-    ],
-    createdAt: Date.now() - 14400000
-  }
-];
+// No fake/demo activities — only real Firestore activities are shown
+const INITIAL_DEMO_ACTIVITIES = [];
 
 
 function escapeHtml(str) {
@@ -230,8 +164,8 @@ function formatDisplayDate(dateStr) {
  * Initializes App
  */
 export function initApp() {
-  // Pre-seed activities so feed renders instantly
-  state.activities = INITIAL_DEMO_ACTIVITIES;
+  // Start with empty activities list — only real Firestore sessions are loaded
+  state.activities = [];
 
   // REQUIRE LOGIN: If not logged in, redirect directly to login page
   const session = getActiveSession();
@@ -391,7 +325,7 @@ function setupNavigation() {
 
 export function switchTab(targetTab) {
   state.activeTab = targetTab;
-  const tabs = ["feed", "community", "create", "my-activities", "profile", "notifications"];
+  const tabs = ["feed", "community", "create", "my-activities", "profile", "notifications", "student-profile"];
 
   tabs.forEach(t => {
     const section = document.getElementById(`section-${t}`);
@@ -417,6 +351,17 @@ export function switchTab(targetTab) {
     }
   });
 
+  if (targetTab === "student-profile") {
+    const commDeskBtn = document.getElementById("tab-btn-community");
+    const commMobBtn = document.getElementById("mobile-tab-community");
+    if (commDeskBtn) {
+      commDeskBtn.className = "sidebar-btn nav-sidebar-btn font-bold bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 cursor-pointer group overflow-hidden";
+    }
+    if (commMobBtn) {
+      commMobBtn.className = "flex flex-col items-center gap-1 text-zinc-950 dark:text-white transition cursor-pointer";
+    }
+  }
+
   if (targetTab === "community") {
     renderCommunity();
   }
@@ -435,27 +380,87 @@ export function switchTab(targetTab) {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
+function isFakeActivity(id, data) {
+  if (!id || String(id).startsWith("demo-")) return true;
+  const fakeCreators = ["fontys-student-rep", "tue-runner-rep", "climb-lover", "gym-bro"];
+  if (data && fakeCreators.includes(data.creatorId)) return true;
+  return false;
+}
+
+async function fetchActivitiesDirectFromFirestore() {
+  try {
+    const url = `https://firestore.googleapis.com/v1/projects/fontys-unisport/databases/(default)/documents/activities?pageSize=100&_t=${Date.now()}`;
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) return;
+    const json = await res.json();
+    if (!json || !Array.isArray(json.documents)) {
+      if (state.activities.length === 0) renderFeed();
+      return;
+    }
+    const items = [];
+    json.documents.forEach(docObj => {
+      const id = (docObj.name || "").split("/").pop();
+      const f = docObj.fields || {};
+      const creatorId = f.creatorId?.stringValue || "";
+      if (isFakeActivity(id, { creatorId })) return;
+
+      const participants = [];
+      if (f.participants?.arrayValue?.values) {
+        f.participants.arrayValue.values.forEach(v => {
+          const mf = v.mapValue?.fields || {};
+          participants.push({
+            uid: mf.uid?.stringValue || "",
+            name: mf.name?.stringValue || "Student",
+            university: mf.university?.stringValue || "Fontys UAS",
+            avatarId: mf.avatarId?.stringValue || "footballer"
+          });
+        });
+      }
+      items.push({
+        id,
+        sport: f.sport?.stringValue || "Football",
+        title: f.title?.stringValue || "Campus Session",
+        location: f.location?.stringValue || "Eindhoven",
+        distance: f.distance?.stringValue || "Eindhoven Area",
+        dateTime: f.dateTime?.stringValue || "Upcoming",
+        maxParticipants: f.maxParticipants?.integerValue ? parseInt(f.maxParticipants.integerValue, 10) : 10,
+        creatorId,
+        creatorName: f.creatorName?.stringValue || "Student",
+        creatorUniversity: f.creatorUniversity?.stringValue || "Fontys UAS",
+        description: f.description?.stringValue || "",
+        participants,
+        createdAt: f.createdAt?.timestampValue ? new Date(f.createdAt.timestampValue).getTime() : Date.now()
+      });
+    });
+    items.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    state.activities = items;
+    renderFeed();
+    if (state.activeTab === "my-activities") renderMyActivities();
+  } catch (e) {
+    console.warn("Direct activities fetch notice:", e);
+  }
+}
+
 function listenToActivities() {
+  fetchActivitiesDirectFromFirestore();
   try {
     const q = query(collection(db, "activities"), orderBy("createdAt", "desc"));
     onSnapshot(q, (snapshot) => {
       const items = [];
       snapshot.forEach(docSnap => {
-        items.push({ id: docSnap.id, ...docSnap.data() });
+        const data = docSnap.data();
+        if (!isFakeActivity(docSnap.id, data)) {
+          items.push({ id: docSnap.id, ...data });
+        }
       });
 
-      if (items.length > 0) {
-        state.activities = items;
-      } else {
-        state.activities = INITIAL_DEMO_ACTIVITIES;
-      }
+      state.activities = items;
       renderFeed();
+      if (state.activeTab === "my-activities") renderMyActivities();
     }, (error) => {
-      state.activities = INITIAL_DEMO_ACTIVITIES;
       renderFeed();
     });
   } catch (err) {
-    state.activities = INITIAL_DEMO_ACTIVITIES;
     renderFeed();
   }
 }
@@ -1200,57 +1205,94 @@ export async function deleteAccount() {
 function getStoredSocialData() {
   try {
     const rawFriends = localStorage.getItem("unisport_friends");
+    const rawSent = localStorage.getItem("unisport_sent_requests");
+    const rawDeclined = localStorage.getItem("unisport_declined_requests");
     const rawRequests = localStorage.getItem("unisport_friend_requests");
     const rawNotifs = localStorage.getItem("unisport_notifications");
 
-    state.friends = rawFriends ? JSON.parse(rawFriends) : ["demo-p1"];
-    state.friendRequests = rawRequests ? JSON.parse(rawRequests) : [
-      {
-        id: "req-1",
-        fromUid: "fontys-student-rep",
-        fromName: "Thomas van Dijk",
-        fromUni: "Fontys UAS",
-        fromAvatar: "footballer",
-        timestamp: Date.now() - 3600000
-      },
-      {
-        id: "req-2",
-        fromUid: "tue-runner-rep",
-        fromName: "Sophie de Vries",
-        fromUni: "TU Eindhoven",
-        fromAvatar: "runner",
-        timestamp: Date.now() - 7200000
-      }
-    ];
-    state.notifications = rawNotifs ? JSON.parse(rawNotifs) : [
-      {
-        id: "notif-1",
-        title: "Match Kickoff Reminder",
-        desc: "Casual 5v5 Match starts in 1 hour at SSC Field 1.",
-        time: "1h ago"
-      },
-      {
-        id: "notif-2",
-        title: "New Student Joined",
-        desc: "Sara Martins joined your hosted Dommel Run session.",
-        time: "3h ago"
-      }
-    ];
+    const parsedFriends = rawFriends ? JSON.parse(rawFriends) : [];
+    const parsedSent = rawSent ? JSON.parse(rawSent) : [];
+    const parsedDeclined = rawDeclined ? JSON.parse(rawDeclined) : [];
+    const parsedRequests = rawRequests ? JSON.parse(rawRequests) : [];
+    const parsedNotifs = rawNotifs ? JSON.parse(rawNotifs) : [];
+
+    state.friends = Array.isArray(parsedFriends)
+      ? parsedFriends.filter(id => id && !String(id).startsWith("demo-") && !String(id).includes("-rep"))
+      : [];
+    state.sentRequests = Array.isArray(parsedSent)
+      ? parsedSent.filter(id => id && !String(id).startsWith("demo-") && !String(id).includes("-rep"))
+      : [];
+    state.declinedRequests = Array.isArray(parsedDeclined) ? parsedDeclined : [];
+    state.friendRequests = Array.isArray(parsedRequests)
+      ? parsedRequests.filter(r => r && r.id !== "req-1" && r.id !== "req-2" && r.fromUid && !String(r.fromUid).startsWith("demo-"))
+      : [];
+    state.notifications = Array.isArray(parsedNotifs)
+      ? parsedNotifs.filter(n => n && n.id !== "notif-1" && n.id !== "notif-2" && !String(n.id).startsWith("demo-"))
+      : [];
   } catch(e) {
-    state.friends = ["demo-p1"];
+    state.friends = [];
+    state.sentRequests = [];
+    state.declinedRequests = [];
     state.friendRequests = [];
     state.notifications = [];
   }
   updateNotifBadge();
 }
 
+export function syncSocialStateFromStorage() {
+  getStoredSocialData();
+  updateNotifBadge();
+}
+
 function saveStoredSocialData() {
   try {
-    localStorage.setItem("unisport_friends", JSON.stringify(state.friends));
-    localStorage.setItem("unisport_friend_requests", JSON.stringify(state.friendRequests));
-    localStorage.setItem("unisport_notifications", JSON.stringify(state.notifications));
+    localStorage.setItem("unisport_friends", JSON.stringify(state.friends || []));
+    localStorage.setItem("unisport_sent_requests", JSON.stringify(state.sentRequests || []));
+    localStorage.setItem("unisport_declined_requests", JSON.stringify(state.declinedRequests || []));
+    localStorage.setItem("unisport_friend_requests", JSON.stringify(state.friendRequests || []));
+    localStorage.setItem("unisport_notifications", JSON.stringify(state.notifications || []));
   } catch(e) {}
   updateNotifBadge();
+}
+
+async function persistMySocialToFirestore(targetUidForSync = null, syncAction = null) {
+  const currentUid = state.currentUser?.uid || (getActiveSession() || {}).uid;
+  if (!currentUid) return;
+
+  // Keep local student record in sync
+  const meInList = (state.students || []).find(s => s.uid === currentUid);
+  if (meInList) {
+    meInList.friends = [...(state.friends || [])];
+    meInList.sentRequests = [...(state.sentRequests || [])];
+    meInList.declinedRequests = [...(state.declinedRequests || [])];
+  }
+
+  try {
+    await setDoc(doc(db, "users", currentUid), {
+      friends: state.friends || [],
+      sentRequests: state.sentRequests || [],
+      declinedRequests: state.declinedRequests || [],
+      updatedAt: Date.now()
+    }, { merge: true });
+
+    if (targetUidForSync && syncAction === "accept") {
+      await setDoc(doc(db, "users", targetUidForSync), {
+        friends: arrayUnion(currentUid),
+        sentRequests: arrayRemove(currentUid)
+      }, { merge: true });
+    } else if (targetUidForSync && syncAction === "decline") {
+      await setDoc(doc(db, "users", targetUidForSync), {
+        sentRequests: arrayRemove(currentUid)
+      }, { merge: true });
+    } else if (targetUidForSync && syncAction === "remove") {
+      await setDoc(doc(db, "users", targetUidForSync), {
+        friends: arrayRemove(currentUid),
+        sentRequests: arrayRemove(currentUid)
+      }, { merge: true });
+    }
+  } catch (err) {
+    console.warn("Firestore social sync notice:", err);
+  }
 }
 
 export function updateNotifBadge() {
@@ -1296,23 +1338,26 @@ export function renderNotifications() {
       return `<p class="text-zinc-400 text-xs py-3 text-center">No pending friend requests.</p>`;
     }
     return state.friendRequests.map(req => {
-      const av = getAvatarById(req.fromAvatar || "footballer");
+      const fromName = req.fromName || req.displayName || "Student";
+      const fromUni = req.fromUni || req.university || "Fontys UAS";
+      const fromAvatar = req.fromAvatar || req.avatarId || "footballer";
+      const av = getAvatarById(fromAvatar);
       return `
         <div class="p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-800 space-y-3">
-          <div class="flex items-center gap-3">
+          <div class="flex items-center gap-3 cursor-pointer" onclick="window.openStudentProfileModal('${req.fromUid}')">
             <div class="w-10 h-10 rounded-full overflow-hidden border border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0">
               ${av.svg}
             </div>
             <div class="min-w-0 flex-grow">
-              <p class="font-bold text-xs sm:text-sm text-zinc-950 dark:text-white truncate">${escapeHtml(req.fromName)}</p>
-              <p class="text-[11px] text-zinc-500 truncate">${escapeHtml(req.fromUni)}</p>
+              <p class="font-bold text-xs sm:text-sm text-zinc-950 dark:text-white truncate hover:underline">${escapeHtml(fromName)}</p>
+              <p class="text-[11px] text-zinc-500 truncate">${escapeHtml(fromUni)}</p>
             </div>
           </div>
           <div class="flex items-center gap-2">
-            <button onclick="window.acceptFriendRequest('${req.id}', '${req.fromUid}')" class="flex-1 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 font-bold text-xs transition shadow-sm cursor-pointer">
+            <button onclick="window.acceptFriendRequest('${req.id}', '${req.fromUid}')" class="flex-1 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition shadow-sm cursor-pointer">
               Accept
             </button>
-            <button onclick="window.declineFriendRequest('${req.id}')" class="flex-1 py-2 rounded-xl bg-zinc-200 hover:bg-zinc-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 font-semibold text-xs transition cursor-pointer">
+            <button onclick="window.declineFriendRequest('${req.id}', '${req.fromUid}')" class="flex-1 py-2 rounded-xl bg-zinc-200 hover:bg-red-50 dark:bg-zinc-800 dark:hover:bg-red-950/40 text-zinc-800 hover:text-red-600 dark:text-zinc-200 dark:hover:text-red-400 font-semibold text-xs transition cursor-pointer">
               Decline
             </button>
           </div>
@@ -1350,25 +1395,74 @@ export function renderNotifications() {
 }
 
 export function acceptFriendRequest(reqId, fromUid) {
-  state.friendRequests = state.friendRequests.filter(r => r.id !== reqId);
-  if (!state.friends.includes(fromUid)) {
-    state.friends.push(fromUid);
+  let targetUid = fromUid;
+  if (!targetUid) {
+    const found = (state.friendRequests || []).find(r => r.id === reqId);
+    if (found) targetUid = found.fromUid;
+  }
+  state.friendRequests = (state.friendRequests || []).filter(r => r.id !== reqId && (!targetUid || r.fromUid !== targetUid));
+  if (targetUid) {
+    state.sentRequests = (state.sentRequests || []).filter(id => id !== targetUid);
+    state.declinedRequests = (state.declinedRequests || []).filter(id => id !== targetUid);
+    if (!state.friends.includes(targetUid)) {
+      state.friends.push(targetUid);
+    }
+    const student = (state.students || []).find(s => s.uid === targetUid);
+    state.notifications.unshift({
+      id: "friend-acc-" + Date.now(),
+      title: "Friend Request Accepted",
+      desc: `You and ${student ? student.displayName : "your campus teammate"} are now friends.`,
+      time: "Just now"
+    });
   }
   saveStoredSocialData();
+  persistMySocialToFirestore(targetUid, "accept");
   renderNotifications();
-  if (state.activeTab === "community") renderCommunity();
+  renderCommunity();
+  if (typeof window.renderCommunityInstant === "function") window.renderCommunityInstant();
+  if (targetUid && window.__ACTIVE_VIEWED_STUDENT_UID__ === targetUid && typeof window.renderOtherStudentProfilePage === "function") {
+    window.renderOtherStudentProfilePage(targetUid, true);
+  }
 }
 
-export function declineFriendRequest(reqId) {
-  state.friendRequests = state.friendRequests.filter(r => r.id !== reqId);
+export function declineFriendRequest(reqId, fromUid) {
+  let targetUid = fromUid;
+  if (!targetUid) {
+    const found = (state.friendRequests || []).find(r => r.id === reqId);
+    if (found) targetUid = found.fromUid;
+  }
+  state.friendRequests = (state.friendRequests || []).filter(r => r.id !== reqId && (!targetUid || r.fromUid !== targetUid));
+  if (targetUid && !state.declinedRequests.includes(targetUid)) {
+    state.declinedRequests.push(targetUid);
+  }
   saveStoredSocialData();
+  persistMySocialToFirestore(targetUid, "decline");
   renderNotifications();
+  renderCommunity();
+  if (typeof window.renderCommunityInstant === "function") window.renderCommunityInstant();
+  if (targetUid && window.__ACTIVE_VIEWED_STUDENT_UID__ === targetUid && typeof window.renderOtherStudentProfilePage === "function") {
+    window.renderOtherStudentProfilePage(targetUid, true);
+  }
 }
 
 export function clearAllNotifsGlobal() {
   state.notifications = [];
   saveStoredSocialData();
   renderNotifications();
+}
+
+function parseRestStringArray(fieldObj) {
+  if (!fieldObj || !fieldObj.arrayValue || !Array.isArray(fieldObj.arrayValue.values)) return [];
+  return fieldObj.arrayValue.values
+    .map(v => v && typeof v.stringValue === "string" ? v.stringValue : "")
+    .filter(Boolean);
+}
+
+function reconcileSocialFromStudentList(studentsList) {
+  if (typeof window.syncSocialFromFirestoreStudents === "function") {
+    window.syncSocialFromFirestoreStudents(studentsList);
+    getStoredSocialData();
+  }
 }
 
 export async function fetchCampusStudents() {
@@ -1383,17 +1477,17 @@ export async function fetchCampusStudents() {
     if (res.ok) {
       const json = await res.json();
       if (json && Array.isArray(json.documents)) {
-        json.documents.forEach(doc => {
-          const uid = (doc.name || "").split("/").pop();
+        json.documents.forEach(docObj => {
+          const uid = (docObj.name || "").split("/").pop();
           if (!uid) return;
-          const f = doc.fields || {};
+          const f = docObj.fields || {};
           const isSelf = uid === currentUid;
           const dEmail = (f.email && f.email.stringValue) ? f.email.stringValue : (isSelf ? (currentSession.email || "") : "");
           const dName = (f.displayName && f.displayName.stringValue) ? f.displayName.stringValue : (dEmail ? dEmail.split("@")[0] : (isSelf ? currentSession.displayName : "Student")) || "Student";
           let avId = (f.avatarId && f.avatarId.stringValue) ? f.avatarId.stringValue : (isSelf ? (currentSession.avatarId || "footballer") : "footballer");
           if (!["bodybuilder", "footballer", "runner"].includes(avId)) avId = "footballer";
           const sport = (f.sport && f.sport.stringValue) ? f.sport.stringValue : "Football";
-          const sessCnt = (f.sessionsCount && f.sessionsCount.integerValue) ? parseInt(f.sessionsCount.integerValue, 10) : 3;
+          const sessCnt = (f.sessionsCount && f.sessionsCount.integerValue) ? parseInt(f.sessionsCount.integerValue, 10) : 0;
 
           remoteStudents.push({
             uid,
@@ -1405,7 +1499,10 @@ export async function fetchCampusStudents() {
             sport,
             location: (f.location && f.location.stringValue) ? f.location.stringValue : "Eindhoven Campus",
             sports: [sport],
-            sessionsCount: sessCnt
+            sessionsCount: sessCnt,
+            friends: parseRestStringArray(f.friends),
+            sentRequests: parseRestStringArray(f.sentRequests),
+            declinedRequests: parseRestStringArray(f.declinedRequests)
           });
         });
       }
@@ -1417,7 +1514,6 @@ export async function fetchCampusStudents() {
   // 2. Also query via Firebase SDK getDocs and merge
   try {
     const snap = await getDocs(collection(db, "users"));
-    console.log("[UniSport Firestore] Users snapshot count:", snap.size);
     snap.forEach(docSnap => {
       const data = docSnap.data();
       const isSelf = docSnap.id === currentUid;
@@ -1435,11 +1531,14 @@ export async function fetchCampusStudents() {
         sport: data.sport || "Football",
         location: data.location || "Eindhoven Campus",
         sports: data.sports || [data.sport || "Football"],
-        sessionsCount: data.sessionsCount || 3
+        sessionsCount: data.sessionsCount || 0,
+        friends: Array.isArray(data.friends) ? data.friends : [],
+        sentRequests: Array.isArray(data.sentRequests) ? data.sentRequests : [],
+        declinedRequests: Array.isArray(data.declinedRequests) ? data.declinedRequests : []
       });
     });
   } catch(e) {
-    console.error("[UniSport Firestore] fetchCampusStudents error:", e);
+    console.warn("[UniSport Firestore] fetchCampusStudents notice:", e);
   }
 
   // Ensure current logged-in user is in directory if not returned by Firestore query yet
@@ -1456,7 +1555,10 @@ export async function fetchCampusStudents() {
       sport: currentSession.sport || "Football",
       location: "Eindhoven Campus",
       sports: [currentSession.sport || "Football"],
-      sessionsCount: 3
+      sessionsCount: 0,
+      friends: state.friends || [],
+      sentRequests: state.sentRequests || [],
+      declinedRequests: state.declinedRequests || []
     });
   }
 
@@ -1474,13 +1576,18 @@ export async function fetchCampusStudents() {
     localStorage.setItem("unisport_students_cache", JSON.stringify(state.students));
   } catch(e) {}
 
+  reconcileSocialFromStudentList(state.students);
   renderCommunity();
+  renderNotifications();
   if (typeof window.renderCommunityInstant === "function") {
     window.renderCommunityInstant();
   }
+  if (window.__ACTIVE_VIEWED_STUDENT_UID__ && typeof window.renderOtherStudentProfilePage === "function") {
+    window.renderOtherStudentProfilePage(window.__ACTIVE_VIEWED_STUDENT_UID__, true);
+  }
 }
 
-// Set up real-time listener for users collection so new signups appear instantly
+// Set up real-time listener for users collection so new signups & friend requests appear instantly
 export function listenToCampusStudents() {
   try {
     onSnapshot(collection(db, "users"), (snapshot) => {
@@ -1504,7 +1611,10 @@ export function listenToCampusStudents() {
           sport: data.sport || "Football",
           location: data.location || "Eindhoven Campus",
           sports: data.sports || [data.sport || "Football"],
-          sessionsCount: data.sessionsCount || 3
+          sessionsCount: data.sessionsCount || 0,
+          friends: Array.isArray(data.friends) ? data.friends : [],
+          sentRequests: Array.isArray(data.sentRequests) ? data.sentRequests : [],
+          declinedRequests: Array.isArray(data.declinedRequests) ? data.declinedRequests : []
         });
       });
 
@@ -1522,7 +1632,10 @@ export function listenToCampusStudents() {
           sport: currentSession.sport || "Football",
           location: "Eindhoven Campus",
           sports: [currentSession.sport || "Football"],
-          sessionsCount: 3
+          sessionsCount: 0,
+          friends: state.friends || [],
+          sentRequests: state.sentRequests || [],
+          declinedRequests: state.declinedRequests || []
         });
       }
 
@@ -1539,9 +1652,14 @@ export function listenToCampusStudents() {
         localStorage.setItem("unisport_students_cache", JSON.stringify(state.students));
       } catch(e) {}
 
+      reconcileSocialFromStudentList(state.students);
       renderCommunity();
+      renderNotifications();
       if (typeof window.renderCommunityInstant === "function") {
         window.renderCommunityInstant();
+      }
+      if (window.__ACTIVE_VIEWED_STUDENT_UID__ && typeof window.renderOtherStudentProfilePage === "function") {
+        window.renderOtherStudentProfilePage(window.__ACTIVE_VIEWED_STUDENT_UID__, true);
       }
     }, (err) => {
       console.warn("listenToCampusStudents notice:", err);
@@ -1552,287 +1670,96 @@ export function listenToCampusStudents() {
 }
 
 export function renderCommunity() {
-  const container = document.getElementById("students-grid");
-  const countFriends = document.getElementById("community-friends-count");
-  if (countFriends) countFriends.textContent = (state.friends || []).length;
-  if (!container) return;
-
-  // Merge any direct REST-fetched students so state.students is never missing accounts
-  if (Array.isArray(window.__FIRESTORE_STUDENTS__) && window.__FIRESTORE_STUDENTS__.length > 0) {
-    const mergedMap = new Map();
-    window.__FIRESTORE_STUDENTS__.forEach(s => { if (s && s.uid) mergedMap.set(s.uid, s); });
-    (state.students || []).forEach(s => { if (s && s.uid) mergedMap.set(s.uid, s); });
-    state.students = Array.from(mergedMap.values());
-  }
-
-  let list = [...(state.students || [])];
-
-  // Filter by community view (All vs Friends)
-  if (state.communityView === "friends") {
-    list = list.filter(s => state.friends.includes(s.uid));
-  }
-
-  // Filter by university
-  if (state.communityUniFilter && state.communityUniFilter !== "all") {
-    list = list.filter(s => s.university && s.university.includes(state.communityUniFilter));
-  }
-
-  // Filter by search query
-  if (state.studentSearchQuery) {
-    const q = state.studentSearchQuery.toLowerCase();
-    list = list.filter(s => 
-      (s.displayName || "").toLowerCase().includes(q) ||
-      (s.university || "").toLowerCase().includes(q) ||
-      (s.sport || "").toLowerCase().includes(q) ||
-      (s.email || "").toLowerCase().includes(q) ||
-      (s.sports || []).some(sp => sp.toLowerCase().includes(q))
-    );
-  }
-
-  if (list.length === 0) {
-    container.innerHTML = `
-      <div class="col-span-full py-16 px-6 text-center rounded-2xl bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800">
-        <h3 class="text-base font-bold text-zinc-950 dark:text-white mb-1">No campus students found</h3>
-        <p class="text-zinc-500 dark:text-zinc-400 text-xs max-w-sm mx-auto mb-4">
-          ${state.communityView === 'friends' ? "You haven't connected with any friends yet. Explore all campus students to send requests!" : "Try searching for a different name, university, or sport."}
-        </p>
-        ${state.communityView === 'friends' ? `
-          <button onclick="window.setCommunityView('all')" class="px-4 py-2 rounded-xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 text-xs font-semibold">
-            Explore All Students
-          </button>
-        ` : ''}
-      </div>
-    `;
+  if (typeof window.renderCommunityInstant === "function") {
+    window.renderCommunityInstant();
     return;
-  }
-
-  // Update ticker numbers
-  const statStudents = document.getElementById("community-stat-students");
-  if (statStudents) statStudents.textContent = `${(state.students || []).length}+`;
-
-  const currentUid = state.currentUser?.uid || (getActiveSession() || {}).uid;
-
-  container.innerHTML = list.map((student, idx) => {
-    const av = getAvatarById(student.avatarId || "footballer");
-    const isSelf = student.uid === currentUid || student.isSelf;
-    const isFriend = state.friends.includes(student.uid);
-    const isTue = (student.university || "").includes("TU") || (student.email || "").includes("tue.nl");
-    const sports = student.sports || [student.sport || "Football"];
-
-    return `
-      <div class="p-4 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-5 transition hover:bg-zinc-50/70 dark:hover:bg-zinc-800/40">
-        
-        <!-- Left: Avatar, Verified Name, University & Contact -->
-        <div class="flex items-center gap-4 min-w-0">
-          <div class="relative shrink-0 cursor-pointer" onclick="window.openStudentProfileModal('${student.uid}')">
-            <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl overflow-hidden border border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-white shadow-sm">
-              ${av.svg}
-            </div>
-            <span class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white dark:border-zinc-900 shadow-sm" title="Active Verified Student"></span>
-          </div>
-
-          <div class="min-w-0 flex-grow space-y-1">
-            <div class="flex items-center gap-2 flex-wrap">
-              <h3 class="font-extrabold text-sm sm:text-base text-zinc-950 dark:text-white truncate cursor-pointer hover:underline" onclick="window.openStudentProfileModal('${student.uid}')">
-                ${escapeHtml(student.displayName)}
-              </h3>
-
-              ${isSelf ? `
-                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-950 text-white dark:bg-white dark:text-zinc-950">
-                  You
-                </span>
-              ` : ''}
-              
-              <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${isTue ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20' : 'bg-orange-500/10 text-brand-orange border border-orange-500/20'}">
-                <i data-lucide="graduation-cap" class="w-3 h-3"></i>
-                ${isTue ? 'TU Eindhoven' : 'Fontys UAS'}
-              </span>
-
-              ${isFriend ? `
-                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                  <i data-lucide="check" class="w-3 h-3"></i>
-                  Friend
-                </span>
-              ` : ''}
-            </div>
-
-            <!-- Student Email & Campus Location -->
-            <div class="flex items-center gap-3 text-xs text-zinc-500 dark:text-zinc-400 truncate">
-              <span class="font-medium truncate text-zinc-700 dark:text-zinc-300">${escapeHtml(student.email || 'campus.student@fontys.nl')}</span>
-              <span>•</span>
-              <span class="truncate">${escapeHtml(student.location || 'Eindhoven Campus')}</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Center: Preferred Sports Pills -->
-        <div class="hidden lg:flex items-center gap-1.5 shrink-0">
-          ${sports.slice(0, 3).map(sp => `
-            <span class="px-3 py-1 rounded-xl text-xs font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200/50 dark:border-zinc-700/50">
-              ${escapeHtml(sp)}
-            </span>
-          `).join('')}
-          ${sports.length > 3 ? `
-            <span class="px-2 py-1 rounded-xl text-xs font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-400">
-              +${sports.length - 3}
-            </span>
-          ` : ''}
-        </div>
-
-        <!-- Right: Activity Stats & Direct Actions -->
-        <div class="flex items-center justify-between md:justify-end gap-3 shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-zinc-100 dark:border-zinc-800/60">
-          <div class="text-left md:text-right pr-2">
-            <span class="block text-xs font-extrabold text-zinc-950 dark:text-white">${student.sessionsCount || 0} matches</span>
-            <span class="block text-[10px] text-zinc-400 uppercase font-semibold">Attendance</span>
-          </div>
-
-          <div class="flex items-center gap-2">
-            <button onclick="window.openStudentProfileModal('${student.uid}')" class="px-4 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-xs font-bold text-zinc-900 dark:text-white transition cursor-pointer">
-              Profile
-            </button>
-
-            ${isSelf ? `
-              <button onclick="window.switchTabGlobal('profile')" class="px-4 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 font-bold text-xs transition cursor-pointer shadow-sm">
-                Edit
-              </button>
-            ` : isFriend ? `
-              <button onclick="window.removeFriend('${student.uid}')" class="px-3.5 py-2 rounded-xl bg-red-50 hover:bg-red-100 dark:bg-red-950/40 dark:hover:bg-red-900/60 text-xs font-bold text-red-600 dark:text-red-400 transition cursor-pointer" title="Remove Friend">
-                Remove
-              </button>
-            ` : `
-              <button onclick="window.toggleFriendship('${student.uid}')" class="px-4 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 font-bold text-xs transition cursor-pointer shadow-sm">
-                Connect
-              </button>
-            `}
-          </div>
-        </div>
-
-      </div>
-    `;
-  }).join('');
-
-  if (window.lucide && typeof window.lucide.createIcons === "function") {
-    window.lucide.createIcons();
   }
 }
 
 export function openStudentProfileModal(uid) {
-  const currentUid = state.currentUser?.uid || (getActiveSession() || {}).uid;
-  const modal = document.getElementById("student-profile-modal");
-  if (!modal) return;
-
-  let student = (state.students || []).find(s => s.uid === uid);
-  if (!student && uid === currentUid) {
-    const user = state.currentUser || getActiveSession() || {};
-    student = {
-      uid: currentUid,
-      displayName: user.displayName || "You",
-      email: user.email || "",
-      university: user.university || (user.email?.includes("tue.nl") ? "TU Eindhoven" : "Fontys UAS"),
-      avatarId: user.avatarId || "footballer",
-      sport: user.sport || "Football",
-      location: "Eindhoven Campus",
-      sports: [user.sport || "Football"],
-      sessionsCount: state.activities.filter(a => (a.participants || []).some(p => p.uid === currentUid)).length
-    };
-  }
-
-  if (!student) return;
-
-  const av = getAvatarById(student.avatarId || "footballer");
-  const isSelf = student.uid === currentUid;
-  const isFriend = state.friends.includes(student.uid);
-
-  const nameEl = document.getElementById("view-profile-name");
-  const emailEl = document.getElementById("view-profile-email");
-  const uniEl = document.getElementById("view-profile-uni");
-  const sportEl = document.getElementById("view-profile-sport");
-  const locEl = document.getElementById("view-profile-location");
-  const countEl = document.getElementById("view-profile-sessions-count");
-  const avatarInner = document.getElementById("view-profile-avatar-inner");
-  const tagsEl = document.getElementById("view-profile-sports-tags");
-  const actionsEl = document.getElementById("view-profile-social-actions");
-
-  if (nameEl) nameEl.textContent = student.displayName;
-  if (emailEl) emailEl.textContent = student.email;
-  if (uniEl) uniEl.innerHTML = `<i data-lucide="graduation-cap" class="w-3.5 h-3.5"></i> <span>${escapeHtml(student.university)}</span>`;
-  if (sportEl) sportEl.textContent = student.sport;
-  if (locEl) locEl.textContent = student.location || "Eindhoven, NL";
-  if (countEl) countEl.textContent = `${student.sessionsCount || 0} matches`;
-  if (avatarInner) avatarInner.innerHTML = `<img src="${av.image}" class="w-full h-full object-cover rounded-full" onerror="this.src='./assets/avatars/footballer.png'" />`;
-
-  if (tagsEl) {
-    const sports = student.sports || [student.sport || "Football"];
-    tagsEl.innerHTML = sports.map(sp => `
-      <span class="px-2.5 py-1 rounded-lg text-xs bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-medium">
-        ${escapeHtml(sp)}
-      </span>
-    `).join('');
-  }
-
-  if (actionsEl) {
-    if (isSelf) {
-      actionsEl.innerHTML = `
-        <button onclick="window.closeStudentProfileModal(); window.switchTabGlobal('profile')" class="w-full py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white font-semibold text-xs transition">
-          Edit Your Profile
-        </button>
-      `;
-    } else if (isFriend) {
-      actionsEl.innerHTML = `
-        <div class="flex items-center gap-2">
-          <span class="flex-1 py-2 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold text-xs text-center border border-emerald-500/20">
-            You are friends
-          </span>
-          <button onclick="window.removeFriend('${student.uid}')" class="px-4 py-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-red-50 dark:hover:bg-red-950/40 text-red-600 dark:text-red-400 font-semibold text-xs transition">
-            Remove
-          </button>
-        </div>
-      `;
-    } else {
-      actionsEl.innerHTML = `
-        <button onclick="window.toggleFriendship('${student.uid}')" class="w-full py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 font-bold text-xs transition shadow-sm">
-          Send Friend Request
-        </button>
-      `;
-    }
-  }
-
-  modal.classList.remove("hidden");
-  if (window.lucide && typeof window.lucide.createIcons === "function") {
-    window.lucide.createIcons();
+  if (typeof window.renderOtherStudentProfilePage === "function") {
+    window.renderOtherStudentProfilePage(uid, false);
+    return;
   }
 }
 
 export function toggleFriendship(uid) {
   const currentUid = state.currentUser?.uid || (getActiveSession() || {}).uid;
-  if (!state.friends.includes(uid)) {
-    state.friends.push(uid);
-    // Add confirmation notification
-    const student = (state.students || []).find(s => s.uid === uid);
+  if (!uid || uid === currentUid) return;
+
+  getStoredSocialData();
+  const student = (state.students || []).find(s => s.uid === uid) ||
+                  (window.__FIRESTORE_STUDENTS__ || []).find(s => s.uid === uid);
+
+  // Check if the other student already sent us a friend request (or has us in their sentRequests)
+  // Rule: User 1 friend request User 2 AND User 2 friend request User 1 = Friends!
+  const incomingReq = (state.friendRequests || []).find(r => r && r.fromUid === uid);
+  const otherSentHasMe = student && Array.isArray(student.sentRequests) && student.sentRequests.includes(currentUid);
+
+  if (incomingReq || otherSentHasMe) {
+    acceptFriendRequest(incomingReq ? incomingReq.id : `req-${uid}`, uid);
+    return;
+  }
+
+  // Otherwise send a friend request -> button becomes "Pending" (NO modal opens!)
+  if (!state.friends.includes(uid) && !state.sentRequests.includes(uid)) {
+    state.sentRequests.push(uid);
+    state.declinedRequests = (state.declinedRequests || []).filter(id => id !== uid);
     if (student) {
       state.notifications.unshift({
-        id: "conn-" + Date.now(),
-        title: "Friend Connected",
-        desc: `You and ${student.displayName} are now connected on UniSport.`,
+        id: "req-sent-" + Date.now(),
+        title: "Friend Request Sent",
+        desc: `Friend request sent to ${student.displayName}. Waiting for approval.`,
         time: "Just now"
       });
     }
+    saveStoredSocialData();
+    persistMySocialToFirestore();
   }
-  saveStoredSocialData();
+
+  renderNotifications();
   renderCommunity();
-  openStudentProfileModal(uid);
+  if (typeof window.renderCommunityInstant === "function") {
+    window.renderCommunityInstant();
+  }
+  if (window.__ACTIVE_VIEWED_STUDENT_UID__ === uid && typeof window.renderOtherStudentProfilePage === "function") {
+    window.renderOtherStudentProfilePage(uid, true);
+  }
+}
+
+export function cancelFriendRequest(uid) {
+  getStoredSocialData();
+  state.sentRequests = (state.sentRequests || []).filter(id => id !== uid);
+  saveStoredSocialData();
+  persistMySocialToFirestore();
+  renderCommunity();
+  if (typeof window.renderCommunityInstant === "function") {
+    window.renderCommunityInstant();
+  }
+  if (window.__ACTIVE_VIEWED_STUDENT_UID__ === uid && typeof window.renderOtherStudentProfilePage === "function") {
+    window.renderOtherStudentProfilePage(uid, true);
+  }
 }
 
 export function removeFriend(uid) {
-  state.friends = state.friends.filter(f => f !== uid);
+  getStoredSocialData();
+  state.friends = (state.friends || []).filter(f => f !== uid);
+  state.sentRequests = (state.sentRequests || []).filter(s => s !== uid);
   saveStoredSocialData();
+  persistMySocialToFirestore(uid, "remove");
   renderCommunity();
-  openStudentProfileModal(uid);
+  if (typeof window.renderCommunityInstant === "function") {
+    window.renderCommunityInstant();
+  }
+  if (window.__ACTIVE_VIEWED_STUDENT_UID__ === uid && typeof window.renderOtherStudentProfilePage === "function") {
+    window.renderOtherStudentProfilePage(uid, true);
+  }
 }
 
 // Global window helpers for community & socials
 window.setCommunityView = function(view) {
   state.communityView = view;
+  if (window.communityStateInline) window.communityStateInline.view = view;
   const btnAll = document.getElementById("community-tab-all");
   const btnFriends = document.getElementById("community-tab-friends");
 
@@ -1851,6 +1778,7 @@ window.setCommunityView = function(view) {
 
 window.filterStudentsByUni = function(uni) {
   state.communityUniFilter = uni;
+  if (window.communityStateInline) window.communityStateInline.uniFilter = uni;
   document.querySelectorAll(".student-uni-chip").forEach(chip => {
     if (chip.getAttribute("data-uni-filter") === uni) {
       chip.className = "student-uni-chip px-3.5 py-2 rounded-xl bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 text-xs font-bold whitespace-nowrap transition cursor-pointer";
@@ -1881,6 +1809,7 @@ window.executeStudentSearch = function() {
 
 window.openStudentProfileModal = openStudentProfileModal;
 window.toggleFriendship = toggleFriendship;
+window.cancelFriendRequest = cancelFriendRequest;
 window.removeFriend = removeFriend;
 window.acceptFriendRequest = acceptFriendRequest;
 window.declineFriendRequest = declineFriendRequest;
@@ -1898,6 +1827,12 @@ window.UniSport = {
   renderCommunity,
   renderNotifications,
   openStudentProfileModal,
+  toggleFriendship,
+  cancelFriendRequest,
+  acceptFriendRequest,
+  declineFriendRequest,
+  removeFriend,
+  syncSocialStateFromStorage,
   fetchCampusStudents,
   signOut: signOutStudent
 };
