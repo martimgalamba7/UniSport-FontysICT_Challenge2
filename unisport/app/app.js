@@ -349,8 +349,11 @@ function listenToAuthChanges() {
           const merged = { ...profile, ...currentLocal, uid: user.uid, email: user.email };
           setActiveSession(merged);
           updateAuthUI(merged, merged);
+          // Fetch real campus students now that auth is fully confirmed
+          fetchCampusStudents();
         } catch (err) {
           console.warn("Could not fetch remote profile, keeping active session:", err);
+          fetchCampusStudents();
         }
       }
     });
@@ -1113,10 +1116,20 @@ function setupSettingsModal() {
 export async function clearCache() {
   const activeSession = localStorage.getItem("unisport_active_session");
   const prefs = localStorage.getItem("unisport_app_preferences");
+  
+  // Clear offline community and cache storages
   localStorage.removeItem("unisport_students_cache");
   localStorage.removeItem("unisport_friends");
   localStorage.removeItem("unisport_friend_requests");
   localStorage.removeItem("unisport_notifications");
+
+  // Clear browser CacheStorage if any
+  if ("caches" in window) {
+    try {
+      const keys = await caches.keys();
+      await Promise.all(keys.map(k => caches.delete(k)));
+    } catch(e) {}
+  }
 
   state.students = [];
   state.friends = [];
@@ -1143,9 +1156,9 @@ export async function clearCache() {
     setTimeout(() => {
       btn.disabled = false;
       btn.textContent = "Clear Cache";
-      // Auto-reload to guarantee fresh runtime state
-      window.location.reload();
-    }, 1000);
+      // Force reload bypassing cache
+      window.location.reload(true);
+    }, 600);
   }
 }
 
@@ -1359,6 +1372,13 @@ export function clearAllNotifsGlobal() {
 }
 
 export async function fetchCampusStudents() {
+  // If Firebase Auth is initializing, wait for it so request.auth is populated for Firestore rules
+  if (auth && typeof auth.authStateReady === "function") {
+    try {
+      await auth.authStateReady();
+    } catch(e) {}
+  }
+
   const currentUid = state.currentUser?.uid || (getActiveSession() || {}).uid;
   const currentSession = getActiveSession() || state.currentUser || {};
   let remoteStudents = [];

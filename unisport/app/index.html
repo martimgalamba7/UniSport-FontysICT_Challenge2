@@ -778,7 +778,7 @@
       window.location.href = "./login.html";
     };
 
-    window.clearCacheGlobal = function() {
+    window.clearCacheGlobal = async function() {
       if (window.UniSport && typeof window.UniSport.clearCache === "function") {
         window.UniSport.clearCache();
         return;
@@ -788,6 +788,13 @@
         localStorage.removeItem("unisport_friends");
         localStorage.removeItem("unisport_friend_requests");
         localStorage.removeItem("unisport_notifications");
+
+        if ("caches" in window) {
+          try {
+            var keys = await caches.keys();
+            await Promise.all(keys.map(function(k) { return caches.delete(k); }));
+          } catch(e) {}
+        }
 
         var btn = document.getElementById("settings-clear-cache-btn");
         if (btn) {
@@ -800,8 +807,8 @@
             btn.textContent = "Cleared & Updated!";
           }
           setTimeout(function() {
-            window.location.reload();
-          }, 800);
+            window.location.reload(true);
+          }, 600);
         }, 500);
       } catch(e) {
         console.error("clearCache error:", e);
@@ -1745,7 +1752,7 @@
   </script>
 
   <!-- Application script entry -->
-  <script type="module" src="./app.js"></script>
+  <script type="module" src="./app.js?v=20261026_01"></script>
 
 </body>
 </html>
