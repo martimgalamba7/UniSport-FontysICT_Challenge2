@@ -314,7 +314,7 @@
         id="google-avatar-btn" 
         class="hidden relative p-0.5 rounded-full ring-2 ring-zinc-200 dark:ring-zinc-800 hover:ring-brand-orange transition cursor-pointer select-none" 
         aria-label="Open User Menu"
-        onclick="event.stopPropagation(); var dd = document.getElementById('user-dropdown'); if (dd) dd.classList.toggle('hidden');"
+        onclick="window.toggleUserDropdownGlobal(event);"
       >
         <div class="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden flex items-center justify-center pointer-events-none">
           <div id="google-avatar-inner" class="w-full h-full rounded-full overflow-hidden flex items-center justify-center pointer-events-none">
@@ -370,30 +370,30 @@
   </aside>
 
   <!-- Mobile User Dropdown Menu -->
-  <div id="user-dropdown" class="hidden fixed top-16 right-4 w-64 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-2xl p-2.5 z-50 text-xs transition-all">
+  <div id="user-dropdown" onclick="event.stopPropagation();" class="hidden fixed top-16 right-4 w-64 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-2xl p-2.5 z-50 text-xs transition-all">
     <div class="px-3 py-3 border-b border-zinc-100 dark:border-zinc-800">
       <p id="dropdown-name" class="font-bold text-sm text-zinc-950 dark:text-white truncate">Student</p>
       <p id="dropdown-email" class="text-xs text-zinc-500 dark:text-zinc-400 truncate mt-0.5">student@fontys.nl</p>
-      <div class="mt-2.5 flex items-center gap-1.5 text-[11px] text-zinc-500 dark:text-zinc-400">
+      <div id="dropdown-school-container" class="mt-2.5 flex items-center gap-1.5 text-[11px] text-zinc-500 dark:text-zinc-400">
         <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-brand-orange"></i>
         <span id="dropdown-school-full" class="truncate font-medium">Fontys UAS</span>
       </div>
     </div>
 
     <div class="py-1.5 space-y-0.5">
-      <button id="dropdown-profile-btn" onclick="window.switchTabGlobal('profile');" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-semibold transition text-left cursor-pointer">
+      <button id="dropdown-profile-btn" onclick="window.switchTabGlobal('profile'); var dd=document.getElementById('user-dropdown'); if(dd) dd.classList.add('hidden');" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-semibold transition text-left cursor-pointer">
         <i data-lucide="user" class="w-4 h-4 text-zinc-500"></i>
         <span>Profile</span>
       </button>
-      <button id="dropdown-community-btn" onclick="window.switchTabGlobal('community');" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-semibold transition text-left cursor-pointer">
+      <button id="dropdown-community-btn" onclick="window.switchTabGlobal('community'); var dd=document.getElementById('user-dropdown'); if(dd) dd.classList.add('hidden');" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-semibold transition text-left cursor-pointer">
         <i data-lucide="users" class="w-4 h-4 text-zinc-500"></i>
         <span>Campus Students</span>
       </button>
-      <button id="dropdown-sessions-btn" onclick="window.switchTabGlobal('my-activities');" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-semibold transition text-left cursor-pointer">
+      <button id="dropdown-sessions-btn" onclick="window.switchTabGlobal('my-activities'); var dd=document.getElementById('user-dropdown'); if(dd) dd.classList.add('hidden');" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-semibold transition text-left cursor-pointer">
         <i data-lucide="calendar" class="w-4 h-4 text-zinc-500"></i>
         <span>My Sessions</span>
       </button>
-      <button id="dropdown-settings-btn" onclick="window.openSettingsGlobal();" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-semibold transition text-left cursor-pointer">
+      <button id="dropdown-settings-btn" onclick="window.openSettingsGlobal(); var dd=document.getElementById('user-dropdown'); if(dd) dd.classList.add('hidden');" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-semibold transition text-left cursor-pointer">
         <i data-lucide="settings" class="w-4 h-4 text-zinc-500"></i>
         <span>Settings</span>
       </button>
@@ -462,12 +462,48 @@
         var dd = document.getElementById("user-dropdown");
         var btn = document.getElementById("google-avatar-btn");
         if (dd && !dd.classList.contains("hidden")) {
-          if (!dd.contains(e.target) && !btn.contains(e.target)) {
+          if (!dd.contains(e.target) && (!btn || !btn.contains(e.target))) {
             dd.classList.add("hidden");
           }
         }
       });
     })();
+
+    // Robust user dropdown toggle for mobile and desktop avatar clicks
+    window.toggleUserDropdownGlobal = function(e) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      var dd = document.getElementById("user-dropdown");
+      if (!dd) return;
+      dd.classList.toggle("hidden");
+
+      // Ensure dropdown data is hydrated
+      var raw = localStorage.getItem("unisport_active_session");
+      if (raw) {
+        try {
+          var u = JSON.parse(raw);
+          var dropName = document.getElementById("dropdown-name");
+          var dropEmail = document.getElementById("dropdown-email");
+          var dropSchoolFull = document.getElementById("dropdown-school-full");
+          var dropSchoolContainer = document.getElementById("dropdown-school-container");
+          var prefs = JSON.parse(localStorage.getItem("unisport_app_preferences") || "{}");
+          var showUni = prefs.showUni !== undefined ? prefs.showUni : (u.showUniBadge !== undefined ? u.showUniBadge : true);
+          if (dropName) dropName.textContent = u.displayName || u.email || "Student";
+          if (dropEmail) dropEmail.textContent = u.email || "";
+          var isTue = (u.university && u.university.indexOf("TU") !== -1) || (u.email && u.email.indexOf("tue.nl") !== -1);
+          if (dropSchoolFull) dropSchoolFull.textContent = isTue ? "TU Eindhoven" : "Fontys UAS";
+          if (dropSchoolContainer) {
+            if (showUni) dropSchoolContainer.classList.remove("hidden");
+            else dropSchoolContainer.classList.add("hidden");
+          }
+        } catch(err) {}
+      }
+      if (window.lucide && typeof window.lucide.createIcons === "function") {
+        window.lucide.createIcons();
+      }
+    };
 
     // Synchronous resilient tab switcher for instant profile / sessions / notifications navigation
     window.switchTabGlobal = function(tabId) {
@@ -525,6 +561,7 @@
             var hName = document.getElementById("profile-hero-name");
             var hEmail = document.getElementById("profile-hero-email");
             var hSchool = document.getElementById("profile-hero-school");
+            var hBadge = document.getElementById("profile-hero-badge");
             var hInner = document.getElementById("profile-hero-avatar-inner");
             var pName = document.getElementById("profile-name");
             var pEmail = document.getElementById("profile-email");
@@ -535,9 +572,16 @@
             var isTue = (u.university && u.university.indexOf("TU") !== -1) || (u.email && u.email.indexOf("tue.nl") !== -1);
             var avId = u.avatarId || "footballer";
 
+            var prefs = JSON.parse(localStorage.getItem("unisport_app_preferences") || "{}");
+            var showU = prefs.showUni !== undefined ? prefs.showUni : (u.showUniBadge !== undefined ? u.showUniBadge : true);
+
             if (hName) hName.textContent = dName;
             if (hEmail) hEmail.textContent = u.email || "";
             if (hSchool) hSchool.textContent = isTue ? "TU Eindhoven" : "Fontys UAS";
+            if (hBadge) {
+              if (showU) hBadge.classList.remove("hidden");
+              else hBadge.classList.add("hidden");
+            }
             if (hInner) hInner.innerHTML = '<img src="./assets/avatars/' + avId + '.png" class="w-full h-full object-cover rounded-full" onerror="this.src=\'./assets/avatars/footballer.png\'" />';
             if (pName) pName.value = dName;
             if (pEmail) pEmail.value = u.email || "";
@@ -808,6 +852,18 @@
           var sentRequestsArr = parseFirestoreStringArray(f.sentRequests);
           var declinedRequestsArr = parseFirestoreStringArray(f.declinedRequests);
 
+          var isPublic = true;
+          if (f.isPublic && f.isPublic.booleanValue !== undefined) {
+            isPublic = f.isPublic.booleanValue;
+          } else if (f.isPublicProfile && f.isPublicProfile.booleanValue !== undefined) {
+            isPublic = f.isPublicProfile.booleanValue;
+          }
+
+          var showUniBadge = true;
+          if (f.showUniBadge && f.showUniBadge.booleanValue !== undefined) {
+            showUniBadge = f.showUniBadge.booleanValue;
+          }
+
           remoteStudents.push({
             uid: uid,
             isSelf: uid === currentUid,
@@ -821,7 +877,9 @@
             sessionsCount: sessionsCount,
             friends: friendsArr,
             sentRequests: sentRequestsArr,
-            declinedRequests: declinedRequestsArr
+            declinedRequests: declinedRequestsArr,
+            isPublic: isPublic,
+            showUniBadge: showUniBadge
           });
         }
 
@@ -861,13 +919,23 @@
         }
       } catch(e) {}
 
+      var myPrefs = {};
+      try { myPrefs = JSON.parse(localStorage.getItem("unisport_app_preferences") || "{}"); } catch(e) {}
+      var myIsPublic = myPrefs.privacyPublic !== undefined ? myPrefs.privacyPublic : (currentSession && currentSession.isPublic !== undefined ? currentSession.isPublic : true);
+      var myShowUni = myPrefs.showUni !== undefined ? myPrefs.showUni : (currentSession && currentSession.showUniBadge !== undefined ? currentSession.showUniBadge : true);
+
       var list = [];
       var seenUids = {};
 
       if (Array.isArray(window.__FIRESTORE_STUDENTS__)) {
         window.__FIRESTORE_STUDENTS__.forEach(function(cs) {
           if (cs && cs.uid && !seenUids[cs.uid] && !cs.uid.startsWith("demo-") && !cs.uid.includes("-rep") && cs.uid !== "climb-lover" && cs.uid !== "gym-bro") {
-            list.push(Object.assign({}, cs, { isSelf: cs.uid === currentUid }));
+            var itemSelf = cs.uid === currentUid;
+            list.push(Object.assign({}, cs, {
+              isSelf: itemSelf,
+              isPublic: itemSelf ? myIsPublic : (cs.isPublic !== undefined ? cs.isPublic : true),
+              showUniBadge: itemSelf ? myShowUni : (cs.showUniBadge !== undefined ? cs.showUniBadge : true)
+            }));
             seenUids[cs.uid] = true;
           }
         });
@@ -880,7 +948,12 @@
           if (Array.isArray(parsedCache)) {
             parsedCache.forEach(function(cs) {
               if (cs && cs.uid && !seenUids[cs.uid] && !cs.uid.startsWith("demo-") && !cs.uid.includes("-rep") && cs.uid !== "climb-lover" && cs.uid !== "gym-bro") {
-                list.push(Object.assign({}, cs, { isSelf: cs.uid === currentUid }));
+                var itemSelf = cs.uid === currentUid;
+                list.push(Object.assign({}, cs, {
+                  isSelf: itemSelf,
+                  isPublic: itemSelf ? myIsPublic : (cs.isPublic !== undefined ? cs.isPublic : true),
+                  showUniBadge: itemSelf ? myShowUni : (cs.showUniBadge !== undefined ? cs.showUniBadge : true)
+                }));
                 seenUids[cs.uid] = true;
               }
             });
@@ -902,7 +975,9 @@
             sport: currentSession.sport || "Football",
             location: "Eindhoven Campus",
             sports: [currentSession.sport || "Football"],
-            sessionsCount: 0
+            sessionsCount: 0,
+            isPublic: myIsPublic,
+            showUniBadge: myShowUni
           });
           seenUids[currentSession.uid] = true;
         } else {
@@ -912,6 +987,8 @@
               if (currentSession.displayName) item.displayName = currentSession.displayName;
               if (currentSession.university) item.university = currentSession.university;
               if (currentSession.avatarId) item.avatarId = sessAv;
+              item.isPublic = myIsPublic;
+              item.showUniBadge = myShowUni;
             }
           });
         }
@@ -929,6 +1006,9 @@
         var rawSess = localStorage.getItem("unisport_active_session");
         if (rawSess) currentUid = JSON.parse(rawSess).uid;
       } catch(e) {}
+
+      var myPrefs = {};
+      try { myPrefs = JSON.parse(localStorage.getItem("unisport_app_preferences") || "{}"); } catch(e) {}
 
       var friends = [];
       var sentRequests = [];
@@ -1009,6 +1089,14 @@
           avId = "footballer";
         }
 
+        // Privacy rules:
+        // 1. isPublic: if false, other users cannot view this profile (no "Profile" button, name/avatar not clickable)
+        var isProfilePublic = isSelf ? true : (student.isPublic !== undefined ? student.isPublic : true);
+        // 2. showUniBadge: if false, university badge ("TU Eindhoven" / "Fontys UAS") does not appear
+        var showBadge = isSelf
+          ? (myPrefs.showUni !== undefined ? myPrefs.showUni : (student.showUniBadge !== undefined ? student.showUniBadge : true))
+          : (student.showUniBadge !== undefined ? student.showUniBadge : true);
+
         var actionButtonsHtml = '';
         if (isSelf) {
           actionButtonsHtml = '<button onclick="window.switchTabGlobal(\'profile\')" class="px-4 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 font-bold text-xs transition cursor-pointer shadow-sm">Edit</button>';
@@ -1024,25 +1112,46 @@
           actionButtonsHtml = '<button onclick="window.toggleFriendship(\'' + student.uid + '\')" class="px-4 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 font-bold text-xs transition cursor-pointer shadow-sm">Connect</button>';
         }
 
+        var avatarContainerHtml = '';
+        if (isProfilePublic) {
+          avatarContainerHtml = '<div class="relative shrink-0 cursor-pointer" onclick="window.openStudentProfileModal(\'' + student.uid + '\')">';
+        } else {
+          avatarContainerHtml = '<div class="relative shrink-0">';
+        }
+        avatarContainerHtml += '<div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl overflow-hidden border border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-white shadow-sm">' +
+          '<img src="./assets/avatars/' + avId + '.png" class="w-full h-full object-cover" onerror="this.onerror=null;this.src=\'/challenge2/unisport/app/assets/avatars/' + avId + '.png\'" />' +
+        '</div>' +
+        '<span class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white dark:border-zinc-900 shadow-sm" title="Active Verified Student"></span>' +
+        '</div>';
+
+        var nameHeadingHtml = '';
+        if (isProfilePublic) {
+          nameHeadingHtml = '<h3 class="font-extrabold text-sm sm:text-base text-zinc-950 dark:text-white truncate cursor-pointer hover:underline" onclick="window.openStudentProfileModal(\'' + student.uid + '\')">' + student.displayName + '</h3>';
+        } else {
+          nameHeadingHtml = '<h3 class="font-extrabold text-sm sm:text-base text-zinc-950 dark:text-white truncate">' + student.displayName + '</h3>';
+        }
+
+        var uniBadgeHtml = '';
+        if (showBadge) {
+          uniBadgeHtml = '<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ' + (isTue ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20' : 'bg-orange-500/10 text-brand-orange border border-orange-500/20') + '">' +
+            '<i data-lucide="graduation-cap" class="w-3 h-3"></i>' +
+            (isTue ? 'TU Eindhoven' : 'Fontys UAS') +
+          '</span>';
+        }
+
+        var profileBtnHtml = '';
+        if (isProfilePublic && !isSelf) {
+          profileBtnHtml = '<button onclick="window.openStudentProfileModal(\'' + student.uid + '\')" class="px-4 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-xs font-bold text-zinc-900 dark:text-white transition cursor-pointer">Profile</button>';
+        }
+
         html += '<div class="p-4 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-5 transition hover:bg-zinc-50/70 dark:hover:bg-zinc-800/40">' +
           '<div class="flex items-center gap-4 min-w-0">' +
-            '<div class="relative shrink-0 cursor-pointer" onclick="window.openStudentProfileModal(\'' + student.uid + '\')">' +
-              '<div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl overflow-hidden border border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-white shadow-sm">' +
-                '<img src="./assets/avatars/' + avId + '.png" class="w-full h-full object-cover" onerror="this.onerror=null;this.src=\'/challenge2/unisport/app/assets/avatars/' + avId + '.png\'" />' +
-              '</div>' +
-              '<span class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white dark:border-zinc-900 shadow-sm" title="Active Verified Student"></span>' +
-            '</div>' +
-
+            avatarContainerHtml +
             '<div class="min-w-0 flex-grow space-y-1">' +
               '<div class="flex items-center gap-2 flex-wrap">' +
-                '<h3 class="font-extrabold text-sm sm:text-base text-zinc-950 dark:text-white truncate cursor-pointer hover:underline" onclick="window.openStudentProfileModal(\'' + student.uid + '\')">' +
-                  student.displayName +
-                '</h3>' +
+                nameHeadingHtml +
                 (isSelf ? '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-950 text-white dark:bg-white dark:text-zinc-950">You</span>' : '') +
-                '<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ' + (isTue ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20' : 'bg-orange-500/10 text-brand-orange border border-orange-500/20') + '">' +
-                  '<i data-lucide="graduation-cap" class="w-3 h-3"></i>' +
-                  (isTue ? 'TU Eindhoven' : 'Fontys UAS') +
-                '</span>' +
+                uniBadgeHtml +
                 (isFriend ? '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"><i data-lucide="check" class="w-3 h-3"></i>Friend</span>' : '') +
                 (isPending ? '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20"><i data-lucide="clock" class="w-3 h-3"></i>Request Pending</span>' : '') +
                 (incomingReqObj ? '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-brand-orange/15 text-brand-orange border border-brand-orange/30">Sent you a request</span>' : '') +
@@ -1072,9 +1181,7 @@
             '</div>' +
 
             '<div class="flex items-center gap-2">' +
-              '<button onclick="window.openStudentProfileModal(\'' + student.uid + '\')" class="px-4 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-xs font-bold text-zinc-900 dark:text-white transition cursor-pointer">' +
-                'Profile' +
-              '</button>' +
+              profileBtnHtml +
               actionButtonsHtml +
             '</div>' +
           '</div>' +
@@ -1087,7 +1194,7 @@
       }
     };
 
-    // Full-page Student Profile Renderer (replaces modal, displays top orange banner + identical profile page)
+    // Full-page Student Profile Renderer (replaces modal, displays top orange banner + clean athlete hero card only)
     window.renderOtherStudentProfilePage = function(uid, skipTabSwitch) {
       var modal = document.getElementById("student-profile-modal");
       if (modal) modal.classList.add("hidden");
@@ -1113,6 +1220,11 @@
       }
       if (!student) return;
 
+      // Privacy: If student disabled public profile, do not show their profile
+      if (student.isPublic === false) {
+        return;
+      }
+
       window.__ACTIVE_VIEWED_STUDENT_UID__ = uid;
 
       var avId = student.avatarId || "footballer";
@@ -1121,34 +1233,37 @@
       var uniLabel = isTue ? "TU Eindhoven" : "Fontys UAS";
       var sportLabel = student.sport || (student.sports && student.sports[0]) || "Football";
       var dName = student.displayName || "Student";
+      var showBadge = student.showUniBadge !== undefined ? student.showUniBadge : true;
 
       var bannerName = document.getElementById("other-profile-banner-name");
       var heroName = document.getElementById("other-profile-hero-name");
       var heroEmail = document.getElementById("other-profile-hero-email");
       var heroLoc = document.getElementById("other-profile-hero-location");
       var heroSchool = document.getElementById("other-profile-hero-school");
+      var heroBadge = document.getElementById("other-profile-hero-badge");
       var heroAvatarInner = document.getElementById("other-profile-hero-avatar-inner");
       var statActivities = document.getElementById("other-profile-stat-activities");
       var statSport = document.getElementById("other-profile-stat-sport");
-      var inpName = document.getElementById("other-profile-input-name");
-      var inpEmail = document.getElementById("other-profile-input-email");
-      var inpUni = document.getElementById("other-profile-input-uni");
-      var inpSport = document.getElementById("other-profile-input-sport");
 
       if (bannerName) bannerName.textContent = dName;
       if (heroName) heroName.textContent = dName;
       if (heroEmail) heroEmail.textContent = student.email || "campus.student@fontys.nl";
       if (heroLoc) heroLoc.textContent = student.location || "Eindhoven Campus";
       if (heroSchool) heroSchool.textContent = uniLabel;
+      if (heroBadge) {
+        if (showBadge) {
+          heroBadge.classList.remove("hidden");
+          heroBadge.style.display = "";
+        } else {
+          heroBadge.classList.add("hidden");
+          heroBadge.style.display = "none";
+        }
+      }
       if (heroAvatarInner) {
         heroAvatarInner.innerHTML = '<img src="./assets/avatars/' + avId + '.png" class="w-full h-full object-cover rounded-full" onerror="this.onerror=null;this.src=\'/challenge2/unisport/app/assets/avatars/' + avId + '.png\'" />';
       }
       if (statActivities) statActivities.textContent = String(student.sessionsCount || 0);
       if (statSport) statSport.textContent = sportLabel;
-      if (inpName) inpName.value = dName;
-      if (inpEmail) inpEmail.value = student.email || "campus.student@fontys.nl";
-      if (inpUni) inpUni.value = uniLabel;
-      if (inpSport) inpSport.value = sportLabel;
 
       // Render relationship action buttons in hero card
       var actionsEl = document.getElementById("other-profile-social-actions");
@@ -1203,37 +1318,6 @@
         }
       }
 
-      // Render the 3 Mascot Avatar cards identically to the user's own profile (highlighting student's avatarId)
-      var pickerContainer = document.getElementById("other-profile-avatar-picker");
-      if (pickerContainer) {
-        var presets = [
-          { id: "bodybuilder", name: "Bodybuilder", subtitle: "Gym & Strength", img: "./assets/avatars/bodybuilder.png" },
-          { id: "footballer", name: "Footballer", subtitle: "Pitch & Team Sport", img: "./assets/avatars/footballer.png" },
-          { id: "runner", name: "Runner", subtitle: "Track & Endurance", img: "./assets/avatars/runner.png" }
-        ];
-        var cardsHtml = "";
-        for (var pIdx = 0; pIdx < presets.length; pIdx++) {
-          var p = presets[pIdx];
-          var isSel = p.id === avId;
-          cardsHtml +=
-            '<div class="relative flex flex-col items-center p-5 rounded-3xl transition-all duration-200 select-none overflow-hidden ' +
-              (isSel
-                ? 'bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 ring-4 ring-brand-orange shadow-xl scale-[1.02]'
-                : 'bg-zinc-50/60 dark:bg-zinc-800/30 text-zinc-400 dark:text-zinc-500 border border-zinc-200/60 dark:border-zinc-700/40 opacity-60') +
-            '">' +
-              (isSel
-                ? '<div class="absolute top-3 right-3 px-2.5 py-0.5 rounded-full bg-brand-orange text-white text-[10px] font-extrabold uppercase tracking-wider shadow-sm flex items-center gap-1"><i data-lucide="check" class="w-3 h-3"></i> Active</div>'
-                : '') +
-              '<div class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden mb-3.5 bg-zinc-200/50 dark:bg-zinc-700/50 p-1 flex items-center justify-center shadow-inner">' +
-                '<img src="' + p.img + '" alt="' + p.name + '" class="w-full h-full object-cover rounded-xl" onerror="this.onerror=null;this.src=\'/challenge2/unisport/app/assets/avatars/' + p.id + '.png\'" />' +
-              '</div>' +
-              '<span class="text-sm font-extrabold tracking-tight">' + p.name + '</span>' +
-              '<span class="text-[11px] font-medium mt-0.5 ' + (isSel ? 'text-zinc-300 dark:text-zinc-600' : 'text-zinc-400 dark:text-zinc-500') + '">' + p.subtitle + '</span>' +
-            '</div>';
-        }
-        pickerContainer.innerHTML = cardsHtml;
-      }
-
       if (!skipTabSwitch) {
         window.switchTabGlobal("student-profile");
       } else if (window.lucide && typeof window.lucide.createIcons === "function") {
@@ -1246,11 +1330,93 @@
 
     // Open full-page student profile (never modal)
     window.openStudentProfileModal = function(uid) {
+      var currentUid = null;
+      try {
+        var rawSess = localStorage.getItem("unisport_active_session");
+        if (rawSess) currentUid = JSON.parse(rawSess).uid;
+      } catch(e) {}
+      if (uid && currentUid && uid === currentUid) {
+        window.switchTabGlobal("profile");
+        return;
+      }
+
+      var list = window.getAllKnownStudentsList();
+      var student = null;
+      for (var i = 0; i < list.length; i++) {
+        if (list[i] && list[i].uid === uid) {
+          student = list[i];
+          break;
+        }
+      }
+      if (student && student.isPublic === false) {
+        return;
+      }
+
       if (window.UniSport && typeof window.UniSport.openStudentProfileModal === "function") {
         window.UniSport.openStudentProfileModal(uid);
         return;
       }
       window.renderOtherStudentProfilePage(uid, false);
+    };
+
+    // Privacy Settings Live Toggle Handler
+    window.onPrivacySettingChanged = async function() {
+      var pubInp = document.getElementById("settings-privacy-public");
+      var uniInp = document.getElementById("settings-show-uni");
+      var isPub = pubInp ? pubInp.checked : true;
+      var showU = uniInp ? uniInp.checked : true;
+
+      // 1. Update localStorage preferences
+      var prefs = {};
+      try { prefs = JSON.parse(localStorage.getItem("unisport_app_preferences") || "{}"); } catch(e) {}
+      prefs.privacyPublic = isPub;
+      prefs.showUni = showU;
+      localStorage.setItem("unisport_app_preferences", JSON.stringify(prefs));
+
+      // 2. Update active session
+      var rawSess = localStorage.getItem("unisport_active_session");
+      var sess = null;
+      if (rawSess) {
+        try {
+          sess = JSON.parse(rawSess);
+          sess.isPublic = isPub;
+          sess.showUniBadge = showU;
+          localStorage.setItem("unisport_active_session", JSON.stringify(sess));
+        } catch(e) {}
+      }
+
+      // 3. Update current user entry in memory and cached list
+      if (window.__FIRESTORE_STUDENTS__ && sess && sess.uid) {
+        window.__FIRESTORE_STUDENTS__.forEach(function(s) {
+          if (s.uid === sess.uid) {
+            s.isPublic = isPub;
+            s.showUniBadge = showU;
+          }
+        });
+        try { localStorage.setItem("unisport_students_cache", JSON.stringify(window.__FIRESTORE_STUDENTS__)); } catch(e) {}
+      }
+
+      // 4. Update own profile and dropdown badge visibility immediately
+      var heroBadge = document.getElementById("profile-hero-badge");
+      if (heroBadge) {
+        if (showU) heroBadge.classList.remove("hidden");
+        else heroBadge.classList.add("hidden");
+      }
+      var dropBadge = document.getElementById("dropdown-school-container");
+      if (dropBadge) {
+        if (showU) dropBadge.classList.remove("hidden");
+        else dropBadge.classList.add("hidden");
+      }
+
+      // 5. Re-render directory
+      if (typeof window.renderCommunityInstant === "function") {
+        window.renderCommunityInstant();
+      }
+
+      // 6. Persist to Firestore
+      if (sess && sess.uid && window.UniSport && typeof window.UniSport.savePrivacySettingsToFirestore === "function") {
+        await window.UniSport.savePrivacySettingsToFirestore(isPub, showU);
+      }
     };
 
     window.toggleFriendship = function(uid) {
@@ -1443,6 +1609,21 @@
       if (dd) dd.classList.add("hidden");
       var notifDd = document.getElementById("notifications-dropdown");
       if (notifDd) notifDd.classList.add("hidden");
+
+      // Hydrate privacy and preference toggles from stored settings and session
+      try {
+        var prefs = JSON.parse(localStorage.getItem("unisport_app_preferences") || "{}");
+        var rawSess = localStorage.getItem("unisport_active_session");
+        var sess = rawSess ? JSON.parse(rawSess) : {};
+        var isPub = prefs.privacyPublic !== undefined ? prefs.privacyPublic : (sess.isPublic !== undefined ? sess.isPublic : true);
+        var showU = prefs.showUni !== undefined ? prefs.showUni : (sess.showUniBadge !== undefined ? sess.showUniBadge : true);
+
+        var pubInp = document.getElementById("settings-privacy-public");
+        var uniInp = document.getElementById("settings-show-uni");
+        if (pubInp) pubInp.checked = isPub;
+        if (uniInp) uniInp.checked = showU;
+      } catch(e) {}
+
       if (window.UniSport && typeof window.UniSport.openSettingsModal === "function") {
         window.UniSport.openSettingsModal();
         return;
@@ -2158,67 +2339,6 @@
         </div>
       </div>
 
-      <!-- Mascot Avatar Display (Identical 3-Card Layout) -->
-      <div class="p-6 sm:p-10 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 space-y-5">
-        <div>
-          <h3 class="text-base sm:text-lg font-bold text-zinc-950 dark:text-white">Athlete Mascot Avatar</h3>
-          <p class="text-xs sm:text-sm text-zinc-500">3D mascot character displayed on match rosters across Eindhoven campus.</p>
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6" id="other-profile-avatar-picker"></div>
-      </div>
-
-      <!-- Read-Only Athlete Account Information (Identical to Own Profile Form Layout) -->
-      <div class="p-6 sm:p-10 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 space-y-6">
-        <div>
-          <h3 class="text-base sm:text-lg font-bold text-zinc-950 dark:text-white mb-1">Athlete Account Information</h3>
-          <p class="text-xs sm:text-sm text-zinc-500">Verified student details and sports preferences across the Eindhoven campus network.</p>
-        </div>
-
-        <div class="space-y-4">
-          <div>
-            <label class="block text-xs sm:text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">Full Name</label>
-            <input
-              type="text"
-              id="other-profile-input-name"
-              disabled
-              class="w-full px-5 py-3.5 rounded-xl bg-zinc-100/60 dark:bg-zinc-800/40 border-0 text-sm sm:text-base text-zinc-700 dark:text-zinc-200 cursor-default"
-            />
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-xs sm:text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">Student Email</label>
-              <input
-                type="email"
-                id="other-profile-input-email"
-                disabled
-                class="w-full px-5 py-3.5 rounded-xl bg-zinc-100/60 dark:bg-zinc-800/40 border-0 text-sm sm:text-base text-zinc-500 dark:text-zinc-400 cursor-default"
-              />
-            </div>
-
-            <div>
-              <label class="block text-xs sm:text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">Campus / School</label>
-              <input
-                type="text"
-                id="other-profile-input-uni"
-                disabled
-                class="w-full px-5 py-3.5 rounded-xl bg-zinc-100/60 dark:bg-zinc-800/40 border-0 text-sm sm:text-base text-zinc-500 dark:text-zinc-400 cursor-default"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-xs sm:text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">Primary Sport</label>
-            <input
-              type="text"
-              id="other-profile-input-sport"
-              disabled
-              class="w-full px-5 py-3.5 rounded-xl bg-zinc-100/60 dark:bg-zinc-800/40 border-0 text-sm sm:text-base text-zinc-700 dark:text-zinc-200 cursor-default"
-            />
-          </div>
-        </div>
-      </div>
-
     </section>
 
     <!-- ================= SECTION 6: DEDICATED NOTIFICATIONS PAGE (MOBILE FULL VIEW) ================= -->
@@ -2402,7 +2522,7 @@
                 <p class="text-xs text-zinc-500">Allow verified students from Fontys and TU/e to view your profile</p>
               </div>
               <label class="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" id="settings-privacy-public" class="sr-only peer" checked>
+                <input type="checkbox" id="settings-privacy-public" onchange="window.onPrivacySettingChanged()" class="sr-only peer" checked>
                 <div class="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer dark:bg-zinc-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-orange"></div>
               </label>
             </div>
@@ -2413,7 +2533,7 @@
                 <p class="text-xs text-zinc-500">Display "Fontys UAS" or "TU Eindhoven" on match rosters</p>
               </div>
               <label class="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" id="settings-show-uni" class="sr-only peer" checked>
+                <input type="checkbox" id="settings-show-uni" onchange="window.onPrivacySettingChanged()" class="sr-only peer" checked>
                 <div class="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer dark:bg-zinc-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-orange"></div>
               </label>
             </div>

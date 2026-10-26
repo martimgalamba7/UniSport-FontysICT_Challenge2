@@ -308,17 +308,17 @@ function setupNavigation() {
     if (mobileBtn) mobileBtn.addEventListener("click", clickHandler);
   });
 
-  // Google avatar dropdown toggle
-  const avatarBtn = document.getElementById("google-avatar-btn");
+  // Google avatar dropdown click outside close
   const dropdown = document.getElementById("user-dropdown");
-  if (avatarBtn && dropdown) {
-    avatarBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      dropdown.classList.toggle("hidden");
-    });
-
-    document.addEventListener("click", () => {
-      dropdown.classList.add("hidden");
+  if (dropdown) {
+    document.addEventListener("click", (e) => {
+      const avatarBtn = document.getElementById("google-avatar-btn");
+      if (avatarBtn && (avatarBtn === e.target || avatarBtn.contains(e.target))) {
+        return;
+      }
+      if (dropdown && !dropdown.contains(e.target)) {
+        dropdown.classList.add("hidden");
+      }
     });
   }
 }
@@ -1039,6 +1039,97 @@ export function openRosterModal(activityId) {
   modal.classList.remove("hidden");
 }
 
+export async function savePrivacySettingsToFirestore(isPublic, showUniBadge) {
+  const currentUid = state.currentUser?.uid || (getActiveSession() || {}).uid;
+  if (!currentUid) return;
+
+  // 1. Update in-memory state & localStorage active session
+  if (state.currentUser) {
+    state.currentUser.isPublic = isPublic;
+    state.currentUser.showUniBadge = showUniBadge;
+  }
+  const session = getActiveSession();
+  if (session) {
+    session.isPublic = isPublic;
+    session.showUniBadge = showUniBadge;
+    try {
+      localStorage.setItem("unisport_active_session", JSON.stringify(session));
+    } catch(e) {}
+  }
+
+  // 2. Update student list entries
+  if (Array.isArray(state.students)) {
+    const sIdx = state.students.findIndex(s => s.uid === currentUid);
+    if (sIdx !== -1) {
+      state.students[sIdx].isPublic = isPublic;
+      state.students[sIdx].showUniBadge = showUniBadge;
+    }
+  }
+  if (Array.isArray(window.__FIRESTORE_STUDENTS__)) {
+    const wIdx = window.__FIRESTORE_STUDENTS__.findIndex(s => s.uid === currentUid);
+    if (wIdx !== -1) {
+      window.__FIRESTORE_STUDENTS__[wIdx].isPublic = isPublic;
+      window.__FIRESTORE_STUDENTS__[wIdx].showUniBadge = showUniBadge;
+    }
+  }
+
+  // 3. Immediately update UI elements for current user
+  const ownBadge = document.getElementById("profile-hero-badge");
+  if (ownBadge) {
+    if (showUniBadge === false) {
+      ownBadge.classList.add("hidden");
+    } else {
+      ownBadge.classList.remove("hidden");
+    }
+  }
+  const dropSchool = document.getElementById("dropdown-school-container");
+  if (dropSchool) {
+    if (showUniBadge === false) {
+      dropSchool.classList.add("hidden");
+    } else {
+      dropSchool.classList.remove("hidden");
+    }
+  }
+
+  // 4. Update Firestore via SDK
+  try {
+    await updateDoc(doc(db, "users", currentUid), {
+      isPublic: isPublic !== false,
+      showUniBadge: showUniBadge !== false,
+      updatedAt: Date.now()
+    });
+  } catch (sdkErr) {
+    console.warn("[UniSport] SDK updateDoc for privacy notice:", sdkErr);
+  }
+
+  // 5. Update Firestore via REST PATCH fallback
+  try {
+    const restPatchUrl = `https://firestore.googleapis.com/v1/projects/fontys-unisport/databases/(default)/documents/users/${currentUid}?updateMask.fieldPaths=isPublic&updateMask.fieldPaths=showUniBadge`;
+    const headers = { "Content-Type": "application/json" };
+    if (session && session.idToken) {
+      headers["Authorization"] = `Bearer ${session.idToken}`;
+    }
+    await fetch(restPatchUrl, {
+      method: "PATCH",
+      headers,
+      body: JSON.stringify({
+        fields: {
+          isPublic: { booleanValue: isPublic !== false },
+          showUniBadge: { booleanValue: showUniBadge !== false }
+        }
+      })
+    });
+  } catch (restErr) {
+    console.warn("[UniSport] REST patch privacy notice:", restErr);
+  }
+
+  // 6. Re-render directory
+  renderCommunity();
+  if (typeof window.renderCommunityInstant === "function") {
+    window.renderCommunityInstant();
+  }
+}
+
 export function openSettingsModal() {
   const modal = document.getElementById("settings-modal");
   const dropdown = document.getElementById("user-dropdown");
@@ -1065,31 +1156,50 @@ function setupSettingsModal() {
   const privacyPublic = document.getElementById("settings-privacy-public");
   const showUni = document.getElementById("settings-show-uni");
 
-  // Load preferences from localStorage
+  // Load preferences from localStorage and active session
   try {
     const savedPrefs = JSON.parse(localStorage.getItem("unisport_app_preferences") || "{}");
+    const activeSess = getActiveSession() || state.currentUser || {};
     if (unitSelect && savedPrefs.unit) unitSelect.value = savedPrefs.unit;
     if (hapticsToggle && typeof savedPrefs.haptics === "boolean") hapticsToggle.checked = savedPrefs.haptics;
     if (notifRoster && typeof savedPrefs.notifRoster === "boolean") notifRoster.checked = savedPrefs.notifRoster;
     if (notifActivities && typeof savedPrefs.notifActivities === "boolean") notifActivities.checked = savedPrefs.notifActivities;
     if (notifReminders && typeof savedPrefs.notifReminders === "boolean") notifReminders.checked = savedPrefs.notifReminders;
-    if (privacyPublic && typeof savedPrefs.privacyPublic === "boolean") privacyPublic.checked = savedPrefs.privacyPublic;
-    if (showUni && typeof savedPrefs.showUni === "boolean") showUni.checked = savedPrefs.showUni;
+
+    const initialPub = typeof savedPrefs.privacyPublic === "boolean" ? savedPrefs.privacyPublic : (activeSess.isPublic !== undefined ? activeSess.isPublic : true);
+    const initialUni = typeof savedPrefs.showUni === "boolean" ? savedPrefs.showUni : (activeSess.showUniBadge !== undefined ? activeSess.showUniBadge : true);
+    if (privacyPublic) privacyPublic.checked = initialPub;
+    if (showUni) showUni.checked = initialUni;
+
+    // Apply immediate badge visibility
+    const ownBadge = document.getElementById("profile-hero-badge");
+    if (ownBadge) {
+      if (initialUni === false) ownBadge.classList.add("hidden");
+      else ownBadge.classList.remove("hidden");
+    }
+    const dropSchool = document.getElementById("dropdown-school-container");
+    if (dropSchool) {
+      if (initialUni === false) dropSchool.classList.add("hidden");
+      else dropSchool.classList.remove("hidden");
+    }
   } catch (e) {}
 
   const savePreferences = () => {
     try {
+      const isPub = privacyPublic ? privacyPublic.checked : true;
+      const showU = showUni ? showUni.checked : true;
       const prefs = {
         unit: unitSelect ? unitSelect.value : "metric",
         haptics: hapticsToggle ? hapticsToggle.checked : true,
         notifRoster: notifRoster ? notifRoster.checked : true,
         notifActivities: notifActivities ? notifActivities.checked : true,
         notifReminders: notifReminders ? notifReminders.checked : true,
-        privacyPublic: privacyPublic ? privacyPublic.checked : true,
-        showUni: showUni ? showUni.checked : true,
+        privacyPublic: isPub,
+        showUni: showU,
         updatedAt: Date.now()
       };
       localStorage.setItem("unisport_app_preferences", JSON.stringify(prefs));
+      savePrivacySettingsToFirestore(isPub, showU);
     } catch (e) {}
   };
 
@@ -1488,10 +1598,14 @@ export async function fetchCampusStudents() {
           if (!["bodybuilder", "footballer", "runner"].includes(avId)) avId = "footballer";
           const sport = (f.sport && f.sport.stringValue) ? f.sport.stringValue : "Football";
           const sessCnt = (f.sessionsCount && f.sessionsCount.integerValue) ? parseInt(f.sessionsCount.integerValue, 10) : 0;
+          const isPub = (f.isPublic && f.isPublic.booleanValue !== undefined) ? f.isPublic.booleanValue : true;
+          const showBadge = (f.showUniBadge && f.showUniBadge.booleanValue !== undefined) ? f.showUniBadge.booleanValue : true;
 
           remoteStudents.push({
             uid,
             isSelf,
+            isPublic: isPub,
+            showUniBadge: showBadge,
             displayName: dName,
             email: dEmail,
             university: (f.university && f.university.stringValue) ? f.university.stringValue : (dEmail.endsWith("@student.tue.nl") ? "TU Eindhoven" : "Fontys UAS"),
@@ -1521,9 +1635,14 @@ export async function fetchCampusStudents() {
       const dEmail = data.email || (isSelf ? currentSession.email : "") || "";
       let avId = data.avatarId || (isSelf ? (currentSession.avatarId || "footballer") : "footballer");
       if (!["bodybuilder", "footballer", "runner"].includes(avId)) avId = "footballer";
+      const isPub = data.isPublic !== undefined ? data.isPublic : true;
+      const showBadge = data.showUniBadge !== undefined ? data.showUniBadge : true;
+
       remoteStudents.push({
         uid: docSnap.id,
         isSelf: isSelf,
+        isPublic: isPub,
+        showUniBadge: showBadge,
         displayName: dName,
         email: dEmail,
         university: data.university || (dEmail.endsWith("@student.tue.nl") ? "TU Eindhoven" : "Fontys UAS"),
@@ -1545,9 +1664,16 @@ export async function fetchCampusStudents() {
   if (currentSession && currentSession.uid && !remoteStudents.some(s => s.uid === currentSession.uid)) {
     let selfAv = currentSession.avatarId || "footballer";
     if (!["bodybuilder", "footballer", "runner"].includes(selfAv)) selfAv = "footballer";
+    let selfPrefs = {};
+    try { selfPrefs = JSON.parse(localStorage.getItem("unisport_app_preferences") || "{}"); } catch(e){}
+    const selfIsPub = selfPrefs.privacyPublic !== undefined ? selfPrefs.privacyPublic : (currentSession.isPublic !== undefined ? currentSession.isPublic : true);
+    const selfShowBadge = selfPrefs.showUni !== undefined ? selfPrefs.showUni : (currentSession.showUniBadge !== undefined ? currentSession.showUniBadge : true);
+
     remoteStudents.push({
       uid: currentSession.uid,
       isSelf: true,
+      isPublic: selfIsPub,
+      showUniBadge: selfShowBadge,
       displayName: currentSession.displayName || "Student",
       email: currentSession.email || "",
       university: currentSession.university || "Fontys UAS",
@@ -1601,9 +1727,14 @@ export function listenToCampusStudents() {
         const dEmail = data.email || (isSelf ? currentSession.email : "") || "";
         let avId = data.avatarId || (isSelf ? (currentSession.avatarId || "footballer") : "footballer");
         if (!["bodybuilder", "footballer", "runner"].includes(avId)) avId = "footballer";
+        const isPub = data.isPublic !== undefined ? data.isPublic : true;
+        const showBadge = data.showUniBadge !== undefined ? data.showUniBadge : true;
+
         remote.push({
           uid: docSnap.id,
           isSelf: isSelf,
+          isPublic: isPub,
+          showUniBadge: showBadge,
           displayName: dName,
           email: dEmail,
           university: data.university || (dEmail.endsWith("@student.tue.nl") ? "TU Eindhoven" : "Fontys UAS"),
@@ -1622,9 +1753,16 @@ export function listenToCampusStudents() {
       if (currentSession && currentSession.uid && !remote.some(s => s.uid === currentSession.uid)) {
         let selfAv = currentSession.avatarId || "footballer";
         if (!["bodybuilder", "footballer", "runner"].includes(selfAv)) selfAv = "footballer";
+        let selfPrefs = {};
+        try { selfPrefs = JSON.parse(localStorage.getItem("unisport_app_preferences") || "{}"); } catch(e){}
+        const selfIsPub = selfPrefs.privacyPublic !== undefined ? selfPrefs.privacyPublic : (currentSession.isPublic !== undefined ? currentSession.isPublic : true);
+        const selfShowBadge = selfPrefs.showUni !== undefined ? selfPrefs.showUni : (currentSession.showUniBadge !== undefined ? currentSession.showUniBadge : true);
+
         remote.push({
           uid: currentSession.uid,
           isSelf: true,
+          isPublic: selfIsPub,
+          showUniBadge: selfShowBadge,
           displayName: currentSession.displayName || "Student",
           email: currentSession.email || "",
           university: currentSession.university || "Fontys UAS",
@@ -1814,6 +1952,7 @@ window.removeFriend = removeFriend;
 window.acceptFriendRequest = acceptFriendRequest;
 window.declineFriendRequest = declineFriendRequest;
 window.clearAllNotifsGlobal = clearAllNotifsGlobal;
+window.savePrivacySettingsToFirestore = savePrivacySettingsToFirestore;
 
 window.UniSport = {
   switchTab,
@@ -1834,6 +1973,7 @@ window.UniSport = {
   removeFriend,
   syncSocialStateFromStorage,
   fetchCampusStudents,
+  savePrivacySettingsToFirestore,
   signOut: signOutStudent
 };
 
