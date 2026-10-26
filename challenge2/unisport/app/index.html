@@ -152,13 +152,13 @@
   <aside id="desktop-sidebar" class="hidden md:flex fixed top-0 bottom-0 left-0 z-40 bg-white dark:bg-black border-r border-zinc-200 dark:border-zinc-800 flex-col justify-between p-3 select-none transition-colors">
     <!-- Top: Brand Logo + Main Nav Links -->
     <div class="space-y-6">
-      <!-- UniSport Brand Logo -->
-      <a href="/challenge2/unisport" class="sidebar-btn flex items-center group overflow-hidden">
+      <!-- UniSport Brand Logo (Navigates to Feed) -->
+      <button onclick="window.switchTabGlobal('feed')" class="sidebar-btn flex items-center group overflow-hidden cursor-pointer text-left" title="UniSport Feed">
         <div class="sidebar-icon-wrap">
           <img src="/assets/logoUniSport.png" alt="UniSport" class="h-8 w-auto object-contain transition group-hover:scale-105" onerror="this.src='./assets/logoUniSport.png';" />
         </div>
         <span id="sidebar-logo-text" class="font-black text-xl tracking-tight text-zinc-950 dark:text-white">UNISPORT</span>
-      </a>
+      </button>
 
       <!-- Icon-First Vertical Navigation List -->
       <nav class="space-y-2">
@@ -279,11 +279,11 @@
 
   <!-- Mobile Top Header (Visible on Mobile only) -->
   <header class="md:hidden sticky top-0 z-40 w-full backdrop-blur-md bg-white/90 dark:bg-black/90 border-b border-zinc-100 dark:border-zinc-900 px-4 py-3 flex items-center justify-between">
-    <!-- Brand Logo -->
-    <a href="/challenge2/unisport" class="flex items-center gap-2 group">
+    <!-- Brand Logo (Navigates to Feed) -->
+    <button onclick="window.switchTabGlobal('feed')" class="flex items-center gap-2 group cursor-pointer text-left" title="UniSport Feed">
       <img src="/assets/logoUniSport.png" alt="UniSport" class="h-6 w-auto object-contain" onerror="this.src='./assets/logoUniSport.png';" />
       <span class="font-extrabold text-lg tracking-tight text-zinc-950 dark:text-white">UNISPORT</span>
-    </a>
+    </button>
 
     <!-- Mobile Top Right Controls -->
     <div class="flex items-center gap-1.5 relative">
