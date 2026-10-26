@@ -309,18 +309,15 @@
         Sign in
       </a>
 
-      <!-- Google-Style Avatar Circle Button (Mobile) -->
+      <!-- Mobile Profile Hamburger Button (3-bar menu, visible when on Profile tab per user request) -->
       <button 
-        id="google-avatar-btn" 
-        class="hidden relative p-0.5 rounded-full ring-2 ring-zinc-200 dark:ring-zinc-800 hover:ring-brand-orange transition cursor-pointer select-none" 
-        aria-label="Open User Menu"
-        onclick="window.openUserMenuGlobal(event);"
+        id="mobile-profile-burger-btn" 
+        onclick="window.openMobileSettingsMenu(event);" 
+        class="hidden p-2 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 hover:text-brand-orange transition-all duration-300 cursor-pointer select-none" 
+        aria-label="Open Settings"
+        title="Settings"
       >
-        <div class="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden flex items-center justify-center pointer-events-none">
-          <div id="google-avatar-inner" class="w-full h-full rounded-full overflow-hidden flex items-center justify-center pointer-events-none">
-            <img src="./assets/avatars/footballer.png" alt="Avatar" class="w-full h-full object-cover" />
-          </div>
-        </div>
+        <i data-lucide="menu" id="burger-icon-header" class="w-6 h-6 transition-transform duration-300 ease-in-out"></i>
       </button>
     </div>
   </header>
@@ -387,11 +384,11 @@
         </a>
         <button 
           id="fullscreen-menu-close-btn" 
-          onclick="window.closeUserMenuGlobal();" 
-          class="p-2 -mr-2 rounded-2xl hover:bg-zinc-100 dark:hover:bg-zinc-900 text-zinc-500 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer" 
+          onclick="window.closeUserMenuGlobal(event);" 
+          class="p-2 -mr-2 rounded-2xl hover:bg-zinc-100 dark:hover:bg-zinc-900 text-zinc-500 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer select-none" 
           aria-label="Close menu"
         >
-          <i data-lucide="x" class="w-7 h-7"></i>
+          <i data-lucide="x" id="fullscreen-close-icon" class="w-7 h-7 transition-transform duration-300 ease-in-out"></i>
         </button>
       </div>
 
@@ -514,16 +511,9 @@
             navAuthBtn.style.setProperty("display", "none", "important");
             navAuthBtn.classList.add("hidden");
           }
-          if (googleAvatarBtn) {
-            googleAvatarBtn.style.setProperty("display", "inline-flex", "important");
-            googleAvatarBtn.classList.remove("hidden");
-          }
-          if (avatarInner) {
-            var avId = user.avatarId || "footballer";
-            if (avId === "bolt" || avId === "flame" || avId === "cyber") avId = "footballer";
-            var avSrc = "./assets/avatars/" + avId + ".png";
-            avatarInner.innerHTML = '<img src="' + avSrc + '" alt="Avatar" class="w-full h-full object-cover rounded-full" onerror="this.src=\'./assets/avatars/footballer.png\'" />';
-          }
+          var avId = user.avatarId || "footballer";
+          if (avId === "bolt" || avId === "flame" || avId === "cyber") avId = "footballer";
+          var avSrc = "./assets/avatars/" + avId + ".png";
           var uni = user.university || (user.email && user.email.includes("tue.nl") ? "TU Eindhoven" : "Fontys UAS");
           var isTue = uni.indexOf("TU") !== -1 || (user.email && user.email.includes("tue.nl"));
           if (dropName) dropName.textContent = user.displayName || user.email || "Student";
@@ -574,34 +564,64 @@
       } catch(err) {}
     };
 
-    // Open full-screen mobile menu
-    window.openUserMenuGlobal = function(e) {
+    // Open full-screen mobile menu with smooth rotation of the 3-bar button
+    window.openMobileSettingsMenu = function(e) {
       if (e) {
         if (typeof e.preventDefault === "function") e.preventDefault();
         if (typeof e.stopPropagation === "function") e.stopPropagation();
       }
+
+      // Rotate hamburger icon 90 degrees
+      var burgerHeader = document.getElementById("burger-icon-header");
+      var burgerCard = document.getElementById("burger-icon-card");
+      if (burgerHeader) burgerHeader.style.transform = "rotate(90deg)";
+      if (burgerCard) burgerCard.style.transform = "rotate(90deg)";
+
+      var closeIcon = document.getElementById("fullscreen-close-icon");
+      if (closeIcon) closeIcon.style.transform = "rotate(0deg)";
+
       var menu = document.getElementById("user-dropdown");
       if (!menu) return;
-      menu.classList.remove("hidden");
-      menu.classList.add("flex");
-      document.body.style.overflow = "hidden";
-      window.hydrateUserMenuData();
-      if (window.lucide && typeof window.lucide.createIcons === "function") {
-        window.lucide.createIcons();
-      }
+
+      setTimeout(function() {
+        menu.classList.remove("hidden");
+        menu.classList.add("flex");
+        document.body.style.overflow = "hidden";
+        window.hydrateUserMenuData();
+        if (window.lucide && typeof window.lucide.createIcons === "function") {
+          window.lucide.createIcons();
+        }
+      }, 100);
     };
 
-    // Close full-screen mobile menu
+    window.openUserMenuGlobal = window.openMobileSettingsMenu;
+
+    // Close full-screen mobile menu with reverse rotation
     window.closeUserMenuGlobal = function(e) {
       if (e) {
         if (typeof e.preventDefault === "function") e.preventDefault();
         if (typeof e.stopPropagation === "function") e.stopPropagation();
       }
+
+      // Rotate close icon
+      var closeIcon = document.getElementById("fullscreen-close-icon");
+      if (closeIcon) closeIcon.style.transform = "rotate(90deg)";
+
+      // Reset hamburger icon back to 0 degrees
+      var burgerHeader = document.getElementById("burger-icon-header");
+      var burgerCard = document.getElementById("burger-icon-card");
+      if (burgerHeader) burgerHeader.style.transform = "rotate(0deg)";
+      if (burgerCard) burgerCard.style.transform = "rotate(0deg)";
+
       var menu = document.getElementById("user-dropdown");
       if (!menu) return;
-      menu.classList.add("hidden");
-      menu.classList.remove("flex");
-      document.body.style.overflow = "";
+
+      setTimeout(function() {
+        menu.classList.add("hidden");
+        menu.classList.remove("flex");
+        document.body.style.overflow = "";
+        if (closeIcon) closeIcon.style.transform = "rotate(0deg)";
+      }, 150);
     };
 
     // Robust user dropdown toggle for mobile and desktop avatar clicks
@@ -609,7 +629,7 @@
       var dd = document.getElementById("user-dropdown");
       if (!dd) return;
       if (dd.classList.contains("hidden")) {
-        window.openUserMenuGlobal(e);
+        window.openMobileSettingsMenu(e);
       } else {
         window.closeUserMenuGlobal(e);
       }
@@ -621,6 +641,18 @@
       var drawer = document.getElementById("notifications-desktop-drawer");
       if (drawer && tabId !== "notifications") {
         drawer.classList.add("-translate-x-full");
+      }
+
+      // Update visibility of the mobile profile hamburger button:
+      var mobileBurger = document.getElementById("mobile-profile-burger-btn");
+      if (mobileBurger) {
+        if (tabId === "profile") {
+          mobileBurger.classList.remove("hidden");
+          mobileBurger.classList.add("inline-flex");
+        } else {
+          mobileBurger.classList.add("hidden");
+          mobileBurger.classList.remove("inline-flex");
+        }
       }
 
       // Switch section visibility
@@ -2144,6 +2176,18 @@
       
       <!-- Athlete Hero Card (Clean Uber UI) -->
       <div class="p-6 sm:p-10 lg:p-12 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm relative overflow-hidden">
+        
+        <!-- Mobile 3-bar Settings Button in Profile Card -->
+        <button 
+          id="profile-hero-burger-btn" 
+          onclick="window.openMobileSettingsMenu(event);" 
+          class="md:hidden absolute top-4 right-4 p-2.5 rounded-2xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-900 dark:text-white transition-all duration-300 cursor-pointer shadow-sm z-20 flex items-center justify-center select-none"
+          aria-label="Open Settings Menu"
+          title="Settings"
+        >
+          <i data-lucide="menu" id="burger-icon-card" class="w-6 h-6 transition-transform duration-300 ease-in-out"></i>
+        </button>
+
         <div class="flex flex-col md:flex-row items-center md:items-start gap-8 relative z-10 text-center md:text-left">
           
           <!-- Avatar Hero Circle with Minimalist Ring & Online Pulse -->

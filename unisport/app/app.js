@@ -218,12 +218,10 @@ function updateAuthUI(user, profile) {
       navAuthBtn.style.setProperty("display", "none", "important");
     }
 
-    // Force show Google-style circular avatar in top right
-    if (googleAvatarBtn && avatarInner) {
-      avatarInner.className = `w-full h-full rounded-full overflow-hidden bg-gradient-to-tr ${avatar.bg} flex items-center justify-center text-white`;
-      avatarInner.innerHTML = `<img src="${avatar.image}" alt="${avatar.name}" class="w-full h-full object-cover rounded-full" onerror="this.src='./assets/avatars/footballer.png'" />`;
-      googleAvatarBtn.classList.remove("hidden");
-      googleAvatarBtn.style.setProperty("display", "inline-flex", "important");
+    // Mobile avatar circle removed per user request
+    if (googleAvatarBtn) {
+      googleAvatarBtn.classList.add("hidden");
+      googleAvatarBtn.style.setProperty("display", "none", "important");
     }
 
     if (userDropdown) {
@@ -319,21 +317,25 @@ function setupNavigation() {
     if (mobileBtn) mobileBtn.addEventListener("click", clickHandler);
   });
 
-  // Google avatar button open mobile full-screen user menu
-  const avatarBtn = document.getElementById("google-avatar-btn");
-  if (avatarBtn) {
-    avatarBtn.addEventListener("click", (e) => {
-      if (typeof window.openUserMenuGlobal === "function") {
-        window.openUserMenuGlobal(e);
-      } else {
-        const dd = document.getElementById("user-dropdown");
-        if (dd) {
-          dd.classList.remove("hidden");
-          dd.classList.add("flex");
-        }
-      }
-    });
-  }
+  // Mobile Profile Settings Hamburger button listeners
+  const headerBurger = document.getElementById("mobile-profile-burger-btn");
+  const cardBurger = document.getElementById("profile-hero-burger-btn");
+  const closeBtn = document.getElementById("fullscreen-menu-close-btn");
+
+  const openHandler = (e) => {
+    if (typeof window.openMobileSettingsMenu === "function") {
+      window.openMobileSettingsMenu(e);
+    }
+  };
+  const closeHandler = (e) => {
+    if (typeof window.closeUserMenuGlobal === "function") {
+      window.closeUserMenuGlobal(e);
+    }
+  };
+
+  if (headerBurger) headerBurger.addEventListener("click", openHandler);
+  if (cardBurger) cardBurger.addEventListener("click", openHandler);
+  if (closeBtn) closeBtn.addEventListener("click", closeHandler);
 }
 
 export function switchTab(targetTab) {
@@ -345,6 +347,18 @@ export function switchTab(targetTab) {
     userDropdown.classList.add("hidden");
     userDropdown.classList.remove("flex");
     document.body.style.overflow = "";
+  }
+
+  // Update visibility of the mobile profile hamburger button:
+  const mobileBurger = document.getElementById("mobile-profile-burger-btn");
+  if (mobileBurger) {
+    if (targetTab === "profile") {
+      mobileBurger.classList.remove("hidden");
+      mobileBurger.classList.add("inline-flex");
+    } else {
+      mobileBurger.classList.add("hidden");
+      mobileBurger.classList.remove("inline-flex");
+    }
   }
 
   tabs.forEach(t => {
