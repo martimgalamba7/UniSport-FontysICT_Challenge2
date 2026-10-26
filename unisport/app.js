@@ -468,6 +468,7 @@ async function fetchActivitiesDirectFromFirestore() {
       return;
     }
     const items = [];
+    const allRawItems = [];
     json.documents.forEach(docObj => {
       const id = (docObj.name || "").split("/").pop();
       const f = docObj.fields || {};
@@ -480,6 +481,7 @@ async function fetchActivitiesDirectFromFirestore() {
           const mf = v.mapValue?.fields || {};
           participants.push({
             uid: mf.uid?.stringValue || "",
+            email: mf.email?.stringValue || "",
             name: mf.name?.stringValue || "Student",
             university: mf.university?.stringValue || "Fontys UAS",
             avatarId: mf.avatarId?.stringValue || "footballer"
@@ -495,16 +497,14 @@ async function fetchActivitiesDirectFromFirestore() {
           if (v.stringValue) kickedUids.push(v.stringValue);
         });
       }
-
-      if (isFakeActivity(id, { creatorId, isDeleted: isDeletedFlag, participants })) {
-        // Also clean up orphaned/deleted activity in Firestore in background
-        if (creatorId && (!participants.length || !participants.some(p => p && p.uid === creatorId))) {
-          try { deleteDoc(doc(db, "activities", id)).catch(() => {}); } catch (e) {}
-        }
-        return;
+      const cancelledParticipantUids = [];
+      if (f.cancelledParticipantUids?.arrayValue?.values) {
+        f.cancelledParticipantUids.arrayValue.values.forEach(v => {
+          if (v.stringValue) cancelledParticipantUids.push(v.stringValue);
+        });
       }
 
-      items.push({
+      const actObj = {
         id,
         sport: f.sport?.stringValue || "Football",
         creatorEmail: f.creatorEmail?.stringValue || "",
@@ -516,6 +516,9 @@ async function fetchActivitiesDirectFromFirestore() {
         isPaid: !!isPaid,
         price: priceVal,
         kickedUids,
+        cancelledParticipantUids,
+        isDeleted: isDeletedFlag,
+        cancelled: isDeletedFlag,
         maxParticipants: f.maxParticipants?.integerValue ? parseInt(f.maxParticipants.integerValue, 10) : 10,
         creatorId,
         creatorName: f.creatorName?.stringValue || "Student",
@@ -523,11 +526,19 @@ async function fetchActivitiesDirectFromFirestore() {
         description: f.description?.stringValue || "",
         participants,
         createdAt: f.createdAt?.timestampValue ? new Date(f.createdAt.timestampValue).getTime() : Date.now()
-      });
+      };
+
+      allRawItems.push(actObj);
+
+      if (isFakeActivity(id, actObj)) {
+        return;
+      }
+
+      items.push(actObj);
     });
     items.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
     state.activities = items;
-    checkKickedStatusAndNotify(items);
+    checkKickedStatusAndNotify(allRawItems);
     renderFeed();
     if (state.activeTab === "my-activities") renderMyActivities();
   } catch (e) {
@@ -536,12 +547,17 @@ async function fetchActivitiesDirectFromFirestore() {
 }
 
 
-// Check if current logged-in user was kicked from any session and notify them
+// Check if current logged-in user was kicked from a session or if a session they joined was cancelled
 function checkKickedStatusAndNotify(activitiesList) {
-  const currentUid = state.currentUser?.uid || (getActiveSession() || {}).uid;
+  const sess = getActiveSession() || {};
+  const currentUid = state.currentUser?.uid || sess.uid;
+  const currentEmail = (state.currentUser?.email || sess.email || "").toLowerCase().trim();
   if (!currentUid || !Array.isArray(activitiesList)) return;
 
   activitiesList.forEach(act => {
+    if (!act || !act.id) return;
+
+    // 1. Check if user was kicked from this session
     if (Array.isArray(act.kickedUids) && act.kickedUids.includes(currentUid)) {
       const notifKey = `kicked_notif_seen_${act.id}_${currentUid}`;
       if (!localStorage.getItem(notifKey)) {
@@ -549,13 +565,46 @@ function checkKickedStatusAndNotify(activitiesList) {
         getStoredSocialData();
         state.notifications = state.notifications || [];
         state.notifications.unshift({
-          id: "kick-" + Date.now(),
+          id: "kick-" + act.id + "-" + Date.now(),
           title: "Removed from Session",
-          desc: `You were removed from ${act.title} by the host.`,
+          desc: `You were removed from "${act.title}" (${act.sport || "Sport"}) by the host.`,
           time: "Just now"
         });
         saveStoredSocialData();
         renderNotifications();
+      }
+    }
+
+    // 2. Check if this session was cancelled and notify all participants
+    const isCancelledOrHostLeft = !!(
+      act.isDeleted ||
+      act.cancelled ||
+      (act.creatorId && Array.isArray(act.participants) && !act.participants.some(p => p && p.uid === act.creatorId))
+    );
+
+    if (isCancelledOrHostLeft) {
+      const wasParticipant =
+        (Array.isArray(act.cancelledParticipantUids) && act.cancelledParticipantUids.includes(currentUid)) ||
+        (Array.isArray(act.participants) && act.participants.some(p => p && (p.uid === currentUid || (currentEmail && p.email && p.email.toLowerCase() === currentEmail))));
+
+      if (wasParticipant) {
+        const cancelNotifKey = `cancelled_notif_seen_${act.id}_${currentUid}`;
+        if (!localStorage.getItem(cancelNotifKey)) {
+          localStorage.setItem(cancelNotifKey, "true");
+          getStoredSocialData();
+          state.notifications = state.notifications || [];
+          const isHostSelf = isUserActivityHost(act);
+          state.notifications.unshift({
+            id: "cancel-" + act.id + "-" + Date.now(),
+            title: "Session Cancelled",
+            desc: isHostSelf
+              ? `You cancelled "${act.title}" (${act.sport || "Sport"}). All participants have been notified.`
+              : `The session "${act.title}" (${act.sport || "Sport"}) at ${act.location || "Eindhoven"} was cancelled by the host.`,
+            time: "Just now"
+          });
+          saveStoredSocialData();
+          renderNotifications();
+        }
       }
     }
   });
@@ -567,15 +616,18 @@ function listenToActivities() {
     const q = query(collection(db, "activities"), orderBy("createdAt", "desc"));
     onSnapshot(q, (snapshot) => {
       const items = [];
+      const allRawItems = [];
       snapshot.forEach(docSnap => {
         const data = docSnap.data();
+        const fullItem = { id: docSnap.id, ...data };
+        allRawItems.push(fullItem);
         if (!isFakeActivity(docSnap.id, data)) {
-          items.push({ id: docSnap.id, ...data });
+          items.push(fullItem);
         }
       });
 
       state.activities = items;
-      checkKickedStatusAndNotify(items);
+      checkKickedStatusAndNotify(allRawItems);
       renderFeed();
       if (state.activeTab === "my-activities") renderMyActivities();
     }, (error) => {
@@ -687,10 +739,16 @@ export function renderFeed() {
 
   if (totalUpcoming === 0) {
     container.innerHTML = `
-      <div class="col-span-full py-16 px-6 text-center rounded-2xl bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800">
-        <h3 class="text-base font-bold text-zinc-950 dark:text-white mb-1">No upcoming sessions found</h3>
-        <p class="text-zinc-500 dark:text-zinc-400 text-xs max-w-sm mx-auto mb-4">Try adjusting your filters or be the first student to host a new session.</p>
-        <button onclick="window.UniSport.switchTab('create')" class="px-4 py-2 rounded-xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 text-xs font-semibold transition cursor-pointer">
+      <div class="col-span-full py-12 px-6 text-center rounded-3xl bg-zinc-50/80 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 flex flex-col items-center justify-center">
+        <img 
+          src="./assets/mascot-sessions.png" 
+          onerror="this.src='/challenge2/unisport/app/assets/mascot-sessions.png'"
+          alt="UniSport Mascot Searching Sessions" 
+          class="w-36 h-36 sm:w-44 sm:h-44 object-contain drop-shadow-md mb-2 select-none"
+        />
+        <h3 class="text-base sm:text-lg font-extrabold text-zinc-950 dark:text-white mb-1">No upcoming sessions found</h3>
+        <p class="text-zinc-500 dark:text-zinc-400 text-xs max-w-sm mx-auto mb-5 leading-relaxed">Our scout searched the whole Eindhoven campus! Try adjusting your filters or host a new session yourself.</p>
+        <button onclick="window.UniSport.switchTab('create')" class="px-5 py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 text-xs font-bold transition shadow-sm cursor-pointer">
           Host Session
         </button>
       </div>
@@ -1319,27 +1377,44 @@ export async function toggleJoinActivity(activityId) {
 
   if (isJoined) {
     if (isHost) {
+      const cancelledParticipantUids = Array.from(new Set(
+        participants.map(p => p && p.uid).filter(Boolean)
+      ));
+
+      // Trigger local notification immediately
+      const cancelNotifKey = `cancelled_notif_seen_${activityId}_${currentUid}`;
+      if (!localStorage.getItem(cancelNotifKey)) {
+        localStorage.setItem(cancelNotifKey, "true");
+        getStoredSocialData();
+        state.notifications = state.notifications || [];
+        state.notifications.unshift({
+          id: "cancel-" + activityId + "-" + Date.now(),
+          title: "Session Cancelled",
+          desc: `You cancelled "${activity.title}" (${activity.sport || "Sport"}). All participants have been notified.`,
+          time: "Just now"
+        });
+        saveStoredSocialData();
+        renderNotifications();
+      }
+
       // Mark deleted locally and remove from UI immediately
       markActivityDeletedLocally(activityId);
       state.activities = (state.activities || []).filter(a => a.id !== activityId);
       renderFeed();
       renderMyActivities();
 
-      // Delete document from Firestore (SDK + updateDoc fallback + REST DELETE)
+      // Soft-delete in Firestore preserving cancelledParticipantUids so all participants receive real-time cancellation notifications
       try {
         const actRef = doc(db, "activities", activityId);
-        await deleteDoc(actRef);
-      } catch (err) {
-        try {
-          const actRef = doc(db, "activities", activityId);
-          await updateDoc(actRef, { isDeleted: true, cancelled: true, participants: [] });
-        } catch (e2) {}
-      }
-      try {
-        await fetch(`https://firestore.googleapis.com/v1/projects/fontys-unisport/databases/(default)/documents/activities/${activityId}`, {
-          method: "DELETE"
+        await updateDoc(actRef, {
+          isDeleted: true,
+          cancelled: true,
+          cancelledAt: Date.now(),
+          cancelledParticipantUids: cancelledParticipantUids
         });
-      } catch (e3) {}
+      } catch (err) {
+        console.warn("Firestore cancel session update error:", err);
+      }
       return;
     }
 
@@ -1404,10 +1479,16 @@ function renderMyActivities() {
 
   if (myActivities.length === 0) {
     container.innerHTML = `
-      <div class="text-center py-12 rounded-2xl bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 p-8">
-        <h4 class="text-zinc-950 dark:text-white font-bold text-base mb-1">No registered activities yet</h4>
-        <p class="text-zinc-500 dark:text-zinc-400 text-xs mb-4">Explore the feed to find sports sessions matching your schedule in Eindhoven.</p>
-        <button onclick="window.UniSport.switchTab('feed')" class="px-4 py-2 rounded-xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-semibold text-xs cursor-pointer">
+      <div class="text-center py-12 px-6 rounded-3xl bg-zinc-50/80 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 flex flex-col items-center justify-center">
+        <img 
+          src="./assets/mascot-sessions.png" 
+          onerror="this.src='/challenge2/unisport/app/assets/mascot-sessions.png'"
+          alt="UniSport Mascot" 
+          class="w-36 h-36 sm:w-44 sm:h-44 object-contain drop-shadow-md mb-2 select-none"
+        />
+        <h4 class="text-zinc-950 dark:text-white font-extrabold text-base sm:text-lg mb-1">No registered sessions yet</h4>
+        <p class="text-zinc-500 dark:text-zinc-400 text-xs max-w-sm mx-auto mb-5 leading-relaxed">Your sports locker is empty! Explore the feed to join upcoming sessions or host your own match in Eindhoven.</p>
+        <button onclick="window.UniSport.switchTab('feed')" class="px-5 py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 font-bold text-xs transition shadow-sm cursor-pointer">
           Browse Feed
         </button>
       </div>
@@ -2371,7 +2452,13 @@ export function renderNotifications() {
 
   const renderRequestsHtml = () => {
     if (!state.friendRequests || state.friendRequests.length === 0) {
-      return `<p class="text-zinc-400 text-xs py-3 text-center">No pending friend requests.</p>`;
+      return `
+        <div class="py-4 px-3 text-center flex flex-col items-center justify-center">
+          <img src="./assets/mascot-students.png" onerror="this.src='/challenge2/unisport/app/assets/mascot-students.png'" alt="No pending friend requests" class="w-20 h-20 object-contain drop-shadow-sm mb-1.5 select-none" />
+          <p class="text-zinc-500 dark:text-zinc-400 font-semibold text-xs">No pending friend requests</p>
+          <p class="text-zinc-400 dark:text-zinc-500 text-[11px]">Connect with athletes in the Students tab.</p>
+        </div>
+      `;
     }
     return state.friendRequests.map(req => {
       const fromName = req.fromName || req.displayName || "Student";
@@ -2404,7 +2491,13 @@ export function renderNotifications() {
 
   const renderGeneralHtml = () => {
     if (!state.notifications || state.notifications.length === 0) {
-      return `<p class="text-zinc-400 text-xs py-3 text-center">All caught up! No recent alerts.</p>`;
+      return `
+        <div class="py-5 px-3 text-center flex flex-col items-center justify-center">
+          <img src="./assets/mascot-notifs.png" onerror="this.src='/challenge2/unisport/app/assets/mascot-notifs.png'" alt="All caught up" class="w-24 h-24 object-contain drop-shadow-sm mb-1.5 select-none" />
+          <p class="text-zinc-700 dark:text-zinc-300 font-bold text-xs">All caught up!</p>
+          <p class="text-zinc-400 dark:text-zinc-500 text-[11px]">No recent session or match alerts.</p>
+        </div>
+      `;
     }
     return state.notifications.map(n => `
       <div class="p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/60 dark:border-zinc-800/80 space-y-1">

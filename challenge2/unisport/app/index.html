@@ -363,7 +363,7 @@
           <span class="text-xs font-bold text-zinc-400 uppercase tracking-wider">Friend Requests</span>
         </div>
         <div id="notif-friend-requests-list" class="space-y-2.5">
-          <p class="text-zinc-400 text-xs py-3 text-center">No pending friend requests.</p>
+          <div class="py-4 px-3 text-center flex flex-col items-center justify-center"><img src="./assets/mascot-students.png" onerror="this.src='/challenge2/unisport/app/assets/mascot-students.png'" alt="No pending friend requests" class="w-20 h-20 object-contain drop-shadow-sm mb-1.5 select-none" /><p class="text-zinc-500 dark:text-zinc-400 font-semibold text-xs">No pending friend requests</p></div>
         </div>
       </div>
 
@@ -371,7 +371,7 @@
       <div class="space-y-3 pt-4 border-t border-zinc-100 dark:border-zinc-900">
         <span class="text-xs font-bold text-zinc-400 uppercase tracking-wider">Activity & Match Alerts</span>
         <div id="notif-general-list" class="space-y-2.5">
-          <p class="text-zinc-400 text-xs py-3 text-center">All caught up!</p>
+          <div class="py-5 px-3 text-center flex flex-col items-center justify-center"><img src="./assets/mascot-notifs.png" onerror="this.src='/challenge2/unisport/app/assets/mascot-notifs.png'" alt="All caught up" class="w-24 h-24 object-contain drop-shadow-sm mb-1.5 select-none" /><p class="text-zinc-700 dark:text-zinc-300 font-bold text-xs">All caught up!</p><p class="text-zinc-400 dark:text-zinc-500 text-[11px]">No recent session or match alerts.</p></div>
         </div>
       </div>
     </div>
@@ -996,12 +996,13 @@
       }
 
       if (list.length === 0) {
-        container.innerHTML = '<div class="col-span-full py-16 px-6 text-center rounded-2xl bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800">' +
-          '<h3 class="text-base font-bold text-zinc-950 dark:text-white mb-1">No campus students found</h3>' +
-          '<p class="text-zinc-500 dark:text-zinc-400 text-xs max-w-sm mx-auto mb-4">' +
-            (window.communityStateInline.view === 'friends' ? "You haven't connected with any friends yet. Explore all campus students to send requests!" : "Try searching for a different name, university, or sport.") +
+        container.innerHTML = '<div class="col-span-full py-12 px-6 text-center rounded-3xl bg-zinc-50/80 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 flex flex-col items-center justify-center">' +
+          '<img src="./assets/mascot-students.png" onerror="this.src=\'/challenge2/unisport/app/assets/mascot-students.png\'" alt="UniSport Mascot" class="w-36 h-36 sm:w-44 sm:h-44 object-contain drop-shadow-md mb-2 select-none" />' +
+          '<h3 class="text-base sm:text-lg font-extrabold text-zinc-950 dark:text-white mb-1">No campus students found</h3>' +
+          '<p class="text-zinc-500 dark:text-zinc-400 text-xs max-w-sm mx-auto mb-5 leading-relaxed">' +
+            (window.communityStateInline.view === 'friends' ? "You haven't connected with any teammates yet. Explore all Fontys & TU/e students to build your squad!" : "Try searching for a different student name, university campus, or sport.") +
           '</p>' +
-          (window.communityStateInline.view === 'friends' ? '<button onclick="window.setCommunityView(\'all\')" class="px-4 py-2 rounded-xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 text-xs font-semibold cursor-pointer">Explore All Students</button>' : '') +
+          (window.communityStateInline.view === 'friends' ? '<button onclick="window.setCommunityView(\'all\')" class="px-5 py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 text-xs font-bold shadow-sm transition cursor-pointer">Explore All Students</button>' : '') +
         '</div>';
         return;
       }
@@ -2405,7 +2406,7 @@
           </div>
         </div>
         <div id="mobile-notif-requests-list" class="space-y-3">
-          <p class="text-zinc-400 text-xs py-3 text-center">No pending friend requests.</p>
+          <div class="py-4 px-3 text-center flex flex-col items-center justify-center"><img src="./assets/mascot-students.png" onerror="this.src='/challenge2/unisport/app/assets/mascot-students.png'" alt="No pending friend requests" class="w-20 h-20 object-contain drop-shadow-sm mb-1.5 select-none" /><p class="text-zinc-500 dark:text-zinc-400 font-semibold text-xs">No pending friend requests</p></div>
         </div>
       </div>
 
@@ -2416,7 +2417,7 @@
           <h2 class="text-sm font-bold text-zinc-950 dark:text-white">Activity & Match Alerts</h2>
         </div>
         <div id="mobile-notif-general-list" class="space-y-3">
-          <p class="text-zinc-400 text-xs py-3 text-center">All caught up! No recent alerts.</p>
+          <div class="py-5 px-3 text-center flex flex-col items-center justify-center"><img src="./assets/mascot-notifs.png" onerror="this.src='/challenge2/unisport/app/assets/mascot-notifs.png'" alt="All caught up" class="w-24 h-24 object-contain drop-shadow-sm mb-1.5 select-none" /><p class="text-zinc-700 dark:text-zinc-300 font-bold text-xs">All caught up!</p><p class="text-zinc-400 dark:text-zinc-500 text-[11px]">No recent session or match alerts.</p></div>
         </div>
       </div>
 
@@ -2966,7 +2967,7 @@
   </script>
 
   <!-- Application script entry with path-resilient fallback -->
-  <script type="module" src="./app.js?v=20261026_04" onerror="var s=document.createElement('script');s.type='module';s.src='/challenge2/unisport/app/app.js?v=20261026_04';document.body.appendChild(s);"></script>
+  <script type="module" src="./app.js?v=20261026_05" onerror="var s=document.createElement('script');s.type='module';s.src='/challenge2/unisport/app/app.js?v=20261026_05';document.body.appendChild(s);"></script>
 
 </body>
 </html>

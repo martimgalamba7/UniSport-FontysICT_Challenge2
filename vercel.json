@@ -21,6 +21,7 @@
     { "source": "/challenge2/unisport/firebase-config.js", "destination": "/challenge2/unisport/app/firebase-config.js" },
     { "source": "/challenge2/unisport/theme.js", "destination": "/challenge2/unisport/app/theme.js" },
     { "source": "/challenge2/unisport/assets/avatars/:path*", "destination": "/challenge2/unisport/app/assets/avatars/:path*" },
+    { "source": "/challenge2/unisport/assets/:path*", "destination": "/challenge2/unisport/app/assets/:path*" },
     { "source": "/unisport/app.js", "destination": "/challenge2/unisport/app/app.js" },
     { "source": "/unisport/avatar-data.js", "destination": "/challenge2/unisport/app/avatar-data.js" },
     { "source": "/unisport/avatars.js", "destination": "/challenge2/unisport/app/avatars.js" },
@@ -28,6 +29,8 @@
     { "source": "/unisport/firebase-config.js", "destination": "/challenge2/unisport/app/firebase-config.js" },
     { "source": "/unisport/theme.js", "destination": "/challenge2/unisport/app/theme.js" },
     { "source": "/unisport/assets/avatars/:path*", "destination": "/challenge2/unisport/app/assets/avatars/:path*" },
+    { "source": "/unisport/assets/:path*", "destination": "/challenge2/unisport/app/assets/:path*" },
+    { "source": "/assets/:path*", "destination": "/challenge2/unisport/app/assets/:path*" },
     { "source": "/challenge2/unisport/login", "destination": "/challenge2/unisport/app/login.html" },
     { "source": "/challenge2/unisport/register", "destination": "/challenge2/unisport/app/register.html" },
     { "source": "/challenge2/unisport/welcome", "destination": "/challenge2/unisport/app/welcome.html" },
@@ -46,6 +49,7 @@
     { "source": "/challenge2/survey", "destination": "/survey/index.html" },
     { "source": "/survey", "destination": "/survey/index.html" },
     { "source": "/app", "destination": "/challenge2/unisport/app/index.html" },
-    { "source": "/unisportapp", "destination": "/challenge2/unisport/app/index.html" }
+    { "source": "/unisportapp", "destination": "/challenge2/unisport/app/index.html" },
+    { "source": "/404", "destination": "/404.html" }
   ]
 }
