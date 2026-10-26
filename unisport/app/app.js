@@ -1,6 +1,7 @@
 // UniSport App Main Logic - Clean Minimalist UI (No Emojis, Kick/Google Avatars, Auth Guard)
 import { 
-  auth, 
+  auth,
+  deleteDoc, 
   db, 
   collection, 
   doc, 
@@ -46,6 +47,18 @@ window.UniSport.declineFriendRequest = declineFriendRequest;
 window.UniSport.removeFriend = removeFriend;
 window.UniSport.syncSocialStateFromStorage = syncSocialStateFromStorage;
 window.UniSport.signOut = signOutStudent;
+window.UniSport.openFilterDrawer = openFilterDrawer;
+window.UniSport.closeFilterDrawer = closeFilterDrawer;
+window.UniSport.setDrawerDateFilter = setDrawerDateFilter;
+window.UniSport.setDrawerPriceFilter = setDrawerPriceFilter;
+window.UniSport.applyFilterDrawer = applyFilterDrawer;
+window.UniSport.resetFeedFilters = resetFeedFilters;
+window.UniSport.openEditActivityModal = openEditActivityModal;
+window.UniSport.closeEditActivityModal = closeEditActivityModal;
+window.UniSport.saveEditedActivity = saveEditedActivity;
+window.UniSport.kickParticipant = kickParticipant;
+window.openFilterDrawer = openFilterDrawer;
+window.closeFilterDrawer = closeFilterDrawer;
 
 // Expose global filter and social handlers immediately
 window.filterStudentsGlobal = function(val) {
@@ -869,6 +882,7 @@ function setupFilterSearch() {
 export function openFilterDrawer() {
   const drawer = document.getElementById("feed-filter-drawer");
   if (!drawer) return;
+  drawer.style.display = "flex";
 
   const sportSel = document.getElementById("filter-drawer-sport");
   const uniSel = document.getElementById("filter-drawer-university");
@@ -888,7 +902,10 @@ export function openFilterDrawer() {
 
 export function closeFilterDrawer() {
   const drawer = document.getElementById("feed-filter-drawer");
-  if (drawer) drawer.classList.add("hidden");
+  if (drawer) {
+    drawer.classList.add("hidden");
+    drawer.style.display = "none";
+  }
   document.body.style.overflow = "";
 }
 
@@ -960,20 +977,122 @@ export function goToFeedPage(page) {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
+
+// Amsterdam Timezone & Host Validation Helpers
+export function getAmsterdamDate() {
+  const amsString = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Europe/Amsterdam",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false
+  }).format(new Date());
+
+  const [datePart, timePart] = amsString.split(", ");
+  const [month, day, year] = datePart.split("/");
+  const [hour, minute, second] = timePart.split(":");
+  return new Date(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10), parseInt(hour, 10), parseInt(minute, 10), parseInt(second, 10));
+}
+
+export function parseAmsterdamDateTimeString(dtString) {
+  if (!dtString) return null;
+  const [datePart, timePart] = dtString.split("T");
+  if (!datePart || !timePart) return null;
+  const [year, month, day] = datePart.split("-").map(n => parseInt(n, 10));
+  const [hour, minute] = timePart.split(":").map(n => parseInt(n, 10));
+  return new Date(year, month - 1, day, hour, minute, 0);
+}
+
+export function getAmsterdamMinDateTime() {
+  const nowAms = getAmsterdamDate();
+  // Strictly at least 1 hour from current Amsterdam time
+  const minAms = new Date(nowAms.getTime() + 60 * 60 * 1000);
+  const YYYY = minAms.getFullYear();
+  const MM = String(minAms.getMonth() + 1).padStart(2, "0");
+  const DD = String(minAms.getDate()).padStart(2, "0");
+  const HH = String(minAms.getHours()).padStart(2, "0");
+  const mm = String(minAms.getMinutes()).padStart(2, "0");
+  return {
+    minDate: minAms,
+    minString: `${YYYY}-${MM}-${DD}T${HH}:${mm}`
+  };
+}
+
+export function isUserActivityHost(activity) {
+  if (!activity) return false;
+  const sess = getActiveSession() || {};
+  const currentUid = state.currentUser?.uid || sess.uid || "";
+  const currentEmail = (state.currentUser?.email || sess.email || "").toLowerCase().trim();
+  const currentName = (state.userProfile?.displayName || state.currentUser?.displayName || sess.name || "").toLowerCase().trim();
+
+  const creatorId = String(activity.creatorId || "").trim();
+  const creatorEmail = String(activity.creatorEmail || "").toLowerCase().trim();
+  const creatorName = String(activity.creatorName || "").toLowerCase().trim();
+
+  // 1. Direct UID match
+  if (currentUid && (creatorId === currentUid || creatorEmail === currentUid)) return true;
+
+  // 2. Direct Email match
+  if (currentEmail && (creatorId.toLowerCase() === currentEmail || creatorEmail === currentEmail)) return true;
+
+  // 3. Name match if creatorId is missing or equals name
+  if (currentName && creatorName && (creatorName === currentName || creatorId.toLowerCase() === currentName)) return true;
+
+  // 4. Check if current user is first participant (creator is always index 0)
+  const participants = Array.isArray(activity.participants) ? activity.participants : [];
+  if (participants.length > 0) {
+    const firstP = participants[0];
+    if (firstP) {
+      if (currentUid && firstP.uid === currentUid) return true;
+      if (currentEmail && firstP.email && firstP.email.toLowerCase() === currentEmail) return true;
+      if (currentName && firstP.name && firstP.name.toLowerCase() === currentName) return true;
+    }
+  }
+
+  return false;
+}
+
 function setupCreateForm() {
   const form = document.getElementById("create-activity-form");
   if (!form) return;
 
   const dtInput = document.getElementById("create-datetime");
+  const errEl = document.getElementById("create-datetime-error");
+
+  const validateDt = () => {
+    if (!dtInput || !dtInput.value) {
+      if (errEl) errEl.classList.add("hidden");
+      if (dtInput) dtInput.classList.remove("ring-2", "ring-red-500");
+      return false;
+    }
+    const selectedDate = parseAmsterdamDateTimeString(dtInput.value);
+    const { minDate } = getAmsterdamMinDateTime();
+    if (!selectedDate || selectedDate.getTime() < minDate.getTime()) {
+      if (errEl) {
+        errEl.textContent = "Sessions must be scheduled at least 1 hour in advance (Amsterdam time).";
+        errEl.classList.remove("hidden");
+      }
+      dtInput.classList.add("ring-2", "ring-red-500");
+      return false;
+    } else {
+      if (errEl) errEl.classList.add("hidden");
+      dtInput.classList.remove("ring-2", "ring-red-500");
+      return true;
+    }
+  };
+
   if (dtInput) {
-    const setMinDt = () => {
-      const now = new Date();
-      now.setMinutes(now.getMinutes() + 5);
-      const iso = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
-      dtInput.min = iso;
+    const updateMinDt = () => {
+      const { minString } = getAmsterdamMinDateTime();
+      dtInput.min = minString;
     };
-    setMinDt();
-    dtInput.addEventListener("focus", setMinDt);
+    updateMinDt();
+    dtInput.addEventListener("focus", updateMinDt);
+    dtInput.addEventListener("input", validateDt);
+    dtInput.addEventListener("change", validateDt);
   }
 
   form.addEventListener("submit", async (e) => {
@@ -1011,10 +1130,9 @@ function setupCreateForm() {
       return;
     }
 
-    // RULE 2: Date must strictly be in the future
-    const selectedTime = new Date(dateTime).getTime();
-    if (isNaN(selectedTime) || selectedTime <= Date.now()) {
-      alert("Session date and time must be in the future.");
+    // Validation: Date and Time must be at least 1 hour in advance (Amsterdam time)
+    if (!validateDt()) {
+      alert("Session must be scheduled at least 1 hour in advance (Amsterdam time). Please choose a valid future date and time.");
       return;
     }
 
@@ -1075,7 +1193,8 @@ function setupCreateForm() {
 }
 
 export async function toggleJoinActivity(activityId) {
-  if (!state.currentUser) {
+  const currentUid = state.currentUser?.uid || (getActiveSession() || {}).uid;
+  if (!currentUid) {
     window.location.href = "./login.html";
     return;
   }
@@ -1083,54 +1202,82 @@ export async function toggleJoinActivity(activityId) {
   const activity = state.activities.find(a => a.id === activityId);
   if (!activity) return;
 
-  const participants = activity.participants || [];
-  const isJoined = participants.some(p => p.uid === state.currentUser.uid);
-  const max = parseInt(activity.maxParticipants, 10) || 10;
+  const isHost = isUserActivityHost(activity);
+  const participants = Array.isArray(activity.participants) ? activity.participants : [];
+  const isJoined = participants.some(p => p.uid === currentUid) || isHost;
 
-  if (!isJoined && participants.length >= max) {
+  if (isJoined) {
+    if (isHost) {
+      const confirmDelete = confirm("You are the host of this session. Leaving will delete and cancel the session for all participants. Are you sure you want to delete this session?");
+      if (!confirmDelete) return;
+
+      try {
+        const actRef = doc(db, "activities", activityId);
+        await deleteDoc(actRef);
+      } catch (err) {
+        console.warn("Firestore deleteDoc error:", err);
+      }
+
+      state.activities = (state.activities || []).filter(a => a.id !== activityId);
+      renderFeed();
+      renderMyActivities();
+      return;
+    }
+
+    const currentParticipantObj = participants.find(p => p.uid === currentUid) || { uid: currentUid };
+    try {
+      const actRef = doc(db, "activities", activityId);
+      await updateDoc(actRef, {
+        participants: arrayRemove(currentParticipantObj)
+      });
+    } catch (err) {
+      console.warn("Firestore arrayRemove error:", err);
+    }
+    activity.participants = participants.filter(p => p.uid !== currentUid);
+    renderFeed();
+    renderMyActivities();
+    return;
+  }
+
+  // Not joined - join logic
+  const max = parseInt(activity.maxParticipants, 10) || 10;
+  if (participants.length >= max) {
     alert("This activity is already full!");
     return;
   }
 
+  const sess = getActiveSession() || {};
   const currentParticipantObj = {
-    uid: state.currentUser.uid,
-    name: state.userProfile?.displayName || state.currentUser.displayName || "Student",
-    university: state.userProfile?.university || (state.currentUser.email.endsWith("@student.tue.nl") ? "TU Eindhoven" : "Fontys UAS"),
-    avatarId: state.userProfile?.avatarId || state.currentUser.avatarId || "bodybuilder"
+    uid: currentUid,
+    name: state.userProfile?.displayName || state.currentUser?.displayName || sess.name || "Student",
+    university: state.userProfile?.university || sess.university || (sess.email?.endsWith("@student.tue.nl") ? "TU Eindhoven" : "Fontys UAS"),
+    avatarId: state.userProfile?.avatarId || state.currentUser?.avatarId || sess.avatarId || "bodybuilder"
   };
 
   try {
     const actRef = doc(db, "activities", activityId);
-    if (isJoined) {
-      const itemToRemove = participants.find(p => p.uid === state.currentUser.uid) || currentParticipantObj;
-      await updateDoc(actRef, {
-        participants: arrayRemove(itemToRemove)
-      });
-    } else {
-      await updateDoc(actRef, {
-        participants: arrayUnion(currentParticipantObj)
-      });
-    }
+    await updateDoc(actRef, {
+      participants: arrayUnion(currentParticipantObj)
+    });
   } catch (err) {
-    if (isJoined) {
-      activity.participants = participants.filter(p => p.uid !== state.currentUser.uid);
-    } else {
-      activity.participants.push(currentParticipantObj);
-    }
-    renderFeed();
+    console.warn("Firestore arrayUnion error:", err);
   }
+
+  activity.participants = [...participants, currentParticipantObj];
+  renderFeed();
+  renderMyActivities();
 }
 
 function renderMyActivities() {
   const container = document.getElementById("my-activities-list");
   if (!container) return;
 
-  const currentUid = state.currentUser ? state.currentUser.uid : "";
+  const currentUid = state.currentUser?.uid || (getActiveSession() || {}).uid || "";
   const nowMs = Date.now();
 
   const myActivities = (state.activities || []).filter(a => {
     const isJoined = (a.participants || []).some(p => p.uid === currentUid);
-    const isCreator = a.creatorId === currentUid;
+    const isCreator = isUserActivityHost(a);
     return isJoined || isCreator;
   });
 
@@ -1164,7 +1311,7 @@ function renderMyActivities() {
   });
 
   const renderCard = (a, isPast = false) => {
-    const isCreator = a.creatorId === currentUid;
+    const isCreator = isUserActivityHost(a);
     const durationStr = formatDurationBadge(a.durationMinutes);
     const isPaid = !!a.isPaid && parseFloat(a.price || 0) > 0;
     const priceDisplay = isPaid ? `€${parseFloat(a.price).toFixed(2)}` : "Free";
@@ -1200,11 +1347,15 @@ function renderMyActivities() {
             </button>
           </div>
 
-          ${!isCreator && !isPast ? `
+          ${isCreator && !isPast ? `
+            <button onclick="window.UniSport.toggleJoinActivity('${a.id}')" class="px-3 py-1.5 rounded-xl bg-red-50 dark:bg-red-950/40 hover:bg-red-100 text-red-600 dark:text-red-400 text-xs font-semibold transition cursor-pointer" title="Cancel & Delete Session">
+              Cancel Session
+            </button>
+          ` : (!isPast ? `
             <button onclick="window.UniSport.toggleJoinActivity('${a.id}')" class="px-3 py-1.5 rounded-xl bg-red-50 dark:bg-red-950/40 hover:bg-red-100 text-red-600 dark:text-red-400 text-xs font-semibold transition cursor-pointer">
               Leave
             </button>
-          ` : ''}
+          ` : '')}
         </div>
       </div>
     `;
@@ -1482,8 +1633,8 @@ export function openRosterModal(activityId) {
 
   if (!activity || !modal || !content) return;
 
-  const currentUid = state.currentUser ? state.currentUser.uid : "";
-  const isHost = activity.creatorId === currentUid;
+  const currentUid = state.currentUser?.uid || (getActiveSession() || {}).uid || "";
+  const isHost = isUserActivityHost(activity);
 
   title.textContent = activity.title;
   const participants = activity.participants || [];
@@ -1491,7 +1642,7 @@ export function openRosterModal(activityId) {
   content.innerHTML = participants.map((p, idx) => {
     const av = getAvatarById(p.avatarId || "bodybuilder");
     const isMe = p.uid === currentUid;
-    const isCreatorRow = p.uid === activity.creatorId;
+    const isCreatorRow = (p.uid && p.uid === activity.creatorId) || idx === 0;
 
     return `
       <div class="flex items-center justify-between p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800">
@@ -1510,7 +1661,7 @@ export function openRosterModal(activityId) {
         </div>
         
         <div class="flex items-center gap-2">
-          ${isHost && !isCreatorRow ? `
+          ${isHost && !isMe ? `
             <button onclick="window.UniSport.kickParticipant('${activity.id}', '${p.uid}', '${escapeHtml(p.name)}')" class="px-2.5 py-1 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 text-xs font-bold transition cursor-pointer">
               Kick
             </button>
@@ -1528,9 +1679,8 @@ export function openRosterModal(activityId) {
 }
 
 export async function kickParticipant(activityId, participantUid, participantName) {
-  const currentUid = state.currentUser ? state.currentUser.uid : "";
   const activity = state.activities.find(a => a.id === activityId);
-  if (!activity || activity.creatorId !== currentUid) {
+  if (!activity || !isUserActivityHost(activity)) {
     alert("Only the host can kick participants from this session.");
     return;
   }
@@ -1563,8 +1713,7 @@ export async function kickParticipant(activityId, participantUid, participantNam
 // Edit Session Modal Functions
 export function openEditActivityModal(activityId) {
   const activity = state.activities.find(a => a.id === activityId);
-  const currentUid = state.currentUser ? state.currentUser.uid : "";
-  if (!activity || activity.creatorId !== currentUid) {
+  if (!activity || !isUserActivityHost(activity)) {
     alert("Only the event host can edit this session.");
     return;
   }
@@ -1595,10 +1744,8 @@ export function openEditActivityModal(activityId) {
   
   const dtInput = document.getElementById("edit-datetime");
   if (dtInput) {
-    const now = new Date();
-    now.setMinutes(now.getMinutes() + 5);
-    const iso = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
-    dtInput.min = iso;
+    const { minString } = getAmsterdamMinDateTime();
+    dtInput.min = minString;
     dtInput.value = activity.dateTime || "";
   }
 
@@ -1624,8 +1771,10 @@ export function closeEditActivityModal() {
 export async function saveEditedActivity() {
   const id = document.getElementById("edit-activity-id").value;
   const activity = state.activities.find(a => a.id === id);
-  const currentUid = state.currentUser ? state.currentUser.uid : "";
-  if (!activity || activity.creatorId !== currentUid) return;
+  if (!activity || !isUserActivityHost(activity)) {
+    alert("Only the event host can edit this session.");
+    return;
+  }
 
   const title = sanitize(document.getElementById("edit-title").value);
   let sport = document.getElementById("edit-sport").value;
@@ -1637,9 +1786,10 @@ export async function saveEditedActivity() {
   const location = sanitize(document.getElementById("edit-location").value);
   const dateTime = document.getElementById("edit-datetime").value;
 
-  const selectedTime = new Date(dateTime).getTime();
-  if (isNaN(selectedTime) || selectedTime <= Date.now()) {
-    alert("Session date and time must be in the future.");
+  const selectedDate = parseAmsterdamDateTimeString(dateTime);
+  const { minDate } = getAmsterdamMinDateTime();
+  if (!selectedDate || selectedDate.getTime() < minDate.getTime()) {
+    alert("Sessions must be scheduled at least 1 hour in advance (Amsterdam time). Please select a valid future date and time.");
     return;
   }
 

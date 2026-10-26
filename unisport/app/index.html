@@ -144,6 +144,28 @@
       }
     }
   </style>
+  <script>
+    // Immediate fallback helper for filter drawer
+    window.UniSport = window.UniSport || {};
+    window.openFilterDrawer = function() {
+      var d = document.getElementById("feed-filter-drawer");
+      if (d) {
+        d.classList.remove("hidden");
+        d.style.display = "flex";
+        document.body.style.overflow = "hidden";
+      }
+    };
+    window.closeFilterDrawer = function() {
+      var d = document.getElementById("feed-filter-drawer");
+      if (d) {
+        d.classList.add("hidden");
+        d.style.display = "none";
+        document.body.style.overflow = "";
+      }
+    };
+    window.UniSport.openFilterDrawer = window.openFilterDrawer;
+    window.UniSport.closeFilterDrawer = window.closeFilterDrawer;
+  </script>
 </head>
 
 <body class="bg-white text-zinc-900 dark:bg-black dark:text-zinc-100 min-h-screen flex flex-col font-sans transition-colors duration-150 pb-16 md:pb-8">
@@ -1760,7 +1782,7 @@
         <!-- Filter Trigger & Active Filter Summary -->
         <div class="flex items-center justify-between gap-2">
           <div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none flex-grow">
-            <button id="btn-open-feed-filters" onclick="window.UniSport.openFilterDrawer()" class="px-3.5 py-2 rounded-xl bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 text-xs font-bold whitespace-nowrap transition cursor-pointer flex items-center gap-2 shadow-sm">
+            <button id="btn-open-feed-filters" onclick="(window.UniSport && window.UniSport.openFilterDrawer) ? window.UniSport.openFilterDrawer() : window.openFilterDrawer()" class="px-3.5 py-2 rounded-xl bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 text-xs font-bold whitespace-nowrap transition cursor-pointer flex items-center gap-2 shadow-sm">
               <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i>
               <span>Filters</span>
               <span id="feed-filter-count-badge" class="hidden px-1.5 py-0.2 rounded-full text-[10px] font-black bg-orange-500 text-white">0</span>
@@ -1860,13 +1882,14 @@
           </div>
 
           <div>
-            <label class="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Date & Time (Future only) *</label>
+            <label class="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Date & Time *</label>
             <input 
               type="datetime-local" 
               id="create-datetime" 
               required 
               class="w-full px-4 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-900 border-0 text-sm text-zinc-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition"
             />
+            <p id="create-datetime-error" class="hidden text-xs text-red-500 font-semibold mt-1">Sessions must be scheduled at least 1 hour in advance (Amsterdam time).</p>
           </div>
         </div>
 
@@ -2628,7 +2651,7 @@
   </div>
 
   <!-- Feed Deep Filter Drawer (Slide-in on Desktop, Full-Screen Modal on Mobile) -->
-  <div id="feed-filter-drawer" class="hidden fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm transition-opacity duration-200" onclick="if(event.target===this) window.UniSport.closeFilterDrawer();">
+  <div id="feed-filter-drawer" class="hidden fixed inset-0 z-[100] flex justify-end bg-black/60 backdrop-blur-sm transition-opacity duration-200" onclick="if(event.target===this) window.UniSport.closeFilterDrawer();">
     <div class="relative w-full max-w-md h-full bg-white dark:bg-zinc-950 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col overflow-y-auto animate-in slide-in-from-right duration-200">
       
       <!-- Drawer Header -->
@@ -2772,8 +2795,9 @@
             <input type="text" id="edit-location" required class="w-full px-4 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-800 border-0 text-sm text-zinc-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition" />
           </div>
           <div>
-            <label class="block font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Date & Time (Future) *</label>
+            <label class="block font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Date & Time *</label>
             <input type="datetime-local" id="edit-datetime" required class="w-full px-4 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-800 border-0 text-sm text-zinc-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition" />
+            <p id="edit-datetime-error" class="hidden text-xs text-red-500 font-semibold mt-1">Sessions must be scheduled at least 1 hour in advance (Amsterdam time).</p>
           </div>
         </div>
 
@@ -2939,7 +2963,7 @@
   </script>
 
   <!-- Application script entry with path-resilient fallback -->
-  <script type="module" src="./app.js?v=20261026_02" onerror="var s=document.createElement('script');s.type='module';s.src='/challenge2/unisport/app/app.js?v=20261026_02';document.body.appendChild(s);"></script>
+  <script type="module" src="./app.js?v=20261026_03" onerror="var s=document.createElement('script');s.type='module';s.src='/challenge2/unisport/app/app.js?v=20261026_03';document.body.appendChild(s);"></script>
 
 </body>
 </html>
