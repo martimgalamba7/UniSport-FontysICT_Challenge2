@@ -317,49 +317,18 @@ function setupNavigation() {
     if (mobileBtn) mobileBtn.addEventListener("click", clickHandler);
   });
 
-  // Mobile Profile Settings Hamburger button listeners
-  const headerBurger = document.getElementById("mobile-profile-burger-btn");
-  const cardBurger = document.getElementById("profile-hero-burger-btn");
-  const closeBtn = document.getElementById("fullscreen-menu-close-btn");
-
-  const openHandler = (e) => {
-    if (typeof window.openMobileSettingsMenu === "function") {
-      window.openMobileSettingsMenu(e);
-    }
-  };
-  const closeHandler = (e) => {
-    if (typeof window.closeUserMenuGlobal === "function") {
-      window.closeUserMenuGlobal(e);
-    }
-  };
-
-  if (headerBurger) headerBurger.addEventListener("click", openHandler);
-  if (cardBurger) cardBurger.addEventListener("click", openHandler);
-  if (closeBtn) closeBtn.addEventListener("click", closeHandler);
+  // Mobile Settings button in bottom navbar
+  const mobileSettingsBtn = document.getElementById("mobile-tab-settings");
+  if (mobileSettingsBtn) {
+    mobileSettingsBtn.addEventListener("click", () => {
+      openSettingsModal();
+    });
+  }
 }
 
 export function switchTab(targetTab) {
   state.activeTab = targetTab;
   const tabs = ["feed", "community", "create", "my-activities", "profile", "notifications", "student-profile"];
-
-  const userDropdown = document.getElementById("user-dropdown");
-  if (userDropdown) {
-    userDropdown.classList.add("hidden");
-    userDropdown.classList.remove("flex");
-    document.body.style.overflow = "";
-  }
-
-  // Update visibility of the mobile profile hamburger button:
-  const mobileBurger = document.getElementById("mobile-profile-burger-btn");
-  if (mobileBurger) {
-    if (targetTab === "profile") {
-      mobileBurger.classList.remove("hidden");
-      mobileBurger.classList.add("inline-flex");
-    } else {
-      mobileBurger.classList.add("hidden");
-      mobileBurger.classList.remove("inline-flex");
-    }
-  }
 
   tabs.forEach(t => {
     const section = document.getElementById(`section-${t}`);
@@ -384,6 +353,11 @@ export function switchTab(targetTab) {
       }
     }
   });
+
+  const mobSettingsBtn = document.getElementById("mobile-tab-settings");
+  if (mobSettingsBtn) {
+    mobSettingsBtn.className = "flex flex-col items-center gap-1 text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer";
+  }
 
   if (targetTab === "student-profile") {
     const commDeskBtn = document.getElementById("tab-btn-community");
@@ -1166,14 +1140,10 @@ export async function savePrivacySettingsToFirestore(isPublic, showUniBadge) {
 
 export function openSettingsModal() {
   const modal = document.getElementById("settings-modal");
-  const dropdown = document.getElementById("user-dropdown");
-  if (dropdown) {
-    dropdown.classList.add("hidden");
-    dropdown.classList.remove("flex");
-    document.body.style.overflow = "";
-  }
   if (modal) {
     modal.classList.remove("hidden");
+    modal.classList.add("flex");
+    document.body.style.overflow = "hidden";
     if (window.lucide && typeof window.lucide.createIcons === "function") {
       window.lucide.createIcons();
     }
@@ -1256,14 +1226,15 @@ function setupSettingsModal() {
     deleteAccountBtn.addEventListener("click", deleteAccount);
   }
 
-  const close = () => { if (modal) modal.classList.add("hidden"); };
+  const close = () => {
+    if (modal) {
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+    }
+    document.body.style.overflow = "";
+  };
   if (closeBtn) closeBtn.addEventListener("click", close);
   if (doneBtn) doneBtn.addEventListener("click", close);
-  if (modal) {
-    modal.addEventListener("click", (e) => {
-      if (e.target === modal) close();
-    });
-  }
 }
 
 export async function clearCache() {

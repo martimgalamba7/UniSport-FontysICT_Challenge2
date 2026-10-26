@@ -308,17 +308,6 @@
       <a href="./login.html" id="nav-auth-btn" class="px-3 py-1.5 rounded-xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 text-xs font-semibold">
         Sign in
       </a>
-
-      <!-- Mobile Profile Hamburger Button (3-bar menu, visible when on Profile tab per user request) -->
-      <button 
-        id="mobile-profile-burger-btn" 
-        onclick="window.openMobileSettingsMenu(event);" 
-        class="hidden p-2 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 hover:text-brand-orange transition-all duration-300 cursor-pointer select-none" 
-        aria-label="Open Settings"
-        title="Settings"
-      >
-        <i data-lucide="menu" id="burger-icon-header" class="w-6 h-6 transition-transform duration-300 ease-in-out"></i>
-      </button>
     </div>
   </header>
 
@@ -366,129 +355,6 @@
     </div>
   </aside>
 
-  <!-- Full-Screen Mobile User Navigation Overlay (Matches requested modern mobile full-screen style) -->
-  <div 
-    id="user-dropdown" 
-    class="hidden fixed inset-0 z-[100] bg-white dark:bg-zinc-950 flex flex-col justify-between p-6 sm:p-8 overflow-y-auto animate-in fade-in duration-150"
-    role="dialog"
-    aria-modal="true"
-    aria-label="User Menu"
-  >
-    <!-- Top Block: Header, Student Info & Navigation Links -->
-    <div class="flex flex-col">
-      <!-- Top Header Row: Logo on left, 'X' close button on right -->
-      <div class="flex items-center justify-between pb-6 border-b border-zinc-100 dark:border-zinc-800/80">
-        <a href="/challenge2/unisport" class="flex items-center gap-2.5">
-          <img src="/assets/logoUniSport.png" alt="UniSport" class="h-7 w-auto object-contain" onerror="this.src='./assets/logoUniSport.png';" />
-          <span class="font-extrabold text-xl tracking-tight text-zinc-950 dark:text-white">UNISPORT</span>
-        </a>
-        <button 
-          id="fullscreen-menu-close-btn" 
-          onclick="window.closeUserMenuGlobal(event);" 
-          class="p-2 -mr-2 rounded-2xl hover:bg-zinc-100 dark:hover:bg-zinc-900 text-zinc-500 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer select-none" 
-          aria-label="Close menu"
-        >
-          <i data-lucide="x" id="fullscreen-close-icon" class="w-7 h-7 transition-transform duration-300 ease-in-out"></i>
-        </button>
-      </div>
-
-      <!-- Student Card Summary -->
-      <div class="py-5 flex items-center gap-3.5 border-b border-zinc-100 dark:border-zinc-800/80">
-        <div id="fullscreen-user-avatar-wrap" class="w-12 h-12 rounded-full overflow-hidden border-2 border-zinc-200 dark:border-zinc-800 shrink-0 flex items-center justify-center bg-zinc-100 dark:bg-zinc-900">
-          <img id="fullscreen-user-avatar-img" src="./assets/avatars/footballer.png" alt="Student Mascot" class="w-full h-full object-cover" />
-        </div>
-        <div class="min-w-0 flex-1">
-          <p id="dropdown-name" class="font-black text-lg text-zinc-950 dark:text-white truncate">Student</p>
-          <p id="dropdown-email" class="text-xs text-zinc-500 dark:text-zinc-400 truncate">student@fontys.nl</p>
-          <div id="dropdown-school-container" class="mt-1 flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400 font-medium">
-            <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-brand-orange"></i>
-            <span id="dropdown-school-full">Fontys UAS</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Large Bold Navigation Menu List (Exact style from reference screenshot) -->
-      <nav class="flex flex-col mt-2">
-        <!-- 1. Profile -->
-        <button 
-          id="dropdown-profile-btn" 
-          onclick="window.switchTabGlobal('profile'); window.closeUserMenuGlobal();" 
-          class="w-full py-5 border-b border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between text-left group cursor-pointer"
-        >
-          <span class="text-2xl sm:text-3xl font-black text-zinc-950 dark:text-white group-hover:text-brand-orange transition tracking-tight">Profile</span>
-          <i data-lucide="chevron-right" class="w-5 h-5 text-zinc-300 dark:text-zinc-700 group-hover:text-brand-orange group-hover:translate-x-1 transition-transform"></i>
-        </button>
-
-        <!-- 2. Campus Students -->
-        <button 
-          id="dropdown-community-btn" 
-          onclick="window.switchTabGlobal('community'); window.closeUserMenuGlobal();" 
-          class="w-full py-5 border-b border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between text-left group cursor-pointer"
-        >
-          <span class="text-2xl sm:text-3xl font-black text-zinc-950 dark:text-white group-hover:text-brand-orange transition tracking-tight">Campus Students</span>
-          <i data-lucide="chevron-right" class="w-5 h-5 text-zinc-300 dark:text-zinc-700 group-hover:text-brand-orange group-hover:translate-x-1 transition-transform"></i>
-        </button>
-
-        <!-- 3. My Sessions -->
-        <button 
-          id="dropdown-sessions-btn" 
-          onclick="window.switchTabGlobal('my-activities'); window.closeUserMenuGlobal();" 
-          class="w-full py-5 border-b border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between text-left group cursor-pointer"
-        >
-          <span class="text-2xl sm:text-3xl font-black text-zinc-950 dark:text-white group-hover:text-brand-orange transition tracking-tight">My Sessions</span>
-          <i data-lucide="chevron-right" class="w-5 h-5 text-zinc-300 dark:text-zinc-700 group-hover:text-brand-orange group-hover:translate-x-1 transition-transform"></i>
-        </button>
-
-        <!-- 4. Create Activity -->
-        <button 
-          onclick="window.switchTabGlobal('create'); window.closeUserMenuGlobal();" 
-          class="w-full py-5 border-b border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between text-left group cursor-pointer"
-        >
-          <span class="text-2xl sm:text-3xl font-black text-zinc-950 dark:text-white group-hover:text-brand-orange transition tracking-tight">Create Activity</span>
-          <i data-lucide="chevron-right" class="w-5 h-5 text-zinc-300 dark:text-zinc-700 group-hover:text-brand-orange group-hover:translate-x-1 transition-transform"></i>
-        </button>
-
-        <!-- 5. Settings -->
-        <button 
-          id="dropdown-settings-btn" 
-          onclick="window.closeUserMenuGlobal(); window.openSettingsGlobal();" 
-          class="w-full py-5 border-b border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between text-left group cursor-pointer"
-        >
-          <span class="text-2xl sm:text-3xl font-black text-zinc-950 dark:text-white group-hover:text-brand-orange transition tracking-tight">Settings</span>
-          <i data-lucide="chevron-right" class="w-5 h-5 text-zinc-300 dark:text-zinc-700 group-hover:text-brand-orange group-hover:translate-x-1 transition-transform"></i>
-        </button>
-      </nav>
-
-      <!-- Pill Control: Theme / Appearance Switcher (Matches language dropdown pill in screenshot) -->
-      <div class="my-6 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/70 dark:bg-zinc-900/50">
-        <div class="flex items-center gap-2.5 text-zinc-800 dark:text-zinc-200 font-bold text-sm">
-          <i data-lucide="sun-moon" class="w-4 h-4 text-brand-orange"></i>
-          <span>Appearance</span>
-        </div>
-        <button 
-          class="theme-toggle-btn px-4 py-2 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs font-bold text-zinc-800 dark:text-zinc-200 flex items-center gap-2 shadow-sm cursor-pointer transition active:scale-95" 
-          aria-label="Toggle theme"
-        >
-          <i data-lucide="moon" class="icon-moon w-3.5 h-3.5"></i>
-          <i data-lucide="sun" class="icon-sun w-3.5 h-3.5 hidden"></i>
-          <span class="theme-label">Theme</span>
-        </button>
-      </div>
-    </div>
-
-    <!-- Bottom Action Button: Full-width prominent button (Matches GET IN TOUCH button in screenshot) -->
-    <div class="pt-4 pb-2">
-      <button 
-        id="dropdown-signout-btn" 
-        onclick="window.closeUserMenuGlobal(); window.handleSignOutGlobal();" 
-        class="w-full py-4 rounded-2xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 font-black text-center tracking-wider uppercase text-sm shadow-xl active:scale-[0.99] transition cursor-pointer flex items-center justify-center gap-2"
-      >
-        <i data-lucide="log-out" class="w-4 h-4 text-red-500"></i>
-        <span>Sign Out</span>
-      </button>
-    </div>
-  </div>
-
   <script>
     // Immediate synchronous avatar and UI render to avoid ANY flash or delay
     (function() {
@@ -533,126 +399,11 @@
       } catch (err) {}
     })();
 
-    // Hydrate student data inside the Full-Screen User Menu
-    window.hydrateUserMenuData = function() {
-      var raw = localStorage.getItem("unisport_active_session");
-      if (!raw) return;
-      try {
-        var u = JSON.parse(raw);
-        var dropName = document.getElementById("dropdown-name");
-        var dropEmail = document.getElementById("dropdown-email");
-        var dropSchoolFull = document.getElementById("dropdown-school-full");
-        var dropSchoolContainer = document.getElementById("dropdown-school-container");
-        var avatarImg = document.getElementById("fullscreen-user-avatar-img");
-        var prefs = JSON.parse(localStorage.getItem("unisport_app_preferences") || "{}");
-        var showUni = prefs.showUni !== undefined ? prefs.showUni : (u.showUniBadge !== undefined ? u.showUniBadge : true);
-
-        if (dropName) dropName.textContent = u.displayName || u.email || "Student";
-        if (dropEmail) dropEmail.textContent = u.email || "";
-        var isTue = (u.university && u.university.indexOf("TU") !== -1) || (u.email && u.email.indexOf("tue.nl") !== -1);
-        if (dropSchoolFull) dropSchoolFull.textContent = isTue ? "TU Eindhoven" : "Fontys UAS";
-        if (dropSchoolContainer) {
-          if (showUni === false) dropSchoolContainer.classList.add("hidden");
-          else dropSchoolContainer.classList.remove("hidden");
-        }
-
-        if (avatarImg) {
-          var avId = u.avatarId || "footballer";
-          if (!["footballer", "runner", "bodybuilder"].includes(avId)) avId = "footballer";
-          avatarImg.src = "./assets/avatars/" + avId + ".png";
-        }
-      } catch(err) {}
-    };
-
-    // Open full-screen mobile menu with smooth rotation of the 3-bar button
-    window.openMobileSettingsMenu = function(e) {
-      if (e) {
-        if (typeof e.preventDefault === "function") e.preventDefault();
-        if (typeof e.stopPropagation === "function") e.stopPropagation();
-      }
-
-      // Rotate hamburger icon 90 degrees
-      var burgerHeader = document.getElementById("burger-icon-header");
-      var burgerCard = document.getElementById("burger-icon-card");
-      if (burgerHeader) burgerHeader.style.transform = "rotate(90deg)";
-      if (burgerCard) burgerCard.style.transform = "rotate(90deg)";
-
-      var closeIcon = document.getElementById("fullscreen-close-icon");
-      if (closeIcon) closeIcon.style.transform = "rotate(0deg)";
-
-      var menu = document.getElementById("user-dropdown");
-      if (!menu) return;
-
-      setTimeout(function() {
-        menu.classList.remove("hidden");
-        menu.classList.add("flex");
-        document.body.style.overflow = "hidden";
-        window.hydrateUserMenuData();
-        if (window.lucide && typeof window.lucide.createIcons === "function") {
-          window.lucide.createIcons();
-        }
-      }, 100);
-    };
-
-    window.openUserMenuGlobal = window.openMobileSettingsMenu;
-
-    // Close full-screen mobile menu with reverse rotation
-    window.closeUserMenuGlobal = function(e) {
-      if (e) {
-        if (typeof e.preventDefault === "function") e.preventDefault();
-        if (typeof e.stopPropagation === "function") e.stopPropagation();
-      }
-
-      // Rotate close icon
-      var closeIcon = document.getElementById("fullscreen-close-icon");
-      if (closeIcon) closeIcon.style.transform = "rotate(90deg)";
-
-      // Reset hamburger icon back to 0 degrees
-      var burgerHeader = document.getElementById("burger-icon-header");
-      var burgerCard = document.getElementById("burger-icon-card");
-      if (burgerHeader) burgerHeader.style.transform = "rotate(0deg)";
-      if (burgerCard) burgerCard.style.transform = "rotate(0deg)";
-
-      var menu = document.getElementById("user-dropdown");
-      if (!menu) return;
-
-      setTimeout(function() {
-        menu.classList.add("hidden");
-        menu.classList.remove("flex");
-        document.body.style.overflow = "";
-        if (closeIcon) closeIcon.style.transform = "rotate(0deg)";
-      }, 150);
-    };
-
-    // Robust user dropdown toggle for mobile and desktop avatar clicks
-    window.toggleUserDropdownGlobal = function(e) {
-      var dd = document.getElementById("user-dropdown");
-      if (!dd) return;
-      if (dd.classList.contains("hidden")) {
-        window.openMobileSettingsMenu(e);
-      } else {
-        window.closeUserMenuGlobal(e);
-      }
-    };
-
     // Synchronous resilient tab switcher for instant profile / sessions / notifications navigation
     window.switchTabGlobal = function(tabId) {
-      window.closeUserMenuGlobal();
       var drawer = document.getElementById("notifications-desktop-drawer");
       if (drawer && tabId !== "notifications") {
         drawer.classList.add("-translate-x-full");
-      }
-
-      // Update visibility of the mobile profile hamburger button:
-      var mobileBurger = document.getElementById("mobile-profile-burger-btn");
-      if (mobileBurger) {
-        if (tabId === "profile") {
-          mobileBurger.classList.remove("hidden");
-          mobileBurger.classList.add("inline-flex");
-        } else {
-          mobileBurger.classList.add("hidden");
-          mobileBurger.classList.remove("inline-flex");
-        }
       }
 
       // Switch section visibility
@@ -1746,10 +1497,15 @@
     });
 
     window.openSettingsGlobal = function() {
-      var dd = document.getElementById("user-dropdown");
-      if (dd) dd.classList.add("hidden");
       var notifDd = document.getElementById("notifications-dropdown");
       if (notifDd) notifDd.classList.add("hidden");
+
+      var modal = document.getElementById("settings-modal");
+      if (modal) {
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+        document.body.style.overflow = "hidden";
+      }
 
       // Hydrate privacy and preference toggles from stored settings and session
       try {
@@ -1767,15 +1523,19 @@
 
       if (window.UniSport && typeof window.UniSport.openSettingsModal === "function") {
         window.UniSport.openSettingsModal();
-        return;
       }
-      var modal = document.getElementById("settings-modal");
-      if (modal) modal.classList.remove("hidden");
+      if (window.lucide && typeof window.lucide.createIcons === "function") {
+        window.lucide.createIcons();
+      }
     };
 
     window.closeSettingsGlobal = function() {
       var modal = document.getElementById("settings-modal");
-      if (modal) modal.classList.add("hidden");
+      if (modal) {
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+      }
+      document.body.style.overflow = "";
     };
 
     window.handleSignOutGlobal = async function() {
@@ -2176,18 +1936,6 @@
       
       <!-- Athlete Hero Card (Clean Uber UI) -->
       <div class="p-6 sm:p-10 lg:p-12 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm relative overflow-hidden">
-        
-        <!-- Mobile 3-bar Settings Button in Profile Card -->
-        <button 
-          id="profile-hero-burger-btn" 
-          onclick="window.openMobileSettingsMenu(event);" 
-          class="md:hidden absolute top-4 right-4 p-2.5 rounded-2xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-900 dark:text-white transition-all duration-300 cursor-pointer shadow-sm z-20 flex items-center justify-center select-none"
-          aria-label="Open Settings Menu"
-          title="Settings"
-        >
-          <i data-lucide="menu" id="burger-icon-card" class="w-6 h-6 transition-transform duration-300 ease-in-out"></i>
-        </button>
-
         <div class="flex flex-col md:flex-row items-center md:items-start gap-8 relative z-10 text-center md:text-left">
           
           <!-- Avatar Hero Circle with Minimalist Ring & Online Pulse -->
@@ -2562,189 +2310,216 @@
       <i data-lucide="user" class="w-4 h-4"></i>
       <span class="text-[10px] font-semibold">Profile</span>
     </button>
+    <button id="mobile-tab-settings" onclick="window.openSettingsGlobal()" class="flex flex-col items-center gap-1 text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer">
+      <i data-lucide="settings" class="w-4 h-4"></i>
+      <span class="text-[10px] font-semibold">Settings</span>
+    </button>
   </nav>
 
-  <!-- Comprehensive App Settings Modal (Uber-Style App Settings) -->
-  <div id="settings-modal" onclick="if (event.target === this) window.closeSettingsGlobal();" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/75 backdrop-blur-md overflow-y-auto">
-    <div class="relative w-full max-w-2xl max-h-[92vh] flex flex-col rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-2xl overflow-hidden my-auto">
+  <!-- Full-Screen Settings Menu (App, Privacy & Account Preferences) -->
+  <div 
+    id="settings-modal" 
+    class="hidden fixed inset-0 z-50 bg-white dark:bg-zinc-950 flex flex-col overflow-y-auto animate-in fade-in duration-150"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Settings"
+  >
+    <!-- Full-Screen Sticky Header -->
+    <header class="sticky top-0 z-20 px-6 py-4 border-b border-zinc-100 dark:border-zinc-800/80 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md flex items-center justify-between shrink-0">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center text-zinc-950 dark:text-white shrink-0">
+          <i data-lucide="settings" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h2 class="text-xl sm:text-2xl font-black tracking-tight text-zinc-950 dark:text-white">Settings</h2>
+          <p class="text-xs text-zinc-500">Preferences, privacy & account</p>
+        </div>
+      </div>
+      <button 
+        id="settings-modal-close" 
+        onclick="window.closeSettingsGlobal();" 
+        class="p-2.5 rounded-2xl hover:bg-zinc-100 dark:hover:bg-zinc-900 text-zinc-500 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer select-none" 
+        aria-label="Close Settings"
+      >
+        <i data-lucide="x" class="w-6 h-6"></i>
+      </button>
+    </header>
+
+    <!-- Scrollable Full-Screen Settings Content -->
+    <div class="max-w-3xl w-full mx-auto px-6 py-6 sm:py-8 space-y-6 flex-1 text-xs sm:text-sm">
       
-      <!-- Modal Header -->
-      <div class="p-5 sm:p-6 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between shrink-0 bg-white dark:bg-zinc-900">
-        <div class="flex items-center gap-3">
-          <i data-lucide="settings" class="w-6 h-6 text-zinc-950 dark:text-white"></i>
-          <div>
-            <h3 class="text-lg sm:text-xl font-extrabold text-zinc-950 dark:text-white">App Settings</h3>
-            <p class="text-xs text-zinc-500">Preferences, security, notifications & privacy.</p>
+      <!-- SECTION 1: APPEARANCE & LOCALIZATION -->
+      <div class="space-y-3">
+        <h4 class="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Appearance & Experience</h4>
+        
+        <div class="divide-y divide-zinc-100 dark:divide-zinc-800/80 rounded-2xl border border-zinc-100 dark:border-zinc-800/80 overflow-hidden bg-zinc-50/50 dark:bg-zinc-900/40">
+          <div class="p-4 flex items-center justify-between">
+            <div>
+              <p class="font-bold text-zinc-950 dark:text-white">Theme</p>
+              <p class="text-xs text-zinc-500">Switch between light and dark visual mode</p>
+            </div>
+            <button class="theme-toggle-btn px-4 py-2 rounded-xl bg-zinc-200 dark:bg-zinc-800 hover:bg-zinc-300 dark:hover:bg-zinc-700 font-semibold text-zinc-900 dark:text-zinc-100 transition cursor-pointer text-xs">
+              Toggle Mode
+            </button>
+          </div>
+
+          <div class="p-4 flex items-center justify-between">
+            <div>
+              <p class="font-bold text-zinc-950 dark:text-white">Distance & Measurement Unit</p>
+              <p class="text-xs text-zinc-500">Display distance in kilometers around Eindhoven</p>
+            </div>
+            <select id="settings-unit-select" class="px-3 py-1.5 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs font-semibold text-zinc-900 dark:text-white focus:outline-none">
+              <option value="metric">Kilometers (km)</option>
+              <option value="imperial">Miles (mi)</option>
+            </select>
+          </div>
+
+          <div class="p-4 flex items-center justify-between">
+            <div>
+              <p class="font-bold text-zinc-950 dark:text-white">Haptic & Sound Feedback</p>
+              <p class="text-xs text-zinc-500">Play subtle cue sounds when joining activities</p>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="settings-haptics" class="sr-only peer" checked>
+              <div class="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer dark:bg-zinc-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-orange"></div>
+            </label>
           </div>
         </div>
-        <button id="settings-modal-close" onclick="window.closeSettingsGlobal();" class="p-2 text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
       </div>
 
-      <!-- Scrollable Settings Body -->
-      <div class="p-5 sm:p-6 space-y-6 overflow-y-auto flex-grow text-xs sm:text-sm">
+      <!-- SECTION 2: NOTIFICATIONS -->
+      <div class="space-y-3">
+        <h4 class="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Push & Notifications</h4>
         
-        <!-- SECTION 1: APPEARANCE & LOCALIZATION -->
-        <div class="space-y-3">
-          <h4 class="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Appearance & Experience</h4>
-          
-          <div class="divide-y divide-zinc-100 dark:divide-zinc-800/80 rounded-2xl border border-zinc-100 dark:border-zinc-800/80 overflow-hidden bg-zinc-50/50 dark:bg-zinc-900/40">
-            <div class="p-4 flex items-center justify-between">
-              <div>
-                <p class="font-bold text-zinc-950 dark:text-white">Theme</p>
-                <p class="text-xs text-zinc-500">Switch between light and dark visual mode</p>
-              </div>
-              <button class="theme-toggle-btn px-4 py-2 rounded-xl bg-zinc-200 dark:bg-zinc-800 hover:bg-zinc-300 dark:hover:bg-zinc-700 font-semibold text-zinc-900 dark:text-zinc-100 transition cursor-pointer text-xs">
-                Toggle Mode
-              </button>
-            </div>
-
-            <div class="p-4 flex items-center justify-between">
-              <div>
-                <p class="font-bold text-zinc-950 dark:text-white">Distance & Measurement Unit</p>
-                <p class="text-xs text-zinc-500">Display distance in kilometers around Eindhoven</p>
-              </div>
-              <select id="settings-unit-select" class="px-3 py-1.5 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs font-semibold text-zinc-900 dark:text-white focus:outline-none">
-                <option value="metric">Kilometers (km)</option>
-                <option value="imperial">Miles (mi)</option>
-              </select>
-            </div>
-
-            <div class="p-4 flex items-center justify-between">
-              <div>
-                <p class="font-bold text-zinc-950 dark:text-white">Haptic & Sound Feedback</p>
-                <p class="text-xs text-zinc-500">Play subtle cue sounds when joining activities</p>
-              </div>
-              <label class="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" id="settings-haptics" class="sr-only peer" checked>
-                <div class="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer dark:bg-zinc-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-orange"></div>
-              </label>
-            </div>
-          </div>
-        </div>
-
-        <!-- SECTION 2: NOTIFICATIONS -->
-        <div class="space-y-3">
-          <h4 class="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Push & Notifications</h4>
-          
-          <div class="divide-y divide-zinc-100 dark:divide-zinc-800/80 rounded-2xl border border-zinc-100 dark:border-zinc-800/80 overflow-hidden bg-zinc-50/50 dark:bg-zinc-900/40">
-            <div class="p-4 flex items-center justify-between">
-              <div>
-                <p class="font-bold text-zinc-950 dark:text-white">Roster Alerts</p>
-                <p class="text-xs text-zinc-500">When someone joins or leaves your hosted session</p>
-              </div>
-              <label class="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" id="settings-notif-roster" class="sr-only peer" checked>
-                <div class="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer dark:bg-zinc-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-orange"></div>
-              </label>
-            </div>
-
-            <div class="p-4 flex items-center justify-between">
-              <div>
-                <p class="font-bold text-zinc-950 dark:text-white">Campus Activity Feed Updates</p>
-                <p class="text-xs text-zinc-500">Alerts when new matches matching your sport are created</p>
-              </div>
-              <label class="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" id="settings-notif-activities" class="sr-only peer" checked>
-                <div class="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer dark:bg-zinc-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-orange"></div>
-              </label>
-            </div>
-
-            <div class="p-4 flex items-center justify-between">
-              <div>
-                <p class="font-bold text-zinc-950 dark:text-white">Session Reminders</p>
-                <p class="text-xs text-zinc-500">Notification 1 hour prior to confirmed match kickoff</p>
-              </div>
-              <label class="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" id="settings-notif-reminders" class="sr-only peer" checked>
-                <div class="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer dark:bg-zinc-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-orange"></div>
-              </label>
-            </div>
-          </div>
-        </div>
-
-        <!-- SECTION 3: PRIVACY & CAMPUS VISIBILITY -->
-        <div class="space-y-3">
-          <h4 class="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Privacy & Roster Visibility</h4>
-          
-          <div class="divide-y divide-zinc-100 dark:divide-zinc-800/80 rounded-2xl border border-zinc-100 dark:border-zinc-800/80 overflow-hidden bg-zinc-50/50 dark:bg-zinc-900/40">
-            <div class="p-4 flex items-center justify-between">
-              <div>
-                <p class="font-bold text-zinc-950 dark:text-white">Public Campus Profile</p>
-                <p class="text-xs text-zinc-500">Allow verified students from Fontys and TU/e to view your profile</p>
-              </div>
-              <label class="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" id="settings-privacy-public" onchange="window.onPrivacySettingChanged()" class="sr-only peer" checked>
-                <div class="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer dark:bg-zinc-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-orange"></div>
-              </label>
-            </div>
-
-            <div class="p-4 flex items-center justify-between">
-              <div>
-                <p class="font-bold text-zinc-950 dark:text-white">Show Student University Badge</p>
-                <p class="text-xs text-zinc-500">Display "Fontys UAS" or "TU Eindhoven" on match rosters</p>
-              </div>
-              <label class="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" id="settings-show-uni" onchange="window.onPrivacySettingChanged()" class="sr-only peer" checked>
-                <div class="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer dark:bg-zinc-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-orange"></div>
-              </label>
-            </div>
-
-            <div class="p-4 flex items-center justify-between">
-              <div>
-                <p class="font-bold text-zinc-950 dark:text-white">Student Domain Verification</p>
-                <p class="text-xs text-zinc-500">Domain authenticates automatically against student portal</p>
-              </div>
-              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
-                Verified
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <!-- SECTION 4: DATA & STORAGE -->
-        <div class="space-y-3">
-          <h4 class="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Data & Cache Management</h4>
-          
-          <div class="p-4 rounded-2xl border border-zinc-100 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="divide-y divide-zinc-100 dark:divide-zinc-800/80 rounded-2xl border border-zinc-100 dark:border-zinc-800/80 overflow-hidden bg-zinc-50/50 dark:bg-zinc-900/40">
+          <div class="p-4 flex items-center justify-between">
             <div>
-              <p class="font-bold text-zinc-950 dark:text-white">Clear Offline Cache</p>
-              <p class="text-xs text-zinc-500">Clear cached matches and refresh student live state</p>
+              <p class="font-bold text-zinc-950 dark:text-white">Roster Alerts</p>
+              <p class="text-xs text-zinc-500">When someone joins or leaves your hosted session</p>
             </div>
-            <button id="settings-clear-cache-btn" onclick="window.clearCacheGlobal()" class="px-4 py-2 rounded-xl bg-zinc-200 hover:bg-zinc-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-xs font-semibold text-zinc-900 dark:text-white transition cursor-pointer self-start sm:self-auto">
-              Clear Cache
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="settings-notif-roster" class="sr-only peer" checked>
+              <div class="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer dark:bg-zinc-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-orange"></div>
+            </label>
+          </div>
+
+          <div class="p-4 flex items-center justify-between">
+            <div>
+              <p class="font-bold text-zinc-950 dark:text-white">Campus Activity Feed Updates</p>
+              <p class="text-xs text-zinc-500">Alerts when new matches matching your sport are created</p>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="settings-notif-activities" class="sr-only peer" checked>
+              <div class="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer dark:bg-zinc-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-orange"></div>
+            </label>
+          </div>
+
+          <div class="p-4 flex items-center justify-between">
+            <div>
+              <p class="font-bold text-zinc-950 dark:text-white">Session Reminders</p>
+              <p class="text-xs text-zinc-500">Notification 1 hour prior to confirmed match kickoff</p>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="settings-notif-reminders" class="sr-only peer" checked>
+              <div class="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer dark:bg-zinc-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-orange"></div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 3: PRIVACY & CAMPUS VISIBILITY -->
+      <div class="space-y-3">
+        <h4 class="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Privacy & Roster Visibility</h4>
+        
+        <div class="divide-y divide-zinc-100 dark:divide-zinc-800/80 rounded-2xl border border-zinc-100 dark:border-zinc-800/80 overflow-hidden bg-zinc-50/50 dark:bg-zinc-900/40">
+          <div class="p-4 flex items-center justify-between">
+            <div>
+              <p class="font-bold text-zinc-950 dark:text-white">Public Campus Profile</p>
+              <p class="text-xs text-zinc-500">Allow verified students from Fontys and TU/e to view your profile</p>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="settings-privacy-public" onchange="window.onPrivacySettingChanged()" class="sr-only peer" checked>
+              <div class="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer dark:bg-zinc-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-orange"></div>
+            </label>
+          </div>
+
+          <div class="p-4 flex items-center justify-between">
+            <div>
+              <p class="font-bold text-zinc-950 dark:text-white">Show Student University Badge</p>
+              <p class="text-xs text-zinc-500">Display "Fontys UAS" or "TU Eindhoven" on match rosters</p>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="settings-show-uni" onchange="window.onPrivacySettingChanged()" class="sr-only peer" checked>
+              <div class="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer dark:bg-zinc-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-orange"></div>
+            </label>
+          </div>
+
+          <div class="p-4 flex items-center justify-between">
+            <div>
+              <p class="font-bold text-zinc-950 dark:text-white">Student Domain Verification</p>
+              <p class="text-xs text-zinc-500">Domain authenticates automatically against student portal</p>
+            </div>
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+              <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+              Verified
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 4: DATA & STORAGE -->
+      <div class="space-y-3">
+        <h4 class="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Data & Cache Management</h4>
+        
+        <div class="p-4 rounded-2xl border border-zinc-100 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <p class="font-bold text-zinc-950 dark:text-white">Clear Offline Cache</p>
+            <p class="text-xs text-zinc-500">Clear cached matches and refresh student live state</p>
+          </div>
+          <button id="settings-clear-cache-btn" onclick="window.clearCacheGlobal()" class="px-4 py-2 rounded-xl bg-zinc-200 hover:bg-zinc-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-xs font-semibold text-zinc-900 dark:text-white transition cursor-pointer self-start sm:self-auto">
+            Clear Cache
+          </button>
+        </div>
+      </div>
+
+      <!-- SECTION 5: DANGER ZONE -->
+      <div class="space-y-3 pt-2">
+        <h4 class="text-xs font-bold text-red-500 uppercase tracking-wider">Danger Zone</h4>
+        
+        <div class="p-4 sm:p-5 rounded-2xl border border-red-200 dark:border-red-950/60 bg-red-50/40 dark:bg-red-950/10 space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <p class="font-bold text-red-600 dark:text-red-400">Delete Account</p>
+              <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Permanently erase your student profile, mascot preferences, and match memberships. This action cannot be reversed.</p>
+            </div>
+            <button id="settings-delete-account-btn" onclick="window.deleteAccountGlobal()" class="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs transition cursor-pointer self-start sm:self-auto shrink-0 shadow-sm">
+              Delete Account
             </button>
           </div>
         </div>
-
-        <!-- SECTION 5: DANGER ZONE -->
-        <div class="space-y-3 pt-2">
-          <h4 class="text-xs font-bold text-red-500 uppercase tracking-wider">Danger Zone</h4>
-          
-          <div class="p-4 sm:p-5 rounded-2xl border border-red-200 dark:border-red-950/60 bg-red-50/40 dark:bg-red-950/10 space-y-4">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div>
-                <p class="font-bold text-red-600 dark:text-red-400">Delete Account</p>
-                <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Permanently erase your student profile, mascot preferences, and match memberships. This action cannot be reversed.</p>
-              </div>
-              <button id="settings-delete-account-btn" onclick="window.deleteAccountGlobal()" class="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs transition cursor-pointer self-start sm:self-auto shrink-0 shadow-sm">
-                Delete Account
-              </button>
-            </div>
-          </div>
-        </div>
-
       </div>
 
-      <!-- Modal Footer -->
-      <div class="p-5 sm:p-6 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-end shrink-0 bg-white dark:bg-zinc-900">
-        <button id="settings-modal-done" onclick="window.closeSettingsGlobal();" class="px-6 py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 font-bold text-xs transition cursor-pointer">
+    </div>
+
+    <!-- Sticky Bottom Actions Bar -->
+    <footer class="sticky bottom-0 z-20 px-6 py-4 border-t border-zinc-100 dark:border-zinc-800/80 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md shrink-0">
+      <div class="max-w-3xl w-full mx-auto flex items-center justify-between gap-4">
+        <button 
+          onclick="window.handleSignOutGlobal()" 
+          class="flex items-center gap-2 px-4 py-2.5 rounded-xl hover:bg-red-50 dark:hover:bg-red-950/40 text-red-600 dark:text-red-400 font-bold text-xs transition cursor-pointer"
+        >
+          <i data-lucide="log-out" class="w-4 h-4"></i>
+          <span>Sign Out</span>
+        </button>
+        <button 
+          id="settings-modal-done" 
+          onclick="window.closeSettingsGlobal();" 
+          class="px-6 py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 font-bold text-xs transition cursor-pointer"
+        >
           Done
         </button>
       </div>
-    </div>
+    </footer>
   </div>
 
   <!-- Roster Modal (Clean Uber Style) -->
