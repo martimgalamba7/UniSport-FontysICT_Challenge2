@@ -401,7 +401,7 @@ export function switchTab(targetTab) {
     if (t === targetTab) {
       if (section) section.classList.remove("hidden");
       if (deskBtn) {
-        deskBtn.className = "nav-sidebar-btn w-full flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-sm font-bold bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 transition cursor-pointer group";
+        deskBtn.className = "nav-sidebar-btn w-full flex items-center gap-3 px-2 py-2.5 rounded-2xl text-sm font-bold bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 transition cursor-pointer group overflow-hidden";
       }
       if (mobBtn) {
         mobBtn.className = "flex flex-col items-center gap-1 text-zinc-950 dark:text-white transition cursor-pointer";
@@ -409,7 +409,7 @@ export function switchTab(targetTab) {
     } else {
       if (section) section.classList.add("hidden");
       if (deskBtn) {
-        deskBtn.className = "nav-sidebar-btn w-full flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-sm font-semibold text-zinc-700 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer group";
+        deskBtn.className = "nav-sidebar-btn w-full flex items-center gap-3 px-2 py-2.5 rounded-2xl text-sm font-semibold text-zinc-700 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer group overflow-hidden";
       }
       if (mobBtn) {
         mobBtn.className = "flex flex-col items-center gap-1 text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer";

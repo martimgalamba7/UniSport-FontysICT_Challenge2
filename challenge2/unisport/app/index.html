@@ -33,7 +33,6 @@
   </script>
   <script src="./theme.js"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
-  <script>
     // Immediate pre-render Auth & Avatar resolution
     (function() {
       try {
@@ -47,90 +46,186 @@
       } catch (e) {}
     })();
   </script>
+
+  <style>
+    /* Desktop Instagram-Style Hover-Expanding Sidebar */
+    @media (min-width: 768px) {
+      #desktop-sidebar {
+        width: 4.5rem; /* 72px collapsed */
+        transition: width 0.28s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+        will-change: width;
+        overflow-x: hidden;
+      }
+      #desktop-sidebar:hover {
+        width: 16rem; /* 256px expanded */
+        box-shadow: 12px 0 32px -8px rgba(0, 0, 0, 0.12);
+      }
+      .dark #desktop-sidebar:hover {
+        box-shadow: 12px 0 32px -8px rgba(0, 0, 0, 0.5);
+      }
+
+      /* Logo wordmark fades in on hover */
+      #sidebar-logo-text {
+        opacity: 0;
+        max-width: 0;
+        transform: translateX(-8px);
+        transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1), max-width 0.28s cubic-bezier(0.4, 0, 0.2, 1), transform 0.24s cubic-bezier(0.4, 0, 0.2, 1);
+        pointer-events: none;
+        white-space: nowrap;
+      }
+      #desktop-sidebar:hover #sidebar-logo-text {
+        opacity: 1;
+        max-width: 160px;
+        transform: translateX(0);
+        pointer-events: auto;
+      }
+
+      /* Nav label text hidden by default, slides and fades in smoothly on hover */
+      .sidebar-label {
+        opacity: 0;
+        max-width: 0;
+        transform: translateX(-8px);
+        transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1), max-width 0.28s cubic-bezier(0.4, 0, 0.2, 1), transform 0.24s cubic-bezier(0.4, 0, 0.2, 1);
+        pointer-events: none;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+      #desktop-sidebar:hover .sidebar-label {
+        opacity: 1;
+        max-width: 160px;
+        transform: translateX(0);
+        pointer-events: auto;
+      }
+
+      /* Notification count badge */
+      .sidebar-extra {
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        pointer-events: none;
+      }
+      #desktop-sidebar:hover .sidebar-extra {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      /* Keep icons centered in collapsed mode */
+      .sidebar-icon-wrap {
+        width: 2.5rem;
+        height: 2.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      /* Adjust notifications drawer left to match collapsed bar */
+      #notifications-desktop-drawer {
+        left: 4.5rem;
+      }
+    }
+  </style>
 </head>
 
 <body class="bg-white text-zinc-900 dark:bg-black dark:text-zinc-100 min-h-screen flex flex-col font-sans transition-colors duration-150 pb-16 md:pb-8">
 
-  <!-- Desktop Instagram-Style Sidebar Navigation (Hidden on Mobile) -->
-  <aside class="hidden md:flex fixed top-0 bottom-0 left-0 w-64 z-40 bg-white dark:bg-black border-r border-zinc-200 dark:border-zinc-800 flex-col justify-between p-4 xl:p-5 select-none transition-colors">
+  <!-- Desktop Icon-First Hover-Sliding Sidebar Navigation (Hidden on Mobile) -->
+  <aside id="desktop-sidebar" class="hidden md:flex fixed top-0 bottom-0 left-0 z-40 bg-white dark:bg-black border-r border-zinc-200 dark:border-zinc-800 flex-col justify-between p-3 select-none transition-colors">
     <!-- Top: Brand Logo + Main Nav Links -->
     <div class="space-y-6">
       <!-- UniSport Brand Logo -->
-      <a href="/challenge2/unisport" class="flex items-center gap-3 px-3 py-2 group">
-        <img src="/assets/logoUniSport.png" alt="UniSport" class="h-8 w-auto object-contain transition group-hover:scale-105" onerror="this.src='./assets/logoUniSport.png';" />
-        <span class="font-black text-2xl tracking-tight text-zinc-950 dark:text-white">UNISPORT</span>
+      <a href="/challenge2/unisport" class="flex items-center gap-3 px-2 py-2 group overflow-hidden">
+        <div class="sidebar-icon-wrap">
+          <img src="/assets/logoUniSport.png" alt="UniSport" class="h-8 w-auto object-contain transition group-hover:scale-105" onerror="this.src='./assets/logoUniSport.png';" />
+        </div>
+        <span id="sidebar-logo-text" class="font-black text-xl tracking-tight text-zinc-950 dark:text-white">UNISPORT</span>
       </a>
 
-      <!-- Instagram-Style Vertical Navigation List -->
-      <nav class="space-y-1">
+      <!-- Icon-First Vertical Navigation List -->
+      <nav class="space-y-1.5">
         <!-- Feed / Home -->
         <button 
           id="tab-btn-feed" 
           onclick="window.switchTabGlobal('feed')" 
-          class="nav-sidebar-btn w-full flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-sm font-bold bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 transition cursor-pointer group"
+          title="Feed"
+          class="nav-sidebar-btn w-full flex items-center gap-3 px-2 py-2.5 rounded-2xl text-sm font-bold bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 transition cursor-pointer group overflow-hidden"
         >
-          <i data-lucide="compass" class="w-5 h-5 shrink-0 transition group-hover:scale-110"></i>
-          <span>Feed</span>
+          <div class="sidebar-icon-wrap">
+            <i data-lucide="compass" class="w-5 h-5 shrink-0 transition group-hover:scale-110"></i>
+          </div>
+          <span class="sidebar-label">Feed</span>
         </button>
 
         <!-- Campus Students / Community -->
         <button 
           id="tab-btn-community" 
           onclick="window.switchTabGlobal('community')" 
-          class="nav-sidebar-btn w-full flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-sm font-semibold text-zinc-700 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer group"
+          title="Students"
+          class="nav-sidebar-btn w-full flex items-center gap-3 px-2 py-2.5 rounded-2xl text-sm font-semibold text-zinc-700 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer group overflow-hidden"
         >
-          <i data-lucide="users" class="w-5 h-5 shrink-0 transition group-hover:scale-110"></i>
-          <span>Students</span>
+          <div class="sidebar-icon-wrap">
+            <i data-lucide="users" class="w-5 h-5 shrink-0 transition group-hover:scale-110"></i>
+          </div>
+          <span class="sidebar-label">Students</span>
         </button>
 
         <!-- Host Match / Create -->
         <button 
           id="tab-btn-create" 
           onclick="window.switchTabGlobal('create')" 
-          class="nav-sidebar-btn w-full flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-sm font-semibold text-zinc-700 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer group"
+          title="Host Match"
+          class="nav-sidebar-btn w-full flex items-center gap-3 px-2 py-2.5 rounded-2xl text-sm font-semibold text-zinc-700 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer group overflow-hidden"
         >
-          <i data-lucide="plus-circle" class="w-5 h-5 shrink-0 transition group-hover:scale-110"></i>
-          <span>Host Match</span>
+          <div class="sidebar-icon-wrap">
+            <i data-lucide="plus-circle" class="w-5 h-5 shrink-0 transition group-hover:scale-110"></i>
+          </div>
+          <span class="sidebar-label">Host Match</span>
         </button>
 
         <!-- My Sessions / Spots -->
         <button 
           id="tab-btn-my-activities" 
           onclick="window.switchTabGlobal('my-activities')" 
-          class="nav-sidebar-btn w-full flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-sm font-semibold text-zinc-700 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer group"
+          title="My Sessions"
+          class="nav-sidebar-btn w-full flex items-center gap-3 px-2 py-2.5 rounded-2xl text-sm font-semibold text-zinc-700 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer group overflow-hidden"
         >
-          <i data-lucide="calendar" class="w-5 h-5 shrink-0 transition group-hover:scale-110"></i>
-          <span>My Sessions</span>
+          <div class="sidebar-icon-wrap">
+            <i data-lucide="calendar" class="w-5 h-5 shrink-0 transition group-hover:scale-110"></i>
+          </div>
+          <span class="sidebar-label">My Sessions</span>
         </button>
 
         <!-- Notifications Bell -->
         <button 
           id="sidebar-notif-btn" 
           onclick="window.toggleNotificationsGlobal(event)" 
-          class="w-full flex items-center justify-between px-3.5 py-3 rounded-2xl text-sm font-semibold text-zinc-700 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer group"
+          title="Notifications"
+          class="w-full flex items-center justify-between px-2 py-2.5 rounded-2xl text-sm font-semibold text-zinc-700 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer group overflow-hidden"
         >
-          <div class="flex items-center gap-3.5">
-            <div class="relative">
+          <div class="flex items-center gap-3 overflow-hidden">
+            <div class="sidebar-icon-wrap relative">
               <i data-lucide="bell" class="w-5 h-5 shrink-0 transition group-hover:scale-110"></i>
-              <span id="sidebar-notif-badge" class="hidden absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-brand-orange rounded-full ring-2 ring-white dark:ring-black"></span>
+              <span id="sidebar-notif-badge" class="hidden absolute top-1.5 right-1.5 w-2 h-2 bg-brand-orange rounded-full ring-2 ring-white dark:ring-black"></span>
             </div>
-            <span>Notifications</span>
+            <span class="sidebar-label">Notifications</span>
           </div>
-          <span id="sidebar-notif-count" class="text-xs font-bold text-zinc-400 dark:text-zinc-500"></span>
+          <span id="sidebar-notif-count" class="sidebar-extra text-xs font-bold text-zinc-400 dark:text-zinc-500 pr-2"></span>
         </button>
 
         <!-- Profile -->
         <button 
           id="tab-btn-profile" 
           onclick="window.switchTabGlobal('profile')" 
-          class="nav-sidebar-btn w-full flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-sm font-semibold text-zinc-700 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer group"
+          title="Profile"
+          class="nav-sidebar-btn w-full flex items-center gap-3 px-2 py-2.5 rounded-2xl text-sm font-semibold text-zinc-700 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer group overflow-hidden"
         >
-          <div class="w-5 h-5 rounded-full overflow-hidden shrink-0 ring-1 ring-zinc-300 dark:ring-zinc-700">
-            <div id="sidebar-profile-avatar-inner" class="w-full h-full">
-              <img src="./assets/avatars/footballer.png" alt="Avatar" class="w-full h-full object-cover" />
+          <div class="sidebar-icon-wrap">
+            <div class="w-6 h-6 rounded-full overflow-hidden shrink-0 ring-1 ring-zinc-300 dark:ring-zinc-700">
+              <div id="sidebar-profile-avatar-inner" class="w-full h-full">
+                <img src="./assets/avatars/footballer.png" alt="Avatar" class="w-full h-full object-cover" />
+              </div>
             </div>
           </div>
-          <span id="sidebar-profile-name" class="truncate">Profile</span>
+          <span id="sidebar-profile-name" class="sidebar-label truncate">Profile</span>
         </button>
       </nav>
     </div>
@@ -138,22 +233,28 @@
     <!-- Bottom: Theme Toggle, Settings & User Menu -->
     <div class="space-y-1.5 pt-4 border-t border-zinc-200 dark:border-zinc-800">
       <!-- Theme Switcher -->
-      <button class="theme-toggle-btn w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-2xl text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer">
-        <i data-lucide="sun" class="icon-sun w-4 h-4 hidden"></i>
-        <i data-lucide="moon" class="icon-moon w-4 h-4"></i>
-        <span>Switch Theme</span>
+      <button class="theme-toggle-btn w-full flex items-center gap-3 px-2 py-2 rounded-2xl text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer overflow-hidden" title="Switch Theme">
+        <div class="sidebar-icon-wrap">
+          <i data-lucide="sun" class="icon-sun w-4 h-4 hidden"></i>
+          <i data-lucide="moon" class="icon-moon w-4 h-4"></i>
+        </div>
+        <span class="sidebar-label">Switch Theme</span>
       </button>
 
       <!-- Settings Button -->
-      <button onclick="window.openSettingsGlobal()" class="w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-2xl text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer">
-        <i data-lucide="settings" class="w-4 h-4"></i>
-        <span>Settings</span>
+      <button onclick="window.openSettingsGlobal()" class="w-full flex items-center gap-3 px-2 py-2 rounded-2xl text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer overflow-hidden" title="Settings">
+        <div class="sidebar-icon-wrap">
+          <i data-lucide="settings" class="w-4 h-4"></i>
+        </div>
+        <span class="sidebar-label">Settings</span>
       </button>
 
       <!-- Sign Out Button -->
-      <button onclick="window.handleSignOutGlobal()" class="w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-2xl text-xs font-bold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 transition cursor-pointer">
-        <i data-lucide="log-out" class="w-4 h-4"></i>
-        <span>Sign out</span>
+      <button onclick="window.handleSignOutGlobal()" class="w-full flex items-center gap-3 px-2 py-2 rounded-2xl text-xs font-bold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 transition cursor-pointer overflow-hidden" title="Sign out">
+        <div class="sidebar-icon-wrap">
+          <i data-lucide="log-out" class="w-4 h-4"></i>
+        </div>
+        <span class="sidebar-label">Sign out</span>
       </button>
     </div>
   </aside>
@@ -370,7 +471,7 @@
         if (t === tabId) {
           if (sec) sec.classList.remove("hidden");
           if (deskBtn) {
-            deskBtn.className = "nav-sidebar-btn w-full flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-sm font-bold bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 transition cursor-pointer group";
+            deskBtn.className = "nav-sidebar-btn w-full flex items-center gap-3 px-2 py-2.5 rounded-2xl text-sm font-bold bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 transition cursor-pointer group overflow-hidden";
           }
           if (mobBtn) {
             mobBtn.className = "flex flex-col items-center gap-1 text-zinc-950 dark:text-white transition cursor-pointer";
@@ -378,7 +479,7 @@
         } else {
           if (sec) sec.classList.add("hidden");
           if (deskBtn) {
-            deskBtn.className = "nav-sidebar-btn w-full flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-sm font-semibold text-zinc-700 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer group";
+            deskBtn.className = "nav-sidebar-btn w-full flex items-center gap-3 px-2 py-2.5 rounded-2xl text-sm font-semibold text-zinc-700 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer group overflow-hidden";
           }
           if (mobBtn) {
             mobBtn.className = "flex flex-col items-center gap-1 text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer";
@@ -891,8 +992,8 @@
     };
   </script>
 
-  <!-- Main Container (Responsive Full Desktop Viewport with Instagram-Style Sidebar offset) -->
-  <main class="md:pl-64 flex-grow w-full max-w-full lg:max-w-7xl 2xl:max-w-[1536px] mx-auto px-4 sm:px-8 lg:px-12 py-8">
+  <!-- Main Container (Responsive Full Desktop Viewport with Icon-Rail Sidebar offset) -->
+  <main class="md:pl-20 flex-grow w-full max-w-full lg:max-w-7xl 2xl:max-w-[1536px] mx-auto px-4 sm:px-8 lg:px-12 py-8">
 
     <!-- ================= SECTION 1: GEO FEED ================= -->
     <section id="section-feed" class="space-y-6">
