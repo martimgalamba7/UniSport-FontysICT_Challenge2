@@ -944,10 +944,19 @@
         list = list.filter(function(s) { return friends.indexOf(s.uid) !== -1; });
       }
 
-      // Filter by university
+      // Filter by university (Robust matching for Fontys and TU Eindhoven / TU/e)
       if (window.communityStateInline.uniFilter && window.communityStateInline.uniFilter !== "all") {
+        var targetUni = window.communityStateInline.uniFilter.toLowerCase();
         list = list.filter(function(s) {
-          return (s.university || "").indexOf(window.communityStateInline.uniFilter) !== -1;
+          var u = (s.university || "").toLowerCase();
+          var em = (s.email || "").toLowerCase();
+          if (targetUni.indexOf("tu") !== -1) {
+            return u.indexOf("tu") !== -1 || u.indexOf("eindhoven") !== -1 || em.indexOf("tue.nl") !== -1;
+          }
+          if (targetUni.indexOf("fontys") !== -1) {
+            return u.indexOf("fontys") !== -1 || em.indexOf("fontys.nl") !== -1;
+          }
+          return u.indexOf(targetUni) !== -1;
         });
       }
 
@@ -1469,7 +1478,9 @@
     window.filterStudentsByUni = function(uni) {
       window.communityStateInline.uniFilter = uni;
       document.querySelectorAll(".student-uni-chip").forEach(function(chip) {
-        if (chip.getAttribute("data-uni-filter") === uni) {
+        var chipVal = chip.getAttribute("data-uni-filter");
+        var isMatch = chipVal === uni || (uni === "TU Eindhoven" && (chipVal === "TU/e" || chipVal === "TU Eindhoven")) || (uni === "TU/e" && (chipVal === "TU/e" || chipVal === "TU Eindhoven"));
+        if (isMatch) {
           chip.className = "student-uni-chip px-3.5 py-2 rounded-xl bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 text-xs font-bold whitespace-nowrap transition cursor-pointer";
         } else {
           chip.className = "student-uni-chip px-3.5 py-2 rounded-xl bg-white dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs font-semibold whitespace-nowrap hover:text-zinc-950 dark:hover:text-white transition cursor-pointer";
@@ -1746,28 +1757,20 @@
           </div>
         </div>
 
-        <!-- Filter Chips (No Emojis) -->
-        <div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-          <button data-sport="all" class="sport-filter-chip px-3 py-1.5 rounded-xl bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 text-xs font-semibold whitespace-nowrap transition">
-            All Sports
-          </button>
-          <button data-sport="Football" class="sport-filter-chip px-3 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 text-xs font-semibold whitespace-nowrap hover:text-zinc-950 dark:hover:text-white transition">
-            Football
-          </button>
-          <button data-sport="Gym" class="sport-filter-chip px-3 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 text-xs font-semibold whitespace-nowrap hover:text-zinc-950 dark:hover:text-white transition">
-            Gym & Fitness
-          </button>
-          <button data-sport="Running" class="sport-filter-chip px-3 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 text-xs font-semibold whitespace-nowrap hover:text-zinc-950 dark:hover:text-white transition">
-            Running
-          </button>
-          <button data-sport="Basketball" class="sport-filter-chip px-3 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 text-xs font-semibold whitespace-nowrap hover:text-zinc-950 dark:hover:text-white transition">
-            Basketball
-          </button>
-          <button data-sport="Bouldering" class="sport-filter-chip px-3 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 text-xs font-semibold whitespace-nowrap hover:text-zinc-950 dark:hover:text-white transition">
-            Bouldering
-          </button>
-          <button data-sport="Padel" class="sport-filter-chip px-3 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 text-xs font-semibold whitespace-nowrap hover:text-zinc-950 dark:hover:text-white transition">
-            Padel / Tennis
+        <!-- Filter Trigger & Active Filter Summary -->
+        <div class="flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none flex-grow">
+            <button id="btn-open-feed-filters" onclick="window.UniSport.openFilterDrawer()" class="px-3.5 py-2 rounded-xl bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 text-xs font-bold whitespace-nowrap transition cursor-pointer flex items-center gap-2 shadow-sm">
+              <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i>
+              <span>Filters</span>
+              <span id="feed-filter-count-badge" class="hidden px-1.5 py-0.2 rounded-full text-[10px] font-black bg-orange-500 text-white">0</span>
+            </button>
+            <div id="feed-active-chips-summary" class="flex items-center gap-1.5 overflow-x-auto scrollbar-none">
+              <!-- Active filter tags rendered by JS -->
+            </div>
+          </div>
+          <button id="btn-reset-feed-filters" onclick="window.UniSport.resetFeedFilters()" class="hidden text-xs text-zinc-500 hover:text-zinc-950 dark:hover:text-white whitespace-nowrap font-medium transition cursor-pointer">
+            Reset
           </button>
         </div>
       </div>
@@ -1775,6 +1778,11 @@
       <!-- Feed Grid -->
       <div id="activities-feed" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <!-- Rendered by app.js -->
+      </div>
+
+      <!-- Feed Pagination and Load More Bar (3x3 -> 3x10 -> Pages) -->
+      <div id="feed-pagination-container" class="pt-4 pb-8 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-zinc-100 dark:border-zinc-800/80">
+        <!-- Dynamic pagination info and buttons rendered by app.js -->
       </div>
     </section>
 
@@ -1800,14 +1808,16 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Sport *</label>
-            <select id="create-sport" required class="w-full px-4 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-900 border-0 text-sm text-zinc-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition">
+            <select id="create-sport" required onchange="document.getElementById('create-sport-other-container').classList.toggle('hidden', this.value !== 'Other');" class="w-full px-4 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-900 border-0 text-sm text-zinc-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition">
               <option value="Football">Football</option>
               <option value="Gym & Fitness">Gym & Fitness</option>
               <option value="Running">Running</option>
               <option value="Basketball">Basketball</option>
               <option value="Bouldering">Bouldering</option>
-              <option value="Padel">Padel</option>
+              <option value="Padel / Tennis">Padel / Tennis</option>
               <option value="Volleyball">Volleyball</option>
+              <option value="Swimming">Swimming</option>
+              <option value="Cycling">Cycling</option>
               <option value="Other">Other</option>
             </select>
           </div>
@@ -1826,6 +1836,17 @@
           </div>
         </div>
 
+        <!-- Custom Sport Input (Shown when Other is selected) -->
+        <div id="create-sport-other-container" class="hidden">
+          <label class="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Specify Sport *</label>
+          <input 
+            type="text" 
+            id="create-sport-other" 
+            placeholder="e.g. Badminton, Boxing, Calisthenics, Table Tennis..." 
+            class="w-full px-4 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-900 border-0 text-sm text-zinc-950 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition"
+          />
+        </div>
+
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Location in Eindhoven *</label>
@@ -1839,13 +1860,64 @@
           </div>
 
           <div>
-            <label class="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Date & Time *</label>
+            <label class="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Date & Time (Future only) *</label>
             <input 
               type="datetime-local" 
               id="create-datetime" 
               required 
               class="w-full px-4 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-900 border-0 text-sm text-zinc-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition"
             />
+          </div>
+        </div>
+
+        <!-- Duration & Pricing Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Session Duration *</label>
+            <div class="grid grid-cols-2 gap-2">
+              <div class="relative">
+                <input 
+                  type="number" 
+                  id="create-duration-hours" 
+                  min="0" 
+                  max="12" 
+                  value="1" 
+                  required 
+                  class="w-full px-3 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-900 border-0 text-sm text-zinc-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition"
+                />
+                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-zinc-400">hrs</span>
+              </div>
+              <div class="relative">
+                <select id="create-duration-mins" class="w-full px-3 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-900 border-0 text-sm text-zinc-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition">
+                  <option value="0">00 mins</option>
+                  <option value="15">15 mins</option>
+                  <option value="30" selected>30 mins</option>
+                  <option value="45">45 mins</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Pricing / Admission *</label>
+            <div class="grid grid-cols-2 gap-2">
+              <select id="create-pricing-type" onchange="document.getElementById('create-price-wrapper').classList.toggle('hidden', this.value === 'free');" class="w-full px-3 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-900 border-0 text-sm text-zinc-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition">
+                <option value="free" selected>Free</option>
+                <option value="paid">Paid (€)</option>
+              </select>
+              <div id="create-price-wrapper" class="hidden relative">
+                <input 
+                  type="number" 
+                  id="create-price" 
+                  min="0.50" 
+                  step="0.50" 
+                  value="5.00" 
+                  placeholder="0.00" 
+                  class="w-full pl-7 pr-3 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-900 border-0 text-sm text-zinc-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition"
+                />
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-400">€</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1924,7 +1996,7 @@
             <button data-uni-filter="Fontys" onclick="window.filterStudentsByUni('Fontys')" class="student-uni-chip px-3.5 py-2 rounded-xl bg-white dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs font-semibold whitespace-nowrap hover:text-zinc-950 dark:hover:text-white transition cursor-pointer">
               Fontys UAS
             </button>
-            <button data-uni-filter="TU/e" onclick="window.filterStudentsByUni('TU/e')" class="student-uni-chip px-3.5 py-2 rounded-xl bg-white dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs font-semibold whitespace-nowrap hover:text-zinc-950 dark:hover:text-white transition cursor-pointer">
+            <button data-uni-filter="TU Eindhoven" onclick="window.filterStudentsByUni('TU Eindhoven')" class="student-uni-chip px-3.5 py-2 rounded-xl bg-white dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs font-semibold whitespace-nowrap hover:text-zinc-950 dark:hover:text-white transition cursor-pointer">
               TU Eindhoven
             </button>
           </div>
@@ -2552,6 +2624,207 @@
         </div>
       </div>
 
+    </div>
+  </div>
+
+  <!-- Feed Deep Filter Drawer (Slide-in on Desktop, Full-Screen Modal on Mobile) -->
+  <div id="feed-filter-drawer" class="hidden fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm transition-opacity duration-200" onclick="if(event.target===this) window.UniSport.closeFilterDrawer();">
+    <div class="relative w-full max-w-md h-full bg-white dark:bg-zinc-950 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col overflow-y-auto animate-in slide-in-from-right duration-200">
+      
+      <!-- Drawer Header -->
+      <header class="sticky top-0 z-10 px-6 py-4 border-b border-zinc-100 dark:border-zinc-800/80 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md flex items-center justify-between">
+        <div>
+          <h3 class="text-lg font-extrabold text-zinc-950 dark:text-white">Deep Filters</h3>
+          <p class="text-xs text-zinc-500">Refine sessions by sport, date, university & price</p>
+        </div>
+        <button onclick="window.UniSport.closeFilterDrawer()" class="p-1.5 text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </header>
+
+      <!-- Drawer Body -->
+      <div class="p-6 space-y-6 flex-1 text-xs">
+        
+        <!-- Sport Filter -->
+        <div class="space-y-2">
+          <label class="block font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider text-[11px]">Sport</label>
+          <select id="filter-drawer-sport" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 border-0 text-xs text-zinc-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition">
+            <option value="all">All Sports</option>
+            <option value="Football">Football</option>
+            <option value="Gym & Fitness">Gym & Fitness</option>
+            <option value="Running">Running</option>
+            <option value="Basketball">Basketball</option>
+            <option value="Bouldering">Bouldering</option>
+            <option value="Padel / Tennis">Padel / Tennis</option>
+            <option value="Volleyball">Volleyball</option>
+            <option value="Swimming">Swimming</option>
+            <option value="Cycling">Cycling</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <!-- Date Timing Filter -->
+        <div class="space-y-2">
+          <label class="block font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider text-[11px]">When / Date</label>
+          <div class="grid grid-cols-2 gap-2" id="filter-drawer-date-chips">
+            <button type="button" data-date-filter="all" onclick="window.UniSport.setDrawerDateFilter('all')" class="filter-date-btn px-3 py-2 rounded-xl text-xs font-bold bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 transition cursor-pointer text-center">Any Time</button>
+            <button type="button" data-date-filter="today" onclick="window.UniSport.setDrawerDateFilter('today')" class="filter-date-btn px-3 py-2 rounded-xl text-xs font-semibold bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 transition cursor-pointer text-center">Today</button>
+            <button type="button" data-date-filter="tomorrow" onclick="window.UniSport.setDrawerDateFilter('tomorrow')" class="filter-date-btn px-3 py-2 rounded-xl text-xs font-semibold bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 transition cursor-pointer text-center">Tomorrow</button>
+            <button type="button" data-date-filter="weekend" onclick="window.UniSport.setDrawerDateFilter('weekend')" class="filter-date-btn px-3 py-2 rounded-xl text-xs font-semibold bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 transition cursor-pointer text-center">This Weekend</button>
+          </div>
+        </div>
+
+        <!-- University Campus Filter -->
+        <div class="space-y-2">
+          <label class="block font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider text-[11px]">Host Campus</label>
+          <select id="filter-drawer-university" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 border-0 text-xs text-zinc-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition">
+            <option value="all">All Campuses</option>
+            <option value="Fontys">Fontys UAS</option>
+            <option value="TU Eindhoven">TU Eindhoven</option>
+          </select>
+        </div>
+
+        <!-- Price Filter -->
+        <div class="space-y-2">
+          <label class="block font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider text-[11px]">Admission / Price</label>
+          <div class="grid grid-cols-3 gap-2" id="filter-drawer-price-chips">
+            <button type="button" data-price-filter="all" onclick="window.UniSport.setDrawerPriceFilter('all')" class="filter-price-btn px-2.5 py-2 rounded-xl text-xs font-bold bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 transition cursor-pointer text-center">All</button>
+            <button type="button" data-price-filter="free" onclick="window.UniSport.setDrawerPriceFilter('free')" class="filter-price-btn px-2.5 py-2 rounded-xl text-xs font-semibold bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 transition cursor-pointer text-center">Free Only</button>
+            <button type="button" data-price-filter="paid" onclick="window.UniSport.setDrawerPriceFilter('paid')" class="filter-price-btn px-2.5 py-2 rounded-xl text-xs font-semibold bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 transition cursor-pointer text-center">Paid Only</button>
+          </div>
+        </div>
+
+        <!-- Location Filter -->
+        <div class="space-y-2">
+          <label class="block font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider text-[11px]">Venue Location</label>
+          <input 
+            type="text" 
+            id="filter-drawer-location" 
+            placeholder="e.g. SSC, Strijp-S, Genneper Parken..." 
+            class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 border-0 text-xs text-zinc-950 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition"
+          />
+        </div>
+
+      </div>
+
+      <!-- Drawer Footer Actions -->
+      <footer class="sticky bottom-0 z-10 px-6 py-4 border-t border-zinc-100 dark:border-zinc-800 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md flex items-center gap-3">
+        <button type="button" onclick="window.UniSport.resetFeedFilters()" class="w-1/3 py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 font-semibold text-xs transition cursor-pointer">
+          Reset
+        </button>
+        <button type="button" onclick="window.UniSport.applyFilterDrawer()" class="w-2/3 py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 font-bold text-xs transition cursor-pointer">
+          Apply Filters
+        </button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Edit Activity Modal (Host only) -->
+  <div id="edit-activity-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md overflow-y-auto" onclick="if(event.target===this) window.UniSport.closeEditActivityModal();">
+    <div class="relative w-full max-w-lg rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-2xl p-6 sm:p-7 space-y-4 my-auto">
+      <div class="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800">
+        <div>
+          <h3 class="text-lg font-bold text-zinc-950 dark:text-white">Edit Session</h3>
+          <p class="text-xs text-zinc-500">Update game time, location or roster limit</p>
+        </div>
+        <button onclick="window.UniSport.closeEditActivityModal()" class="p-1.5 text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="edit-activity-form" class="space-y-4 text-xs" onsubmit="event.preventDefault(); window.UniSport.saveEditedActivity();">
+        <input type="hidden" id="edit-activity-id" />
+        <div>
+          <label class="block font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Activity Title *</label>
+          <input type="text" id="edit-title" required class="w-full px-4 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-800 border-0 text-sm text-zinc-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition" />
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Sport *</label>
+            <select id="edit-sport" required onchange="document.getElementById('edit-sport-other-container').classList.toggle('hidden', this.value !== 'Other');" class="w-full px-4 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-800 border-0 text-sm text-zinc-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition">
+              <option value="Football">Football</option>
+              <option value="Gym & Fitness">Gym & Fitness</option>
+              <option value="Running">Running</option>
+              <option value="Basketball">Basketball</option>
+              <option value="Bouldering">Bouldering</option>
+              <option value="Padel / Tennis">Padel / Tennis</option>
+              <option value="Volleyball">Volleyball</option>
+              <option value="Swimming">Swimming</option>
+              <option value="Cycling">Cycling</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Max Spots *</label>
+            <input type="number" id="edit-max" min="2" max="50" required class="w-full px-4 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-800 border-0 text-sm text-zinc-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition" />
+          </div>
+        </div>
+
+        <div id="edit-sport-other-container" class="hidden">
+          <label class="block font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Custom Sport *</label>
+          <input type="text" id="edit-sport-other" class="w-full px-4 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-800 border-0 text-sm text-zinc-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition" />
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Location *</label>
+            <input type="text" id="edit-location" required class="w-full px-4 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-800 border-0 text-sm text-zinc-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition" />
+          </div>
+          <div>
+            <label class="block font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Date & Time (Future) *</label>
+            <input type="datetime-local" id="edit-datetime" required class="w-full px-4 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-800 border-0 text-sm text-zinc-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Duration *</label>
+            <div class="grid grid-cols-2 gap-2">
+              <div class="relative">
+                <input type="number" id="edit-duration-hours" min="0" max="12" value="1" required class="w-full px-3 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-800 border-0 text-sm text-zinc-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition" />
+                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-zinc-400">hrs</span>
+              </div>
+              <div>
+                <select id="edit-duration-mins" class="w-full px-3 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-800 border-0 text-sm text-zinc-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition">
+                  <option value="0">00 mins</option>
+                  <option value="15">15 mins</option>
+                  <option value="30">30 mins</option>
+                  <option value="45">45 mins</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label class="block font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Pricing *</label>
+            <div class="grid grid-cols-2 gap-2">
+              <select id="edit-pricing-type" onchange="document.getElementById('edit-price-wrapper').classList.toggle('hidden', this.value === 'free');" class="w-full px-3 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-800 border-0 text-sm text-zinc-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition">
+                <option value="free">Free</option>
+                <option value="paid">Paid (€)</option>
+              </select>
+              <div id="edit-price-wrapper" class="hidden relative">
+                <input type="number" id="edit-price" min="0.50" step="0.50" value="5.00" class="w-full pl-7 pr-3 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-800 border-0 text-sm text-zinc-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition" />
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-400">€</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Notes (Optional)</label>
+          <textarea id="edit-desc" rows="3" class="w-full px-4 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-800 border-0 text-sm text-zinc-950 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition resize-none"></textarea>
+        </div>
+
+        <div class="pt-2 flex items-center gap-2">
+          <button type="button" onclick="window.UniSport.closeEditActivityModal()" class="w-1/3 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-semibold text-xs transition cursor-pointer">
+            Cancel
+          </button>
+          <button type="submit" id="edit-submit-btn" class="w-2/3 py-3 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 font-semibold text-xs transition cursor-pointer">
+            Save Changes
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 

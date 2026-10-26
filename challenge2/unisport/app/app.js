@@ -104,6 +104,17 @@ const state = {
   filterSport: "all",
   searchQuery: "",
   selectedActivity: null,
+
+  // Feed Deep Filters & Pagination State
+  feedFilters: {
+    sport: "all",
+    date: "all", // "all" | "today" | "tomorrow" | "weekend"
+    university: "all", // "all" | "Fontys" | "TU Eindhoven"
+    price: "all", // "all" | "free" | "paid"
+    location: ""
+  },
+  feedPageSize: 9, // starts at 9 (3x3), can expand to 30 (3x10) or paginate
+  feedCurrentPage: 1,
   
   // Social & Community State
   students: [],
@@ -128,6 +139,8 @@ export const SPORTS_CONFIG = {
   "Padel": { badge: "bg-lime-500/10 text-lime-700 dark:text-lime-400 border-lime-500/20" },
   "Padel / Tennis": { badge: "bg-lime-500/10 text-lime-700 dark:text-lime-400 border-lime-500/20" },
   "Volleyball": { badge: "bg-pink-500/10 text-pink-700 dark:text-pink-400 border-pink-500/20" },
+  "Swimming": { badge: "bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 border-cyan-500/20" },
+  "Cycling": { badge: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20" },
   "Other": { badge: "bg-zinc-500/10 text-zinc-700 dark:text-zinc-300 border-zinc-500/20" }
 };
 
@@ -424,6 +437,16 @@ async function fetchActivitiesDirectFromFirestore() {
           });
         });
       }
+      const durationMins = f.durationMinutes?.integerValue ? parseInt(f.durationMinutes.integerValue, 10) : (f.durationHours?.integerValue ? parseInt(f.durationHours.integerValue, 10) * 60 : 90);
+      const isPaid = f.isPaid?.booleanValue !== undefined ? f.isPaid.booleanValue : (f.price?.doubleValue > 0 || f.price?.integerValue > 0);
+      const priceVal = f.price?.doubleValue !== undefined ? parseFloat(f.price.doubleValue) : (f.price?.integerValue ? parseInt(f.price.integerValue, 10) : 0);
+      const kickedUids = [];
+      if (f.kickedUids?.arrayValue?.values) {
+        f.kickedUids.arrayValue.values.forEach(v => {
+          if (v.stringValue) kickedUids.push(v.stringValue);
+        });
+      }
+
       items.push({
         id,
         sport: f.sport?.stringValue || "Football",
@@ -431,6 +454,10 @@ async function fetchActivitiesDirectFromFirestore() {
         location: f.location?.stringValue || "Eindhoven",
         distance: f.distance?.stringValue || "Eindhoven Area",
         dateTime: f.dateTime?.stringValue || "Upcoming",
+        durationMinutes: durationMins,
+        isPaid: !!isPaid,
+        price: priceVal,
+        kickedUids,
         maxParticipants: f.maxParticipants?.integerValue ? parseInt(f.maxParticipants.integerValue, 10) : 10,
         creatorId,
         creatorName: f.creatorName?.stringValue || "Student",
@@ -442,11 +469,38 @@ async function fetchActivitiesDirectFromFirestore() {
     });
     items.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
     state.activities = items;
+    checkKickedStatusAndNotify(items);
     renderFeed();
     if (state.activeTab === "my-activities") renderMyActivities();
   } catch (e) {
     console.warn("Direct activities fetch notice:", e);
   }
+}
+
+
+// Check if current logged-in user was kicked from any session and notify them
+function checkKickedStatusAndNotify(activitiesList) {
+  const currentUid = state.currentUser?.uid || (getActiveSession() || {}).uid;
+  if (!currentUid || !Array.isArray(activitiesList)) return;
+
+  activitiesList.forEach(act => {
+    if (Array.isArray(act.kickedUids) && act.kickedUids.includes(currentUid)) {
+      const notifKey = `kicked_notif_seen_${act.id}_${currentUid}`;
+      if (!localStorage.getItem(notifKey)) {
+        localStorage.setItem(notifKey, "true");
+        getStoredSocialData();
+        state.notifications = state.notifications || [];
+        state.notifications.unshift({
+          id: "kick-" + Date.now(),
+          title: "Removed from Session",
+          desc: `You were removed from ${act.title} by the host.`,
+          time: "Just now"
+        });
+        saveStoredSocialData();
+        renderNotifications();
+      }
+    }
+  });
 }
 
 function listenToActivities() {
@@ -463,6 +517,7 @@ function listenToActivities() {
       });
 
       state.activities = items;
+      checkKickedStatusAndNotify(items);
       renderFeed();
       if (state.activeTab === "my-activities") renderMyActivities();
     }, (error) => {
@@ -473,17 +528,33 @@ function listenToActivities() {
   }
 }
 
+function formatDurationBadge(durationMinutes) {
+  const mins = parseInt(durationMinutes, 10) || 90;
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  if (h > 0 && m > 0) return `${h}h ${m}m`;
+  if (h > 0) return `${h}h`;
+  return `${m}m`;
+}
+
 export function renderFeed() {
   const container = document.getElementById("activities-feed");
   const countBadge = document.getElementById("activity-count-badge");
+  const paginationContainer = document.getElementById("feed-pagination-container");
   if (!container) return;
 
-  let filtered = [...state.activities];
+  const nowMs = Date.now();
 
-  if (state.filterSport && state.filterSport !== "all") {
-    filtered = filtered.filter(a => (a.sport || "").toLowerCase().includes(state.filterSport.toLowerCase()));
-  }
+  // RULE 10: Eventos passados ou a correr atualmente não aparecem no feed.
+  // Session must strictly start in the future! (new Date(dateTime).getTime() > nowMs)
+  let filtered = (state.activities || []).filter(a => {
+    if (!a.dateTime) return false;
+    const startTime = new Date(a.dateTime).getTime();
+    if (isNaN(startTime)) return true;
+    return startTime > nowMs;
+  });
 
+  // Apply Search Query
   if (state.searchQuery) {
     const q = state.searchQuery.toLowerCase();
     filtered = filtered.filter(a => 
@@ -494,42 +565,114 @@ export function renderFeed() {
     );
   }
 
-  if (countBadge) {
-    countBadge.textContent = `${filtered.length} active sessions in Eindhoven`;
+  // Apply Deep Filters
+  const df = state.feedFilters || {};
+  if (df.sport && df.sport !== "all") {
+    filtered = filtered.filter(a => (a.sport || "").toLowerCase() === df.sport.toLowerCase() || (a.sport || "").toLowerCase().includes(df.sport.toLowerCase()));
+  }
+  if (df.university && df.university !== "all") {
+    const targetUni = df.university.toLowerCase();
+    filtered = filtered.filter(a => {
+      const u = (a.creatorUniversity || "").toLowerCase();
+      if (targetUni.includes("tu")) return u.includes("tu") || u.includes("eindhoven");
+      if (targetUni.includes("fontys")) return u.includes("fontys");
+      return u.includes(targetUni);
+    });
+  }
+  if (df.price && df.price !== "all") {
+    if (df.price === "free") {
+      filtered = filtered.filter(a => !a.isPaid || parseFloat(a.price || 0) === 0);
+    } else if (df.price === "paid") {
+      filtered = filtered.filter(a => a.isPaid && parseFloat(a.price || 0) > 0);
+    }
+  }
+  if (df.location && df.location.trim()) {
+    const locQ = df.location.toLowerCase().trim();
+    filtered = filtered.filter(a => (a.location || "").toLowerCase().includes(locQ));
+  }
+  if (df.date && df.date !== "all") {
+    const now = new Date();
+    const todayStr = now.toDateString();
+    const tomorrow = new Date(now.getTime() + 24 * 3600 * 1000);
+    const tomorrowStr = tomorrow.toDateString();
+
+    filtered = filtered.filter(a => {
+      const d = new Date(a.dateTime);
+      if (isNaN(d.getTime())) return false;
+      if (df.date === "today") return d.toDateString() === todayStr;
+      if (df.date === "tomorrow") return d.toDateString() === tomorrowStr;
+      if (df.date === "weekend") {
+        const day = d.getDay();
+        return day === 0 || day === 6 || (day === 5 && d.getHours() >= 17);
+      }
+      return true;
+    });
   }
 
-  if (filtered.length === 0) {
+  // Update filter count badge and summary tags
+  renderFeedFilterSummary();
+
+  const totalUpcoming = filtered.length;
+  if (countBadge) {
+    countBadge.textContent = `${totalUpcoming} upcoming session${totalUpcoming === 1 ? '' : 's'} in Eindhoven`;
+  }
+
+  if (totalUpcoming === 0) {
     container.innerHTML = `
       <div class="col-span-full py-16 px-6 text-center rounded-2xl bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800">
-        <h3 class="text-base font-bold text-zinc-950 dark:text-white mb-1">No sports sessions found</h3>
-        <p class="text-zinc-500 dark:text-zinc-400 text-xs max-w-sm mx-auto mb-4">Be the first student to create a session in Eindhoven.</p>
-        <button onclick="window.UniSport.switchTab('create')" class="px-4 py-2 rounded-xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 text-xs font-semibold transition">
-          Create Session
+        <h3 class="text-base font-bold text-zinc-950 dark:text-white mb-1">No upcoming sessions found</h3>
+        <p class="text-zinc-500 dark:text-zinc-400 text-xs max-w-sm mx-auto mb-4">Try adjusting your filters or be the first student to host a new session.</p>
+        <button onclick="window.UniSport.switchTab('create')" class="px-4 py-2 rounded-xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 text-xs font-semibold transition cursor-pointer">
+          Host Session
         </button>
       </div>
     `;
+    if (paginationContainer) paginationContainer.innerHTML = "";
     return;
   }
 
-  container.innerHTML = filtered.map(activity => {
+  // RULE 7: 3x3 (9 items) initially -> Load 3x10 (30 items) -> Unlimited pages
+  const pageSize = state.feedPageSize || 9;
+  const totalPages = Math.ceil(totalUpcoming / pageSize);
+  if (state.feedCurrentPage > totalPages) state.feedCurrentPage = 1;
+  const currentPage = state.feedCurrentPage || 1;
+
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = Math.min(startIndex + pageSize, totalUpcoming);
+  const pagedItems = filtered.slice(startIndex, endIndex);
+
+  container.innerHTML = pagedItems.map(activity => {
     const sportInfo = SPORTS_CONFIG[activity.sport] || SPORTS_CONFIG["Other"];
     const participants = activity.participants || [];
     const max = parseInt(activity.maxParticipants, 10) || 10;
     const spotsLeft = Math.max(0, max - participants.length);
     const isFull = spotsLeft === 0;
     const isJoined = state.currentUser && participants.some(p => p.uid === state.currentUser.uid);
+    const durationStr = formatDurationBadge(activity.durationMinutes);
+    const isPaid = !!activity.isPaid && parseFloat(activity.price || 0) > 0;
+    const priceDisplay = isPaid ? `€${parseFloat(activity.price).toFixed(2)}` : "Free";
 
     return `
       <article class="relative flex flex-col justify-between rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800/90 p-5 transition duration-200 hover:border-zinc-400 dark:hover:border-zinc-700">
         <div>
           <div class="flex items-center justify-between gap-2 mb-3">
-            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold border ${sportInfo.badge}">
-              ${escapeHtml(activity.sport)}
-            </span>
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold border ${sportInfo.badge}">
+                ${escapeHtml(activity.sport)}
+              </span>
+              <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">
+                ${durationStr}
+              </span>
+            </div>
 
-            <span class="text-xs font-semibold px-2 py-0.5 rounded-md ${isFull ? 'bg-red-500/10 text-red-600 dark:text-red-400' : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'}">
-              ${isFull ? 'Full' : `${spotsLeft} spots left`}
-            </span>
+            <div class="flex items-center gap-1.5">
+              <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold ${isPaid ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20' : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'}">
+                ${priceDisplay}
+              </span>
+              <span class="text-xs font-semibold px-2 py-0.5 rounded-md ${isFull ? 'bg-red-500/10 text-red-600 dark:text-red-400' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300'}">
+                ${isFull ? 'Full' : `${spotsLeft} left`}
+              </span>
+            </div>
           </div>
 
           <h3 class="text-base font-bold text-zinc-950 dark:text-white mb-2 leading-snug">
@@ -556,7 +699,7 @@ export function renderFeed() {
           <div class="mb-4 pt-3 border-t border-zinc-100 dark:border-zinc-800">
             <div class="flex items-center justify-between text-xs mb-2">
               <span class="font-semibold text-zinc-500">Roster (${participants.length}/${max})</span>
-              <button onclick="window.UniSport.openRosterModal('${activity.id}')" class="text-zinc-900 dark:text-white hover:underline text-[11px] font-semibold">
+              <button onclick="window.UniSport.openRosterModal('${activity.id}')" class="text-zinc-900 dark:text-white hover:underline text-[11px] font-semibold cursor-pointer">
                 View names &rarr;
               </button>
             </div>
@@ -585,14 +728,14 @@ export function renderFeed() {
 
           <div>
             ${isJoined ? `
-              <button onclick="window.UniSport.toggleJoinActivity('${activity.id}')" class="px-3.5 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-red-50 dark:hover:bg-red-950/40 text-red-600 dark:text-red-400 text-xs font-semibold transition">
+              <button onclick="window.UniSport.toggleJoinActivity('${activity.id}')" class="px-3.5 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-red-50 dark:hover:bg-red-950/40 text-red-600 dark:text-red-400 text-xs font-semibold transition cursor-pointer">
                 Leave
               </button>
             ` : `
               <button 
                 onclick="window.UniSport.toggleJoinActivity('${activity.id}')" 
                 ${isFull ? 'disabled' : ''}
-                class="px-3.5 py-1.5 rounded-xl ${isFull ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400 cursor-not-allowed' : 'bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950'} text-xs font-semibold transition"
+                class="px-3.5 py-1.5 rounded-xl ${isFull ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400 cursor-not-allowed' : 'bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950'} text-xs font-semibold transition cursor-pointer"
               >
                 ${isFull ? 'Full' : 'Join'}
               </button>
@@ -602,6 +745,114 @@ export function renderFeed() {
       </article>
     `;
   }).join('');
+
+  // Render Pagination and Load More Bar
+  if (paginationContainer) {
+    let paginationHtml = `
+      <div class="text-xs text-zinc-500">
+        Showing <span class="font-bold text-zinc-900 dark:text-white">${startIndex + 1}–${endIndex}</span> of <span class="font-bold text-zinc-900 dark:text-white">${totalUpcoming}</span> sessions
+      </div>
+      <div class="flex items-center gap-2 flex-wrap">
+    `;
+
+    // Button to expand from 3x3 (9) to 3x10 (30)
+    if (pageSize === 9 && totalUpcoming > 9) {
+      paginationHtml += `
+        <button onclick="window.UniSport.setFeedPageSize(30)" class="px-3 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 text-xs font-bold transition cursor-pointer">
+          Load 30 (3x10)
+        </button>
+      `;
+    } else if (pageSize === 30) {
+      paginationHtml += `
+        <button onclick="window.UniSport.setFeedPageSize(9)" class="px-3 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 text-xs font-medium transition cursor-pointer">
+          Show 3x3 Grid
+        </button>
+      `;
+    }
+
+    // Numbered pagination controls
+    if (totalPages > 1) {
+      paginationHtml += `
+        <div class="flex items-center gap-1">
+          <button onclick="window.UniSport.goToFeedPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled class="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-zinc-300 dark:text-zinc-700 cursor-not-allowed"' : 'class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 cursor-pointer"'}>
+            Prev
+          </button>
+      `;
+
+      for (let p = 1; p <= totalPages; p++) {
+        if (p === 1 || p === totalPages || (p >= currentPage - 1 && p <= currentPage + 1)) {
+          const isCur = p === currentPage;
+          paginationHtml += `
+            <button onclick="window.UniSport.goToFeedPage(${p})" class="px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${isCur ? 'bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 shadow-sm' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200'}">
+              ${p}
+            </button>
+          `;
+        } else if (p === currentPage - 2 || p === currentPage + 2) {
+          paginationHtml += `<span class="px-1 text-zinc-400 text-xs">...</span>`;
+        }
+      }
+
+      paginationHtml += `
+          <button onclick="window.UniSport.goToFeedPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled class="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-zinc-300 dark:text-zinc-700 cursor-not-allowed"' : 'class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 cursor-pointer"'}>
+            Next
+          </button>
+        </div>
+      `;
+    }
+
+    paginationHtml += `</div>`;
+    paginationContainer.innerHTML = paginationHtml;
+  }
+
+  if (window.lucide && typeof window.lucide.createIcons === "function") {
+    window.lucide.createIcons();
+  }
+}
+
+function renderFeedFilterSummary() {
+  const badge = document.getElementById("feed-filter-count-badge");
+  const summary = document.getElementById("feed-active-chips-summary");
+  const resetBtn = document.getElementById("btn-reset-feed-filters");
+  if (!summary) return;
+
+  const df = state.feedFilters || {};
+  let count = 0;
+  let chips = [];
+
+  if (df.sport && df.sport !== "all") {
+    count++;
+    chips.push(`<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold">${escapeHtml(df.sport)}</span>`);
+  }
+  if (df.date && df.date !== "all") {
+    count++;
+    const label = df.date === "today" ? "Today" : df.date === "tomorrow" ? "Tomorrow" : "Weekend";
+    chips.push(`<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold">${label}</span>`);
+  }
+  if (df.university && df.university !== "all") {
+    count++;
+    chips.push(`<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold">${escapeHtml(df.university)}</span>`);
+  }
+  if (df.price && df.price !== "all") {
+    count++;
+    chips.push(`<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold">${df.price === 'free' ? 'Free Only' : 'Paid Only'}</span>`);
+  }
+  if (df.location && df.location.trim()) {
+    count++;
+    chips.push(`<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold">${escapeHtml(df.location.trim())}</span>`);
+  }
+
+  summary.innerHTML = chips.join('');
+  if (badge) {
+    if (count > 0) {
+      badge.textContent = count;
+      badge.classList.remove("hidden");
+    } else {
+      badge.classList.add("hidden");
+    }
+  }
+  if (resetBtn) {
+    resetBtn.classList.toggle("hidden", count === 0);
+  }
 }
 
 function setupFilterSearch() {
@@ -609,27 +860,121 @@ function setupFilterSearch() {
   if (searchInput) {
     searchInput.addEventListener("input", (e) => {
       state.searchQuery = sanitize(e.target.value);
+      state.feedCurrentPage = 1;
       renderFeed();
     });
   }
+}
 
-  const chips = document.querySelectorAll(".sport-filter-chip");
-  chips.forEach(chip => {
-    chip.addEventListener("click", () => {
-      chips.forEach(c => {
-        c.className = "sport-filter-chip px-3 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 text-xs font-semibold whitespace-nowrap hover:text-zinc-950 dark:hover:text-white transition";
-      });
+export function openFilterDrawer() {
+  const drawer = document.getElementById("feed-filter-drawer");
+  if (!drawer) return;
 
-      chip.className = "sport-filter-chip px-3 py-1.5 rounded-xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 text-xs font-semibold whitespace-nowrap transition";
-      state.filterSport = chip.dataset.sport;
-      renderFeed();
-    });
+  const sportSel = document.getElementById("filter-drawer-sport");
+  const uniSel = document.getElementById("filter-drawer-university");
+  const locInp = document.getElementById("filter-drawer-location");
+
+  if (sportSel) sportSel.value = state.feedFilters.sport || "all";
+  if (uniSel) uniSel.value = state.feedFilters.university || "all";
+  if (locInp) locInp.value = state.feedFilters.location || "";
+
+  setDrawerDateFilter(state.feedFilters.date || "all", false);
+  setDrawerPriceFilter(state.feedFilters.price || "all", false);
+
+  drawer.classList.remove("hidden");
+  document.body.style.overflow = "hidden";
+  if (window.lucide && typeof window.lucide.createIcons === "function") window.lucide.createIcons();
+}
+
+export function closeFilterDrawer() {
+  const drawer = document.getElementById("feed-filter-drawer");
+  if (drawer) drawer.classList.add("hidden");
+  document.body.style.overflow = "";
+}
+
+export function setDrawerDateFilter(dateVal, updateState = true) {
+  if (updateState) {
+    state.feedFilters.date = dateVal;
+  }
+  document.querySelectorAll("#filter-drawer-date-chips .filter-date-btn").forEach(btn => {
+    if (btn.getAttribute("data-date-filter") === dateVal) {
+      btn.className = "filter-date-btn px-3 py-2 rounded-xl text-xs font-bold bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 transition cursor-pointer text-center";
+    } else {
+      btn.className = "filter-date-btn px-3 py-2 rounded-xl text-xs font-semibold bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 transition cursor-pointer text-center";
+    }
   });
+}
+
+export function setDrawerPriceFilter(priceVal, updateState = true) {
+  if (updateState) {
+    state.feedFilters.price = priceVal;
+  }
+  document.querySelectorAll("#filter-drawer-price-chips .filter-price-btn").forEach(btn => {
+    if (btn.getAttribute("data-price-filter") === priceVal) {
+      btn.className = "filter-price-btn px-2.5 py-2 rounded-xl text-xs font-bold bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 transition cursor-pointer text-center";
+    } else {
+      btn.className = "filter-price-btn px-2.5 py-2 rounded-xl text-xs font-semibold bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 transition cursor-pointer text-center";
+    }
+  });
+}
+
+export function applyFilterDrawer() {
+  const sportSel = document.getElementById("filter-drawer-sport");
+  const uniSel = document.getElementById("filter-drawer-university");
+  const locInp = document.getElementById("filter-drawer-location");
+
+  if (sportSel) state.feedFilters.sport = sportSel.value;
+  if (uniSel) state.feedFilters.university = uniSel.value;
+  if (locInp) state.feedFilters.location = locInp.value.trim();
+
+  state.feedCurrentPage = 1;
+  closeFilterDrawer();
+  renderFeed();
+}
+
+export function resetFeedFilters() {
+  state.feedFilters = {
+    sport: "all",
+    date: "all",
+    university: "all",
+    price: "all",
+    location: ""
+  };
+  state.searchQuery = "";
+  const searchInput = document.getElementById("search-activities");
+  if (searchInput) searchInput.value = "";
+  state.feedCurrentPage = 1;
+  closeFilterDrawer();
+  renderFeed();
+}
+
+export function setFeedPageSize(size) {
+  state.feedPageSize = size;
+  state.feedCurrentPage = 1;
+  renderFeed();
+}
+
+export function goToFeedPage(page) {
+  state.feedCurrentPage = page;
+  renderFeed();
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function setupCreateForm() {
   const form = document.getElementById("create-activity-form");
   if (!form) return;
+
+  const dtInput = document.getElementById("create-datetime");
+  if (dtInput) {
+    const setMinDt = () => {
+      const now = new Date();
+      now.setMinutes(now.getMinutes() + 5);
+      const iso = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+      dtInput.min = iso;
+    };
+    setMinDt();
+    dtInput.addEventListener("focus", setMinDt);
+  }
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -640,14 +985,41 @@ function setupCreateForm() {
     }
 
     const title = sanitize(document.getElementById("create-title").value);
-    const sport = document.getElementById("create-sport").value;
+    let sport = document.getElementById("create-sport").value;
+    if (sport === "Other") {
+      const otherSport = sanitize(document.getElementById("create-sport-other").value);
+      if (otherSport) sport = otherSport;
+    }
+
     const location = sanitize(document.getElementById("create-location").value);
     const dateTime = document.getElementById("create-datetime").value;
     const maxParticipants = parseInt(document.getElementById("create-max").value, 10);
     const description = sanitize(document.getElementById("create-desc").value);
 
+    // Parse Duration
+    const durHours = parseInt(document.getElementById("create-duration-hours").value, 10) || 0;
+    const durMins = parseInt(document.getElementById("create-duration-mins").value, 10) || 0;
+    const totalDurationMinutes = (durHours * 60) + durMins;
+
+    // Parse Pricing
+    const pricingType = document.getElementById("create-pricing-type").value;
+    const isPaid = pricingType === "paid";
+    const priceVal = isPaid ? (parseFloat(document.getElementById("create-price").value) || 0) : 0;
+
     if (!title || !location || !dateTime) {
       alert("Please fill in all required fields.");
+      return;
+    }
+
+    // RULE 2: Date must strictly be in the future
+    const selectedTime = new Date(dateTime).getTime();
+    if (isNaN(selectedTime) || selectedTime <= Date.now()) {
+      alert("Session date and time must be in the future.");
+      return;
+    }
+
+    if (totalDurationMinutes <= 0) {
+      alert("Session duration must be greater than 0 minutes.");
       return;
     }
 
@@ -661,11 +1033,15 @@ function setupCreateForm() {
       location,
       distance: "Eindhoven Area",
       dateTime,
+      durationMinutes: totalDurationMinutes,
+      isPaid: isPaid,
+      price: priceVal,
       maxParticipants: maxParticipants || 10,
       creatorId: state.currentUser.uid,
       creatorName,
       creatorUniversity,
       description,
+      kickedUids: [],
       participants: [
         {
           uid: state.currentUser.uid,
@@ -749,9 +1125,12 @@ function renderMyActivities() {
   const container = document.getElementById("my-activities-list");
   if (!container) return;
 
-  const myActivities = state.activities.filter(a => {
-    const isJoined = (a.participants || []).some(p => p.uid === state.currentUser.uid);
-    const isCreator = a.creatorId === state.currentUser.uid;
+  const currentUid = state.currentUser ? state.currentUser.uid : "";
+  const nowMs = Date.now();
+
+  const myActivities = (state.activities || []).filter(a => {
+    const isJoined = (a.participants || []).some(p => p.uid === currentUid);
+    const isCreator = a.creatorId === currentUid;
     return isJoined || isCreator;
   });
 
@@ -760,7 +1139,7 @@ function renderMyActivities() {
       <div class="text-center py-12 rounded-2xl bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 p-8">
         <h4 class="text-zinc-950 dark:text-white font-bold text-base mb-1">No registered activities yet</h4>
         <p class="text-zinc-500 dark:text-zinc-400 text-xs mb-4">Explore the feed to find sports sessions matching your schedule in Eindhoven.</p>
-        <button onclick="window.UniSport.switchTab('feed')" class="px-4 py-2 rounded-xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-semibold text-xs">
+        <button onclick="window.UniSport.switchTab('feed')" class="px-4 py-2 rounded-xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-semibold text-xs cursor-pointer">
           Browse Feed
         </button>
       </div>
@@ -768,30 +1147,110 @@ function renderMyActivities() {
     return;
   }
 
-  container.innerHTML = myActivities.map(a => {
-    const isCreator = a.creatorId === state.currentUser.uid;
-    const sportInfo = SPORTS_CONFIG[a.sport] || SPORTS_CONFIG["Other"];
+  // RULE 9: Só é uma past session quando passa da hora do evento + duração
+  const activeSessions = [];
+  const pastSessions = [];
+
+  myActivities.forEach(a => {
+    const startMs = new Date(a.dateTime).getTime();
+    const durMs = (parseInt(a.durationMinutes, 10) || 90) * 60000;
+    const endMs = startMs + durMs;
+
+    if (!isNaN(endMs) && endMs <= nowMs) {
+      pastSessions.push(a);
+    } else {
+      activeSessions.push(a);
+    }
+  });
+
+  const renderCard = (a, isPast = false) => {
+    const isCreator = a.creatorId === currentUid;
+    const durationStr = formatDurationBadge(a.durationMinutes);
+    const isPaid = !!a.isPaid && parseFloat(a.price || 0) > 0;
+    const priceDisplay = isPaid ? `€${parseFloat(a.price).toFixed(2)}` : "Free";
+
     return `
-      <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div class="flex items-center gap-2 mb-1">
-            <span class="text-xs font-bold text-zinc-500 uppercase tracking-wider">${escapeHtml(a.sport)}</span>
-            ${isCreator ? `<span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">Hosted by you</span>` : ''}
+      <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border ${isPast ? 'border-zinc-200/60 dark:border-zinc-800/60 opacity-80' : 'border-zinc-200 dark:border-zinc-800'} flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="space-y-1">
+          <div class="flex items-center gap-2 flex-wrap mb-1">
+            <span class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider">${escapeHtml(a.sport)}</span>
+            <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">${durationStr}</span>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded ${isPaid ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400' : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'}">${priceDisplay}</span>
+            ${isCreator ? `<span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-zinc-950 dark:bg-white text-white dark:text-zinc-950">Hosted by you</span>` : ''}
+            ${isPast ? `<span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">Completed</span>` : ''}
           </div>
-          <h4 class="text-sm font-bold text-zinc-950 dark:text-white mb-0.5">${escapeHtml(a.title)}</h4>
+          <h4 class="text-sm font-bold text-zinc-950 dark:text-white">${escapeHtml(a.title)}</h4>
           <p class="text-xs text-zinc-500 dark:text-zinc-400">${escapeHtml(a.location)} • ${escapeHtml(formatDisplayDate(a.dateTime))}</p>
         </div>
-        <div class="flex items-center gap-2">
-          <button onclick="window.UniSport.openRosterModal('${a.id}')" class="px-3 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-xs font-medium text-zinc-900 dark:text-white transition">
-            Roster (${(a.participants || []).length}/${a.maxParticipants})
-          </button>
-          <button onclick="window.UniSport.toggleJoinActivity('${a.id}')" class="px-3 py-1.5 rounded-xl bg-red-50 dark:bg-red-950/40 hover:bg-red-100 text-red-600 dark:text-red-400 text-xs font-semibold transition">
-            Leave
-          </button>
+
+        <div class="flex items-center gap-2 shrink-0">
+          <!-- RULE 4: Se for hosted by me, botão de Editar ao lado de Roster (X/X) -->
+          <div class="flex items-center gap-1.5 bg-zinc-100 dark:bg-zinc-800/80 px-2 py-1 rounded-xl">
+            <span class="text-xs font-semibold text-zinc-700 dark:text-zinc-300">
+              Roster (${(a.participants || []).length}/${a.maxParticipants})
+            </span>
+            ${isCreator && !isPast ? `
+              <button onclick="window.UniSport.openEditActivityModal('${a.id}')" class="ml-1 px-2.5 py-1 rounded-lg bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 text-xs font-bold transition hover:opacity-90 cursor-pointer" title="Edit Session">
+                Edit
+              </button>
+            ` : ''}
+            <!-- Modal de participantes acessível pelo ícone de pessoas -->
+            <button onclick="window.UniSport.openRosterModal('${a.id}')" class="p-1.5 text-zinc-600 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer" title="View Participants">
+              <i data-lucide="users" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+          ${!isCreator && !isPast ? `
+            <button onclick="window.UniSport.toggleJoinActivity('${a.id}')" class="px-3 py-1.5 rounded-xl bg-red-50 dark:bg-red-950/40 hover:bg-red-100 text-red-600 dark:text-red-400 text-xs font-semibold transition cursor-pointer">
+              Leave
+            </button>
+          ` : ''}
         </div>
       </div>
     `;
-  }).join('');
+  };
+
+  let htmlContent = "";
+
+  // Active Sessions
+  if (activeSessions.length > 0) {
+    htmlContent += `
+      <div class="space-y-3">
+        ${activeSessions.map(a => renderCard(a, false)).join('')}
+      </div>
+    `;
+  } else {
+    htmlContent += `
+      <div class="text-center py-6 text-xs text-zinc-400">
+        No active upcoming sessions. Check the Past Sessions below or create a new game.
+      </div>
+    `;
+  }
+
+  // RULE 8: Categoria Past Sessions só aparece se houver past sessions
+  if (pastSessions.length > 0) {
+    htmlContent += `
+      <div class="pt-8 space-y-4">
+        <div class="border-t border-zinc-100 dark:border-zinc-800 pt-6 flex items-center justify-between">
+          <div>
+            <h3 class="text-base font-bold text-zinc-950 dark:text-white">Past Sessions</h3>
+            <p class="text-xs text-zinc-500">History of matches and workouts completed</p>
+          </div>
+          <span class="text-xs font-semibold px-2 py-1 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-500">
+            ${pastSessions.length} completed
+          </span>
+        </div>
+        <div class="space-y-3">
+          ${pastSessions.map(a => renderCard(a, true)).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  container.innerHTML = htmlContent;
+  if (window.lucide && typeof window.lucide.createIcons === "function") {
+    window.lucide.createIcons();
+  }
 }
 
 export function populateProfileTab() {
@@ -1023,28 +1482,204 @@ export function openRosterModal(activityId) {
 
   if (!activity || !modal || !content) return;
 
+  const currentUid = state.currentUser ? state.currentUser.uid : "";
+  const isHost = activity.creatorId === currentUid;
+
   title.textContent = activity.title;
   const participants = activity.participants || [];
 
   content.innerHTML = participants.map((p, idx) => {
     const av = getAvatarById(p.avatarId || "bodybuilder");
+    const isMe = p.uid === currentUid;
+    const isCreatorRow = p.uid === activity.creatorId;
+
     return `
       <div class="flex items-center justify-between p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800">
-        <div class="flex items-center gap-2.5">
+        <div class="flex items-center gap-2.5 cursor-pointer" onclick="window.openStudentProfileModal('${p.uid}')">
           <div class="w-8 h-8 rounded-full overflow-hidden border border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-white shadow-sm">
             ${av.svg}
           </div>
           <div>
-            <p class="text-xs font-semibold text-zinc-950 dark:text-white">${escapeHtml(p.name)}</p>
+            <p class="text-xs font-semibold text-zinc-950 dark:text-white flex items-center gap-1.5">
+              ${escapeHtml(p.name)}
+              ${isCreatorRow ? '<span class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-zinc-950 text-white dark:bg-white dark:text-zinc-950">Host</span>' : ''}
+              ${isMe && !isCreatorRow ? '<span class="text-[9px] font-semibold text-zinc-400">(You)</span>' : ''}
+            </p>
             <p class="text-[11px] text-zinc-500">${escapeHtml(p.university || 'Student')}</p>
           </div>
         </div>
-        <span class="text-[11px] font-semibold text-zinc-400">#${idx + 1}</span>
+        
+        <div class="flex items-center gap-2">
+          ${isHost && !isCreatorRow ? `
+            <button onclick="window.UniSport.kickParticipant('${activity.id}', '${p.uid}', '${escapeHtml(p.name)}')" class="px-2.5 py-1 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 text-xs font-bold transition cursor-pointer">
+              Kick
+            </button>
+          ` : ''}
+          <span class="text-[11px] font-semibold text-zinc-400">#${idx + 1}</span>
+        </div>
       </div>
     `;
   }).join('');
 
   modal.classList.remove("hidden");
+  if (window.lucide && typeof window.lucide.createIcons === "function") {
+    window.lucide.createIcons();
+  }
+}
+
+export async function kickParticipant(activityId, participantUid, participantName) {
+  const currentUid = state.currentUser ? state.currentUser.uid : "";
+  const activity = state.activities.find(a => a.id === activityId);
+  if (!activity || activity.creatorId !== currentUid) {
+    alert("Only the host can kick participants from this session.");
+    return;
+  }
+
+  const confirmed = confirm(`Are you sure you want to kick ${participantName} from ${activity.title}?`);
+  if (!confirmed) return;
+
+  const targetParticipant = (activity.participants || []).find(p => p.uid === participantUid);
+  if (!targetParticipant) return;
+
+  try {
+    const actRef = doc(db, "activities", activityId);
+    await updateDoc(actRef, {
+      participants: arrayRemove(targetParticipant),
+      kickedUids: arrayUnion(participantUid)
+    });
+  } catch(e) {
+    console.warn("Firestore kick update notice:", e);
+  }
+
+  // Update local activity state
+  activity.participants = (activity.participants || []).filter(p => p.uid !== participantUid);
+  activity.kickedUids = [...(activity.kickedUids || []), participantUid];
+
+  openRosterModal(activityId);
+  renderFeed();
+  renderMyActivities();
+}
+
+// Edit Session Modal Functions
+export function openEditActivityModal(activityId) {
+  const activity = state.activities.find(a => a.id === activityId);
+  const currentUid = state.currentUser ? state.currentUser.uid : "";
+  if (!activity || activity.creatorId !== currentUid) {
+    alert("Only the event host can edit this session.");
+    return;
+  }
+
+  const modal = document.getElementById("edit-activity-modal");
+  if (!modal) return;
+
+  document.getElementById("edit-activity-id").value = activity.id;
+  document.getElementById("edit-title").value = activity.title || "";
+  
+  const sportSel = document.getElementById("edit-sport");
+  const otherContainer = document.getElementById("edit-sport-other-container");
+  const otherInp = document.getElementById("edit-sport-other");
+
+  const standardSports = ["Football", "Gym & Fitness", "Running", "Basketball", "Bouldering", "Padel / Tennis", "Volleyball", "Swimming", "Cycling"];
+  if (standardSports.includes(activity.sport)) {
+    sportSel.value = activity.sport;
+    otherContainer.classList.add("hidden");
+    otherInp.value = "";
+  } else {
+    sportSel.value = "Other";
+    otherContainer.classList.remove("hidden");
+    otherInp.value = activity.sport || "";
+  }
+
+  document.getElementById("edit-max").value = activity.maxParticipants || 10;
+  document.getElementById("edit-location").value = activity.location || "";
+  
+  const dtInput = document.getElementById("edit-datetime");
+  if (dtInput) {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() + 5);
+    const iso = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+    dtInput.min = iso;
+    dtInput.value = activity.dateTime || "";
+  }
+
+  const totalMins = parseInt(activity.durationMinutes, 10) || 90;
+  document.getElementById("edit-duration-hours").value = Math.floor(totalMins / 60);
+  document.getElementById("edit-duration-mins").value = String(totalMins % 60);
+
+  const isPaid = !!activity.isPaid && parseFloat(activity.price || 0) > 0;
+  document.getElementById("edit-pricing-type").value = isPaid ? "paid" : "free";
+  document.getElementById("edit-price-wrapper").classList.toggle("hidden", !isPaid);
+  document.getElementById("edit-price").value = isPaid ? parseFloat(activity.price).toFixed(2) : "5.00";
+  document.getElementById("edit-desc").value = activity.description || "";
+
+  modal.classList.remove("hidden");
+  if (window.lucide && typeof window.lucide.createIcons === "function") window.lucide.createIcons();
+}
+
+export function closeEditActivityModal() {
+  const modal = document.getElementById("edit-activity-modal");
+  if (modal) modal.classList.add("hidden");
+}
+
+export async function saveEditedActivity() {
+  const id = document.getElementById("edit-activity-id").value;
+  const activity = state.activities.find(a => a.id === id);
+  const currentUid = state.currentUser ? state.currentUser.uid : "";
+  if (!activity || activity.creatorId !== currentUid) return;
+
+  const title = sanitize(document.getElementById("edit-title").value);
+  let sport = document.getElementById("edit-sport").value;
+  if (sport === "Other") {
+    const customSp = sanitize(document.getElementById("edit-sport-other").value);
+    if (customSp) sport = customSp;
+  }
+  const maxParticipants = parseInt(document.getElementById("edit-max").value, 10) || 10;
+  const location = sanitize(document.getElementById("edit-location").value);
+  const dateTime = document.getElementById("edit-datetime").value;
+
+  const selectedTime = new Date(dateTime).getTime();
+  if (isNaN(selectedTime) || selectedTime <= Date.now()) {
+    alert("Session date and time must be in the future.");
+    return;
+  }
+
+  const durHours = parseInt(document.getElementById("edit-duration-hours").value, 10) || 0;
+  const durMins = parseInt(document.getElementById("edit-duration-mins").value, 10) || 0;
+  const durationMinutes = (durHours * 60) + durMins;
+
+  const isPaid = document.getElementById("edit-pricing-type").value === "paid";
+  const priceVal = isPaid ? (parseFloat(document.getElementById("edit-price").value) || 0) : 0;
+  const description = sanitize(document.getElementById("edit-desc").value);
+
+  const updatedData = {
+    title,
+    sport,
+    maxParticipants,
+    location,
+    dateTime,
+    durationMinutes,
+    isPaid,
+    price: priceVal,
+    description
+  };
+
+  const submitBtn = document.getElementById("edit-submit-btn");
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Saving...";
+
+  try {
+    const actRef = doc(db, "activities", id);
+    await updateDoc(actRef, updatedData);
+  } catch(e) {
+    console.warn("Firestore update activity notice:", e);
+  }
+
+  Object.assign(activity, updatedData);
+  submitBtn.disabled = false;
+  submitBtn.textContent = "Save Changes";
+  closeEditActivityModal();
+  renderFeed();
+  renderMyActivities();
 }
 
 export async function savePrivacySettingsToFirestore(isPublic, showUniBadge) {
@@ -1985,8 +2620,34 @@ window.UniSport = {
   syncSocialStateFromStorage,
   fetchCampusStudents,
   savePrivacySettingsToFirestore,
+  openFilterDrawer,
+  closeFilterDrawer,
+  setDrawerDateFilter,
+  setDrawerPriceFilter,
+  applyFilterDrawer,
+  resetFeedFilters,
+  setFeedPageSize,
+  goToFeedPage,
+  openEditActivityModal,
+  closeEditActivityModal,
+  saveEditedActivity,
+  kickParticipant,
   signOut: signOutStudent
 };
+
+// Also expose immediately onto window
+window.UniSport.openFilterDrawer = openFilterDrawer;
+window.UniSport.closeFilterDrawer = closeFilterDrawer;
+window.UniSport.setDrawerDateFilter = setDrawerDateFilter;
+window.UniSport.setDrawerPriceFilter = setDrawerPriceFilter;
+window.UniSport.applyFilterDrawer = applyFilterDrawer;
+window.UniSport.resetFeedFilters = resetFeedFilters;
+window.UniSport.setFeedPageSize = setFeedPageSize;
+window.UniSport.goToFeedPage = goToFeedPage;
+window.UniSport.openEditActivityModal = openEditActivityModal;
+window.UniSport.closeEditActivityModal = closeEditActivityModal;
+window.UniSport.saveEditedActivity = saveEditedActivity;
+window.UniSport.kickParticipant = kickParticipant;
 
 // Bootstrapping: Load local/cached students, initialize app immediately, and fetch remote updates asynchronously
 function bootUniSport() {
