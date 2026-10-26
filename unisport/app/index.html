@@ -401,6 +401,18 @@
 
     // Synchronous resilient tab switcher for instant profile / sessions / notifications navigation
     window.switchTabGlobal = function(tabId) {
+      // Auto-close settings if navigating via tabs
+      var settModal = document.getElementById("settings-modal");
+      if (settModal && !settModal.classList.contains("hidden")) {
+        settModal.classList.add("hidden");
+        settModal.classList.remove("flex");
+        document.body.style.overflow = "";
+      }
+      var settTab = document.getElementById("mobile-tab-settings");
+      if (settTab) {
+        settTab.className = "flex flex-col items-center gap-1 text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer";
+      }
+
       var drawer = document.getElementById("notifications-desktop-drawer");
       if (drawer && tabId !== "notifications") {
         drawer.classList.add("-translate-x-full");
@@ -1507,6 +1519,17 @@
         document.body.style.overflow = "hidden";
       }
 
+      // Update mobile bottom tab highlighting for settings
+      var settTab = document.getElementById("mobile-tab-settings");
+      if (settTab) {
+        settTab.className = "flex flex-col items-center gap-1 text-zinc-950 dark:text-white transition cursor-pointer font-bold";
+      }
+      var tabs = ["feed", "community", "create", "my-activities", "profile"];
+      for (var i = 0; i < tabs.length; i++) {
+        var tb = document.getElementById("mobile-tab-" + tabs[i]);
+        if (tb) tb.className = "flex flex-col items-center gap-1 text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer";
+      }
+
       // Hydrate privacy and preference toggles from stored settings and session
       try {
         var prefs = JSON.parse(localStorage.getItem("unisport_app_preferences") || "{}");
@@ -1536,6 +1559,12 @@
         modal.classList.remove("flex");
       }
       document.body.style.overflow = "";
+
+      // Reset mobile settings tab styling
+      var settTab = document.getElementById("mobile-tab-settings");
+      if (settTab) {
+        settTab.className = "flex flex-col items-center gap-1 text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer";
+      }
     };
 
     window.handleSignOutGlobal = async function() {
@@ -2289,7 +2318,7 @@
   </main>
 
   <!-- Mobile Bottom Nav -->
-  <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/90 dark:bg-black/90 backdrop-blur-md border-t border-zinc-100 dark:border-zinc-900 px-4 py-2.5 flex items-center justify-around text-xs">
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md border-t border-zinc-100 dark:border-zinc-900 px-4 py-2.5 flex items-center justify-around text-xs shadow-lg">
     <button id="mobile-tab-feed" onclick="window.switchTabGlobal('feed')" class="flex flex-col items-center gap-1 text-zinc-950 dark:text-white transition cursor-pointer">
       <i data-lucide="compass" class="w-4 h-4"></i>
       <span class="text-[10px] font-semibold">Feed</span>
@@ -2319,34 +2348,29 @@
   <!-- Full-Screen Settings Menu (App, Privacy & Account Preferences) -->
   <div 
     id="settings-modal" 
-    class="hidden fixed inset-0 z-50 bg-white dark:bg-zinc-950 flex flex-col overflow-y-auto animate-in fade-in duration-150"
+    class="hidden fixed inset-0 pb-16 md:pb-0 z-30 bg-white dark:bg-zinc-950 flex flex-col overflow-y-auto animate-in fade-in duration-150"
     role="dialog"
     aria-modal="true"
     aria-label="Settings"
   >
     <!-- Full-Screen Sticky Header -->
     <header class="sticky top-0 z-20 px-6 py-4 border-b border-zinc-100 dark:border-zinc-800/80 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md flex items-center justify-between shrink-0">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-2xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center text-zinc-950 dark:text-white shrink-0">
-          <i data-lucide="settings" class="w-5 h-5"></i>
-        </div>
-        <div>
-          <h2 class="text-xl sm:text-2xl font-black tracking-tight text-zinc-950 dark:text-white">Settings</h2>
-          <p class="text-xs text-zinc-500">Preferences, privacy & account</p>
-        </div>
+      <div>
+        <h2 class="text-xl sm:text-2xl font-black tracking-tight text-zinc-950 dark:text-white">Settings</h2>
+        <p class="text-xs text-zinc-500">Preferences, privacy & account</p>
       </div>
       <button 
-        id="settings-modal-close" 
+        id="settings-modal-save" 
         onclick="window.closeSettingsGlobal();" 
-        class="p-2.5 rounded-2xl hover:bg-zinc-100 dark:hover:bg-zinc-900 text-zinc-500 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer select-none" 
-        aria-label="Close Settings"
+        class="px-5 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 font-bold text-xs transition cursor-pointer select-none" 
+        aria-label="Save Settings"
       >
-        <i data-lucide="x" class="w-6 h-6"></i>
+        Save
       </button>
     </header>
 
     <!-- Scrollable Full-Screen Settings Content -->
-    <div class="max-w-3xl w-full mx-auto px-6 py-6 sm:py-8 space-y-6 flex-1 text-xs sm:text-sm">
+    <div class="max-w-3xl w-full mx-auto px-6 py-6 sm:py-8 pb-28 space-y-6 flex-1 text-xs sm:text-sm">
       
       <!-- SECTION 1: APPEARANCE & LOCALIZATION -->
       <div class="space-y-3">
@@ -2482,44 +2506,41 @@
         </div>
       </div>
 
-      <!-- SECTION 5: DANGER ZONE -->
-      <div class="space-y-3 pt-2">
-        <h4 class="text-xs font-bold text-red-500 uppercase tracking-wider">Danger Zone</h4>
-        
-        <div class="p-4 sm:p-5 rounded-2xl border border-red-200 dark:border-red-950/60 bg-red-50/40 dark:bg-red-950/10 space-y-4">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <p class="font-bold text-red-600 dark:text-red-400">Delete Account</p>
-              <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Permanently erase your student profile, mascot preferences, and match memberships. This action cannot be reversed.</p>
+      <!-- SECTION 5: ACCOUNT ACTIONS & DANGER ZONE -->
+      <div class="space-y-4 pt-2">
+        <!-- Sign Out Button (Above Delete Account) -->
+        <div class="p-4 sm:p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <p class="font-bold text-zinc-950 dark:text-white">Session & Sign Out</p>
+            <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">End your current session on this device.</p>
+          </div>
+          <button 
+            onclick="window.handleSignOutGlobal()" 
+            class="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-red-200 dark:border-red-900/60 hover:bg-red-50 dark:hover:bg-red-950/40 text-red-600 dark:text-red-400 font-bold text-xs transition cursor-pointer self-start sm:self-auto shrink-0 shadow-sm"
+          >
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+            <span>Sign Out</span>
+          </button>
+        </div>
+
+        <div class="space-y-3">
+          <h4 class="text-xs font-bold text-red-500 uppercase tracking-wider">Danger Zone</h4>
+          
+          <div class="p-4 sm:p-5 rounded-2xl border border-red-200 dark:border-red-950/60 bg-red-50/40 dark:bg-red-950/10 space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <p class="font-bold text-red-600 dark:text-red-400">Delete Account</p>
+                <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Permanently erase your student profile, mascot preferences, and match memberships. This action cannot be reversed.</p>
+              </div>
+              <button id="settings-delete-account-btn" onclick="window.deleteAccountGlobal()" class="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs transition cursor-pointer self-start sm:self-auto shrink-0 shadow-sm">
+                Delete Account
+              </button>
             </div>
-            <button id="settings-delete-account-btn" onclick="window.deleteAccountGlobal()" class="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs transition cursor-pointer self-start sm:self-auto shrink-0 shadow-sm">
-              Delete Account
-            </button>
           </div>
         </div>
       </div>
 
     </div>
-
-    <!-- Sticky Bottom Actions Bar -->
-    <footer class="sticky bottom-0 z-20 px-6 py-4 border-t border-zinc-100 dark:border-zinc-800/80 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md shrink-0">
-      <div class="max-w-3xl w-full mx-auto flex items-center justify-between gap-4">
-        <button 
-          onclick="window.handleSignOutGlobal()" 
-          class="flex items-center gap-2 px-4 py-2.5 rounded-xl hover:bg-red-50 dark:hover:bg-red-950/40 text-red-600 dark:text-red-400 font-bold text-xs transition cursor-pointer"
-        >
-          <i data-lucide="log-out" class="w-4 h-4"></i>
-          <span>Sign Out</span>
-        </button>
-        <button 
-          id="settings-modal-done" 
-          onclick="window.closeSettingsGlobal();" 
-          class="px-6 py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 font-bold text-xs transition cursor-pointer"
-        >
-          Done
-        </button>
-      </div>
-    </footer>
   </div>
 
   <!-- Roster Modal (Clean Uber Style) -->

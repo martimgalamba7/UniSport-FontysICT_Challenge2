@@ -1152,6 +1152,7 @@ export function openSettingsModal() {
 
 function setupSettingsModal() {
   const modal = document.getElementById("settings-modal");
+  const saveBtn = document.getElementById("settings-modal-save");
   const closeBtn = document.getElementById("settings-modal-close");
   const doneBtn = document.getElementById("settings-modal-done");
   const clearCacheBtn = document.getElementById("settings-clear-cache-btn");
@@ -1233,6 +1234,7 @@ function setupSettingsModal() {
     }
     document.body.style.overflow = "";
   };
+  if (saveBtn) saveBtn.addEventListener("click", close);
   if (closeBtn) closeBtn.addEventListener("click", close);
   if (doneBtn) doneBtn.addEventListener("click", close);
 }
