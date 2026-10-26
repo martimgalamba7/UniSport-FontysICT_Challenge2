@@ -110,7 +110,7 @@
       emailEl.textContent = `${session.email} • ${session.university || 'Eindhoven'}`;
 
       const avatar = getAvatarById(session.avatarId || "bolt");
-      avatarInner.className = `w-full h-full rounded-full bg-gradient-to-tr ${avatar.bg} flex items-center justify-center text-white`;
+      avatarInner.className = `w-full h-full rounded-full overflow-hidden bg-gradient-to-tr ${avatar.bg} flex items-center justify-center text-white`;
       avatarInner.innerHTML = avatar.svg;
 
       // Auto redirect after 2.5 seconds

@@ -1372,37 +1372,70 @@ export function clearAllNotifsGlobal() {
 }
 
 export async function fetchCampusStudents() {
-  // If Firebase Auth is initializing, wait for it so request.auth is populated for Firestore rules
-  if (auth && typeof auth.authStateReady === "function") {
-    try {
-      await auth.authStateReady();
-    } catch(e) {}
-  }
-
   const currentUid = state.currentUser?.uid || (getActiveSession() || {}).uid;
   const currentSession = getActiveSession() || state.currentUser || {};
   let remoteStudents = [];
 
+  // 1. Direct REST fetch from Firestore so it never blocks on SDK WebChannel or authStateReady
+  try {
+    const restUrl = `https://firestore.googleapis.com/v1/projects/fontys-unisport/databases/(default)/documents/users?pageSize=100&_t=${Date.now()}`;
+    const res = await fetch(restUrl, { cache: "no-store" });
+    if (res.ok) {
+      const json = await res.json();
+      if (json && Array.isArray(json.documents)) {
+        json.documents.forEach(doc => {
+          const uid = (doc.name || "").split("/").pop();
+          if (!uid) return;
+          const f = doc.fields || {};
+          const isSelf = uid === currentUid;
+          const dEmail = (f.email && f.email.stringValue) ? f.email.stringValue : (isSelf ? (currentSession.email || "") : "");
+          const dName = (f.displayName && f.displayName.stringValue) ? f.displayName.stringValue : (dEmail ? dEmail.split("@")[0] : (isSelf ? currentSession.displayName : "Student")) || "Student";
+          let avId = (f.avatarId && f.avatarId.stringValue) ? f.avatarId.stringValue : (isSelf ? (currentSession.avatarId || "footballer") : "footballer");
+          if (!["bodybuilder", "footballer", "runner"].includes(avId)) avId = "footballer";
+          const sport = (f.sport && f.sport.stringValue) ? f.sport.stringValue : "Football";
+          const sessCnt = (f.sessionsCount && f.sessionsCount.integerValue) ? parseInt(f.sessionsCount.integerValue, 10) : 3;
+
+          remoteStudents.push({
+            uid,
+            isSelf,
+            displayName: dName,
+            email: dEmail,
+            university: (f.university && f.university.stringValue) ? f.university.stringValue : (dEmail.endsWith("@student.tue.nl") ? "TU Eindhoven" : "Fontys UAS"),
+            avatarId: avId,
+            sport,
+            location: (f.location && f.location.stringValue) ? f.location.stringValue : "Eindhoven Campus",
+            sports: [sport],
+            sessionsCount: sessCnt
+          });
+        });
+      }
+    }
+  } catch (restErr) {
+    console.warn("[UniSport Firestore REST] fallback:", restErr);
+  }
+
+  // 2. Also query via Firebase SDK getDocs and merge
   try {
     const snap = await getDocs(collection(db, "users"));
     console.log("[UniSport Firestore] Users snapshot count:", snap.size);
     snap.forEach(docSnap => {
       const data = docSnap.data();
       const isSelf = docSnap.id === currentUid;
-      // Real Firestore data takes precedence
       const dName = data.displayName || (data.email ? data.email.split("@")[0] : (isSelf ? currentSession.displayName : "Student")) || "Student";
       const dEmail = data.email || (isSelf ? currentSession.email : "") || "";
+      let avId = data.avatarId || (isSelf ? (currentSession.avatarId || "footballer") : "footballer");
+      if (!["bodybuilder", "footballer", "runner"].includes(avId)) avId = "footballer";
       remoteStudents.push({
         uid: docSnap.id,
         isSelf: isSelf,
         displayName: dName,
         email: dEmail,
         university: data.university || (dEmail.endsWith("@student.tue.nl") ? "TU Eindhoven" : "Fontys UAS"),
-        avatarId: data.avatarId || (isSelf ? (currentSession.avatarId || "footballer") : "footballer"),
+        avatarId: avId,
         sport: data.sport || "Football",
         location: data.location || "Eindhoven Campus",
         sports: data.sports || [data.sport || "Football"],
-        sessionsCount: data.sessionsCount || Math.floor(Math.random() * 15) + 2
+        sessionsCount: data.sessionsCount || 3
       });
     });
   } catch(e) {
@@ -1411,13 +1444,15 @@ export async function fetchCampusStudents() {
 
   // Ensure current logged-in user is in directory if not returned by Firestore query yet
   if (currentSession && currentSession.uid && !remoteStudents.some(s => s.uid === currentSession.uid)) {
+    let selfAv = currentSession.avatarId || "footballer";
+    if (!["bodybuilder", "footballer", "runner"].includes(selfAv)) selfAv = "footballer";
     remoteStudents.push({
       uid: currentSession.uid,
       isSelf: true,
       displayName: currentSession.displayName || "Student",
       email: currentSession.email || "",
       university: currentSession.university || "Fontys UAS",
-      avatarId: currentSession.avatarId || "footballer",
+      avatarId: selfAv,
       sport: currentSession.sport || "Football",
       location: "Eindhoven Campus",
       sports: [currentSession.sport || "Football"],
@@ -1434,6 +1469,7 @@ export async function fetchCampusStudents() {
   });
 
   state.students = Array.from(map.values());
+  window.__FIRESTORE_STUDENTS__ = state.students;
   try {
     localStorage.setItem("unisport_students_cache", JSON.stringify(state.students));
   } catch(e) {}
@@ -1456,29 +1492,33 @@ export function listenToCampusStudents() {
         const isSelf = docSnap.id === currentUid;
         const dName = data.displayName || (data.email ? data.email.split("@")[0] : (isSelf ? currentSession.displayName : "Student")) || "Student";
         const dEmail = data.email || (isSelf ? currentSession.email : "") || "";
+        let avId = data.avatarId || (isSelf ? (currentSession.avatarId || "footballer") : "footballer");
+        if (!["bodybuilder", "footballer", "runner"].includes(avId)) avId = "footballer";
         remote.push({
           uid: docSnap.id,
           isSelf: isSelf,
           displayName: dName,
           email: dEmail,
           university: data.university || (dEmail.endsWith("@student.tue.nl") ? "TU Eindhoven" : "Fontys UAS"),
-          avatarId: data.avatarId || (isSelf ? (currentSession.avatarId || "footballer") : "footballer"),
+          avatarId: avId,
           sport: data.sport || "Football",
           location: data.location || "Eindhoven Campus",
           sports: data.sports || [data.sport || "Football"],
-          sessionsCount: data.sessionsCount || Math.floor(Math.random() * 15) + 2
+          sessionsCount: data.sessionsCount || 3
         });
       });
 
       // Ensure logged-in user is included
       if (currentSession && currentSession.uid && !remote.some(s => s.uid === currentSession.uid)) {
+        let selfAv = currentSession.avatarId || "footballer";
+        if (!["bodybuilder", "footballer", "runner"].includes(selfAv)) selfAv = "footballer";
         remote.push({
           uid: currentSession.uid,
           isSelf: true,
           displayName: currentSession.displayName || "Student",
           email: currentSession.email || "",
           university: currentSession.university || "Fontys UAS",
-          avatarId: currentSession.avatarId || "footballer",
+          avatarId: selfAv,
           sport: currentSession.sport || "Football",
           location: "Eindhoven Campus",
           sports: [currentSession.sport || "Football"],
@@ -1494,6 +1534,7 @@ export function listenToCampusStudents() {
       });
 
       state.students = Array.from(map.values());
+      window.__FIRESTORE_STUDENTS__ = state.students;
       try {
         localStorage.setItem("unisport_students_cache", JSON.stringify(state.students));
       } catch(e) {}
@@ -1515,6 +1556,14 @@ export function renderCommunity() {
   const countFriends = document.getElementById("community-friends-count");
   if (countFriends) countFriends.textContent = (state.friends || []).length;
   if (!container) return;
+
+  // Merge any direct REST-fetched students so state.students is never missing accounts
+  if (Array.isArray(window.__FIRESTORE_STUDENTS__) && window.__FIRESTORE_STUDENTS__.length > 0) {
+    const mergedMap = new Map();
+    window.__FIRESTORE_STUDENTS__.forEach(s => { if (s && s.uid) mergedMap.set(s.uid, s); });
+    (state.students || []).forEach(s => { if (s && s.uid) mergedMap.set(s.uid, s); });
+    state.students = Array.from(mergedMap.values());
+  }
 
   let list = [...(state.students || [])];
 

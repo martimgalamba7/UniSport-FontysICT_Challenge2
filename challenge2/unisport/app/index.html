@@ -541,7 +541,12 @@
         if (typeof window.renderCommunityInstant === "function") {
           window.renderCommunityInstant();
         }
-        if (window.UniSport && typeof window.UniSport.renderCommunity === "function") {
+        if (typeof window.fetchStudentsDirectFromFirestore === "function") {
+          window.fetchStudentsDirectFromFirestore();
+        }
+        if (window.UniSport && typeof window.UniSport.fetchCampusStudents === "function") {
+          window.UniSport.fetchCampusStudents();
+        } else if (window.UniSport && typeof window.UniSport.renderCommunity === "function") {
           window.UniSport.renderCommunity();
         }
       }
@@ -608,11 +613,76 @@
 
     // Empty seed list - Only real Firestore users are displayed
     window.CAMPUS_STUDENTS_SEED = [];
+    window.__FIRESTORE_STUDENTS__ = [];
 
     window.communityStateInline = {
       searchQuery: "",
       uniFilter: "all",
       view: "all"
+    };
+
+    // Direct, zero-dependency REST fetch from Cloud Firestore (fontys-unisport)
+    window.fetchStudentsDirectFromFirestore = async function() {
+      try {
+        var url = "https://firestore.googleapis.com/v1/projects/fontys-unisport/databases/(default)/documents/users?pageSize=100&_t=" + Date.now();
+        var res = await fetch(url, { cache: "no-store" });
+        if (!res.ok) return;
+        var data = await res.json();
+        if (!data || !Array.isArray(data.documents)) return;
+
+        var currentUid = null;
+        try {
+          var rawSess = localStorage.getItem("unisport_active_session");
+          if (rawSess) currentUid = JSON.parse(rawSess).uid;
+        } catch(e) {}
+
+        var remoteStudents = [];
+        for (var i = 0; i < data.documents.length; i++) {
+          var doc = data.documents[i];
+          var uid = (doc.name || "").split("/").pop();
+          if (!uid || uid.startsWith("demo-") || uid.includes("-rep") || uid === "climb-lover" || uid === "gym-bro") continue;
+
+          var f = doc.fields || {};
+          var email = (f.email && f.email.stringValue) ? f.email.stringValue : "";
+          var displayName = (f.displayName && f.displayName.stringValue) ? f.displayName.stringValue : (email ? email.split("@")[0] : "Student");
+          var university = (f.university && f.university.stringValue) ? f.university.stringValue : (email.indexOf("tue.nl") !== -1 ? "TU Eindhoven" : "Fontys UAS");
+          var avId = (f.avatarId && f.avatarId.stringValue) ? f.avatarId.stringValue : "footballer";
+          if (avId !== "bodybuilder" && avId !== "footballer" && avId !== "runner") {
+            avId = "footballer";
+          }
+          var sport = (f.sport && f.sport.stringValue) ? f.sport.stringValue : "Football";
+          var location = (f.location && f.location.stringValue) ? f.location.stringValue : "Eindhoven Campus";
+          var sessionsCount = (f.sessionsCount && f.sessionsCount.integerValue) ? parseInt(f.sessionsCount.integerValue, 10) : 3;
+
+          remoteStudents.push({
+            uid: uid,
+            isSelf: uid === currentUid,
+            displayName: displayName,
+            email: email,
+            university: university,
+            avatarId: avId,
+            sport: sport,
+            location: location,
+            sports: [sport],
+            sessionsCount: sessionsCount
+          });
+        }
+
+        if (remoteStudents.length > 0) {
+          window.__FIRESTORE_STUDENTS__ = remoteStudents;
+          try {
+            localStorage.setItem("unisport_students_cache", JSON.stringify(remoteStudents));
+          } catch(e) {}
+          if (typeof window.renderCommunityInstant === "function") {
+            window.renderCommunityInstant();
+          }
+          if (window.UniSport && typeof window.UniSport.renderCommunity === "function") {
+            try { window.UniSport.renderCommunity(); } catch(e) {}
+          }
+        }
+      } catch(err) {
+        console.warn("Direct Firestore student fetch error:", err);
+      }
     };
 
     // Instant standalone community renderer that NEVER relies on external module timing
@@ -639,11 +709,21 @@
       var countFriends = document.getElementById("community-friends-count");
       if (countFriends) countFriends.textContent = friends.length;
 
-      // Combine cached students from Firestore and current session
+      // Combine live Firestore students, cached students, and current session
       var list = [];
       var seenUids = {};
 
-      // 1. First add any cached remote students retrieved from Firestore
+      // 0. First add live in-memory Firestore students if fetched
+      if (Array.isArray(window.__FIRESTORE_STUDENTS__)) {
+        window.__FIRESTORE_STUDENTS__.forEach(function(cs) {
+          if (cs && cs.uid && !seenUids[cs.uid] && !cs.uid.startsWith("demo-") && !cs.uid.includes("-rep") && cs.uid !== "climb-lover" && cs.uid !== "gym-bro") {
+            list.push(Object.assign({}, cs, { isSelf: cs.uid === currentUid }));
+            seenUids[cs.uid] = true;
+          }
+        });
+      }
+
+      // 1. Add any cached remote students retrieved from Firestore
       try {
         var rawCache = localStorage.getItem("unisport_students_cache");
         if (rawCache) {
@@ -661,6 +741,8 @@
 
       // 2. Ensure current session user is included with up-to-date email and info
       if (currentSession && currentSession.uid) {
+        var sessAv = currentSession.avatarId || "footballer";
+        if (sessAv !== "bodybuilder" && sessAv !== "footballer" && sessAv !== "runner") sessAv = "footballer";
         if (!seenUids[currentSession.uid]) {
           list.push({
             uid: currentSession.uid,
@@ -668,7 +750,7 @@
             displayName: currentSession.displayName || "Student",
             email: currentSession.email || "",
             university: currentSession.university || "Fontys UAS",
-            avatarId: currentSession.avatarId || "footballer",
+            avatarId: sessAv,
             sport: currentSession.sport || "Football",
             location: "Eindhoven Campus",
             sports: [currentSession.sport || "Football"],
@@ -682,11 +764,15 @@
               if (currentSession.email) item.email = currentSession.email;
               if (currentSession.displayName) item.displayName = currentSession.displayName;
               if (currentSession.university) item.university = currentSession.university;
-              if (currentSession.avatarId) item.avatarId = currentSession.avatarId;
+              if (currentSession.avatarId) item.avatarId = sessAv;
             }
           });
         }
       }
+
+      // Update total student counter before filtering
+      var statStudents = document.getElementById("community-stat-students");
+      if (statStudents) statStudents.textContent = list.length + "+";
 
       // Filter by view
       if (window.communityStateInline.view === "friends") {
@@ -724,9 +810,6 @@
         return;
       }
 
-      var statStudents = document.getElementById("community-stat-students");
-      if (statStudents) statStudents.textContent = list.length + "+";
-
       var html = "";
       for (var i = 0; i < list.length; i++) {
         var student = list[i];
@@ -735,12 +818,15 @@
         var isTue = (student.university || "").indexOf("TU") !== -1 || (student.email || "").indexOf("tue.nl") !== -1;
         var sports = student.sports || [student.sport || "Football"];
         var avId = student.avatarId || "footballer";
+        if (avId !== "bodybuilder" && avId !== "footballer" && avId !== "runner") {
+          avId = "footballer";
+        }
 
         html += '<div class="p-4 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-5 transition hover:bg-zinc-50/70 dark:hover:bg-zinc-800/40">' +
           '<div class="flex items-center gap-4 min-w-0">' +
             '<div class="relative shrink-0 cursor-pointer" onclick="window.openStudentProfileModal(\'' + student.uid + '\')">' +
               '<div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl overflow-hidden border border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-white shadow-sm">' +
-                '<img src="./assets/avatars/' + avId + '.png" class="w-full h-full object-cover" onerror="this.src=\'./assets/avatars/footballer.png\'" />' +
+                '<img src="./assets/avatars/' + avId + '.png" class="w-full h-full object-cover" onerror="this.onerror=null;this.src=\'/challenge2/unisport/app/assets/avatars/' + avId + '.png\'" />' +
               '</div>' +
               '<span class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white dark:border-zinc-900 shadow-sm" title="Active Verified Student"></span>' +
             '</div>' +
@@ -803,6 +889,72 @@
       }
     };
 
+    // Trigger immediate direct Firestore fetch on page load
+    window.fetchStudentsDirectFromFirestore();
+
+    // Standalone inline fallbacks for Profile Modal & Connect/Remove Friend
+    window.openStudentProfileModal = function(uid) {
+      if (window.UniSport && typeof window.UniSport.openStudentProfileModal === "function") {
+        window.UniSport.openStudentProfileModal(uid);
+        return;
+      }
+      var modal = document.getElementById("student-profile-modal");
+      if (!modal) return;
+      var list = (window.__FIRESTORE_STUDENTS__ || []).slice();
+      try {
+        var rawCache = localStorage.getItem("unisport_students_cache");
+        if (rawCache) list = list.concat(JSON.parse(rawCache));
+      } catch(e) {}
+      var student = null;
+      for (var i = 0; i < list.length; i++) {
+        if (list[i] && list[i].uid === uid) { student = list[i]; break; }
+      }
+      if (!student) return;
+      var avId = student.avatarId || "footballer";
+      if (avId !== "bodybuilder" && avId !== "footballer" && avId !== "runner") avId = "footballer";
+      var nameEl = document.getElementById("view-profile-name");
+      var emailEl = document.getElementById("view-profile-email");
+      var uniEl = document.getElementById("view-profile-uni");
+      var sportEl = document.getElementById("view-profile-sport");
+      var locEl = document.getElementById("view-profile-location");
+      var sessEl = document.getElementById("view-profile-sessions-count");
+      var avEl = document.getElementById("view-profile-avatar");
+      if (nameEl) nameEl.textContent = student.displayName || "Student";
+      if (emailEl) emailEl.textContent = student.email || "";
+      if (uniEl) uniEl.textContent = student.university || "Fontys UAS";
+      if (sportEl) sportEl.textContent = student.sport || "Football";
+      if (locEl) locEl.textContent = student.location || "Eindhoven Campus";
+      if (sessEl) sessEl.textContent = (student.sessionsCount || 3) + " matches";
+      if (avEl) avEl.innerHTML = '<img src="./assets/avatars/' + avId + '.png" class="w-full h-full object-cover" onerror="this.onerror=null;this.src=\'/challenge2/unisport/app/assets/avatars/' + avId + '.png\'" />';
+      modal.classList.remove("hidden");
+    };
+
+    window.toggleFriendship = function(uid) {
+      if (window.UniSport && typeof window.UniSport.toggleFriendship === "function") {
+        window.UniSport.toggleFriendship(uid);
+        return;
+      }
+      try {
+        var friends = JSON.parse(localStorage.getItem("unisport_friends") || "[]");
+        if (friends.indexOf(uid) === -1) friends.push(uid);
+        localStorage.setItem("unisport_friends", JSON.stringify(friends));
+        window.renderCommunityInstant();
+      } catch(e) {}
+    };
+
+    window.removeFriend = function(uid) {
+      if (window.UniSport && typeof window.UniSport.removeFriend === "function") {
+        window.UniSport.removeFriend(uid);
+        return;
+      }
+      try {
+        var friends = JSON.parse(localStorage.getItem("unisport_friends") || "[]");
+        friends = friends.filter(function(f) { return f !== uid; });
+        localStorage.setItem("unisport_friends", JSON.stringify(friends));
+        window.renderCommunityInstant();
+      } catch(e) {}
+    };
+
     // Instant filter & search implementations wired directly to renderCommunityInstant
     window.filterStudentsGlobal = function(val) {
       window.communityStateInline.searchQuery = (val || "").trim();
@@ -816,6 +968,9 @@
       var inp = document.getElementById("search-students");
       var val = inp ? inp.value : "";
       window.filterStudentsGlobal(val);
+      if (typeof window.fetchStudentsDirectFromFirestore === "function") {
+        window.fetchStudentsDirectFromFirestore();
+      }
       if (window.UniSport && typeof window.UniSport.fetchCampusStudents === "function") {
         try { window.UniSport.fetchCampusStudents(); } catch(e) {}
       }
@@ -1863,15 +2018,21 @@
     if (typeof window.renderCommunityInstant === "function") {
       window.renderCommunityInstant();
     }
+    if (typeof window.fetchStudentsDirectFromFirestore === "function") {
+      window.fetchStudentsDirectFromFirestore();
+    }
     document.addEventListener("DOMContentLoaded", function() {
       if (typeof window.renderCommunityInstant === "function") {
         window.renderCommunityInstant();
       }
+      if (typeof window.fetchStudentsDirectFromFirestore === "function") {
+        window.fetchStudentsDirectFromFirestore();
+      }
     });
   </script>
 
-  <!-- Application script entry -->
-  <script type="module" src="./app.js?v=20261026_01"></script>
+  <!-- Application script entry with path-resilient fallback -->
+  <script type="module" src="./app.js?v=20261026_02" onerror="var s=document.createElement('script');s.type='module';s.src='/challenge2/unisport/app/app.js?v=20261026_02';document.body.appendChild(s);"></script>
 
 </body>
 </html>

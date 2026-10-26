@@ -1,4 +1,3 @@
-// UniSport Authentication Engine: Standard Secure Email + Password
 import { 
   app, 
   auth, 
@@ -6,11 +5,13 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut, 
+  deleteUser,
   onAuthStateChanged,
   updateProfile,
   doc, 
   setDoc, 
   getDoc,
+  deleteDoc,
   collection,
   addDoc,
   updateDoc,
@@ -161,7 +162,7 @@ export async function loginStudentWithPassword(email, password) {
           email: user.email,
           displayName: user.displayName || emailVal.email.split("@")[0],
           university: emailVal.email.endsWith("@student.tue.nl") ? "TU Eindhoven" : "Fontys UAS",
-          avatarId: "bolt",
+          avatarId: "bodybuilder",
           sport: "Football",
           sports: ["Football"],
           socialPreference: ["Casual"],
@@ -181,7 +182,7 @@ export async function loginStudentWithPassword(email, password) {
       email: user.email,
       displayName: user.displayName || emailVal.email.split("@")[0],
       university: emailVal.email.endsWith("@student.tue.nl") ? "TU Eindhoven" : "Fontys UAS",
-      avatarId: "bolt",
+      avatarId: "bodybuilder",
       sport: "Football"
     };
 
@@ -225,12 +226,17 @@ export async function signOutStudent() {
 
 export async function getStudentProfile(uid) {
   const session = getActiveSession();
-  if (session && session.uid === uid) return session;
-
   try {
     const snap = await getDoc(doc(db, "users", uid));
-    if (snap.exists()) return snap.data();
-  } catch {}
+    if (snap.exists()) {
+      const data = snap.data();
+      const merged = { ...session, ...data, uid };
+      setActiveSession(merged);
+      return merged;
+    }
+  } catch (err) {
+    console.warn("getStudentProfile error:", err);
+  }
 
   return session;
 }
@@ -244,5 +250,30 @@ export async function updateStudentProfile(uid, profileData) {
     await setDoc(doc(db, "users", uid), profileData, { merge: true });
   } catch {}
 
+  return { success: true };
+}
+
+export async function deleteStudentAccount() {
+  const session = getActiveSession();
+  const uid = session?.uid || auth.currentUser?.uid;
+
+  try {
+    if (uid) {
+      try {
+        await deleteDoc(doc(db, "users", uid));
+      } catch (err) {
+        console.warn("Could not delete firestore user document:", err);
+      }
+    }
+
+    if (auth.currentUser) {
+      await deleteUser(auth.currentUser);
+    }
+  } catch (err) {
+    console.error("Account deletion error:", err);
+    throw err;
+  } finally {
+    setActiveSession(null);
+  }
   return { success: true };
 }
