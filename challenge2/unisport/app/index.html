@@ -2657,7 +2657,7 @@
       <!-- Drawer Header -->
       <header class="sticky top-0 z-10 px-6 py-4 border-b border-zinc-100 dark:border-zinc-800/80 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md flex items-center justify-between">
         <div>
-          <h3 class="text-lg font-extrabold text-zinc-950 dark:text-white">Deep Filters</h3>
+          <h3 class="text-lg font-extrabold text-zinc-950 dark:text-white">Filters</h3>
           <p class="text-xs text-zinc-500">Refine sessions by sport, date, university & price</p>
         </div>
         <button onclick="window.UniSport.closeFilterDrawer()" class="p-1.5 text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer">
@@ -2694,6 +2694,9 @@
             <button type="button" data-date-filter="today" onclick="window.UniSport.setDrawerDateFilter('today')" class="filter-date-btn px-3 py-2 rounded-xl text-xs font-semibold bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 transition cursor-pointer text-center">Today</button>
             <button type="button" data-date-filter="tomorrow" onclick="window.UniSport.setDrawerDateFilter('tomorrow')" class="filter-date-btn px-3 py-2 rounded-xl text-xs font-semibold bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 transition cursor-pointer text-center">Tomorrow</button>
             <button type="button" data-date-filter="weekend" onclick="window.UniSport.setDrawerDateFilter('weekend')" class="filter-date-btn px-3 py-2 rounded-xl text-xs font-semibold bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 transition cursor-pointer text-center">This Weekend</button>
+          </div>
+          <div class="pt-1">
+            <input type="date" id="filter-drawer-custom-date" onchange="window.UniSport.setDrawerDateFilter('custom')" class="w-full px-3.5 py-2 rounded-xl bg-zinc-100 dark:bg-zinc-900 border-0 text-xs text-zinc-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition" />
           </div>
         </div>
 
@@ -2963,7 +2966,7 @@
   </script>
 
   <!-- Application script entry with path-resilient fallback -->
-  <script type="module" src="./app.js?v=20261026_03" onerror="var s=document.createElement('script');s.type='module';s.src='/challenge2/unisport/app/app.js?v=20261026_03';document.body.appendChild(s);"></script>
+  <script type="module" src="./app.js?v=20261026_04" onerror="var s=document.createElement('script');s.type='module';s.src='/challenge2/unisport/app/app.js?v=20261026_04';document.body.appendChild(s);"></script>
 
 </body>
 </html>

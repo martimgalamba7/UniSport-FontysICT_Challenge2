@@ -59,6 +59,14 @@ window.UniSport.saveEditedActivity = saveEditedActivity;
 window.UniSport.kickParticipant = kickParticipant;
 window.openFilterDrawer = openFilterDrawer;
 window.closeFilterDrawer = closeFilterDrawer;
+window.setDrawerDateFilter = setDrawerDateFilter;
+window.setDrawerPriceFilter = setDrawerPriceFilter;
+window.applyFilterDrawer = applyFilterDrawer;
+window.resetFeedFilters = resetFeedFilters;
+window.openEditActivityModal = openEditActivityModal;
+window.closeEditActivityModal = closeEditActivityModal;
+window.saveEditedActivity = saveEditedActivity;
+window.kickParticipant = kickParticipant;
 
 // Expose global filter and social handlers immediately
 window.filterStudentsGlobal = function(val) {
@@ -121,7 +129,8 @@ const state = {
   // Feed Deep Filters & Pagination State
   feedFilters: {
     sport: "all",
-    date: "all", // "all" | "today" | "tomorrow" | "weekend"
+    date: "all", // "all" | "today" | "tomorrow" | "weekend" | "custom"
+    customDate: "",
     university: "all", // "all" | "Fontys" | "TU Eindhoven"
     price: "all", // "all" | "free" | "paid"
     location: ""
@@ -414,10 +423,37 @@ export function switchTab(targetTab) {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
+function getLocalDeletedActivityIds() {
+  try {
+    return JSON.parse(localStorage.getItem("unisport_deleted_activities") || "[]");
+  } catch (e) {
+    return [];
+  }
+}
+
+function markActivityDeletedLocally(activityId) {
+  try {
+    const list = getLocalDeletedActivityIds();
+    if (!list.includes(activityId)) {
+      list.push(activityId);
+      localStorage.setItem("unisport_deleted_activities", JSON.stringify(list));
+    }
+  } catch (e) {}
+}
+
 function isFakeActivity(id, data) {
   if (!id || String(id).startsWith("demo-")) return true;
   const fakeCreators = ["fontys-student-rep", "tue-runner-rep", "climb-lover", "gym-bro"];
   if (data && fakeCreators.includes(data.creatorId)) return true;
+  if (data && (data.isDeleted || data.cancelled)) return true;
+  if (getLocalDeletedActivityIds().includes(id)) return true;
+  // If host left the session (participants is empty or creatorId is not in participants), session is deleted
+  if (data && Array.isArray(data.participants)) {
+    if (data.participants.length === 0) return true;
+    if (data.creatorId && !data.participants.some(p => p && p.uid === data.creatorId)) {
+      return true;
+    }
+  }
   return false;
 }
 
@@ -436,7 +472,7 @@ async function fetchActivitiesDirectFromFirestore() {
       const id = (docObj.name || "").split("/").pop();
       const f = docObj.fields || {};
       const creatorId = f.creatorId?.stringValue || "";
-      if (isFakeActivity(id, { creatorId })) return;
+      const isDeletedFlag = !!(f.isDeleted?.booleanValue || f.cancelled?.booleanValue);
 
       const participants = [];
       if (f.participants?.arrayValue?.values) {
@@ -460,9 +496,18 @@ async function fetchActivitiesDirectFromFirestore() {
         });
       }
 
+      if (isFakeActivity(id, { creatorId, isDeleted: isDeletedFlag, participants })) {
+        // Also clean up orphaned/deleted activity in Firestore in background
+        if (creatorId && (!participants.length || !participants.some(p => p && p.uid === creatorId))) {
+          try { deleteDoc(doc(db, "activities", id)).catch(() => {}); } catch (e) {}
+        }
+        return;
+      }
+
       items.push({
         id,
         sport: f.sport?.stringValue || "Football",
+        creatorEmail: f.creatorEmail?.stringValue || "",
         title: f.title?.stringValue || "Campus Session",
         location: f.location?.stringValue || "Eindhoven",
         distance: f.distance?.stringValue || "Eindhoven Area",
@@ -556,15 +601,17 @@ export function renderFeed() {
   const paginationContainer = document.getElementById("feed-pagination-container");
   if (!container) return;
 
-  const nowMs = Date.now();
+  const nowAmsMs = getAmsterdamDate().getTime();
 
   // RULE 10: Eventos passados ou a correr atualmente não aparecem no feed.
-  // Session must strictly start in the future! (new Date(dateTime).getTime() > nowMs)
+  // Session must strictly start in the future (Amsterdam time) and not be deleted/orphaned
   let filtered = (state.activities || []).filter(a => {
+    if (!a || isFakeActivity(a.id, a)) return false;
     if (!a.dateTime) return false;
-    const startTime = new Date(a.dateTime).getTime();
-    if (isNaN(startTime)) return true;
-    return startTime > nowMs;
+    const parsed = parseAmsterdamDateTimeString(a.dateTime) || new Date(a.dateTime);
+    const startTime = parsed.getTime();
+    if (isNaN(startTime)) return false;
+    return startTime > nowAmsMs;
   });
 
   // Apply Search Query
@@ -578,10 +625,15 @@ export function renderFeed() {
     );
   }
 
-  // Apply Deep Filters
+  // Apply Filters
   const df = state.feedFilters || {};
   if (df.sport && df.sport !== "all") {
-    filtered = filtered.filter(a => (a.sport || "").toLowerCase() === df.sport.toLowerCase() || (a.sport || "").toLowerCase().includes(df.sport.toLowerCase()));
+    const standardSportsLower = ["football", "gym & fitness", "running", "basketball", "bouldering", "padel / tennis", "volleyball", "swimming", "cycling"];
+    if (df.sport === "Other") {
+      filtered = filtered.filter(a => !standardSportsLower.includes((a.sport || "").toLowerCase().trim()));
+    } else {
+      filtered = filtered.filter(a => (a.sport || "").toLowerCase() === df.sport.toLowerCase() || (a.sport || "").toLowerCase().includes(df.sport.toLowerCase()));
+    }
   }
   if (df.university && df.university !== "all") {
     const targetUni = df.university.toLowerCase();
@@ -601,22 +653,25 @@ export function renderFeed() {
   }
   if (df.location && df.location.trim()) {
     const locQ = df.location.toLowerCase().trim();
-    filtered = filtered.filter(a => (a.location || "").toLowerCase().includes(locQ));
+    filtered = filtered.filter(a => (a.location || "").toLowerCase().includes(locQ) || (a.title || "").toLowerCase().includes(locQ));
   }
   if (df.date && df.date !== "all") {
-    const now = new Date();
+    const now = getAmsterdamDate();
     const todayStr = now.toDateString();
-    const tomorrow = new Date(now.getTime() + 24 * 3600 * 1000);
+    const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
     const tomorrowStr = tomorrow.toDateString();
 
     filtered = filtered.filter(a => {
-      const d = new Date(a.dateTime);
+      const d = parseAmsterdamDateTimeString(a.dateTime) || new Date(a.dateTime);
       if (isNaN(d.getTime())) return false;
       if (df.date === "today") return d.toDateString() === todayStr;
       if (df.date === "tomorrow") return d.toDateString() === tomorrowStr;
       if (df.date === "weekend") {
         const day = d.getDay();
         return day === 0 || day === 6 || (day === 5 && d.getHours() >= 17);
+      }
+      if (df.date === "custom" && df.customDate) {
+        return String(a.dateTime || "").startsWith(df.customDate);
       }
       return true;
     });
@@ -660,7 +715,9 @@ export function renderFeed() {
     const max = parseInt(activity.maxParticipants, 10) || 10;
     const spotsLeft = Math.max(0, max - participants.length);
     const isFull = spotsLeft === 0;
-    const isJoined = state.currentUser && participants.some(p => p.uid === state.currentUser.uid);
+    const currentUid = state.currentUser?.uid || (getActiveSession() || {}).uid || "";
+    const isHost = isUserActivityHost(activity);
+    const isJoined = isHost || (currentUid && participants.some(p => p.uid === currentUid));
     const durationStr = formatDurationBadge(activity.durationMinutes);
     const isPaid = !!activity.isPaid && parseFloat(activity.price || 0) > 0;
     const priceDisplay = isPaid ? `€${parseFloat(activity.price).toFixed(2)}` : "Free";
@@ -711,9 +768,17 @@ export function renderFeed() {
           <!-- Roster Avatars (Google / Kick Style Icons) -->
           <div class="mb-4 pt-3 border-t border-zinc-100 dark:border-zinc-800">
             <div class="flex items-center justify-between text-xs mb-2">
-              <span class="font-semibold text-zinc-500">Roster (${participants.length}/${max})</span>
-              <button onclick="window.UniSport.openRosterModal('${activity.id}')" class="text-zinc-900 dark:text-white hover:underline text-[11px] font-semibold cursor-pointer">
-                View names &rarr;
+              <div class="flex items-center gap-1.5">
+                <span class="font-semibold text-zinc-500">Roster (${participants.length}/${max})</span>
+                ${isHost ? `
+                  <button onclick="window.UniSport.openEditActivityModal('${activity.id}')" class="px-2 py-0.5 rounded-md bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 text-[10px] font-bold transition hover:opacity-90 cursor-pointer" title="Edit Session">
+                    Edit
+                  </button>
+                ` : ''}
+              </div>
+              <button onclick="window.UniSport.openRosterModal('${activity.id}')" class="inline-flex items-center gap-1 text-zinc-900 dark:text-white hover:underline text-[11px] font-semibold cursor-pointer" title="View Participants">
+                <i data-lucide="users" class="w-3.5 h-3.5"></i>
+                <span>Participants</span>
               </button>
             </div>
             <div class="flex -space-x-1.5 overflow-hidden items-center">
@@ -887,10 +952,12 @@ export function openFilterDrawer() {
   const sportSel = document.getElementById("filter-drawer-sport");
   const uniSel = document.getElementById("filter-drawer-university");
   const locInp = document.getElementById("filter-drawer-location");
+  const customDateInp = document.getElementById("filter-drawer-custom-date");
 
   if (sportSel) sportSel.value = state.feedFilters.sport || "all";
   if (uniSel) uniSel.value = state.feedFilters.university || "all";
   if (locInp) locInp.value = state.feedFilters.location || "";
+  if (customDateInp) customDateInp.value = state.feedFilters.customDate || "";
 
   setDrawerDateFilter(state.feedFilters.date || "all", false);
   setDrawerPriceFilter(state.feedFilters.price || "all", false);
@@ -910,8 +977,15 @@ export function closeFilterDrawer() {
 }
 
 export function setDrawerDateFilter(dateVal, updateState = true) {
+  const customDateInp = document.getElementById("filter-drawer-custom-date");
   if (updateState) {
     state.feedFilters.date = dateVal;
+    if (dateVal !== "custom") {
+      state.feedFilters.customDate = "";
+      if (customDateInp) customDateInp.value = "";
+    } else if (customDateInp) {
+      state.feedFilters.customDate = customDateInp.value || "";
+    }
   }
   document.querySelectorAll("#filter-drawer-date-chips .filter-date-btn").forEach(btn => {
     if (btn.getAttribute("data-date-filter") === dateVal) {
@@ -939,10 +1013,15 @@ export function applyFilterDrawer() {
   const sportSel = document.getElementById("filter-drawer-sport");
   const uniSel = document.getElementById("filter-drawer-university");
   const locInp = document.getElementById("filter-drawer-location");
+  const customDateInp = document.getElementById("filter-drawer-custom-date");
 
   if (sportSel) state.feedFilters.sport = sportSel.value;
   if (uniSel) state.feedFilters.university = uniSel.value;
   if (locInp) state.feedFilters.location = locInp.value.trim();
+  if (customDateInp && customDateInp.value) {
+    state.feedFilters.date = "custom";
+    state.feedFilters.customDate = customDateInp.value;
+  }
 
   state.feedCurrentPage = 1;
   closeFilterDrawer();
@@ -953,6 +1032,7 @@ export function resetFeedFilters() {
   state.feedFilters = {
     sport: "all",
     date: "all",
+    customDate: "",
     university: "all",
     price: "all",
     location: ""
@@ -960,6 +1040,16 @@ export function resetFeedFilters() {
   state.searchQuery = "";
   const searchInput = document.getElementById("search-activities");
   if (searchInput) searchInput.value = "";
+  const sportSel = document.getElementById("filter-drawer-sport");
+  const uniSel = document.getElementById("filter-drawer-university");
+  const locInp = document.getElementById("filter-drawer-location");
+  const customDateInp = document.getElementById("filter-drawer-custom-date");
+  if (sportSel) sportSel.value = "all";
+  if (uniSel) uniSel.value = "all";
+  if (locInp) locInp.value = "";
+  if (customDateInp) customDateInp.value = "";
+  setDrawerDateFilter("all", false);
+  setDrawerPriceFilter("all", false);
   state.feedCurrentPage = 1;
   closeFilterDrawer();
   renderFeed();
@@ -980,7 +1070,7 @@ export function goToFeedPage(page) {
 
 // Amsterdam Timezone & Host Validation Helpers
 export function getAmsterdamDate() {
-  const amsString = new Intl.DateTimeFormat("en-US", {
+  const parts = new Intl.DateTimeFormat("en-GB", {
     timeZone: "Europe/Amsterdam",
     year: "numeric",
     month: "2-digit",
@@ -988,28 +1078,42 @@ export function getAmsterdamDate() {
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",
-    hour12: false
-  }).format(new Date());
-
-  const [datePart, timePart] = amsString.split(", ");
-  const [month, day, year] = datePart.split("/");
-  const [hour, minute, second] = timePart.split(":");
-  return new Date(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10), parseInt(hour, 10), parseInt(minute, 10), parseInt(second, 10));
+    hourCycle: "h23"
+  }).formatToParts(new Date());
+  const map = {};
+  parts.forEach(p => { map[p.type] = p.value; });
+  return new Date(
+    parseInt(map.year, 10),
+    parseInt(map.month, 10) - 1,
+    parseInt(map.day, 10),
+    parseInt(map.hour, 10),
+    parseInt(map.minute, 10),
+    parseInt(map.second || "0", 10)
+  );
 }
 
 export function parseAmsterdamDateTimeString(dtString) {
   if (!dtString) return null;
-  const [datePart, timePart] = dtString.split("T");
+  const [datePart, timePart] = String(dtString).split("T");
   if (!datePart || !timePart) return null;
   const [year, month, day] = datePart.split("-").map(n => parseInt(n, 10));
   const [hour, minute] = timePart.split(":").map(n => parseInt(n, 10));
-  return new Date(year, month - 1, day, hour, minute, 0);
+  if (isNaN(year) || isNaN(month) || isNaN(day) || isNaN(hour) || isNaN(minute)) return null;
+  return new Date(year, month - 1, day, hour, minute, 0, 0);
 }
 
 export function getAmsterdamMinDateTime() {
   const nowAms = getAmsterdamDate();
-  // Strictly at least 1 hour from current Amsterdam time
-  const minAms = new Date(nowAms.getTime() + 60 * 60 * 1000);
+  // Strictly at least 1 hour from current Amsterdam time (minute precision)
+  const minAms = new Date(
+    nowAms.getFullYear(),
+    nowAms.getMonth(),
+    nowAms.getDate(),
+    nowAms.getHours() + 1,
+    nowAms.getMinutes(),
+    0,
+    0
+  );
   const YYYY = minAms.getFullYear();
   const MM = String(minAms.getMonth() + 1).padStart(2, "0");
   const DD = String(minAms.getDate()).padStart(2, "0");
@@ -1026,7 +1130,8 @@ export function isUserActivityHost(activity) {
   const sess = getActiveSession() || {};
   const currentUid = state.currentUser?.uid || sess.uid || "";
   const currentEmail = (state.currentUser?.email || sess.email || "").toLowerCase().trim();
-  const currentName = (state.userProfile?.displayName || state.currentUser?.displayName || sess.name || "").toLowerCase().trim();
+  const currentEmailPrefix = currentEmail ? currentEmail.split("@")[0] : "";
+  const currentName = (state.userProfile?.displayName || state.currentUser?.displayName || sess.displayName || sess.name || currentEmailPrefix || "").toLowerCase().trim();
 
   const creatorId = String(activity.creatorId || "").trim();
   const creatorEmail = String(activity.creatorEmail || "").toLowerCase().trim();
@@ -1038,17 +1143,18 @@ export function isUserActivityHost(activity) {
   // 2. Direct Email match
   if (currentEmail && (creatorId.toLowerCase() === currentEmail || creatorEmail === currentEmail)) return true;
 
-  // 3. Name match if creatorId is missing or equals name
+  // 3. Name match
   if (currentName && creatorName && (creatorName === currentName || creatorId.toLowerCase() === currentName)) return true;
+  if (currentEmailPrefix && creatorName && creatorName === currentEmailPrefix) return true;
 
-  // 4. Check if current user is first participant (creator is always index 0)
+  // 4. First participant match (creator is always index 0)
   const participants = Array.isArray(activity.participants) ? activity.participants : [];
   if (participants.length > 0) {
     const firstP = participants[0];
     if (firstP) {
       if (currentUid && firstP.uid === currentUid) return true;
       if (currentEmail && firstP.email && firstP.email.toLowerCase() === currentEmail) return true;
-      if (currentName && firstP.name && firstP.name.toLowerCase() === currentName) return true;
+      if (currentName && firstP.name && firstP.name.toLowerCase().trim() === currentName) return true;
     }
   }
 
@@ -1098,7 +1204,10 @@ function setupCreateForm() {
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    if (!state.currentUser) {
+    const activeSess = getActiveSession() || {};
+    const creatorUid = state.currentUser?.uid || activeSess.uid;
+    const creatorEmail = state.currentUser?.email || activeSess.email || "";
+    if (!creatorUid) {
       window.location.href = "./login.html";
       return;
     }
@@ -1141,9 +1250,9 @@ function setupCreateForm() {
       return;
     }
 
-    const creatorName = state.userProfile?.displayName || state.currentUser.displayName || "Student";
-    const creatorUniversity = state.userProfile?.university || (state.currentUser.email.endsWith("@student.tue.nl") ? "TU Eindhoven" : "Fontys UAS");
-    const avatarId = state.userProfile?.avatarId || state.currentUser.avatarId || "bodybuilder";
+    const creatorName = state.userProfile?.displayName || state.currentUser?.displayName || activeSess.displayName || activeSess.name || (creatorEmail ? creatorEmail.split("@")[0] : "Student");
+    const creatorUniversity = state.userProfile?.university || activeSess.university || (creatorEmail.endsWith("@student.tue.nl") ? "TU Eindhoven" : "Fontys UAS");
+    const avatarId = state.userProfile?.avatarId || state.currentUser?.avatarId || activeSess.avatarId || "footballer";
 
     const newActivity = {
       sport,
@@ -1155,14 +1264,16 @@ function setupCreateForm() {
       isPaid: isPaid,
       price: priceVal,
       maxParticipants: maxParticipants || 10,
-      creatorId: state.currentUser.uid,
+      creatorId: creatorUid,
+      creatorEmail: creatorEmail,
       creatorName,
       creatorUniversity,
       description,
       kickedUids: [],
       participants: [
         {
-          uid: state.currentUser.uid,
+          uid: creatorUid,
+          email: creatorEmail,
           name: creatorName,
           university: creatorUniversity,
           avatarId: avatarId
@@ -1208,34 +1319,43 @@ export async function toggleJoinActivity(activityId) {
 
   if (isJoined) {
     if (isHost) {
-      const confirmDelete = confirm("You are the host of this session. Leaving will delete and cancel the session for all participants. Are you sure you want to delete this session?");
-      if (!confirmDelete) return;
+      // Mark deleted locally and remove from UI immediately
+      markActivityDeletedLocally(activityId);
+      state.activities = (state.activities || []).filter(a => a.id !== activityId);
+      renderFeed();
+      renderMyActivities();
 
+      // Delete document from Firestore (SDK + updateDoc fallback + REST DELETE)
       try {
         const actRef = doc(db, "activities", activityId);
         await deleteDoc(actRef);
       } catch (err) {
-        console.warn("Firestore deleteDoc error:", err);
+        try {
+          const actRef = doc(db, "activities", activityId);
+          await updateDoc(actRef, { isDeleted: true, cancelled: true, participants: [] });
+        } catch (e2) {}
       }
-
-      state.activities = (state.activities || []).filter(a => a.id !== activityId);
-      renderFeed();
-      renderMyActivities();
+      try {
+        await fetch(`https://firestore.googleapis.com/v1/projects/fontys-unisport/databases/(default)/documents/activities/${activityId}`, {
+          method: "DELETE"
+        });
+      } catch (e3) {}
       return;
     }
 
-    const currentParticipantObj = participants.find(p => p.uid === currentUid) || { uid: currentUid };
+    const updatedParticipants = participants.filter(p => p.uid !== currentUid);
+    activity.participants = updatedParticipants;
+    renderFeed();
+    renderMyActivities();
+
     try {
       const actRef = doc(db, "activities", activityId);
       await updateDoc(actRef, {
-        participants: arrayRemove(currentParticipantObj)
+        participants: updatedParticipants
       });
     } catch (err) {
-      console.warn("Firestore arrayRemove error:", err);
+      console.warn("Firestore leave update error:", err);
     }
-    activity.participants = participants.filter(p => p.uid !== currentUid);
-    renderFeed();
-    renderMyActivities();
     return;
   }
 
@@ -1273,9 +1393,10 @@ function renderMyActivities() {
   if (!container) return;
 
   const currentUid = state.currentUser?.uid || (getActiveSession() || {}).uid || "";
-  const nowMs = Date.now();
+  const nowMs = getAmsterdamDate().getTime();
 
   const myActivities = (state.activities || []).filter(a => {
+    if (!a || isFakeActivity(a.id, a)) return false;
     const isJoined = (a.participants || []).some(p => p.uid === currentUid);
     const isCreator = isUserActivityHost(a);
     return isJoined || isCreator;
@@ -1633,15 +1754,17 @@ export function openRosterModal(activityId) {
 
   if (!activity || !modal || !content) return;
 
-  const currentUid = state.currentUser?.uid || (getActiveSession() || {}).uid || "";
+  const sess = getActiveSession() || {};
+  const currentUid = state.currentUser?.uid || sess.uid || "";
+  const currentName = (state.userProfile?.displayName || state.currentUser?.displayName || sess.displayName || sess.name || "").toLowerCase().trim();
   const isHost = isUserActivityHost(activity);
 
   title.textContent = activity.title;
   const participants = activity.participants || [];
 
-  content.innerHTML = participants.map((p, idx) => {
+  let rowsHtml = participants.map((p, idx) => {
     const av = getAvatarById(p.avatarId || "bodybuilder");
-    const isMe = p.uid === currentUid;
+    const isMe = (currentUid && p.uid === currentUid) || (currentName && (p.name || "").toLowerCase().trim() === currentName);
     const isCreatorRow = (p.uid && p.uid === activity.creatorId) || idx === 0;
 
     return `
@@ -1672,6 +1795,16 @@ export function openRosterModal(activityId) {
     `;
   }).join('');
 
+  if (isHost && participants.length <= 1) {
+    rowsHtml += `
+      <div class="p-3 rounded-xl bg-zinc-50/70 dark:bg-zinc-900/40 border border-dashed border-zinc-200 dark:border-zinc-800 text-center">
+        <p class="text-[11px] text-zinc-500 dark:text-zinc-400">You are the host. When other students join this session, a <strong>Kick</strong> button will appear next to their name.</p>
+      </div>
+    `;
+  }
+
+  content.innerHTML = rowsHtml;
+
   modal.classList.remove("hidden");
   if (window.lucide && typeof window.lucide.createIcons === "function") {
     window.lucide.createIcons();
@@ -1685,29 +1818,26 @@ export async function kickParticipant(activityId, participantUid, participantNam
     return;
   }
 
-  const confirmed = confirm(`Are you sure you want to kick ${participantName} from ${activity.title}?`);
-  if (!confirmed) return;
+  const updatedParticipants = (activity.participants || []).filter(p => p.uid !== participantUid && p.name !== participantName);
+  const updatedKicked = Array.from(new Set([...(activity.kickedUids || []), participantUid]));
 
-  const targetParticipant = (activity.participants || []).find(p => p.uid === participantUid);
-  if (!targetParticipant) return;
-
-  try {
-    const actRef = doc(db, "activities", activityId);
-    await updateDoc(actRef, {
-      participants: arrayRemove(targetParticipant),
-      kickedUids: arrayUnion(participantUid)
-    });
-  } catch(e) {
-    console.warn("Firestore kick update notice:", e);
-  }
-
-  // Update local activity state
-  activity.participants = (activity.participants || []).filter(p => p.uid !== participantUid);
-  activity.kickedUids = [...(activity.kickedUids || []), participantUid];
+  // Update local activity state immediately
+  activity.participants = updatedParticipants;
+  activity.kickedUids = updatedKicked;
 
   openRosterModal(activityId);
   renderFeed();
   renderMyActivities();
+
+  try {
+    const actRef = doc(db, "activities", activityId);
+    await updateDoc(actRef, {
+      participants: updatedParticipants,
+      kickedUids: updatedKicked
+    });
+  } catch(e) {
+    console.warn("Firestore kick update notice:", e);
+  }
 }
 
 // Edit Session Modal Functions

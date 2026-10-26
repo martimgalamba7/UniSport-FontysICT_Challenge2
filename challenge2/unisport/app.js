@@ -1,6 +1,7 @@
 // UniSport App Main Logic - Clean Minimalist UI (No Emojis, Kick/Google Avatars, Auth Guard)
 import { 
-  auth, 
+  auth,
+  deleteDoc, 
   db, 
   collection, 
   doc, 
@@ -46,6 +47,26 @@ window.UniSport.declineFriendRequest = declineFriendRequest;
 window.UniSport.removeFriend = removeFriend;
 window.UniSport.syncSocialStateFromStorage = syncSocialStateFromStorage;
 window.UniSport.signOut = signOutStudent;
+window.UniSport.openFilterDrawer = openFilterDrawer;
+window.UniSport.closeFilterDrawer = closeFilterDrawer;
+window.UniSport.setDrawerDateFilter = setDrawerDateFilter;
+window.UniSport.setDrawerPriceFilter = setDrawerPriceFilter;
+window.UniSport.applyFilterDrawer = applyFilterDrawer;
+window.UniSport.resetFeedFilters = resetFeedFilters;
+window.UniSport.openEditActivityModal = openEditActivityModal;
+window.UniSport.closeEditActivityModal = closeEditActivityModal;
+window.UniSport.saveEditedActivity = saveEditedActivity;
+window.UniSport.kickParticipant = kickParticipant;
+window.openFilterDrawer = openFilterDrawer;
+window.closeFilterDrawer = closeFilterDrawer;
+window.setDrawerDateFilter = setDrawerDateFilter;
+window.setDrawerPriceFilter = setDrawerPriceFilter;
+window.applyFilterDrawer = applyFilterDrawer;
+window.resetFeedFilters = resetFeedFilters;
+window.openEditActivityModal = openEditActivityModal;
+window.closeEditActivityModal = closeEditActivityModal;
+window.saveEditedActivity = saveEditedActivity;
+window.kickParticipant = kickParticipant;
 
 // Expose global filter and social handlers immediately
 window.filterStudentsGlobal = function(val) {
@@ -104,6 +125,18 @@ const state = {
   filterSport: "all",
   searchQuery: "",
   selectedActivity: null,
+
+  // Feed Deep Filters & Pagination State
+  feedFilters: {
+    sport: "all",
+    date: "all", // "all" | "today" | "tomorrow" | "weekend" | "custom"
+    customDate: "",
+    university: "all", // "all" | "Fontys" | "TU Eindhoven"
+    price: "all", // "all" | "free" | "paid"
+    location: ""
+  },
+  feedPageSize: 9, // starts at 9 (3x3), can expand to 30 (3x10) or paginate
+  feedCurrentPage: 1,
   
   // Social & Community State
   students: [],
@@ -128,6 +161,8 @@ export const SPORTS_CONFIG = {
   "Padel": { badge: "bg-lime-500/10 text-lime-700 dark:text-lime-400 border-lime-500/20" },
   "Padel / Tennis": { badge: "bg-lime-500/10 text-lime-700 dark:text-lime-400 border-lime-500/20" },
   "Volleyball": { badge: "bg-pink-500/10 text-pink-700 dark:text-pink-400 border-pink-500/20" },
+  "Swimming": { badge: "bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 border-cyan-500/20" },
+  "Cycling": { badge: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20" },
   "Other": { badge: "bg-zinc-500/10 text-zinc-700 dark:text-zinc-300 border-zinc-500/20" }
 };
 
@@ -218,12 +253,10 @@ function updateAuthUI(user, profile) {
       navAuthBtn.style.setProperty("display", "none", "important");
     }
 
-    // Force show Google-style circular avatar in top right
-    if (googleAvatarBtn && avatarInner) {
-      avatarInner.className = `w-full h-full rounded-full overflow-hidden bg-gradient-to-tr ${avatar.bg} flex items-center justify-center text-white`;
-      avatarInner.innerHTML = `<img src="${avatar.image}" alt="${avatar.name}" class="w-full h-full object-cover rounded-full" onerror="this.src='./assets/avatars/footballer.png'" />`;
-      googleAvatarBtn.classList.remove("hidden");
-      googleAvatarBtn.style.setProperty("display", "inline-flex", "important");
+    // Mobile avatar circle removed per user request
+    if (googleAvatarBtn) {
+      googleAvatarBtn.classList.add("hidden");
+      googleAvatarBtn.style.setProperty("display", "none", "important");
     }
 
     if (userDropdown) {
@@ -231,12 +264,23 @@ function updateAuthUI(user, profile) {
       const dropEmail = document.getElementById("dropdown-email");
       const dropSchoolBadge = document.getElementById("dropdown-school-badge");
       const dropSchoolFull = document.getElementById("dropdown-school-full");
+      const dropSchoolContainer = document.getElementById("dropdown-school-container");
+      const fullScreenAvatarImg = document.getElementById("fullscreen-user-avatar-img");
       const isTue = uni.includes("TU") || email.endsWith("@student.tue.nl");
 
       if (dropName) dropName.textContent = displayName;
       if (dropEmail) dropEmail.textContent = email;
       if (dropSchoolBadge) dropSchoolBadge.textContent = isTue ? "TU/e" : "Fontys";
       if (dropSchoolFull) dropSchoolFull.textContent = isTue ? "TU Eindhoven" : "Fontys UAS";
+      if (fullScreenAvatarImg) fullScreenAvatarImg.src = avatar.image;
+
+      let prefs = {};
+      try { prefs = JSON.parse(localStorage.getItem("unisport_app_preferences") || "{}"); } catch(e){}
+      const showUni = prefs.showUni !== undefined ? prefs.showUni : (state.userProfile?.showUniBadge !== undefined ? state.userProfile.showUniBadge : true);
+      if (dropSchoolContainer) {
+        if (showUni === false) dropSchoolContainer.classList.add("hidden");
+        else dropSchoolContainer.classList.remove("hidden");
+      }
     }
 
     // Update Instagram-style sidebar profile button
@@ -308,17 +352,11 @@ function setupNavigation() {
     if (mobileBtn) mobileBtn.addEventListener("click", clickHandler);
   });
 
-  // Google avatar dropdown toggle
-  const avatarBtn = document.getElementById("google-avatar-btn");
-  const dropdown = document.getElementById("user-dropdown");
-  if (avatarBtn && dropdown) {
-    avatarBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      dropdown.classList.toggle("hidden");
-    });
-
-    document.addEventListener("click", () => {
-      dropdown.classList.add("hidden");
+  // Mobile Settings button in bottom navbar
+  const mobileSettingsBtn = document.getElementById("mobile-tab-settings");
+  if (mobileSettingsBtn) {
+    mobileSettingsBtn.addEventListener("click", () => {
+      openSettingsModal();
     });
   }
 }
@@ -351,6 +389,11 @@ export function switchTab(targetTab) {
     }
   });
 
+  const mobSettingsBtn = document.getElementById("mobile-tab-settings");
+  if (mobSettingsBtn) {
+    mobSettingsBtn.className = "flex flex-col items-center gap-1 text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer";
+  }
+
   if (targetTab === "student-profile") {
     const commDeskBtn = document.getElementById("tab-btn-community");
     const commMobBtn = document.getElementById("mobile-tab-community");
@@ -380,10 +423,37 @@ export function switchTab(targetTab) {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
+function getLocalDeletedActivityIds() {
+  try {
+    return JSON.parse(localStorage.getItem("unisport_deleted_activities") || "[]");
+  } catch (e) {
+    return [];
+  }
+}
+
+function markActivityDeletedLocally(activityId) {
+  try {
+    const list = getLocalDeletedActivityIds();
+    if (!list.includes(activityId)) {
+      list.push(activityId);
+      localStorage.setItem("unisport_deleted_activities", JSON.stringify(list));
+    }
+  } catch (e) {}
+}
+
 function isFakeActivity(id, data) {
   if (!id || String(id).startsWith("demo-")) return true;
   const fakeCreators = ["fontys-student-rep", "tue-runner-rep", "climb-lover", "gym-bro"];
   if (data && fakeCreators.includes(data.creatorId)) return true;
+  if (data && (data.isDeleted || data.cancelled)) return true;
+  if (getLocalDeletedActivityIds().includes(id)) return true;
+  // If host left the session (participants is empty or creatorId is not in participants), session is deleted
+  if (data && Array.isArray(data.participants)) {
+    if (data.participants.length === 0) return true;
+    if (data.creatorId && !data.participants.some(p => p && p.uid === data.creatorId)) {
+      return true;
+    }
+  }
   return false;
 }
 
@@ -402,7 +472,7 @@ async function fetchActivitiesDirectFromFirestore() {
       const id = (docObj.name || "").split("/").pop();
       const f = docObj.fields || {};
       const creatorId = f.creatorId?.stringValue || "";
-      if (isFakeActivity(id, { creatorId })) return;
+      const isDeletedFlag = !!(f.isDeleted?.booleanValue || f.cancelled?.booleanValue);
 
       const participants = [];
       if (f.participants?.arrayValue?.values) {
@@ -416,13 +486,36 @@ async function fetchActivitiesDirectFromFirestore() {
           });
         });
       }
+      const durationMins = f.durationMinutes?.integerValue ? parseInt(f.durationMinutes.integerValue, 10) : (f.durationHours?.integerValue ? parseInt(f.durationHours.integerValue, 10) * 60 : 90);
+      const isPaid = f.isPaid?.booleanValue !== undefined ? f.isPaid.booleanValue : (f.price?.doubleValue > 0 || f.price?.integerValue > 0);
+      const priceVal = f.price?.doubleValue !== undefined ? parseFloat(f.price.doubleValue) : (f.price?.integerValue ? parseInt(f.price.integerValue, 10) : 0);
+      const kickedUids = [];
+      if (f.kickedUids?.arrayValue?.values) {
+        f.kickedUids.arrayValue.values.forEach(v => {
+          if (v.stringValue) kickedUids.push(v.stringValue);
+        });
+      }
+
+      if (isFakeActivity(id, { creatorId, isDeleted: isDeletedFlag, participants })) {
+        // Also clean up orphaned/deleted activity in Firestore in background
+        if (creatorId && (!participants.length || !participants.some(p => p && p.uid === creatorId))) {
+          try { deleteDoc(doc(db, "activities", id)).catch(() => {}); } catch (e) {}
+        }
+        return;
+      }
+
       items.push({
         id,
         sport: f.sport?.stringValue || "Football",
+        creatorEmail: f.creatorEmail?.stringValue || "",
         title: f.title?.stringValue || "Campus Session",
         location: f.location?.stringValue || "Eindhoven",
         distance: f.distance?.stringValue || "Eindhoven Area",
         dateTime: f.dateTime?.stringValue || "Upcoming",
+        durationMinutes: durationMins,
+        isPaid: !!isPaid,
+        price: priceVal,
+        kickedUids,
         maxParticipants: f.maxParticipants?.integerValue ? parseInt(f.maxParticipants.integerValue, 10) : 10,
         creatorId,
         creatorName: f.creatorName?.stringValue || "Student",
@@ -434,11 +527,38 @@ async function fetchActivitiesDirectFromFirestore() {
     });
     items.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
     state.activities = items;
+    checkKickedStatusAndNotify(items);
     renderFeed();
     if (state.activeTab === "my-activities") renderMyActivities();
   } catch (e) {
     console.warn("Direct activities fetch notice:", e);
   }
+}
+
+
+// Check if current logged-in user was kicked from any session and notify them
+function checkKickedStatusAndNotify(activitiesList) {
+  const currentUid = state.currentUser?.uid || (getActiveSession() || {}).uid;
+  if (!currentUid || !Array.isArray(activitiesList)) return;
+
+  activitiesList.forEach(act => {
+    if (Array.isArray(act.kickedUids) && act.kickedUids.includes(currentUid)) {
+      const notifKey = `kicked_notif_seen_${act.id}_${currentUid}`;
+      if (!localStorage.getItem(notifKey)) {
+        localStorage.setItem(notifKey, "true");
+        getStoredSocialData();
+        state.notifications = state.notifications || [];
+        state.notifications.unshift({
+          id: "kick-" + Date.now(),
+          title: "Removed from Session",
+          desc: `You were removed from ${act.title} by the host.`,
+          time: "Just now"
+        });
+        saveStoredSocialData();
+        renderNotifications();
+      }
+    }
+  });
 }
 
 function listenToActivities() {
@@ -455,6 +575,7 @@ function listenToActivities() {
       });
 
       state.activities = items;
+      checkKickedStatusAndNotify(items);
       renderFeed();
       if (state.activeTab === "my-activities") renderMyActivities();
     }, (error) => {
@@ -465,17 +586,35 @@ function listenToActivities() {
   }
 }
 
+function formatDurationBadge(durationMinutes) {
+  const mins = parseInt(durationMinutes, 10) || 90;
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  if (h > 0 && m > 0) return `${h}h ${m}m`;
+  if (h > 0) return `${h}h`;
+  return `${m}m`;
+}
+
 export function renderFeed() {
   const container = document.getElementById("activities-feed");
   const countBadge = document.getElementById("activity-count-badge");
+  const paginationContainer = document.getElementById("feed-pagination-container");
   if (!container) return;
 
-  let filtered = [...state.activities];
+  const nowAmsMs = getAmsterdamDate().getTime();
 
-  if (state.filterSport && state.filterSport !== "all") {
-    filtered = filtered.filter(a => (a.sport || "").toLowerCase().includes(state.filterSport.toLowerCase()));
-  }
+  // RULE 10: Eventos passados ou a correr atualmente não aparecem no feed.
+  // Session must strictly start in the future (Amsterdam time) and not be deleted/orphaned
+  let filtered = (state.activities || []).filter(a => {
+    if (!a || isFakeActivity(a.id, a)) return false;
+    if (!a.dateTime) return false;
+    const parsed = parseAmsterdamDateTimeString(a.dateTime) || new Date(a.dateTime);
+    const startTime = parsed.getTime();
+    if (isNaN(startTime)) return false;
+    return startTime > nowAmsMs;
+  });
 
+  // Apply Search Query
   if (state.searchQuery) {
     const q = state.searchQuery.toLowerCase();
     filtered = filtered.filter(a => 
@@ -486,42 +625,124 @@ export function renderFeed() {
     );
   }
 
-  if (countBadge) {
-    countBadge.textContent = `${filtered.length} active sessions in Eindhoven`;
+  // Apply Filters
+  const df = state.feedFilters || {};
+  if (df.sport && df.sport !== "all") {
+    const standardSportsLower = ["football", "gym & fitness", "running", "basketball", "bouldering", "padel / tennis", "volleyball", "swimming", "cycling"];
+    if (df.sport === "Other") {
+      filtered = filtered.filter(a => !standardSportsLower.includes((a.sport || "").toLowerCase().trim()));
+    } else {
+      filtered = filtered.filter(a => (a.sport || "").toLowerCase() === df.sport.toLowerCase() || (a.sport || "").toLowerCase().includes(df.sport.toLowerCase()));
+    }
+  }
+  if (df.university && df.university !== "all") {
+    const targetUni = df.university.toLowerCase();
+    filtered = filtered.filter(a => {
+      const u = (a.creatorUniversity || "").toLowerCase();
+      if (targetUni.includes("tu")) return u.includes("tu") || u.includes("eindhoven");
+      if (targetUni.includes("fontys")) return u.includes("fontys");
+      return u.includes(targetUni);
+    });
+  }
+  if (df.price && df.price !== "all") {
+    if (df.price === "free") {
+      filtered = filtered.filter(a => !a.isPaid || parseFloat(a.price || 0) === 0);
+    } else if (df.price === "paid") {
+      filtered = filtered.filter(a => a.isPaid && parseFloat(a.price || 0) > 0);
+    }
+  }
+  if (df.location && df.location.trim()) {
+    const locQ = df.location.toLowerCase().trim();
+    filtered = filtered.filter(a => (a.location || "").toLowerCase().includes(locQ) || (a.title || "").toLowerCase().includes(locQ));
+  }
+  if (df.date && df.date !== "all") {
+    const now = getAmsterdamDate();
+    const todayStr = now.toDateString();
+    const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+    const tomorrowStr = tomorrow.toDateString();
+
+    filtered = filtered.filter(a => {
+      const d = parseAmsterdamDateTimeString(a.dateTime) || new Date(a.dateTime);
+      if (isNaN(d.getTime())) return false;
+      if (df.date === "today") return d.toDateString() === todayStr;
+      if (df.date === "tomorrow") return d.toDateString() === tomorrowStr;
+      if (df.date === "weekend") {
+        const day = d.getDay();
+        return day === 0 || day === 6 || (day === 5 && d.getHours() >= 17);
+      }
+      if (df.date === "custom" && df.customDate) {
+        return String(a.dateTime || "").startsWith(df.customDate);
+      }
+      return true;
+    });
   }
 
-  if (filtered.length === 0) {
+  // Update filter count badge and summary tags
+  renderFeedFilterSummary();
+
+  const totalUpcoming = filtered.length;
+  if (countBadge) {
+    countBadge.textContent = `${totalUpcoming} upcoming session${totalUpcoming === 1 ? '' : 's'} in Eindhoven`;
+  }
+
+  if (totalUpcoming === 0) {
     container.innerHTML = `
       <div class="col-span-full py-16 px-6 text-center rounded-2xl bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800">
-        <h3 class="text-base font-bold text-zinc-950 dark:text-white mb-1">No sports sessions found</h3>
-        <p class="text-zinc-500 dark:text-zinc-400 text-xs max-w-sm mx-auto mb-4">Be the first student to create a session in Eindhoven.</p>
-        <button onclick="window.UniSport.switchTab('create')" class="px-4 py-2 rounded-xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 text-xs font-semibold transition">
-          Create Session
+        <h3 class="text-base font-bold text-zinc-950 dark:text-white mb-1">No upcoming sessions found</h3>
+        <p class="text-zinc-500 dark:text-zinc-400 text-xs max-w-sm mx-auto mb-4">Try adjusting your filters or be the first student to host a new session.</p>
+        <button onclick="window.UniSport.switchTab('create')" class="px-4 py-2 rounded-xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 text-xs font-semibold transition cursor-pointer">
+          Host Session
         </button>
       </div>
     `;
+    if (paginationContainer) paginationContainer.innerHTML = "";
     return;
   }
 
-  container.innerHTML = filtered.map(activity => {
+  // RULE 7: 3x3 (9 items) initially -> Load 3x10 (30 items) -> Unlimited pages
+  const pageSize = state.feedPageSize || 9;
+  const totalPages = Math.ceil(totalUpcoming / pageSize);
+  if (state.feedCurrentPage > totalPages) state.feedCurrentPage = 1;
+  const currentPage = state.feedCurrentPage || 1;
+
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = Math.min(startIndex + pageSize, totalUpcoming);
+  const pagedItems = filtered.slice(startIndex, endIndex);
+
+  container.innerHTML = pagedItems.map(activity => {
     const sportInfo = SPORTS_CONFIG[activity.sport] || SPORTS_CONFIG["Other"];
     const participants = activity.participants || [];
     const max = parseInt(activity.maxParticipants, 10) || 10;
     const spotsLeft = Math.max(0, max - participants.length);
     const isFull = spotsLeft === 0;
-    const isJoined = state.currentUser && participants.some(p => p.uid === state.currentUser.uid);
+    const currentUid = state.currentUser?.uid || (getActiveSession() || {}).uid || "";
+    const isHost = isUserActivityHost(activity);
+    const isJoined = isHost || (currentUid && participants.some(p => p.uid === currentUid));
+    const durationStr = formatDurationBadge(activity.durationMinutes);
+    const isPaid = !!activity.isPaid && parseFloat(activity.price || 0) > 0;
+    const priceDisplay = isPaid ? `€${parseFloat(activity.price).toFixed(2)}` : "Free";
 
     return `
       <article class="relative flex flex-col justify-between rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800/90 p-5 transition duration-200 hover:border-zinc-400 dark:hover:border-zinc-700">
         <div>
           <div class="flex items-center justify-between gap-2 mb-3">
-            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold border ${sportInfo.badge}">
-              ${escapeHtml(activity.sport)}
-            </span>
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold border ${sportInfo.badge}">
+                ${escapeHtml(activity.sport)}
+              </span>
+              <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">
+                ${durationStr}
+              </span>
+            </div>
 
-            <span class="text-xs font-semibold px-2 py-0.5 rounded-md ${isFull ? 'bg-red-500/10 text-red-600 dark:text-red-400' : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'}">
-              ${isFull ? 'Full' : `${spotsLeft} spots left`}
-            </span>
+            <div class="flex items-center gap-1.5">
+              <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold ${isPaid ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20' : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'}">
+                ${priceDisplay}
+              </span>
+              <span class="text-xs font-semibold px-2 py-0.5 rounded-md ${isFull ? 'bg-red-500/10 text-red-600 dark:text-red-400' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300'}">
+                ${isFull ? 'Full' : `${spotsLeft} left`}
+              </span>
+            </div>
           </div>
 
           <h3 class="text-base font-bold text-zinc-950 dark:text-white mb-2 leading-snug">
@@ -547,9 +768,17 @@ export function renderFeed() {
           <!-- Roster Avatars (Google / Kick Style Icons) -->
           <div class="mb-4 pt-3 border-t border-zinc-100 dark:border-zinc-800">
             <div class="flex items-center justify-between text-xs mb-2">
-              <span class="font-semibold text-zinc-500">Roster (${participants.length}/${max})</span>
-              <button onclick="window.UniSport.openRosterModal('${activity.id}')" class="text-zinc-900 dark:text-white hover:underline text-[11px] font-semibold">
-                View names &rarr;
+              <div class="flex items-center gap-1.5">
+                <span class="font-semibold text-zinc-500">Roster (${participants.length}/${max})</span>
+                ${isHost ? `
+                  <button onclick="window.UniSport.openEditActivityModal('${activity.id}')" class="px-2 py-0.5 rounded-md bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 text-[10px] font-bold transition hover:opacity-90 cursor-pointer" title="Edit Session">
+                    Edit
+                  </button>
+                ` : ''}
+              </div>
+              <button onclick="window.UniSport.openRosterModal('${activity.id}')" class="inline-flex items-center gap-1 text-zinc-900 dark:text-white hover:underline text-[11px] font-semibold cursor-pointer" title="View Participants">
+                <i data-lucide="users" class="w-3.5 h-3.5"></i>
+                <span>Participants</span>
               </button>
             </div>
             <div class="flex -space-x-1.5 overflow-hidden items-center">
@@ -577,14 +806,14 @@ export function renderFeed() {
 
           <div>
             ${isJoined ? `
-              <button onclick="window.UniSport.toggleJoinActivity('${activity.id}')" class="px-3.5 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-red-50 dark:hover:bg-red-950/40 text-red-600 dark:text-red-400 text-xs font-semibold transition">
+              <button onclick="window.UniSport.toggleJoinActivity('${activity.id}')" class="px-3.5 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-red-50 dark:hover:bg-red-950/40 text-red-600 dark:text-red-400 text-xs font-semibold transition cursor-pointer">
                 Leave
               </button>
             ` : `
               <button 
                 onclick="window.UniSport.toggleJoinActivity('${activity.id}')" 
                 ${isFull ? 'disabled' : ''}
-                class="px-3.5 py-1.5 rounded-xl ${isFull ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400 cursor-not-allowed' : 'bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950'} text-xs font-semibold transition"
+                class="px-3.5 py-1.5 rounded-xl ${isFull ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400 cursor-not-allowed' : 'bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950'} text-xs font-semibold transition cursor-pointer"
               >
                 ${isFull ? 'Full' : 'Join'}
               </button>
@@ -594,6 +823,114 @@ export function renderFeed() {
       </article>
     `;
   }).join('');
+
+  // Render Pagination and Load More Bar
+  if (paginationContainer) {
+    let paginationHtml = `
+      <div class="text-xs text-zinc-500">
+        Showing <span class="font-bold text-zinc-900 dark:text-white">${startIndex + 1}–${endIndex}</span> of <span class="font-bold text-zinc-900 dark:text-white">${totalUpcoming}</span> sessions
+      </div>
+      <div class="flex items-center gap-2 flex-wrap">
+    `;
+
+    // Button to expand from 3x3 (9) to 3x10 (30)
+    if (pageSize === 9 && totalUpcoming > 9) {
+      paginationHtml += `
+        <button onclick="window.UniSport.setFeedPageSize(30)" class="px-3 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 text-xs font-bold transition cursor-pointer">
+          Load 30 (3x10)
+        </button>
+      `;
+    } else if (pageSize === 30) {
+      paginationHtml += `
+        <button onclick="window.UniSport.setFeedPageSize(9)" class="px-3 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 text-xs font-medium transition cursor-pointer">
+          Show 3x3 Grid
+        </button>
+      `;
+    }
+
+    // Numbered pagination controls
+    if (totalPages > 1) {
+      paginationHtml += `
+        <div class="flex items-center gap-1">
+          <button onclick="window.UniSport.goToFeedPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled class="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-zinc-300 dark:text-zinc-700 cursor-not-allowed"' : 'class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 cursor-pointer"'}>
+            Prev
+          </button>
+      `;
+
+      for (let p = 1; p <= totalPages; p++) {
+        if (p === 1 || p === totalPages || (p >= currentPage - 1 && p <= currentPage + 1)) {
+          const isCur = p === currentPage;
+          paginationHtml += `
+            <button onclick="window.UniSport.goToFeedPage(${p})" class="px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${isCur ? 'bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 shadow-sm' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200'}">
+              ${p}
+            </button>
+          `;
+        } else if (p === currentPage - 2 || p === currentPage + 2) {
+          paginationHtml += `<span class="px-1 text-zinc-400 text-xs">...</span>`;
+        }
+      }
+
+      paginationHtml += `
+          <button onclick="window.UniSport.goToFeedPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled class="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-zinc-300 dark:text-zinc-700 cursor-not-allowed"' : 'class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 cursor-pointer"'}>
+            Next
+          </button>
+        </div>
+      `;
+    }
+
+    paginationHtml += `</div>`;
+    paginationContainer.innerHTML = paginationHtml;
+  }
+
+  if (window.lucide && typeof window.lucide.createIcons === "function") {
+    window.lucide.createIcons();
+  }
+}
+
+function renderFeedFilterSummary() {
+  const badge = document.getElementById("feed-filter-count-badge");
+  const summary = document.getElementById("feed-active-chips-summary");
+  const resetBtn = document.getElementById("btn-reset-feed-filters");
+  if (!summary) return;
+
+  const df = state.feedFilters || {};
+  let count = 0;
+  let chips = [];
+
+  if (df.sport && df.sport !== "all") {
+    count++;
+    chips.push(`<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold">${escapeHtml(df.sport)}</span>`);
+  }
+  if (df.date && df.date !== "all") {
+    count++;
+    const label = df.date === "today" ? "Today" : df.date === "tomorrow" ? "Tomorrow" : "Weekend";
+    chips.push(`<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold">${label}</span>`);
+  }
+  if (df.university && df.university !== "all") {
+    count++;
+    chips.push(`<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold">${escapeHtml(df.university)}</span>`);
+  }
+  if (df.price && df.price !== "all") {
+    count++;
+    chips.push(`<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold">${df.price === 'free' ? 'Free Only' : 'Paid Only'}</span>`);
+  }
+  if (df.location && df.location.trim()) {
+    count++;
+    chips.push(`<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold">${escapeHtml(df.location.trim())}</span>`);
+  }
+
+  summary.innerHTML = chips.join('');
+  if (badge) {
+    if (count > 0) {
+      badge.textContent = count;
+      badge.classList.remove("hidden");
+    } else {
+      badge.classList.add("hidden");
+    }
+  }
+  if (resetBtn) {
+    resetBtn.classList.toggle("hidden", count === 0);
+  }
 }
 
 function setupFilterSearch() {
@@ -601,51 +938,321 @@ function setupFilterSearch() {
   if (searchInput) {
     searchInput.addEventListener("input", (e) => {
       state.searchQuery = sanitize(e.target.value);
+      state.feedCurrentPage = 1;
       renderFeed();
     });
   }
+}
 
-  const chips = document.querySelectorAll(".sport-filter-chip");
-  chips.forEach(chip => {
-    chip.addEventListener("click", () => {
-      chips.forEach(c => {
-        c.className = "sport-filter-chip px-3 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 text-xs font-semibold whitespace-nowrap hover:text-zinc-950 dark:hover:text-white transition";
-      });
+export function openFilterDrawer() {
+  const drawer = document.getElementById("feed-filter-drawer");
+  if (!drawer) return;
+  drawer.style.display = "flex";
 
-      chip.className = "sport-filter-chip px-3 py-1.5 rounded-xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 text-xs font-semibold whitespace-nowrap transition";
-      state.filterSport = chip.dataset.sport;
-      renderFeed();
-    });
+  const sportSel = document.getElementById("filter-drawer-sport");
+  const uniSel = document.getElementById("filter-drawer-university");
+  const locInp = document.getElementById("filter-drawer-location");
+  const customDateInp = document.getElementById("filter-drawer-custom-date");
+
+  if (sportSel) sportSel.value = state.feedFilters.sport || "all";
+  if (uniSel) uniSel.value = state.feedFilters.university || "all";
+  if (locInp) locInp.value = state.feedFilters.location || "";
+  if (customDateInp) customDateInp.value = state.feedFilters.customDate || "";
+
+  setDrawerDateFilter(state.feedFilters.date || "all", false);
+  setDrawerPriceFilter(state.feedFilters.price || "all", false);
+
+  drawer.classList.remove("hidden");
+  document.body.style.overflow = "hidden";
+  if (window.lucide && typeof window.lucide.createIcons === "function") window.lucide.createIcons();
+}
+
+export function closeFilterDrawer() {
+  const drawer = document.getElementById("feed-filter-drawer");
+  if (drawer) {
+    drawer.classList.add("hidden");
+    drawer.style.display = "none";
+  }
+  document.body.style.overflow = "";
+}
+
+export function setDrawerDateFilter(dateVal, updateState = true) {
+  const customDateInp = document.getElementById("filter-drawer-custom-date");
+  if (updateState) {
+    state.feedFilters.date = dateVal;
+    if (dateVal !== "custom") {
+      state.feedFilters.customDate = "";
+      if (customDateInp) customDateInp.value = "";
+    } else if (customDateInp) {
+      state.feedFilters.customDate = customDateInp.value || "";
+    }
+  }
+  document.querySelectorAll("#filter-drawer-date-chips .filter-date-btn").forEach(btn => {
+    if (btn.getAttribute("data-date-filter") === dateVal) {
+      btn.className = "filter-date-btn px-3 py-2 rounded-xl text-xs font-bold bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 transition cursor-pointer text-center";
+    } else {
+      btn.className = "filter-date-btn px-3 py-2 rounded-xl text-xs font-semibold bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 transition cursor-pointer text-center";
+    }
   });
+}
+
+export function setDrawerPriceFilter(priceVal, updateState = true) {
+  if (updateState) {
+    state.feedFilters.price = priceVal;
+  }
+  document.querySelectorAll("#filter-drawer-price-chips .filter-price-btn").forEach(btn => {
+    if (btn.getAttribute("data-price-filter") === priceVal) {
+      btn.className = "filter-price-btn px-2.5 py-2 rounded-xl text-xs font-bold bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 transition cursor-pointer text-center";
+    } else {
+      btn.className = "filter-price-btn px-2.5 py-2 rounded-xl text-xs font-semibold bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 transition cursor-pointer text-center";
+    }
+  });
+}
+
+export function applyFilterDrawer() {
+  const sportSel = document.getElementById("filter-drawer-sport");
+  const uniSel = document.getElementById("filter-drawer-university");
+  const locInp = document.getElementById("filter-drawer-location");
+  const customDateInp = document.getElementById("filter-drawer-custom-date");
+
+  if (sportSel) state.feedFilters.sport = sportSel.value;
+  if (uniSel) state.feedFilters.university = uniSel.value;
+  if (locInp) state.feedFilters.location = locInp.value.trim();
+  if (customDateInp && customDateInp.value) {
+    state.feedFilters.date = "custom";
+    state.feedFilters.customDate = customDateInp.value;
+  }
+
+  state.feedCurrentPage = 1;
+  closeFilterDrawer();
+  renderFeed();
+}
+
+export function resetFeedFilters() {
+  state.feedFilters = {
+    sport: "all",
+    date: "all",
+    customDate: "",
+    university: "all",
+    price: "all",
+    location: ""
+  };
+  state.searchQuery = "";
+  const searchInput = document.getElementById("search-activities");
+  if (searchInput) searchInput.value = "";
+  const sportSel = document.getElementById("filter-drawer-sport");
+  const uniSel = document.getElementById("filter-drawer-university");
+  const locInp = document.getElementById("filter-drawer-location");
+  const customDateInp = document.getElementById("filter-drawer-custom-date");
+  if (sportSel) sportSel.value = "all";
+  if (uniSel) uniSel.value = "all";
+  if (locInp) locInp.value = "";
+  if (customDateInp) customDateInp.value = "";
+  setDrawerDateFilter("all", false);
+  setDrawerPriceFilter("all", false);
+  state.feedCurrentPage = 1;
+  closeFilterDrawer();
+  renderFeed();
+}
+
+export function setFeedPageSize(size) {
+  state.feedPageSize = size;
+  state.feedCurrentPage = 1;
+  renderFeed();
+}
+
+export function goToFeedPage(page) {
+  state.feedCurrentPage = page;
+  renderFeed();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+
+// Amsterdam Timezone & Host Validation Helpers
+export function getAmsterdamDate() {
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Europe/Amsterdam",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hourCycle: "h23"
+  }).formatToParts(new Date());
+  const map = {};
+  parts.forEach(p => { map[p.type] = p.value; });
+  return new Date(
+    parseInt(map.year, 10),
+    parseInt(map.month, 10) - 1,
+    parseInt(map.day, 10),
+    parseInt(map.hour, 10),
+    parseInt(map.minute, 10),
+    parseInt(map.second || "0", 10)
+  );
+}
+
+export function parseAmsterdamDateTimeString(dtString) {
+  if (!dtString) return null;
+  const [datePart, timePart] = String(dtString).split("T");
+  if (!datePart || !timePart) return null;
+  const [year, month, day] = datePart.split("-").map(n => parseInt(n, 10));
+  const [hour, minute] = timePart.split(":").map(n => parseInt(n, 10));
+  if (isNaN(year) || isNaN(month) || isNaN(day) || isNaN(hour) || isNaN(minute)) return null;
+  return new Date(year, month - 1, day, hour, minute, 0, 0);
+}
+
+export function getAmsterdamMinDateTime() {
+  const nowAms = getAmsterdamDate();
+  // Strictly at least 1 hour from current Amsterdam time (minute precision)
+  const minAms = new Date(
+    nowAms.getFullYear(),
+    nowAms.getMonth(),
+    nowAms.getDate(),
+    nowAms.getHours() + 1,
+    nowAms.getMinutes(),
+    0,
+    0
+  );
+  const YYYY = minAms.getFullYear();
+  const MM = String(minAms.getMonth() + 1).padStart(2, "0");
+  const DD = String(minAms.getDate()).padStart(2, "0");
+  const HH = String(minAms.getHours()).padStart(2, "0");
+  const mm = String(minAms.getMinutes()).padStart(2, "0");
+  return {
+    minDate: minAms,
+    minString: `${YYYY}-${MM}-${DD}T${HH}:${mm}`
+  };
+}
+
+export function isUserActivityHost(activity) {
+  if (!activity) return false;
+  const sess = getActiveSession() || {};
+  const currentUid = state.currentUser?.uid || sess.uid || "";
+  const currentEmail = (state.currentUser?.email || sess.email || "").toLowerCase().trim();
+  const currentEmailPrefix = currentEmail ? currentEmail.split("@")[0] : "";
+  const currentName = (state.userProfile?.displayName || state.currentUser?.displayName || sess.displayName || sess.name || currentEmailPrefix || "").toLowerCase().trim();
+
+  const creatorId = String(activity.creatorId || "").trim();
+  const creatorEmail = String(activity.creatorEmail || "").toLowerCase().trim();
+  const creatorName = String(activity.creatorName || "").toLowerCase().trim();
+
+  // 1. Direct UID match
+  if (currentUid && (creatorId === currentUid || creatorEmail === currentUid)) return true;
+
+  // 2. Direct Email match
+  if (currentEmail && (creatorId.toLowerCase() === currentEmail || creatorEmail === currentEmail)) return true;
+
+  // 3. Name match
+  if (currentName && creatorName && (creatorName === currentName || creatorId.toLowerCase() === currentName)) return true;
+  if (currentEmailPrefix && creatorName && creatorName === currentEmailPrefix) return true;
+
+  // 4. First participant match (creator is always index 0)
+  const participants = Array.isArray(activity.participants) ? activity.participants : [];
+  if (participants.length > 0) {
+    const firstP = participants[0];
+    if (firstP) {
+      if (currentUid && firstP.uid === currentUid) return true;
+      if (currentEmail && firstP.email && firstP.email.toLowerCase() === currentEmail) return true;
+      if (currentName && firstP.name && firstP.name.toLowerCase().trim() === currentName) return true;
+    }
+  }
+
+  return false;
 }
 
 function setupCreateForm() {
   const form = document.getElementById("create-activity-form");
   if (!form) return;
 
+  const dtInput = document.getElementById("create-datetime");
+  const errEl = document.getElementById("create-datetime-error");
+
+  const validateDt = () => {
+    if (!dtInput || !dtInput.value) {
+      if (errEl) errEl.classList.add("hidden");
+      if (dtInput) dtInput.classList.remove("ring-2", "ring-red-500");
+      return false;
+    }
+    const selectedDate = parseAmsterdamDateTimeString(dtInput.value);
+    const { minDate } = getAmsterdamMinDateTime();
+    if (!selectedDate || selectedDate.getTime() < minDate.getTime()) {
+      if (errEl) {
+        errEl.textContent = "Sessions must be scheduled at least 1 hour in advance (Amsterdam time).";
+        errEl.classList.remove("hidden");
+      }
+      dtInput.classList.add("ring-2", "ring-red-500");
+      return false;
+    } else {
+      if (errEl) errEl.classList.add("hidden");
+      dtInput.classList.remove("ring-2", "ring-red-500");
+      return true;
+    }
+  };
+
+  if (dtInput) {
+    const updateMinDt = () => {
+      const { minString } = getAmsterdamMinDateTime();
+      dtInput.min = minString;
+    };
+    updateMinDt();
+    dtInput.addEventListener("focus", updateMinDt);
+    dtInput.addEventListener("input", validateDt);
+    dtInput.addEventListener("change", validateDt);
+  }
+
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    if (!state.currentUser) {
+    const activeSess = getActiveSession() || {};
+    const creatorUid = state.currentUser?.uid || activeSess.uid;
+    const creatorEmail = state.currentUser?.email || activeSess.email || "";
+    if (!creatorUid) {
       window.location.href = "./login.html";
       return;
     }
 
     const title = sanitize(document.getElementById("create-title").value);
-    const sport = document.getElementById("create-sport").value;
+    let sport = document.getElementById("create-sport").value;
+    if (sport === "Other") {
+      const otherSport = sanitize(document.getElementById("create-sport-other").value);
+      if (otherSport) sport = otherSport;
+    }
+
     const location = sanitize(document.getElementById("create-location").value);
     const dateTime = document.getElementById("create-datetime").value;
     const maxParticipants = parseInt(document.getElementById("create-max").value, 10);
     const description = sanitize(document.getElementById("create-desc").value);
+
+    // Parse Duration
+    const durHours = parseInt(document.getElementById("create-duration-hours").value, 10) || 0;
+    const durMins = parseInt(document.getElementById("create-duration-mins").value, 10) || 0;
+    const totalDurationMinutes = (durHours * 60) + durMins;
+
+    // Parse Pricing
+    const pricingType = document.getElementById("create-pricing-type").value;
+    const isPaid = pricingType === "paid";
+    const priceVal = isPaid ? (parseFloat(document.getElementById("create-price").value) || 0) : 0;
 
     if (!title || !location || !dateTime) {
       alert("Please fill in all required fields.");
       return;
     }
 
-    const creatorName = state.userProfile?.displayName || state.currentUser.displayName || "Student";
-    const creatorUniversity = state.userProfile?.university || (state.currentUser.email.endsWith("@student.tue.nl") ? "TU Eindhoven" : "Fontys UAS");
-    const avatarId = state.userProfile?.avatarId || state.currentUser.avatarId || "bodybuilder";
+    // Validation: Date and Time must be at least 1 hour in advance (Amsterdam time)
+    if (!validateDt()) {
+      alert("Session must be scheduled at least 1 hour in advance (Amsterdam time). Please choose a valid future date and time.");
+      return;
+    }
+
+    if (totalDurationMinutes <= 0) {
+      alert("Session duration must be greater than 0 minutes.");
+      return;
+    }
+
+    const creatorName = state.userProfile?.displayName || state.currentUser?.displayName || activeSess.displayName || activeSess.name || (creatorEmail ? creatorEmail.split("@")[0] : "Student");
+    const creatorUniversity = state.userProfile?.university || activeSess.university || (creatorEmail.endsWith("@student.tue.nl") ? "TU Eindhoven" : "Fontys UAS");
+    const avatarId = state.userProfile?.avatarId || state.currentUser?.avatarId || activeSess.avatarId || "footballer";
 
     const newActivity = {
       sport,
@@ -653,14 +1260,20 @@ function setupCreateForm() {
       location,
       distance: "Eindhoven Area",
       dateTime,
+      durationMinutes: totalDurationMinutes,
+      isPaid: isPaid,
+      price: priceVal,
       maxParticipants: maxParticipants || 10,
-      creatorId: state.currentUser.uid,
+      creatorId: creatorUid,
+      creatorEmail: creatorEmail,
       creatorName,
       creatorUniversity,
       description,
+      kickedUids: [],
       participants: [
         {
-          uid: state.currentUser.uid,
+          uid: creatorUid,
+          email: creatorEmail,
           name: creatorName,
           university: creatorUniversity,
           avatarId: avatarId
@@ -691,7 +1304,8 @@ function setupCreateForm() {
 }
 
 export async function toggleJoinActivity(activityId) {
-  if (!state.currentUser) {
+  const currentUid = state.currentUser?.uid || (getActiveSession() || {}).uid;
+  if (!currentUid) {
     window.location.href = "./login.html";
     return;
   }
@@ -699,51 +1313,92 @@ export async function toggleJoinActivity(activityId) {
   const activity = state.activities.find(a => a.id === activityId);
   if (!activity) return;
 
-  const participants = activity.participants || [];
-  const isJoined = participants.some(p => p.uid === state.currentUser.uid);
-  const max = parseInt(activity.maxParticipants, 10) || 10;
+  const isHost = isUserActivityHost(activity);
+  const participants = Array.isArray(activity.participants) ? activity.participants : [];
+  const isJoined = participants.some(p => p.uid === currentUid) || isHost;
 
-  if (!isJoined && participants.length >= max) {
+  if (isJoined) {
+    if (isHost) {
+      // Mark deleted locally and remove from UI immediately
+      markActivityDeletedLocally(activityId);
+      state.activities = (state.activities || []).filter(a => a.id !== activityId);
+      renderFeed();
+      renderMyActivities();
+
+      // Delete document from Firestore (SDK + updateDoc fallback + REST DELETE)
+      try {
+        const actRef = doc(db, "activities", activityId);
+        await deleteDoc(actRef);
+      } catch (err) {
+        try {
+          const actRef = doc(db, "activities", activityId);
+          await updateDoc(actRef, { isDeleted: true, cancelled: true, participants: [] });
+        } catch (e2) {}
+      }
+      try {
+        await fetch(`https://firestore.googleapis.com/v1/projects/fontys-unisport/databases/(default)/documents/activities/${activityId}`, {
+          method: "DELETE"
+        });
+      } catch (e3) {}
+      return;
+    }
+
+    const updatedParticipants = participants.filter(p => p.uid !== currentUid);
+    activity.participants = updatedParticipants;
+    renderFeed();
+    renderMyActivities();
+
+    try {
+      const actRef = doc(db, "activities", activityId);
+      await updateDoc(actRef, {
+        participants: updatedParticipants
+      });
+    } catch (err) {
+      console.warn("Firestore leave update error:", err);
+    }
+    return;
+  }
+
+  // Not joined - join logic
+  const max = parseInt(activity.maxParticipants, 10) || 10;
+  if (participants.length >= max) {
     alert("This activity is already full!");
     return;
   }
 
+  const sess = getActiveSession() || {};
   const currentParticipantObj = {
-    uid: state.currentUser.uid,
-    name: state.userProfile?.displayName || state.currentUser.displayName || "Student",
-    university: state.userProfile?.university || (state.currentUser.email.endsWith("@student.tue.nl") ? "TU Eindhoven" : "Fontys UAS"),
-    avatarId: state.userProfile?.avatarId || state.currentUser.avatarId || "bodybuilder"
+    uid: currentUid,
+    name: state.userProfile?.displayName || state.currentUser?.displayName || sess.name || "Student",
+    university: state.userProfile?.university || sess.university || (sess.email?.endsWith("@student.tue.nl") ? "TU Eindhoven" : "Fontys UAS"),
+    avatarId: state.userProfile?.avatarId || state.currentUser?.avatarId || sess.avatarId || "bodybuilder"
   };
 
   try {
     const actRef = doc(db, "activities", activityId);
-    if (isJoined) {
-      const itemToRemove = participants.find(p => p.uid === state.currentUser.uid) || currentParticipantObj;
-      await updateDoc(actRef, {
-        participants: arrayRemove(itemToRemove)
-      });
-    } else {
-      await updateDoc(actRef, {
-        participants: arrayUnion(currentParticipantObj)
-      });
-    }
+    await updateDoc(actRef, {
+      participants: arrayUnion(currentParticipantObj)
+    });
   } catch (err) {
-    if (isJoined) {
-      activity.participants = participants.filter(p => p.uid !== state.currentUser.uid);
-    } else {
-      activity.participants.push(currentParticipantObj);
-    }
-    renderFeed();
+    console.warn("Firestore arrayUnion error:", err);
   }
+
+  activity.participants = [...participants, currentParticipantObj];
+  renderFeed();
+  renderMyActivities();
 }
 
 function renderMyActivities() {
   const container = document.getElementById("my-activities-list");
   if (!container) return;
 
-  const myActivities = state.activities.filter(a => {
-    const isJoined = (a.participants || []).some(p => p.uid === state.currentUser.uid);
-    const isCreator = a.creatorId === state.currentUser.uid;
+  const currentUid = state.currentUser?.uid || (getActiveSession() || {}).uid || "";
+  const nowMs = getAmsterdamDate().getTime();
+
+  const myActivities = (state.activities || []).filter(a => {
+    if (!a || isFakeActivity(a.id, a)) return false;
+    const isJoined = (a.participants || []).some(p => p.uid === currentUid);
+    const isCreator = isUserActivityHost(a);
     return isJoined || isCreator;
   });
 
@@ -752,7 +1407,7 @@ function renderMyActivities() {
       <div class="text-center py-12 rounded-2xl bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 p-8">
         <h4 class="text-zinc-950 dark:text-white font-bold text-base mb-1">No registered activities yet</h4>
         <p class="text-zinc-500 dark:text-zinc-400 text-xs mb-4">Explore the feed to find sports sessions matching your schedule in Eindhoven.</p>
-        <button onclick="window.UniSport.switchTab('feed')" class="px-4 py-2 rounded-xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-semibold text-xs">
+        <button onclick="window.UniSport.switchTab('feed')" class="px-4 py-2 rounded-xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-semibold text-xs cursor-pointer">
           Browse Feed
         </button>
       </div>
@@ -760,30 +1415,114 @@ function renderMyActivities() {
     return;
   }
 
-  container.innerHTML = myActivities.map(a => {
-    const isCreator = a.creatorId === state.currentUser.uid;
-    const sportInfo = SPORTS_CONFIG[a.sport] || SPORTS_CONFIG["Other"];
+  // RULE 9: Só é uma past session quando passa da hora do evento + duração
+  const activeSessions = [];
+  const pastSessions = [];
+
+  myActivities.forEach(a => {
+    const startMs = new Date(a.dateTime).getTime();
+    const durMs = (parseInt(a.durationMinutes, 10) || 90) * 60000;
+    const endMs = startMs + durMs;
+
+    if (!isNaN(endMs) && endMs <= nowMs) {
+      pastSessions.push(a);
+    } else {
+      activeSessions.push(a);
+    }
+  });
+
+  const renderCard = (a, isPast = false) => {
+    const isCreator = isUserActivityHost(a);
+    const durationStr = formatDurationBadge(a.durationMinutes);
+    const isPaid = !!a.isPaid && parseFloat(a.price || 0) > 0;
+    const priceDisplay = isPaid ? `€${parseFloat(a.price).toFixed(2)}` : "Free";
+
     return `
-      <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div class="flex items-center gap-2 mb-1">
-            <span class="text-xs font-bold text-zinc-500 uppercase tracking-wider">${escapeHtml(a.sport)}</span>
-            ${isCreator ? `<span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">Hosted by you</span>` : ''}
+      <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border ${isPast ? 'border-zinc-200/60 dark:border-zinc-800/60 opacity-80' : 'border-zinc-200 dark:border-zinc-800'} flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="space-y-1">
+          <div class="flex items-center gap-2 flex-wrap mb-1">
+            <span class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider">${escapeHtml(a.sport)}</span>
+            <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">${durationStr}</span>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded ${isPaid ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400' : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'}">${priceDisplay}</span>
+            ${isCreator ? `<span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-zinc-950 dark:bg-white text-white dark:text-zinc-950">Hosted by you</span>` : ''}
+            ${isPast ? `<span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">Completed</span>` : ''}
           </div>
-          <h4 class="text-sm font-bold text-zinc-950 dark:text-white mb-0.5">${escapeHtml(a.title)}</h4>
+          <h4 class="text-sm font-bold text-zinc-950 dark:text-white">${escapeHtml(a.title)}</h4>
           <p class="text-xs text-zinc-500 dark:text-zinc-400">${escapeHtml(a.location)} • ${escapeHtml(formatDisplayDate(a.dateTime))}</p>
         </div>
-        <div class="flex items-center gap-2">
-          <button onclick="window.UniSport.openRosterModal('${a.id}')" class="px-3 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-xs font-medium text-zinc-900 dark:text-white transition">
-            Roster (${(a.participants || []).length}/${a.maxParticipants})
-          </button>
-          <button onclick="window.UniSport.toggleJoinActivity('${a.id}')" class="px-3 py-1.5 rounded-xl bg-red-50 dark:bg-red-950/40 hover:bg-red-100 text-red-600 dark:text-red-400 text-xs font-semibold transition">
-            Leave
-          </button>
+
+        <div class="flex items-center gap-2 shrink-0">
+          <!-- RULE 4: Se for hosted by me, botão de Editar ao lado de Roster (X/X) -->
+          <div class="flex items-center gap-1.5 bg-zinc-100 dark:bg-zinc-800/80 px-2 py-1 rounded-xl">
+            <span class="text-xs font-semibold text-zinc-700 dark:text-zinc-300">
+              Roster (${(a.participants || []).length}/${a.maxParticipants})
+            </span>
+            ${isCreator && !isPast ? `
+              <button onclick="window.UniSport.openEditActivityModal('${a.id}')" class="ml-1 px-2.5 py-1 rounded-lg bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 text-xs font-bold transition hover:opacity-90 cursor-pointer" title="Edit Session">
+                Edit
+              </button>
+            ` : ''}
+            <!-- Modal de participantes acessível pelo ícone de pessoas -->
+            <button onclick="window.UniSport.openRosterModal('${a.id}')" class="p-1.5 text-zinc-600 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer" title="View Participants">
+              <i data-lucide="users" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+          ${isCreator && !isPast ? `
+            <button onclick="window.UniSport.toggleJoinActivity('${a.id}')" class="px-3 py-1.5 rounded-xl bg-red-50 dark:bg-red-950/40 hover:bg-red-100 text-red-600 dark:text-red-400 text-xs font-semibold transition cursor-pointer" title="Cancel & Delete Session">
+              Cancel Session
+            </button>
+          ` : (!isPast ? `
+            <button onclick="window.UniSport.toggleJoinActivity('${a.id}')" class="px-3 py-1.5 rounded-xl bg-red-50 dark:bg-red-950/40 hover:bg-red-100 text-red-600 dark:text-red-400 text-xs font-semibold transition cursor-pointer">
+              Leave
+            </button>
+          ` : '')}
         </div>
       </div>
     `;
-  }).join('');
+  };
+
+  let htmlContent = "";
+
+  // Active Sessions
+  if (activeSessions.length > 0) {
+    htmlContent += `
+      <div class="space-y-3">
+        ${activeSessions.map(a => renderCard(a, false)).join('')}
+      </div>
+    `;
+  } else {
+    htmlContent += `
+      <div class="text-center py-6 text-xs text-zinc-400">
+        No active upcoming sessions. Check the Past Sessions below or create a new game.
+      </div>
+    `;
+  }
+
+  // RULE 8: Categoria Past Sessions só aparece se houver past sessions
+  if (pastSessions.length > 0) {
+    htmlContent += `
+      <div class="pt-8 space-y-4">
+        <div class="border-t border-zinc-100 dark:border-zinc-800 pt-6 flex items-center justify-between">
+          <div>
+            <h3 class="text-base font-bold text-zinc-950 dark:text-white">Past Sessions</h3>
+            <p class="text-xs text-zinc-500">History of matches and workouts completed</p>
+          </div>
+          <span class="text-xs font-semibold px-2 py-1 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-500">
+            ${pastSessions.length} completed
+          </span>
+        </div>
+        <div class="space-y-3">
+          ${pastSessions.map(a => renderCard(a, true)).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  container.innerHTML = htmlContent;
+  if (window.lucide && typeof window.lucide.createIcons === "function") {
+    window.lucide.createIcons();
+  }
 }
 
 export function populateProfileTab() {
@@ -1015,36 +1754,311 @@ export function openRosterModal(activityId) {
 
   if (!activity || !modal || !content) return;
 
+  const sess = getActiveSession() || {};
+  const currentUid = state.currentUser?.uid || sess.uid || "";
+  const currentName = (state.userProfile?.displayName || state.currentUser?.displayName || sess.displayName || sess.name || "").toLowerCase().trim();
+  const isHost = isUserActivityHost(activity);
+
   title.textContent = activity.title;
   const participants = activity.participants || [];
 
-  content.innerHTML = participants.map((p, idx) => {
+  let rowsHtml = participants.map((p, idx) => {
     const av = getAvatarById(p.avatarId || "bodybuilder");
+    const isMe = (currentUid && p.uid === currentUid) || (currentName && (p.name || "").toLowerCase().trim() === currentName);
+    const isCreatorRow = (p.uid && p.uid === activity.creatorId) || idx === 0;
+
     return `
       <div class="flex items-center justify-between p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800">
-        <div class="flex items-center gap-2.5">
+        <div class="flex items-center gap-2.5 cursor-pointer" onclick="window.openStudentProfileModal('${p.uid}')">
           <div class="w-8 h-8 rounded-full overflow-hidden border border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-white shadow-sm">
             ${av.svg}
           </div>
           <div>
-            <p class="text-xs font-semibold text-zinc-950 dark:text-white">${escapeHtml(p.name)}</p>
+            <p class="text-xs font-semibold text-zinc-950 dark:text-white flex items-center gap-1.5">
+              ${escapeHtml(p.name)}
+              ${isCreatorRow ? '<span class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-zinc-950 text-white dark:bg-white dark:text-zinc-950">Host</span>' : ''}
+              ${isMe && !isCreatorRow ? '<span class="text-[9px] font-semibold text-zinc-400">(You)</span>' : ''}
+            </p>
             <p class="text-[11px] text-zinc-500">${escapeHtml(p.university || 'Student')}</p>
           </div>
         </div>
-        <span class="text-[11px] font-semibold text-zinc-400">#${idx + 1}</span>
+        
+        <div class="flex items-center gap-2">
+          ${isHost && !isMe ? `
+            <button onclick="window.UniSport.kickParticipant('${activity.id}', '${p.uid}', '${escapeHtml(p.name)}')" class="px-2.5 py-1 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 text-xs font-bold transition cursor-pointer">
+              Kick
+            </button>
+          ` : ''}
+          <span class="text-[11px] font-semibold text-zinc-400">#${idx + 1}</span>
+        </div>
       </div>
     `;
   }).join('');
 
+  if (isHost && participants.length <= 1) {
+    rowsHtml += `
+      <div class="p-3 rounded-xl bg-zinc-50/70 dark:bg-zinc-900/40 border border-dashed border-zinc-200 dark:border-zinc-800 text-center">
+        <p class="text-[11px] text-zinc-500 dark:text-zinc-400">You are the host. When other students join this session, a <strong>Kick</strong> button will appear next to their name.</p>
+      </div>
+    `;
+  }
+
+  content.innerHTML = rowsHtml;
+
   modal.classList.remove("hidden");
+  if (window.lucide && typeof window.lucide.createIcons === "function") {
+    window.lucide.createIcons();
+  }
+}
+
+export async function kickParticipant(activityId, participantUid, participantName) {
+  const activity = state.activities.find(a => a.id === activityId);
+  if (!activity || !isUserActivityHost(activity)) {
+    alert("Only the host can kick participants from this session.");
+    return;
+  }
+
+  const updatedParticipants = (activity.participants || []).filter(p => p.uid !== participantUid && p.name !== participantName);
+  const updatedKicked = Array.from(new Set([...(activity.kickedUids || []), participantUid]));
+
+  // Update local activity state immediately
+  activity.participants = updatedParticipants;
+  activity.kickedUids = updatedKicked;
+
+  openRosterModal(activityId);
+  renderFeed();
+  renderMyActivities();
+
+  try {
+    const actRef = doc(db, "activities", activityId);
+    await updateDoc(actRef, {
+      participants: updatedParticipants,
+      kickedUids: updatedKicked
+    });
+  } catch(e) {
+    console.warn("Firestore kick update notice:", e);
+  }
+}
+
+// Edit Session Modal Functions
+export function openEditActivityModal(activityId) {
+  const activity = state.activities.find(a => a.id === activityId);
+  if (!activity || !isUserActivityHost(activity)) {
+    alert("Only the event host can edit this session.");
+    return;
+  }
+
+  const modal = document.getElementById("edit-activity-modal");
+  if (!modal) return;
+
+  document.getElementById("edit-activity-id").value = activity.id;
+  document.getElementById("edit-title").value = activity.title || "";
+  
+  const sportSel = document.getElementById("edit-sport");
+  const otherContainer = document.getElementById("edit-sport-other-container");
+  const otherInp = document.getElementById("edit-sport-other");
+
+  const standardSports = ["Football", "Gym & Fitness", "Running", "Basketball", "Bouldering", "Padel / Tennis", "Volleyball", "Swimming", "Cycling"];
+  if (standardSports.includes(activity.sport)) {
+    sportSel.value = activity.sport;
+    otherContainer.classList.add("hidden");
+    otherInp.value = "";
+  } else {
+    sportSel.value = "Other";
+    otherContainer.classList.remove("hidden");
+    otherInp.value = activity.sport || "";
+  }
+
+  document.getElementById("edit-max").value = activity.maxParticipants || 10;
+  document.getElementById("edit-location").value = activity.location || "";
+  
+  const dtInput = document.getElementById("edit-datetime");
+  if (dtInput) {
+    const { minString } = getAmsterdamMinDateTime();
+    dtInput.min = minString;
+    dtInput.value = activity.dateTime || "";
+  }
+
+  const totalMins = parseInt(activity.durationMinutes, 10) || 90;
+  document.getElementById("edit-duration-hours").value = Math.floor(totalMins / 60);
+  document.getElementById("edit-duration-mins").value = String(totalMins % 60);
+
+  const isPaid = !!activity.isPaid && parseFloat(activity.price || 0) > 0;
+  document.getElementById("edit-pricing-type").value = isPaid ? "paid" : "free";
+  document.getElementById("edit-price-wrapper").classList.toggle("hidden", !isPaid);
+  document.getElementById("edit-price").value = isPaid ? parseFloat(activity.price).toFixed(2) : "5.00";
+  document.getElementById("edit-desc").value = activity.description || "";
+
+  modal.classList.remove("hidden");
+  if (window.lucide && typeof window.lucide.createIcons === "function") window.lucide.createIcons();
+}
+
+export function closeEditActivityModal() {
+  const modal = document.getElementById("edit-activity-modal");
+  if (modal) modal.classList.add("hidden");
+}
+
+export async function saveEditedActivity() {
+  const id = document.getElementById("edit-activity-id").value;
+  const activity = state.activities.find(a => a.id === id);
+  if (!activity || !isUserActivityHost(activity)) {
+    alert("Only the event host can edit this session.");
+    return;
+  }
+
+  const title = sanitize(document.getElementById("edit-title").value);
+  let sport = document.getElementById("edit-sport").value;
+  if (sport === "Other") {
+    const customSp = sanitize(document.getElementById("edit-sport-other").value);
+    if (customSp) sport = customSp;
+  }
+  const maxParticipants = parseInt(document.getElementById("edit-max").value, 10) || 10;
+  const location = sanitize(document.getElementById("edit-location").value);
+  const dateTime = document.getElementById("edit-datetime").value;
+
+  const selectedDate = parseAmsterdamDateTimeString(dateTime);
+  const { minDate } = getAmsterdamMinDateTime();
+  if (!selectedDate || selectedDate.getTime() < minDate.getTime()) {
+    alert("Sessions must be scheduled at least 1 hour in advance (Amsterdam time). Please select a valid future date and time.");
+    return;
+  }
+
+  const durHours = parseInt(document.getElementById("edit-duration-hours").value, 10) || 0;
+  const durMins = parseInt(document.getElementById("edit-duration-mins").value, 10) || 0;
+  const durationMinutes = (durHours * 60) + durMins;
+
+  const isPaid = document.getElementById("edit-pricing-type").value === "paid";
+  const priceVal = isPaid ? (parseFloat(document.getElementById("edit-price").value) || 0) : 0;
+  const description = sanitize(document.getElementById("edit-desc").value);
+
+  const updatedData = {
+    title,
+    sport,
+    maxParticipants,
+    location,
+    dateTime,
+    durationMinutes,
+    isPaid,
+    price: priceVal,
+    description
+  };
+
+  const submitBtn = document.getElementById("edit-submit-btn");
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Saving...";
+
+  try {
+    const actRef = doc(db, "activities", id);
+    await updateDoc(actRef, updatedData);
+  } catch(e) {
+    console.warn("Firestore update activity notice:", e);
+  }
+
+  Object.assign(activity, updatedData);
+  submitBtn.disabled = false;
+  submitBtn.textContent = "Save Changes";
+  closeEditActivityModal();
+  renderFeed();
+  renderMyActivities();
+}
+
+export async function savePrivacySettingsToFirestore(isPublic, showUniBadge) {
+  const currentUid = state.currentUser?.uid || (getActiveSession() || {}).uid;
+  if (!currentUid) return;
+
+  // 1. Update in-memory state & localStorage active session
+  if (state.currentUser) {
+    state.currentUser.isPublic = isPublic;
+    state.currentUser.showUniBadge = showUniBadge;
+  }
+  const session = getActiveSession();
+  if (session) {
+    session.isPublic = isPublic;
+    session.showUniBadge = showUniBadge;
+    try {
+      localStorage.setItem("unisport_active_session", JSON.stringify(session));
+    } catch(e) {}
+  }
+
+  // 2. Update student list entries
+  if (Array.isArray(state.students)) {
+    const sIdx = state.students.findIndex(s => s.uid === currentUid);
+    if (sIdx !== -1) {
+      state.students[sIdx].isPublic = isPublic;
+      state.students[sIdx].showUniBadge = showUniBadge;
+    }
+  }
+  if (Array.isArray(window.__FIRESTORE_STUDENTS__)) {
+    const wIdx = window.__FIRESTORE_STUDENTS__.findIndex(s => s.uid === currentUid);
+    if (wIdx !== -1) {
+      window.__FIRESTORE_STUDENTS__[wIdx].isPublic = isPublic;
+      window.__FIRESTORE_STUDENTS__[wIdx].showUniBadge = showUniBadge;
+    }
+  }
+
+  // 3. Immediately update UI elements for current user
+  const ownBadge = document.getElementById("profile-hero-badge");
+  if (ownBadge) {
+    if (showUniBadge === false) {
+      ownBadge.classList.add("hidden");
+    } else {
+      ownBadge.classList.remove("hidden");
+    }
+  }
+  const dropSchool = document.getElementById("dropdown-school-container");
+  if (dropSchool) {
+    if (showUniBadge === false) {
+      dropSchool.classList.add("hidden");
+    } else {
+      dropSchool.classList.remove("hidden");
+    }
+  }
+
+  // 4. Update Firestore via SDK
+  try {
+    await updateDoc(doc(db, "users", currentUid), {
+      isPublic: isPublic !== false,
+      showUniBadge: showUniBadge !== false,
+      updatedAt: Date.now()
+    });
+  } catch (sdkErr) {
+    console.warn("[UniSport] SDK updateDoc for privacy notice:", sdkErr);
+  }
+
+  // 5. Update Firestore via REST PATCH fallback
+  try {
+    const restPatchUrl = `https://firestore.googleapis.com/v1/projects/fontys-unisport/databases/(default)/documents/users/${currentUid}?updateMask.fieldPaths=isPublic&updateMask.fieldPaths=showUniBadge`;
+    const headers = { "Content-Type": "application/json" };
+    if (session && session.idToken) {
+      headers["Authorization"] = `Bearer ${session.idToken}`;
+    }
+    await fetch(restPatchUrl, {
+      method: "PATCH",
+      headers,
+      body: JSON.stringify({
+        fields: {
+          isPublic: { booleanValue: isPublic !== false },
+          showUniBadge: { booleanValue: showUniBadge !== false }
+        }
+      })
+    });
+  } catch (restErr) {
+    console.warn("[UniSport] REST patch privacy notice:", restErr);
+  }
+
+  // 6. Re-render directory
+  renderCommunity();
+  if (typeof window.renderCommunityInstant === "function") {
+    window.renderCommunityInstant();
+  }
 }
 
 export function openSettingsModal() {
   const modal = document.getElementById("settings-modal");
-  const dropdown = document.getElementById("user-dropdown");
-  if (dropdown) dropdown.classList.add("hidden");
   if (modal) {
     modal.classList.remove("hidden");
+    modal.classList.add("flex");
+    document.body.style.overflow = "hidden";
     if (window.lucide && typeof window.lucide.createIcons === "function") {
       window.lucide.createIcons();
     }
@@ -1053,6 +2067,7 @@ export function openSettingsModal() {
 
 function setupSettingsModal() {
   const modal = document.getElementById("settings-modal");
+  const saveBtn = document.getElementById("settings-modal-save");
   const closeBtn = document.getElementById("settings-modal-close");
   const doneBtn = document.getElementById("settings-modal-done");
   const clearCacheBtn = document.getElementById("settings-clear-cache-btn");
@@ -1065,31 +2080,50 @@ function setupSettingsModal() {
   const privacyPublic = document.getElementById("settings-privacy-public");
   const showUni = document.getElementById("settings-show-uni");
 
-  // Load preferences from localStorage
+  // Load preferences from localStorage and active session
   try {
     const savedPrefs = JSON.parse(localStorage.getItem("unisport_app_preferences") || "{}");
+    const activeSess = getActiveSession() || state.currentUser || {};
     if (unitSelect && savedPrefs.unit) unitSelect.value = savedPrefs.unit;
     if (hapticsToggle && typeof savedPrefs.haptics === "boolean") hapticsToggle.checked = savedPrefs.haptics;
     if (notifRoster && typeof savedPrefs.notifRoster === "boolean") notifRoster.checked = savedPrefs.notifRoster;
     if (notifActivities && typeof savedPrefs.notifActivities === "boolean") notifActivities.checked = savedPrefs.notifActivities;
     if (notifReminders && typeof savedPrefs.notifReminders === "boolean") notifReminders.checked = savedPrefs.notifReminders;
-    if (privacyPublic && typeof savedPrefs.privacyPublic === "boolean") privacyPublic.checked = savedPrefs.privacyPublic;
-    if (showUni && typeof savedPrefs.showUni === "boolean") showUni.checked = savedPrefs.showUni;
+
+    const initialPub = typeof savedPrefs.privacyPublic === "boolean" ? savedPrefs.privacyPublic : (activeSess.isPublic !== undefined ? activeSess.isPublic : true);
+    const initialUni = typeof savedPrefs.showUni === "boolean" ? savedPrefs.showUni : (activeSess.showUniBadge !== undefined ? activeSess.showUniBadge : true);
+    if (privacyPublic) privacyPublic.checked = initialPub;
+    if (showUni) showUni.checked = initialUni;
+
+    // Apply immediate badge visibility
+    const ownBadge = document.getElementById("profile-hero-badge");
+    if (ownBadge) {
+      if (initialUni === false) ownBadge.classList.add("hidden");
+      else ownBadge.classList.remove("hidden");
+    }
+    const dropSchool = document.getElementById("dropdown-school-container");
+    if (dropSchool) {
+      if (initialUni === false) dropSchool.classList.add("hidden");
+      else dropSchool.classList.remove("hidden");
+    }
   } catch (e) {}
 
   const savePreferences = () => {
     try {
+      const isPub = privacyPublic ? privacyPublic.checked : true;
+      const showU = showUni ? showUni.checked : true;
       const prefs = {
         unit: unitSelect ? unitSelect.value : "metric",
         haptics: hapticsToggle ? hapticsToggle.checked : true,
         notifRoster: notifRoster ? notifRoster.checked : true,
         notifActivities: notifActivities ? notifActivities.checked : true,
         notifReminders: notifReminders ? notifReminders.checked : true,
-        privacyPublic: privacyPublic ? privacyPublic.checked : true,
-        showUni: showUni ? showUni.checked : true,
+        privacyPublic: isPub,
+        showUni: showU,
         updatedAt: Date.now()
       };
       localStorage.setItem("unisport_app_preferences", JSON.stringify(prefs));
+      savePrivacySettingsToFirestore(isPub, showU);
     } catch (e) {}
   };
 
@@ -1108,14 +2142,16 @@ function setupSettingsModal() {
     deleteAccountBtn.addEventListener("click", deleteAccount);
   }
 
-  const close = () => { if (modal) modal.classList.add("hidden"); };
+  const close = () => {
+    if (modal) {
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+    }
+    document.body.style.overflow = "";
+  };
+  if (saveBtn) saveBtn.addEventListener("click", close);
   if (closeBtn) closeBtn.addEventListener("click", close);
   if (doneBtn) doneBtn.addEventListener("click", close);
-  if (modal) {
-    modal.addEventListener("click", (e) => {
-      if (e.target === modal) close();
-    });
-  }
 }
 
 export async function clearCache() {
@@ -1488,10 +2524,14 @@ export async function fetchCampusStudents() {
           if (!["bodybuilder", "footballer", "runner"].includes(avId)) avId = "footballer";
           const sport = (f.sport && f.sport.stringValue) ? f.sport.stringValue : "Football";
           const sessCnt = (f.sessionsCount && f.sessionsCount.integerValue) ? parseInt(f.sessionsCount.integerValue, 10) : 0;
+          const isPub = (f.isPublic && f.isPublic.booleanValue !== undefined) ? f.isPublic.booleanValue : true;
+          const showBadge = (f.showUniBadge && f.showUniBadge.booleanValue !== undefined) ? f.showUniBadge.booleanValue : true;
 
           remoteStudents.push({
             uid,
             isSelf,
+            isPublic: isPub,
+            showUniBadge: showBadge,
             displayName: dName,
             email: dEmail,
             university: (f.university && f.university.stringValue) ? f.university.stringValue : (dEmail.endsWith("@student.tue.nl") ? "TU Eindhoven" : "Fontys UAS"),
@@ -1521,9 +2561,14 @@ export async function fetchCampusStudents() {
       const dEmail = data.email || (isSelf ? currentSession.email : "") || "";
       let avId = data.avatarId || (isSelf ? (currentSession.avatarId || "footballer") : "footballer");
       if (!["bodybuilder", "footballer", "runner"].includes(avId)) avId = "footballer";
+      const isPub = data.isPublic !== undefined ? data.isPublic : true;
+      const showBadge = data.showUniBadge !== undefined ? data.showUniBadge : true;
+
       remoteStudents.push({
         uid: docSnap.id,
         isSelf: isSelf,
+        isPublic: isPub,
+        showUniBadge: showBadge,
         displayName: dName,
         email: dEmail,
         university: data.university || (dEmail.endsWith("@student.tue.nl") ? "TU Eindhoven" : "Fontys UAS"),
@@ -1545,9 +2590,16 @@ export async function fetchCampusStudents() {
   if (currentSession && currentSession.uid && !remoteStudents.some(s => s.uid === currentSession.uid)) {
     let selfAv = currentSession.avatarId || "footballer";
     if (!["bodybuilder", "footballer", "runner"].includes(selfAv)) selfAv = "footballer";
+    let selfPrefs = {};
+    try { selfPrefs = JSON.parse(localStorage.getItem("unisport_app_preferences") || "{}"); } catch(e){}
+    const selfIsPub = selfPrefs.privacyPublic !== undefined ? selfPrefs.privacyPublic : (currentSession.isPublic !== undefined ? currentSession.isPublic : true);
+    const selfShowBadge = selfPrefs.showUni !== undefined ? selfPrefs.showUni : (currentSession.showUniBadge !== undefined ? currentSession.showUniBadge : true);
+
     remoteStudents.push({
       uid: currentSession.uid,
       isSelf: true,
+      isPublic: selfIsPub,
+      showUniBadge: selfShowBadge,
       displayName: currentSession.displayName || "Student",
       email: currentSession.email || "",
       university: currentSession.university || "Fontys UAS",
@@ -1601,9 +2653,14 @@ export function listenToCampusStudents() {
         const dEmail = data.email || (isSelf ? currentSession.email : "") || "";
         let avId = data.avatarId || (isSelf ? (currentSession.avatarId || "footballer") : "footballer");
         if (!["bodybuilder", "footballer", "runner"].includes(avId)) avId = "footballer";
+        const isPub = data.isPublic !== undefined ? data.isPublic : true;
+        const showBadge = data.showUniBadge !== undefined ? data.showUniBadge : true;
+
         remote.push({
           uid: docSnap.id,
           isSelf: isSelf,
+          isPublic: isPub,
+          showUniBadge: showBadge,
           displayName: dName,
           email: dEmail,
           university: data.university || (dEmail.endsWith("@student.tue.nl") ? "TU Eindhoven" : "Fontys UAS"),
@@ -1622,9 +2679,16 @@ export function listenToCampusStudents() {
       if (currentSession && currentSession.uid && !remote.some(s => s.uid === currentSession.uid)) {
         let selfAv = currentSession.avatarId || "footballer";
         if (!["bodybuilder", "footballer", "runner"].includes(selfAv)) selfAv = "footballer";
+        let selfPrefs = {};
+        try { selfPrefs = JSON.parse(localStorage.getItem("unisport_app_preferences") || "{}"); } catch(e){}
+        const selfIsPub = selfPrefs.privacyPublic !== undefined ? selfPrefs.privacyPublic : (currentSession.isPublic !== undefined ? currentSession.isPublic : true);
+        const selfShowBadge = selfPrefs.showUni !== undefined ? selfPrefs.showUni : (currentSession.showUniBadge !== undefined ? currentSession.showUniBadge : true);
+
         remote.push({
           uid: currentSession.uid,
           isSelf: true,
+          isPublic: selfIsPub,
+          showUniBadge: selfShowBadge,
           displayName: currentSession.displayName || "Student",
           email: currentSession.email || "",
           university: currentSession.university || "Fontys UAS",
@@ -1814,6 +2878,7 @@ window.removeFriend = removeFriend;
 window.acceptFriendRequest = acceptFriendRequest;
 window.declineFriendRequest = declineFriendRequest;
 window.clearAllNotifsGlobal = clearAllNotifsGlobal;
+window.savePrivacySettingsToFirestore = savePrivacySettingsToFirestore;
 
 window.UniSport = {
   switchTab,
@@ -1834,8 +2899,35 @@ window.UniSport = {
   removeFriend,
   syncSocialStateFromStorage,
   fetchCampusStudents,
+  savePrivacySettingsToFirestore,
+  openFilterDrawer,
+  closeFilterDrawer,
+  setDrawerDateFilter,
+  setDrawerPriceFilter,
+  applyFilterDrawer,
+  resetFeedFilters,
+  setFeedPageSize,
+  goToFeedPage,
+  openEditActivityModal,
+  closeEditActivityModal,
+  saveEditedActivity,
+  kickParticipant,
   signOut: signOutStudent
 };
+
+// Also expose immediately onto window
+window.UniSport.openFilterDrawer = openFilterDrawer;
+window.UniSport.closeFilterDrawer = closeFilterDrawer;
+window.UniSport.setDrawerDateFilter = setDrawerDateFilter;
+window.UniSport.setDrawerPriceFilter = setDrawerPriceFilter;
+window.UniSport.applyFilterDrawer = applyFilterDrawer;
+window.UniSport.resetFeedFilters = resetFeedFilters;
+window.UniSport.setFeedPageSize = setFeedPageSize;
+window.UniSport.goToFeedPage = goToFeedPage;
+window.UniSport.openEditActivityModal = openEditActivityModal;
+window.UniSport.closeEditActivityModal = closeEditActivityModal;
+window.UniSport.saveEditedActivity = saveEditedActivity;
+window.UniSport.kickParticipant = kickParticipant;
 
 // Bootstrapping: Load local/cached students, initialize app immediately, and fetch remote updates asynchronously
 function bootUniSport() {
