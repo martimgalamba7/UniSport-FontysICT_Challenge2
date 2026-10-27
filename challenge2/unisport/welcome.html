@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UniSport • Welcome Back</title>
+  
+  <link rel="icon" type="image/png" href="/assets/logoUniSport.png" />
+  <link rel="apple-touch-icon" href="/assets/logoUniSport.png" />
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              orange: '#FF4D00',
+              'orange-hover': '#EA4500',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <script src="./theme.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body class="bg-white text-zinc-900 dark:bg-black dark:text-zinc-100 min-h-screen flex flex-col font-sans transition-colors duration-150">
+
+  <!-- Minimal Header -->
+  <header class="w-full px-6 sm:px-12 py-5 flex items-center justify-between border-b border-zinc-100 dark:border-zinc-900">
+    <a href="/challenge2/unisport" class="flex items-center space-x-2.5">
+      <img src="/assets/logoUniSport.png" alt="UniSport" class="h-7 w-auto object-contain" onerror="this.src='./assets/logoUniSport.png';" />
+      <span class="font-bold text-lg tracking-tight text-zinc-950 dark:text-white">UniSport</span>
+    </a>
+  </header>
+
+  <!-- Welcome Back Confirmation Cardless Stage -->
+  <main class="flex-grow flex items-center justify-center px-6 py-12">
+    <div class="w-full max-w-sm text-center space-y-6">
+
+      <!-- Google-Style / Kick-Style Glowing Avatar Badge -->
+      <div class="relative inline-block mx-auto">
+        <div id="user-avatar-wrap" class="w-20 h-20 rounded-full p-1 bg-gradient-to-tr from-brand-orange via-purple-500 to-blue-500 shadow-xl flex items-center justify-center">
+          <div id="user-avatar-inner" class="w-full h-full rounded-full bg-zinc-900 flex items-center justify-center text-white">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <span class="text-xs font-semibold uppercase tracking-wider text-emerald-500 flex items-center justify-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          Authenticated
+        </span>
+        <h1 id="welcome-title" class="text-3xl font-bold tracking-tight text-zinc-950 dark:text-white">
+          Welcome back!
+        </h1>
+        <p id="welcome-email" class="text-sm text-zinc-500 dark:text-zinc-400">
+          Loading student session...
+        </p>
+      </div>
+
+      <div class="pt-4">
+        <a 
+          href="/challenge2/unisport/app" 
+          id="btn-goto-app"
+          class="w-full inline-flex items-center justify-center py-3.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 text-sm font-semibold transition"
+        >
+          <span>Open Web App</span>
+          <i data-lucide="arrow-right" class="w-4 h-4 ml-2"></i>
+        </a>
+      </div>
+
+      <p class="text-[11px] text-zinc-400 dark:text-zinc-600">
+        Redirecting automatically in a moment...
+      </p>
+
+    </div>
+  </main>
+
+  <script>
+    lucide.createIcons();
+  </script>
+
+  <!-- Welcome Back Logic Script -->
+  <script type="module">
+    import { getActiveSession } from "./auth.js";
+    import { getAvatarById } from "./avatars.js";
+
+    const titleEl = document.getElementById("welcome-title");
+    const emailEl = document.getElementById("welcome-email");
+    const avatarInner = document.getElementById("user-avatar-inner");
+
+    const session = getActiveSession();
+
+    if (session) {
+      const name = session.displayName || session.email.split("@")[0];
+      titleEl.textContent = `Welcome back, ${name}!`;
+      emailEl.textContent = `${session.email} • ${session.university || 'Eindhoven'}`;
+
+      const avatar = getAvatarById(session.avatarId || "bolt");
+      avatarInner.className = `w-full h-full rounded-full overflow-hidden bg-gradient-to-tr ${avatar.bg} flex items-center justify-center text-white`;
+      avatarInner.innerHTML = avatar.svg;
+
+      // Auto redirect after 2.5 seconds
+      setTimeout(() => {
+        window.location.href = "/challenge2/unisport/app";
+      }, 2500);
+    } else {
+      // If no session found, redirect to login
+      window.location.href = "./login.html";
+    }
+  </script>
+
+</body>
+</html>

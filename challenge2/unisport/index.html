@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth bg-[#FAFAF8] text-zinc-900 antialiased selection:bg-[#FF4D00] selection:text-white">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UniSport • The Student Sports Community</title>
+  
+  <!-- Meta & OpenGraph -->
+  <meta name="description" content="UniSport connects university students for spontaneous pick-up games, court bookings, and athletic partners. Never play alone." />
+  
+  <link rel="icon" type="image/png" href="/assets/logoUniSport.png" />
+  <link rel="apple-touch-icon" href="/assets/logoUniSport.png" />
+
+  <!-- Google Fonts: Plus Jakarta Sans + Syne -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['Syne', 'Plus Jakarta Sans', 'sans-serif'],
+            sans: ['Plus Jakarta Sans', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              orange: '#FF4D00',
+              'orange-hover': '#EA4500',
+              'orange-light': '#FFF1EB',
+              cream: '#FAFAF8',
+              warm: '#F4F2EC',
+              card: '#FFFFFF',
+              dark: '#111113',
+            }
+          },
+          screens: {
+            '3xl': '1920px',
+            '4xl': '2560px',
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- External Separated Stylesheet -->
+  <link rel="stylesheet" href="/challenge2/unisport/styles.css" />
+  <link rel="stylesheet" href="./styles.css" />
+
+  <!-- Critical Inline Typography Fallback (ensures 100% resilient layout regardless of stylesheet load timing) -->
+  <style>
+    .hero-title {
+      font-size: clamp(2.75rem, 6.5vw + 1rem, 7.5rem);
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+    }
+    .section-title {
+      font-size: clamp(2.25rem, 4.5vw + 0.5rem, 5.5rem);
+      line-height: 1.02;
+      letter-spacing: -0.03em;
+    }
+    @keyframes marquee {
+      0% { transform: translateX(0%); }
+      100% { transform: translateX(-50%); }
+    }
+    .animate-marquee {
+      display: flex;
+      width: 200%;
+      animation: marquee 26s linear infinite;
+    }
+  </style>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body class="bg-[#FAFAF8] text-zinc-900 font-sans min-h-screen flex flex-col justify-between selection:bg-brand-orange selection:text-white">
+
+  <!-- ================= TOP NAVIGATION BAR (Full-Bleed Startup Header) ================= -->
+  <header class="sticky top-0 z-50 bg-[#FAFAF8]/90 backdrop-blur-xl border-b border-zinc-200/80 transition-all">
+    <div class="w-full px-6 sm:px-10 lg:px-16 2xl:px-24 h-20 flex items-center justify-between">
+      
+      <!-- Brand Logo & Name -->
+      <a href="/challenge2/unisport" class="flex items-center space-x-3.5 group focus:outline-none">
+        <img src="/assets/logoUniSport.png" alt="UniSport" class="h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105" onerror="this.onerror=null; this.src='./assets/logoUniSport.png';" />
+        <span class="font-display font-extrabold text-2xl tracking-tight text-zinc-950">UniSport</span>
+      </a>
+
+      <!-- Desktop Navigation Links -->
+      <nav class="hidden md:flex items-center space-x-8 lg:space-x-12 text-sm font-semibold text-zinc-600">
+        <a href="#why" class="hover:text-zinc-950 transition-colors">Why UniSport</a>
+        <a href="#features" class="hover:text-zinc-950 transition-colors">Features</a>
+        <a href="#sports" class="hover:text-zinc-950 transition-colors">Sports</a>
+        <a href="#faq" class="hover:text-zinc-950 transition-colors">FAQ</a>
+      </nav>
+
+      <!-- Action Button -->
+      <div class="flex items-center space-x-3 sm:space-x-4">
+        <!-- Launch Web App CTA -->
+        <a href="/challenge2/unisport/app/login.html" class="inline-flex items-center space-x-2 bg-zinc-950 hover:bg-zinc-800 text-white text-xs lg:text-sm font-bold py-2.5 px-6 rounded-full shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5">
+          <span>Open App</span>
+          <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </a>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ================= MAIN CONTENT (Ultra-Wide Full-Bleed Scaling) ================= -->
+  <main class="flex-grow w-full">
+
+    <!-- ================= HERO SECTION (Full Viewport Scaled) ================= -->
+    <section class="w-full min-h-[calc(100vh-5rem)] flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-16 sm:py-24 border-b border-zinc-200/80 relative overflow-hidden">
+      
+      <!-- Large Sports Parallax Icons in Hero -->
+      <div class="sport-parallax-icon-wrapper absolute right-4 sm:right-12 lg:right-24 top-16 sm:top-20 pointer-events-none z-0" data-parallax-speed="0.22" data-parallax-rotate="0.05">
+        <div class="animate-bob-1 icon-size-hero text-brand-orange drop-shadow-[0_20px_45px_rgba(255,77,0,0.35)] opacity-90">
+          <i data-lucide="circle-dot" class="w-full h-full stroke-[1.6]"></i>
+        </div>
+      </div>
+
+      <div class="sport-parallax-icon-wrapper absolute right-16 sm:right-36 lg:right-60 bottom-12 sm:bottom-20 pointer-events-none z-0 opacity-40" data-parallax-speed="-0.18" data-parallax-rotate="-0.04">
+        <div class="animate-bob-2 icon-size-lg text-zinc-500">
+          <i data-lucide="target" class="w-full h-full stroke-[1.5]"></i>
+        </div>
+      </div>
+
+      <div class="sport-parallax-icon-wrapper absolute left-4 sm:left-12 lg:left-20 top-20 pointer-events-none z-0 opacity-30 hidden md:block" data-parallax-speed="0.14" data-parallax-rotate="0.06">
+        <div class="animate-bob-3 icon-size-md text-brand-orange">
+          <i data-lucide="crosshair" class="w-full h-full stroke-[1.6]"></i>
+        </div>
+      </div>
+
+      <div class="w-full relative z-10">
+        
+        <!-- Oversized Fluid Hero Headline with Startup Motto -->
+        <div class="w-full max-w-[2200px] space-y-8">
+          
+          <h1 class="hero-title font-display font-extrabold text-zinc-950 uppercase reveal-on-scroll">
+            Never play alone.<br />
+            <span class="text-brand-orange">Find your squad. Play any sport.</span>
+          </h1>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 pt-2 items-end">
+            <p class="lg:col-span-8 text-lg sm:text-2xl 2xl:text-3xl text-zinc-600 font-normal leading-relaxed max-w-4xl reveal-on-scroll delay-100">
+              Break the solo workout barrier. Leave chaotic 100-message group chats behind. Discover spontaneous pick-up games, court bookings, and athletic partners across your campus in seconds.
+            </p>
+
+            <div class="lg:col-span-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-4 reveal-on-scroll delay-200">
+              <a href="/challenge2/unisport/app/login.html" class="btn-shimmer group relative w-full sm:w-auto inline-flex items-center justify-center space-x-4 bg-brand-orange hover:bg-brand-orange-hover text-white font-extrabold text-base sm:text-lg uppercase tracking-wider py-5 px-10 rounded-2xl shadow-[0_12px_30px_-8px_rgba(255,77,0,0.55)] hover:shadow-[0_20px_40px_-6px_rgba(255,77,0,0.7)] transition-all duration-300 transform hover:-translate-y-1 active:translate-y-0 active:scale-[0.98] border border-orange-400/30">
+                <span>Start Playing</span>
+                <i data-lucide="arrow-right" class="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1.5"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ================= FULL-WIDTH KINETIC MARQUEE (Clean SVG Icons) ================= -->
+    <div class="w-full py-5 bg-zinc-950 text-white overflow-hidden font-display font-extrabold text-lg sm:text-xl 2xl:text-2xl tracking-tight uppercase select-none">
+      <div class="animate-marquee whitespace-nowrap flex items-center space-x-12">
+        <span class="inline-flex items-center space-x-3">
+          <i data-lucide="circle-dot" class="w-5 h-5 text-brand-orange"></i>
+          <span>Football 5v5</span>
+        </span>
+        <span class="text-zinc-700">•</span>
+        <span class="inline-flex items-center space-x-3">
+          <i data-lucide="crosshair" class="w-5 h-5 text-brand-orange"></i>
+          <span>Padel Doubles</span>
+        </span>
+        <span class="text-zinc-700">•</span>
+        <span class="inline-flex items-center space-x-3">
+          <i data-lucide="footprints" class="w-5 h-5 text-brand-orange"></i>
+          <span>Sunset 5K Run</span>
+        </span>
+        <span class="text-zinc-700">•</span>
+        <span class="inline-flex items-center space-x-3">
+          <i data-lucide="mountain" class="w-5 h-5 text-brand-orange"></i>
+          <span>Bouldering Crew</span>
+        </span>
+        <span class="text-zinc-700">•</span>
+        <span class="inline-flex items-center space-x-3">
+          <i data-lucide="target" class="w-5 h-5 text-brand-orange"></i>
+          <span>Basketball 3x3</span>
+        </span>
+        <span class="text-zinc-700">•</span>
+        <span class="inline-flex items-center space-x-3">
+          <i data-lucide="dumbbell" class="w-5 h-5 text-brand-orange"></i>
+          <span>Fitness Circuits</span>
+        </span>
+        <span class="text-zinc-700">•</span>
+        <span class="inline-flex items-center space-x-3">
+          <i data-lucide="activity" class="w-5 h-5 text-brand-orange"></i>
+          <span>Volleyball Squad</span>
+        </span>
+        <span class="text-zinc-700">•</span>
+        <span class="inline-flex items-center space-x-3">
+          <i data-lucide="bike" class="w-5 h-5 text-brand-orange"></i>
+          <span>Group Cycling</span>
+        </span>
+        <span class="text-zinc-700">•</span>
+
+        <!-- Duplicated items for smooth infinite loop -->
+        <span class="inline-flex items-center space-x-3">
+          <i data-lucide="circle-dot" class="w-5 h-5 text-brand-orange"></i>
+          <span>Football 5v5</span>
+        </span>
+        <span class="text-zinc-700">•</span>
+        <span class="inline-flex items-center space-x-3">
+          <i data-lucide="crosshair" class="w-5 h-5 text-brand-orange"></i>
+          <span>Padel Doubles</span>
+        </span>
+        <span class="text-zinc-700">•</span>
+        <span class="inline-flex items-center space-x-3">
+          <i data-lucide="footprints" class="w-5 h-5 text-brand-orange"></i>
+          <span>Sunset 5K Run</span>
+        </span>
+        <span class="text-zinc-700">•</span>
+        <span class="inline-flex items-center space-x-3">
+          <i data-lucide="mountain" class="w-5 h-5 text-brand-orange"></i>
+          <span>Bouldering Crew</span>
+        </span>
+        <span class="text-zinc-700">•</span>
+        <span class="inline-flex items-center space-x-3">
+          <i data-lucide="target" class="w-5 h-5 text-brand-orange"></i>
+          <span>Basketball 3x3</span>
+        </span>
+        <span class="text-zinc-700">•</span>
+        <span class="inline-flex items-center space-x-3">
+          <i data-lucide="dumbbell" class="w-5 h-5 text-brand-orange"></i>
+          <span>Fitness Circuits</span>
+        </span>
+        <span class="text-zinc-700">•</span>
+      </div>
+    </div>
+
+    <!-- ================= SECTION: WHY UNISPORT (Editorial Manifesto Style - ZERO BOXED CARDS) ================= -->
+    <section id="why" class="w-full min-h-screen flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-20 sm:py-28 bg-[#F4F2EC] border-b border-zinc-200 relative overflow-hidden">
+      
+      <!-- Sports Parallax Icons in Why Section -->
+      <div class="sport-parallax-icon-wrapper absolute -left-4 sm:left-6 lg:left-14 top-1/4 pointer-events-none z-0 opacity-20" data-parallax-speed="0.22" data-parallax-rotate="-0.04">
+        <div class="animate-bob-2 icon-size-lg text-zinc-900">
+          <i data-lucide="footprints" class="w-full h-full stroke-[1.5]"></i>
+        </div>
+      </div>
+
+      <div class="sport-parallax-icon-wrapper absolute right-4 sm:right-12 lg:right-20 bottom-16 pointer-events-none z-0 opacity-25" data-parallax-speed="-0.2" data-parallax-rotate="0.05">
+        <div class="animate-bob-1 icon-size-lg text-brand-orange">
+          <i data-lucide="dumbbell" class="w-full h-full stroke-[1.5]"></i>
+        </div>
+      </div>
+
+      <div class="w-full max-w-[2200px] mx-auto relative z-10">
+        
+        <!-- Manifesto Header -->
+        <div class="max-w-4xl space-y-4 reveal-on-scroll">
+          <span class="text-brand-orange font-bold text-xs sm:text-sm uppercase tracking-widest block font-display">The Vision & Movement</span>
+          <h2 class="section-title font-display font-extrabold text-zinc-950 uppercase">
+            Sports shouldn't be hard to organize.
+          </h2>
+          <p class="text-lg sm:text-2xl text-zinc-600 font-normal leading-relaxed">
+            University life is fast, unpredictable, and busy. Existing solutions either focus purely on solo GPS tracking or trap people in endless chat messages. UniSport bridges the gap.
+          </p>
+        </div>
+
+        <!-- 3 Open Editorial Columns with Large Typographic Numbers -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-16 mt-16 sm:mt-24 pt-10 border-t border-zinc-300">
+          
+          <div class="space-y-6 reveal-on-scroll delay-100 group">
+            <div class="flex items-center justify-between pb-3 border-b border-zinc-300/80">
+              <span class="font-display font-extrabold text-4xl lg:text-5xl text-zinc-300 group-hover:text-brand-orange transition-colors duration-300">01</span>
+              <div class="text-brand-orange transition-transform duration-300 group-hover:scale-110">
+                <i data-lucide="zap" class="w-7 h-7 stroke-[2.2]"></i>
+              </div>
+            </div>
+            <div class="space-y-3">
+              <h3 class="font-display font-bold text-2xl lg:text-3xl text-zinc-950">Ditch the Solo Inertia</h3>
+              <p class="text-zinc-600 leading-relaxed text-base sm:text-lg font-normal">
+                Moving to a new city or having friends with different study schedules shouldn't stop you from exercising. Find players on your level whenever you have an hour free.
+              </p>
+            </div>
+          </div>
+
+          <div class="space-y-6 reveal-on-scroll delay-200 group">
+            <div class="flex items-center justify-between pb-3 border-b border-zinc-300/80">
+              <span class="font-display font-extrabold text-4xl lg:text-5xl text-zinc-300 group-hover:text-brand-orange transition-colors duration-300">02</span>
+              <div class="text-brand-orange transition-transform duration-300 group-hover:scale-110">
+                <i data-lucide="message-square-off" class="w-7 h-7 stroke-[2.2]"></i>
+              </div>
+            </div>
+            <div class="space-y-3">
+              <h3 class="font-display font-bold text-2xl lg:text-3xl text-zinc-950">End Group Chat Chaos</h3>
+              <p class="text-zinc-600 leading-relaxed text-base sm:text-lg font-normal">
+                No more 100-person WhatsApp threads where plans fall apart. UniSport replaces back-and-forth texting with clear spot availability and instant sign-ups.
+              </p>
+            </div>
+          </div>
+
+          <div class="space-y-6 reveal-on-scroll delay-300 group">
+            <div class="flex items-center justify-between pb-3 border-b border-zinc-300/80">
+              <span class="font-display font-extrabold text-4xl lg:text-5xl text-zinc-300 group-hover:text-brand-orange transition-colors duration-300">03</span>
+              <div class="text-brand-orange transition-transform duration-300 group-hover:scale-110">
+                <i data-lucide="users" class="w-7 h-7 stroke-[2.2]"></i>
+              </div>
+            </div>
+            <div class="space-y-3">
+              <h3 class="font-display font-bold text-2xl lg:text-3xl text-zinc-950">Inclusive Skill Levels</h3>
+              <p class="text-zinc-600 leading-relaxed text-base sm:text-lg font-normal">
+                From casual first-time padel rallies to competitive 5v5 soccer leagues. Filter games by competitive vibe so everyone feels challenged and welcome.
+              </p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ================= SECTION: FEATURES (Core Features Architecture - CLEAR & COMPELLING) ================= -->
+    <section id="features" class="w-full min-h-screen flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-20 sm:py-28 border-b border-zinc-200/80 relative overflow-hidden bg-white">
+      
+      <!-- Sports Parallax Icons in Features Section -->
+      <div class="sport-parallax-icon-wrapper absolute right-4 sm:right-12 lg:right-24 top-20 pointer-events-none z-0 opacity-20" data-parallax-speed="0.2" data-parallax-rotate="0.05">
+        <div class="animate-bob-3 icon-size-lg text-zinc-800">
+          <i data-lucide="mountain" class="w-full h-full stroke-[1.5]"></i>
+        </div>
+      </div>
+
+      <div class="sport-parallax-icon-wrapper absolute left-4 sm:left-12 bottom-16 pointer-events-none z-0 opacity-25" data-parallax-speed="-0.18" data-parallax-rotate="-0.04">
+        <div class="animate-bob-1 icon-size-md text-brand-orange">
+          <i data-lucide="activity" class="w-full h-full stroke-[1.5]"></i>
+        </div>
+      </div>
+
+      <div class="w-full max-w-[2200px] mx-auto relative z-10 space-y-16 sm:space-y-20">
+        
+        <!-- Header -->
+        <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 reveal-on-scroll">
+          <div class="space-y-4 max-w-3xl">
+            <span class="text-brand-orange font-bold text-xs sm:text-sm uppercase tracking-widest block font-display">Core Platform Features</span>
+            <h2 class="section-title font-display font-extrabold text-zinc-950 uppercase">
+              Everything built for seamless play.
+            </h2>
+          </div>
+          <p class="text-base sm:text-xl text-zinc-600 max-w-md font-normal leading-relaxed">
+            Built for how students actually live and move. From verified campus peers to real-time spot reservations, UniSport removes every obstacle between you and your next workout.
+          </p>
+        </div>
+
+        <!-- 5 Core Features: Structured Architectural Grid (Zero Boxy Cards) -->
+        <div class="space-y-12 sm:space-y-16">
+          
+          <!-- Row 1: Foundational Core (3 Columns) -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-14 pt-10 border-t border-zinc-200">
+            
+            <!-- Feature 1: Student-Only Community -->
+            <div class="space-y-5 reveal-on-scroll delay-100 group">
+              <div class="flex items-center justify-between pb-3 border-b border-zinc-200">
+                <span class="font-display font-extrabold text-4xl lg:text-5xl text-zinc-300 group-hover:text-brand-orange transition-colors duration-300">01</span>
+                <div class="text-brand-orange transition-transform duration-300 group-hover:scale-110">
+                  <i data-lucide="shield-check" class="w-8 h-8 stroke-[2.2]"></i>
+                </div>
+              </div>
+              <div class="space-y-3">
+                <span class="text-xs font-bold text-brand-orange uppercase tracking-wider block font-display">Campus Verified</span>
+                <h3 class="font-display font-bold text-2xl text-zinc-950">Student-Only Community</h3>
+                <p class="text-zinc-600 leading-relaxed text-sm sm:text-base font-normal">
+                  Play with confidence. UniSport is built exclusively for university students, creating a safe, trusted space where everyone on the court belongs to your campus. No random strangers, no commercial ads—just verified peers ready to play.
+                </p>
+              </div>
+            </div>
+
+            <!-- Feature 2: Athletic Preferences -->
+            <div class="space-y-5 reveal-on-scroll delay-150 group">
+              <div class="flex items-center justify-between pb-3 border-b border-zinc-200">
+                <span class="font-display font-extrabold text-4xl lg:text-5xl text-zinc-300 group-hover:text-brand-orange transition-colors duration-300">02</span>
+                <div class="text-brand-orange transition-transform duration-300 group-hover:scale-110">
+                  <i data-lucide="sliders" class="w-8 h-8 stroke-[2.2]"></i>
+                </div>
+              </div>
+              <div class="space-y-3">
+                <span class="text-xs font-bold text-brand-orange uppercase tracking-wider block font-display">Tailored Matching</span>
+                <h3 class="font-display font-bold text-2xl text-zinc-950">Your Sports, Your Skill Level</h3>
+                <p class="text-zinc-600 leading-relaxed text-sm sm:text-base font-normal">
+                  Whether you're hitting the gym, running 5K at sunset, rallying padel, or climbing, UniSport matches you with athletes on your wavelength. Choose your sports, set your intensity from casual fun to competitive sparring, and play with people who match your pace.
+                </p>
+              </div>
+            </div>
+
+            <!-- Feature 3: Geo Feed -->
+            <div class="space-y-5 reveal-on-scroll delay-200 group">
+              <div class="flex items-center justify-between pb-3 border-b border-zinc-200">
+                <span class="font-display font-extrabold text-4xl lg:text-5xl text-zinc-300 group-hover:text-brand-orange transition-colors duration-300">03</span>
+                <div class="text-brand-orange transition-transform duration-300 group-hover:scale-110">
+                  <i data-lucide="compass" class="w-8 h-8 stroke-[2.2]"></i>
+                </div>
+              </div>
+              <div class="space-y-3">
+                <span class="text-xs font-bold text-brand-orange uppercase tracking-wider block font-display">Live Campus Radar</span>
+                <h3 class="font-display font-bold text-2xl text-zinc-950">Spontaneous Campus Feed</h3>
+                <p class="text-zinc-600 leading-relaxed text-sm sm:text-base font-normal">
+                  Got an unexpected hour free between classes? Open the live feed to see games and training sessions happening right around you. Filter by distance to find courts, running tracks, or gym buddies within a short walk or bike ride.
+                </p>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Row 2: High-Impact Action Engines (2 Wide Columns) -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-16 pt-10 border-t border-zinc-200">
+            
+            <!-- Feature 4: Activity Management & Sign-Ups -->
+            <div class="space-y-5 reveal-on-scroll delay-250 group">
+              <div class="flex items-center justify-between pb-3 border-b border-zinc-200">
+                <span class="font-display font-extrabold text-4xl lg:text-5xl text-zinc-300 group-hover:text-brand-orange transition-colors duration-300">04</span>
+                <div class="text-brand-orange transition-transform duration-300 group-hover:scale-110">
+                  <i data-lucide="calendar-plus" class="w-8 h-8 stroke-[2.2]"></i>
+                </div>
+              </div>
+              <div class="space-y-3">
+                <span class="text-xs font-bold text-brand-orange uppercase tracking-wider block font-display">One-Tap Organizing</span>
+                <h3 class="font-display font-bold text-2xl lg:text-3xl text-zinc-950">Host a Game in 30 Seconds</h3>
+                <p class="text-zinc-600 leading-relaxed text-base sm:text-lg font-normal">
+                  Need an extra player for 5v5 or a sparring partner for tennis? Post an activity in seconds: pick your sport, set the court, lock the exact player limit, and let fellow students fill the roster. Live spot tracking ensures your games are always full and never overbooked.
+                </p>
+              </div>
+            </div>
+
+            <!-- Feature 5: Community Interaction -->
+            <div class="space-y-5 reveal-on-scroll delay-300 group">
+              <div class="flex items-center justify-between pb-3 border-b border-zinc-200">
+                <span class="font-display font-extrabold text-4xl lg:text-5xl text-zinc-300 group-hover:text-brand-orange transition-colors duration-300">05</span>
+                <div class="text-brand-orange transition-transform duration-300 group-hover:scale-110">
+                  <i data-lucide="users" class="w-8 h-8 stroke-[2.2]"></i>
+                </div>
+              </div>
+              <div class="space-y-3">
+                <span class="text-xs font-bold text-brand-orange uppercase tracking-wider block font-display">Social Transparency</span>
+                <h3 class="font-display font-bold text-2xl lg:text-3xl text-zinc-950">Know Who's Playing Before You Go</h3>
+                <p class="text-zinc-600 leading-relaxed text-base sm:text-lg font-normal">
+                  Exercising with new people shouldn't feel intimidating. See who has already joined, check out who you'll be playing with, and show up with confidence. Spot counts and player rosters update instantly whenever someone joins or drops out—no missing players, no surprises.
+                </p>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ================= SECTION: POPULAR SPORTS (SVG Icon Badges Without Background) ================= -->
+    <section id="sports" class="w-full min-h-screen flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-20 sm:py-28 bg-[#F4F2EC] border-b border-zinc-200 relative overflow-hidden">
+      
+      <!-- Sports Parallax Icons in Sports Section -->
+      <div class="sport-parallax-icon-wrapper absolute right-4 sm:right-12 lg:right-20 top-16 pointer-events-none z-0 opacity-30" data-parallax-speed="0.24" data-parallax-rotate="0.06">
+        <div class="animate-bob-2 icon-size-lg text-brand-orange">
+          <i data-lucide="bike" class="w-full h-full stroke-[1.5]"></i>
+        </div>
+      </div>
+
+      <div class="sport-parallax-icon-wrapper absolute left-4 sm:left-12 bottom-12 pointer-events-none z-0 opacity-25" data-parallax-speed="-0.16" data-parallax-rotate="-0.05">
+        <div class="animate-bob-3 icon-size-lg text-zinc-800">
+          <i data-lucide="disc" class="w-full h-full stroke-[1.5]"></i>
+        </div>
+      </div>
+
+      <div class="w-full max-w-[2200px] mx-auto relative z-10">
+        
+        <div class="max-w-3xl space-y-4 mb-12 sm:mb-16 reveal-on-scroll">
+          <h2 class="section-title font-display font-extrabold text-zinc-950 uppercase">
+            Whatever you play, someone's in.
+          </h2>
+          <p class="text-base sm:text-xl text-zinc-600">
+            From classic team leagues to solo training partners looking for motivation.
+          </p>
+        </div>
+
+        <!-- 12 Scaled Sport Cards (Pure icons without container backgrounds) -->
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6 gap-4 sm:gap-6">
+          
+          <div class="sport-card bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3 reveal-on-scroll delay-100">
+            <div class="sport-icon-box text-brand-orange flex items-center">
+              <i data-lucide="circle-dot" class="w-7 h-7 stroke-[2]"></i>
+            </div>
+            <h4 class="font-display font-bold text-lg text-zinc-950">Football 5v5</h4>
+            <p class="text-xs text-zinc-500">Pick-up turf matches, astro cages, and casual Sunday matches.</p>
+          </div>
+
+          <div class="sport-card bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3 reveal-on-scroll delay-150">
+            <div class="sport-icon-box text-brand-orange flex items-center">
+              <i data-lucide="crosshair" class="w-7 h-7 stroke-[2]"></i>
+            </div>
+            <h4 class="font-display font-bold text-lg text-zinc-950">Padel Doubles</h4>
+            <p class="text-xs text-zinc-500">Fast 4-player doubles matches. Find your 4th partner in minutes.</p>
+          </div>
+
+          <div class="sport-card bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3 reveal-on-scroll delay-200">
+            <div class="sport-icon-box text-brand-orange flex items-center">
+              <i data-lucide="footprints" class="w-7 h-7 stroke-[2]"></i>
+            </div>
+            <h4 class="font-display font-bold text-lg text-zinc-950">Running Clubs</h4>
+            <p class="text-xs text-zinc-500">Group pacing, sunrise 5Ks, and trail training loops.</p>
+          </div>
+
+          <div class="sport-card bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3 reveal-on-scroll delay-250">
+            <div class="sport-icon-box text-brand-orange flex items-center">
+              <i data-lucide="mountain" class="w-7 h-7 stroke-[2]"></i>
+            </div>
+            <h4 class="font-display font-bold text-lg text-zinc-950">Bouldering</h4>
+            <p class="text-xs text-zinc-500">Indoor climbing sessions, beta solving, and social sessions.</p>
+          </div>
+
+          <div class="sport-card bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3 reveal-on-scroll delay-100">
+            <div class="sport-icon-box text-brand-orange flex items-center">
+              <i data-lucide="target" class="w-7 h-7 stroke-[2]"></i>
+            </div>
+            <h4 class="font-display font-bold text-lg text-zinc-950">Basketball 3x3</h4>
+            <p class="text-xs text-zinc-500">Half-court games, street ball courts, and indoor gym runs.</p>
+          </div>
+
+          <div class="sport-card bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3 reveal-on-scroll delay-150">
+            <div class="sport-icon-box text-brand-orange flex items-center">
+              <i data-lucide="dumbbell" class="w-7 h-7 stroke-[2]"></i>
+            </div>
+            <h4 class="font-display font-bold text-lg text-zinc-950">Gym & Fitness</h4>
+            <p class="text-xs text-zinc-500">Workout partners, spotters, and calisthenics circuits.</p>
+          </div>
+
+          <div class="sport-card bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3 reveal-on-scroll delay-200">
+            <div class="sport-icon-box text-brand-orange flex items-center">
+              <i data-lucide="activity" class="w-7 h-7 stroke-[2]"></i>
+            </div>
+            <h4 class="font-display font-bold text-lg text-zinc-950">Volleyball</h4>
+            <p class="text-xs text-zinc-500">Beach volleyball, sand pits, and indoor campus games.</p>
+          </div>
+
+          <div class="sport-card bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3 reveal-on-scroll delay-250">
+            <div class="sport-icon-box text-brand-orange flex items-center">
+              <i data-lucide="disc" class="w-7 h-7 stroke-[2]"></i>
+            </div>
+            <h4 class="font-display font-bold text-lg text-zinc-950">Badminton</h4>
+            <p class="text-xs text-zinc-500">Indoor singles and doubles across student sports halls.</p>
+          </div>
+
+          <div class="sport-card bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3 reveal-on-scroll delay-100">
+            <div class="sport-icon-box text-brand-orange flex items-center">
+              <i data-lucide="bike" class="w-7 h-7 stroke-[2]"></i>
+            </div>
+            <h4 class="font-display font-bold text-lg text-zinc-950">Cycling</h4>
+            <p class="text-xs text-zinc-500">Road group rides, gravel loops, and leisure weekend tours.</p>
+          </div>
+
+          <div class="sport-card bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3 reveal-on-scroll delay-150">
+            <div class="sport-icon-box text-brand-orange flex items-center">
+              <i data-lucide="shield" class="w-7 h-7 stroke-[2]"></i>
+            </div>
+            <h4 class="font-display font-bold text-lg text-zinc-950">Tennis</h4>
+            <p class="text-xs text-zinc-500">Clay and hard-court singles sparring or casual sets.</p>
+          </div>
+
+          <div class="sport-card bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3 reveal-on-scroll delay-200">
+            <div class="sport-icon-box text-brand-orange flex items-center">
+              <i data-lucide="sparkles" class="w-7 h-7 stroke-[2]"></i>
+            </div>
+            <h4 class="font-display font-bold text-lg text-zinc-950">Yoga / Core</h4>
+            <p class="text-xs text-zinc-500">Park yoga sessions, mobility routines, and recovery groups.</p>
+          </div>
+
+          <div class="sport-card bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3 reveal-on-scroll delay-250">
+            <div class="sport-icon-box text-brand-orange flex items-center">
+              <i data-lucide="award" class="w-7 h-7 stroke-[2]"></i>
+            </div>
+            <h4 class="font-display font-bold text-lg text-zinc-950">Table Tennis</h4>
+            <p class="text-xs text-zinc-500">Campus table tournaments and casual after-class ping pong.</p>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ================= SECTION: FAQ ACCORDION ================= -->
+    <section id="faq" class="w-full min-h-screen flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-20 sm:py-28 border-b border-zinc-200/80 relative overflow-hidden">
+      
+      <!-- Sports Parallax Icons in FAQ Section -->
+      <div class="sport-parallax-icon-wrapper absolute left-4 sm:left-12 top-24 pointer-events-none z-0 opacity-20" data-parallax-speed="0.18" data-parallax-rotate="0.04">
+        <div class="animate-bob-1 icon-size-lg text-zinc-700">
+          <i data-lucide="shield" class="w-full h-full stroke-[1.5]"></i>
+        </div>
+      </div>
+
+      <div class="sport-parallax-icon-wrapper absolute right-4 sm:right-16 bottom-20 pointer-events-none z-0 opacity-30" data-parallax-speed="-0.2" data-parallax-rotate="-0.05">
+        <div class="animate-bob-2 icon-size-md text-brand-orange">
+          <i data-lucide="award" class="w-full h-full stroke-[1.5]"></i>
+        </div>
+      </div>
+
+      <div class="w-full max-w-5xl mx-auto space-y-12 relative z-10">
+        
+        <div class="text-center space-y-4 reveal-on-scroll">
+          <h2 class="section-title font-display font-extrabold text-zinc-950 uppercase">
+            Frequently Asked Questions
+          </h2>
+          <p class="text-base sm:text-xl text-zinc-600 max-w-2xl mx-auto">
+            Everything you need to know about starting, finding teammates, and organizing games.
+          </p>
+        </div>
+
+        <div class="space-y-4" id="faq-accordion">
+          
+          <div class="bg-white p-6 sm:p-8 rounded-3xl border border-zinc-200 cursor-pointer faq-item shadow-xs reveal-on-scroll delay-100">
+            <div class="flex items-center justify-between font-display font-bold text-lg sm:text-xl text-zinc-950">
+              <span>Is UniSport completely free to use?</span>
+              <span class="text-brand-orange text-2xl font-normal faq-icon">+</span>
+            </div>
+            <p class="faq-answer text-sm sm:text-base text-zinc-600 leading-relaxed">
+              Yes, UniSport is 100% free for students. Our goal is to break physical inactivity and make connecting for sports as seamless and spontaneous as sending a message.
+            </p>
+          </div>
+
+          <div class="bg-white p-6 sm:p-8 rounded-3xl border border-zinc-200 cursor-pointer faq-item shadow-xs reveal-on-scroll delay-150">
+            <div class="flex items-center justify-between font-display font-bold text-lg sm:text-xl text-zinc-950">
+              <span>How does match hosting work?</span>
+              <span class="text-brand-orange text-2xl font-normal faq-icon">+</span>
+            </div>
+            <p class="faq-answer text-sm sm:text-base text-zinc-600 leading-relaxed">
+              Any verified student can post a match in under 30 seconds by picking a sport, choosing a location, selecting the time, and setting maximum participants. Nearby students will see the match in their feed and can claim open spots.
+            </p>
+          </div>
+
+          <div class="bg-white p-6 sm:p-8 rounded-3xl border border-zinc-200 cursor-pointer faq-item shadow-xs reveal-on-scroll delay-200">
+            <div class="flex items-center justify-between font-display font-bold text-lg sm:text-xl text-zinc-950">
+              <span>What if I'm a complete beginner in a sport?</span>
+              <span class="text-brand-orange text-2xl font-normal faq-icon">+</span>
+            </div>
+            <p class="faq-answer text-sm sm:text-base text-zinc-600 leading-relaxed">
+              UniSport has skill tags on every activity ("Casual", "Beginner Friendly", "Intermediate", "Competitive"). You can join games matching your confidence level without feeling out of place.
+            </p>
+          </div>
+
+          <div class="bg-white p-6 sm:p-8 rounded-3xl border border-zinc-200 cursor-pointer faq-item shadow-xs reveal-on-scroll delay-250">
+            <div class="flex items-center justify-between font-display font-bold text-lg sm:text-xl text-zinc-950">
+              <span>Can I use UniSport on mobile?</span>
+              <span class="text-brand-orange text-2xl font-normal faq-icon">+</span>
+            </div>
+            <p class="faq-answer text-sm sm:text-base text-zinc-600 leading-relaxed">
+              Absolutely. UniSport is built mobile-first as a Progressive Web App (PWA). You can open it on Safari or Chrome on your phone, add it to your home screen, and access everything instantly.
+            </p>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ================= HIGH-IMPACT CONTRAST CLIMAX BANNER ================= -->
+    <section class="w-full min-h-[85vh] flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-20 sm:py-28 bg-zinc-950 text-white text-center relative overflow-hidden">
+      
+      <!-- Glowing Giant Sports Parallax Icons in Climax Banner -->
+      <div class="sport-parallax-icon-wrapper absolute left-2 sm:left-12 lg:left-24 top-1/2 -translate-y-1/2 pointer-events-none z-0" data-parallax-speed="0.25" data-parallax-rotate="0.06">
+        <div class="animate-bob-1 icon-size-hero text-brand-orange opacity-40 drop-shadow-[0_0_55px_rgba(255,77,0,0.7)]">
+          <i data-lucide="award" class="w-full h-full stroke-[1.2]"></i>
+        </div>
+      </div>
+
+      <div class="sport-parallax-icon-wrapper absolute right-2 sm:right-12 lg:right-24 top-1/2 -translate-y-1/2 pointer-events-none z-0" data-parallax-speed="-0.25" data-parallax-rotate="-0.06">
+        <div class="animate-bob-2 icon-size-hero text-brand-orange opacity-40 drop-shadow-[0_0_55px_rgba(255,77,0,0.7)]">
+          <i data-lucide="zap" class="w-full h-full stroke-[1.2]"></i>
+        </div>
+      </div>
+
+      <div class="w-full max-w-[1900px] mx-auto space-y-10 relative z-10">
+        
+        <h2 class="hero-title font-display font-extrabold text-white uppercase tracking-tight max-w-[1800px] mx-auto leading-tight reveal-on-scroll">
+          Your next game is <span class="text-brand-orange inline-block">waiting for you.</span>
+        </h2>
+
+        <p class="text-lg sm:text-2xl 2xl:text-3xl text-zinc-400 max-w-3xl mx-auto font-normal leading-relaxed reveal-on-scroll delay-100">
+          Join university students across the city. Experience the easiest way to organize, discover, and play sports together.
+        </p>
+
+        <div class="pt-6 flex flex-col items-center justify-center gap-12 reveal-on-scroll delay-200">
+          <a href="/challenge2/unisport/app/login.html" class="btn-shimmer group relative inline-flex items-center space-x-4 bg-brand-orange hover:bg-brand-orange-hover text-white font-extrabold text-base sm:text-xl uppercase tracking-wider py-6 px-12 rounded-2xl shadow-[0_15px_35px_-8px_rgba(255,77,0,0.65)] hover:shadow-[0_25px_45px_-6px_rgba(255,77,0,0.8)] transition-all duration-300 transform hover:-translate-y-1 active:translate-y-0 active:scale-[0.98] border border-orange-400/30">
+            <span>Launch UniSport Web App</span>
+            <i data-lucide="arrow-right" class="w-6 h-6 transition-transform duration-300 group-hover:translate-x-1.5"></i>
+          </a>
+
+          <!-- Open on Mobile QR Code Editorial Block -->
+          <div class="pt-10 border-t border-zinc-800/80 max-w-lg w-full flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-8 text-center sm:text-left">
+            <div class="p-3 bg-white rounded-2xl shadow-[0_12px_35px_rgba(0,0,0,0.5)] shrink-0 transition-transform duration-300 hover:scale-105">
+              <img 
+                src="./assets/qrcode-unisport.png" 
+                onerror="this.onerror=null; this.src='/challenge2/unisport/assets/qrcode-unisport.png';" 
+                alt="Scan QR Code to open UniSport on mobile" 
+                class="w-28 h-28 sm:w-32 sm:h-32 object-contain select-none"
+              />
+            </div>
+            <div class="space-y-2">
+              <h3 class="font-display font-bold text-xl sm:text-2xl text-white tracking-tight">
+                Prefer playing on mobile?
+              </h3>
+              <p class="text-sm sm:text-base text-zinc-400 leading-relaxed font-normal">
+                Scan the QR code with your phone camera to open UniSport directly on your device without typing the link.
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= MODERN STARTUP FOOTER (Full Bleed) ================= -->
+  <footer class="w-full px-6 sm:px-10 lg:px-16 2xl:px-24 py-12 bg-white border-t border-zinc-200 text-zinc-600 text-xs sm:text-sm">
+    <div class="w-full space-y-8">
+      
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-8 border-b border-zinc-100">
+        <div class="flex items-center space-x-3.5">
+          <img src="/assets/logoUniSport.png" alt="UniSport" class="h-8 w-auto object-contain" onerror="this.onerror=null; this.src='./assets/logoUniSport.png';" />
+          <span class="font-display font-bold text-lg text-zinc-950">UniSport</span>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-6 lg:gap-8 font-semibold text-zinc-700">
+          <a href="#why" class="hover:text-zinc-950 transition">Why UniSport</a>
+          <a href="#features" class="hover:text-zinc-950 transition">Features</a>
+          <a href="#sports" class="hover:text-zinc-950 transition">Sports</a>
+          <a href="/challenge2/unisport/app/login.html" class="hover:text-brand-orange transition">Web App</a>
+        </div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-400">
+        <div>
+          &copy; 2026 UniSport. All rights reserved.
+        </div>
+        <div class="flex items-center space-x-6">
+          <a href="#" class="hover:text-zinc-600 transition">Privacy Policy</a>
+          <span>•</span>
+          <a href="#" class="hover:text-zinc-600 transition">Terms of Service</a>
+          <span>•</span>
+          <span>Eindhoven, Netherlands</span>
+        </div>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- ================= LOGIC CONTROLLER: ICONS, CONTINUOUS SCROLL PARALLAX, BI-DIRECTIONAL REVEAL & ACCORDION ================= -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Initialize Lucide Icons
+      if (window.lucide) {
+        lucide.createIcons();
+      }
+
+      // Track scroll direction for bi-directional scroll animations
+      let lastScrollY = window.pageYOffset;
+      let scrollDirection = 'down';
+
+      window.addEventListener('scroll', () => {
+        const currentY = window.pageYOffset;
+        scrollDirection = currentY >= lastScrollY ? 'down' : 'up';
+        lastScrollY = currentY;
+      }, { passive: true });
+
+      // 2. Dynamic Scroll-Driven Parallax for Sports Icons and Cards
+      const parallaxWrappers = document.querySelectorAll('.sport-parallax-icon-wrapper[data-parallax-speed]');
+      const reactiveCards = document.querySelectorAll('.card-hover');
+
+      function updateScrollMotion() {
+        const vh = window.innerHeight;
+
+        // Animate floating sports icons with scroll
+        parallaxWrappers.forEach(wrap => {
+          const speed = parseFloat(wrap.dataset.parallaxSpeed) || 0.15;
+          const rotSpeed = parseFloat(wrap.dataset.parallaxRotate) || 0.04;
+          const parent = wrap.parentElement;
+          if (!parent) return;
+          const rect = parent.getBoundingClientRect();
+          
+          const distFromCenter = (rect.top + rect.height / 2) - (vh / 2);
+          const translateY = -distFromCenter * speed;
+          const rotate = -distFromCenter * rotSpeed;
+          
+          wrap.style.setProperty('--scroll-ty', `${translateY.toFixed(1)}px`);
+          wrap.style.setProperty('--scroll-rot', `${rotate.toFixed(1)}deg`);
+        });
+
+        // Subtle dynamic card drift on scroll (both up and down)
+        reactiveCards.forEach((card, idx) => {
+          const rect = card.getBoundingClientRect();
+          if (rect.top < vh && rect.bottom > 0) {
+            const dist = (rect.top + rect.height / 2) - (vh / 2);
+            const factor = (idx % 2 === 0 ? 0.025 : -0.025);
+            const driftY = -dist * factor;
+            card.style.setProperty('--scroll-drift', `${driftY.toFixed(1)}px`);
+          }
+        });
+      }
+
+      window.addEventListener('scroll', () => {
+        requestAnimationFrame(updateScrollMotion);
+      }, { passive: true });
+      updateScrollMotion();
+
+      // 3. Bi-Directional Continuous Scroll Reveal Observer (Triggers both on scroll UP and scroll DOWN)
+      const revealElements = document.querySelectorAll('.reveal-on-scroll');
+      if ('IntersectionObserver' in window) {
+        const revealObserver = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              if (scrollDirection === 'up') {
+                entry.target.classList.add('is-revealed-up');
+                entry.target.classList.remove('is-revealed');
+              } else {
+                entry.target.classList.add('is-revealed');
+                entry.target.classList.remove('is-revealed-up');
+              }
+            } else {
+              // Scrolled out of viewport: reset classes so animation replays every time you scroll up or down!
+              entry.target.classList.remove('is-revealed', 'is-revealed-up');
+            }
+          });
+        }, {
+          threshold: 0.1,
+          rootMargin: '0px 0px -30px 0px'
+        });
+
+        revealElements.forEach(el => revealObserver.observe(el));
+      } else {
+        revealElements.forEach(el => el.classList.add('is-revealed'));
+      }
+
+      // 4. Smooth FAQ Accordion Toggle
+      const faqItems = document.querySelectorAll('.faq-item');
+      faqItems.forEach(item => {
+        item.addEventListener('click', () => {
+          const answer = item.querySelector('.faq-answer');
+          const icon = item.querySelector('.faq-icon');
+          const isOpen = answer.classList.contains('is-open');
+
+          // Close all answers
+          document.querySelectorAll('.faq-answer').forEach(a => a.classList.remove('is-open'));
+          document.querySelectorAll('.faq-icon').forEach(i => i.classList.remove('is-open'));
+
+          // Toggle current
+          if (!isOpen) {
+            answer.classList.add('is-open');
+            icon.classList.add('is-open');
+          }
+        });
+      });
+    });
+  </script>
+
+</body>
+</html>
