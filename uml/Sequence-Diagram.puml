@@ -1,63 +1,168 @@
 @startuml UniSport_Sequence_Diagram
 autonumber
-skinparam style strictuml
+
+skinparam backgroundColor #FFFFFF
+skinparam Shadowing false
+skinparam RoundCorner 8
+skinparam MaxMessageSize 200
 skinparam SequenceMessageAlign center
-skinparam MaxMessageSize 180
+skinparam BoxPadding 15
+skinparam ParticipantPadding 20
+
+skinparam sequence {
+  ArrowColor #1F2937
+  ArrowThickness 1.3
+
+  ActorBorderColor #3B82F6
+  ActorBackgroundColor #EFF6FF
+  ActorFontColor #1E293B
+  ActorFontSize 12
+
+  ParticipantBorderColor #3B82F6
+  ParticipantBackgroundColor #EFF6FF
+  ParticipantFontColor #1E293B
+  ParticipantFontSize 12
+  ParticipantFontStyle bold
+
+  DatabaseBorderColor #3B82F6
+  DatabaseBackgroundColor #EFF6FF
+  DatabaseFontColor #1E293B
+  DatabaseFontSize 12
+  DatabaseFontStyle bold
+
+  LifeLineBorderColor #3B82F6
+  LifeLineBackgroundColor #DBEAFE
+
+  NoteBackgroundColor #FEFCE8
+  NoteBorderColor #EAB308
+  NoteFontColor #1E293B
+  NoteFontSize 12
+
+  GroupBorderColor #94A3B8
+  GroupBackgroundColor #F8FAFC
+  GroupHeaderFontColor #334155
+  GroupFontColor #475569
+}
 
 actor "Host Student\n(Fontys / TU/e)" as Host
-actor "Participant Student" as Player
-participant "Presentation Layer\n(UI Views)" as UI
-participant "Application Logic Layer\n(Client Engine - app.js)" as Engine
-participant "Firebase Auth" as Auth
-database "Cloud Firestore\n(Real-Time DB)" as DB
+actor "Participant\nStudent" as Player
+participant "Web Interface\n(app/index.html)" as UI
+participant "Client Engine\n(app/app.js)" as Engine
+participant "Firebase Auth\n(Identity Service)" as Auth
+participant "Cloud Firestore\n(Real-Time DB)" as DB
 
-== 1. Campus Authentication & Real-Time Subscription ==
-Host -> UI : Enter campus credentials (@student.fontys.nl / @student.tue.nl)
-UI -> Auth : signInWithEmailAndPassword()
-Auth --> UI : Return UID & Auth Session
+note over Host, Engine
+  Campus Authentication & Real-Time Initialization (Uplink)
+end note
+
+Host -> UI : Login with campus email (@student.fontys.nl / @student.tue.nl)
+activate UI
+UI -> Auth : signInWithEmailAndPassword(email, password)
+activate Auth
+Auth --> UI : Return JWT Token & UID (200 OK)
+deactivate Auth
+
 UI -> Engine : init() & subscribeToFirestore()
-Engine -> DB : onSnapshot(users, activities, notifications, friend_requests)
-DB --> Engine : Live Snapshot Streams
+activate Engine
+Engine -> DB : Attach onSnapshot(users, activities, notifications, friend_requests)
+activate DB
+DB --> Engine : Stream live collection snapshots
+deactivate DB
 Engine --> UI : Render Active Feed (3x3 Grid) & Student Directory
+deactivate Engine
+deactivate UI
 
-== 2. Hosting a Sports Session (Amsterdam Time Validation) ==
-Host -> UI : Fill Session Form (Sport, Venue, Date, Time, Duration, Price)
-UI -> Engine : handleCreateSubmit(event)
-Engine -> Engine : Validate Europe/Amsterdam Time\n(Session Start >= Now + 60 min)
+note over Host, Engine
+  Hosting a Sports Session (Amsterdam Timezone Validation)
+end note
 
-alt Session Time < Amsterdam Now + 1h
-  Engine --> UI : Display Inline Time Validation Error
-else Valid Future Session
-  Engine -> DB : setDoc(activities/{activityId}, payload)
-  DB --> Engine : Broadcast onSnapshot(activities)
-  Engine --> UI : Render new session in Feed & "My Spots"
+Host -> UI : Submit "Host a Session" (Sport, Venue, Date/Time, Duration, Price)
+activate UI
+UI -> Engine : handleCreateSubmit(payload)
+activate Engine
+
+note right of Engine
+  Logic check:
+  if startTime >= AmsterdamNow + 1h
+end note
+
+alt Valid Future Session (>= 1h in advance)
+  Engine -> DB : setDoc(activities/{activityId}, sessionPayload)
+  activate DB
+  DB --> Engine : Confirm write & broadcast onSnapshot(activities)
+  deactivate DB
+  Engine --> UI : Update Feed & "My Spots" (Hosted by Me)
+else Invalid Past / Immediate Time (< 1h)
+  Engine --> UI : Display inline validation error banner
 end
+deactivate Engine
+deactivate UI
 
-== 3. Filtering & Joining a Session ==
+note over Host, Engine
+  Discovery, Filtering & Joining a Session
+end note
+
 Player -> UI : Apply Filters (Sport, University, Date, Price)
-UI -> Engine : applyFeedFilters() & exclude started/past sessions
-Engine --> UI : Update Filtered Feed Grid
-Player -> UI : Click "Join Session"
-UI -> Engine : toggleAttendance(activityId)
-Engine -> DB : updateDoc(activities/{id}, add Player to participantsList)
-Engine -> DB : addDoc(notifications, {recipientUid: hostId, title: "New Player Joined"})
-DB --> Host : Real-time onSnapshot notification & roster counter update
+activate UI
+UI -> Engine : applyFeedFilters() [exclude started & past sessions]
+activate Engine
+Engine --> UI : Render matching future sessions
+deactivate Engine
+deactivate UI
 
-== 4. Roster Management (Kick Participant or Host Cancellation) ==
-alt Host kicks a participant
-  Host -> UI : Open Roster Modal -> Click "Kick"
+Player -> UI : Click "Join Session"
+activate UI
+UI -> Engine : toggleAttendance(activityId)
+activate Engine
+Engine -> DB : updateDoc(activities/{id}, append Player to participantsList)
+activate DB
+DB --> Engine : Confirmation
+Engine -> DB : addDoc(notifications, {recipientUid: hostId, type: "join"})
+DB --> Host : Push live notification & update Roster counter (e.g., 2/10)
+deactivate DB
+Engine --> UI : Button changes to "Leave"
+deactivate Engine
+deactivate UI
+
+note over Host, Engine
+  Roster Management Scenario (Kick Participant or Host Cancellation)
+end note
+
+alt Host Kicks a Participant from Roster Modal
+  Host -> UI : Open Roster Modal & click "Kick"
+  activate UI
   UI -> Engine : kickParticipantFromSession(activityId, playerUid)
+  activate Engine
   Engine -> DB : updateDoc(activities/{id}, remove playerUid)
-  Engine -> DB : addDoc(notifications, {recipientUid: playerUid, title: "Removed from Session"})
-  DB --> Player : Real-time Notification ("Removed from Session")
-else Host leaves own session (Auto-Delete & Notify All)
+  activate DB
+  Engine -> DB : addDoc(notifications, {recipientUid: playerUid, type: "kick"})
+  DB --> Player : Display "Removed from Session" notification
+  deactivate DB
+  Engine --> UI : Refresh Roster Modal
+  deactivate Engine
+  deactivate UI
+else Host Leaves Own Session (Auto-Delete & Notify All)
   Host -> UI : Click "Leave" on Hosted Session
-  UI -> Engine : toggleAttendance(activityId) [Host Detected]
-  loop For each participant in Roster
+  activate UI
+  UI -> Engine : toggleAttendance(activityId)
+  activate Engine
+
+  note right of Engine
+    Logic check:
+    if currentUser.uid == session.hostId
+  end note
+
+  loop For each participant in session.participantsList
     Engine -> DB : addDoc(notifications, {recipientUid: uid, title: "Session Cancelled"})
   end
+
   Engine -> DB : deleteDoc(activities/{activityId})
-  DB --> Player : Real-time Notification ("Session Cancelled") & Feed Removal
+  activate DB
+  DB --> Player : Push "Session Cancelled" alert & remove session from Feed
+  deactivate DB
+  Engine --> UI : Remove session card from UI
+  deactivate Engine
+  deactivate UI
 end
 
 @enduml

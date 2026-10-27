@@ -1,7 +1,34 @@
 @startuml UniSport_System_Architecture_Topology
+skinparam backgroundColor #FFFFFF
 skinparam componentStyle rectangle
 skinparam Shadowing false
+skinparam RoundCorner 8
 skinparam packageStyle rectangle
+
+skinparam package {
+  BackgroundColor #F8FAFC
+  BorderColor #94A3B8
+  FontColor #1E293B
+  FontStyle bold
+}
+
+skinparam component {
+  BackgroundColor #EFF6FF
+  BorderColor #3B82F6
+  FontColor #1E293B
+}
+
+skinparam database {
+  BackgroundColor #FEFCE8
+  BorderColor #EAB308
+  FontColor #1E293B
+}
+
+skinparam arrow {
+  Color #1F2937
+  Thickness 1.3
+  FontColor #334155
+}
 
 package "Delivery Tier" {
   [Vercel Edge CDN\n(HTTPS Static SPA Hosting)] as CDN
