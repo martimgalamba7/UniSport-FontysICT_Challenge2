@@ -7,6 +7,10 @@
   
   <link rel="icon" type="image/png" href="/assets/logoUniSport.png" />
   <link rel="apple-touch-icon" href="/assets/logoUniSport.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="UniSport" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -138,8 +142,15 @@
         pointer-events: auto;
       }
 
-      /* Adjust notifications drawer left to match collapsed bar */
+      /* Adjust notifications drawer, main container & settings modal to start strictly to the right of the 4.75rem (76px) collapsed sidebar */
       #notifications-desktop-drawer {
+        left: 4.75rem;
+      }
+      #app-main-container {
+        margin-left: 4.75rem;
+        width: calc(100% - 4.75rem);
+      }
+      #settings-modal {
         left: 4.75rem;
       }
     }
@@ -1757,7 +1768,8 @@
   </script>
 
   <!-- Main Container (Responsive Full Desktop Viewport with Icon-Rail Sidebar offset) -->
-  <main class="md:pl-20 flex-grow w-full max-w-full lg:max-w-7xl 2xl:max-w-[1536px] mx-auto px-4 sm:px-8 lg:px-12 py-8">
+  <main id="app-main-container" class="flex-grow w-full">
+    <div class="w-full max-w-7xl 2xl:max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-10 xl:px-12 py-8">
 
     <!-- ================= SECTION 1: GEO FEED ================= -->
     <section id="section-feed" class="space-y-6">
@@ -2441,6 +2453,7 @@
 
     </section>
 
+    </div>
   </main>
 
   <!-- Mobile Bottom Nav -->
@@ -2497,6 +2510,130 @@
 
     <!-- Scrollable Full-Screen Settings Content -->
     <div class="max-w-3xl w-full mx-auto px-6 py-6 sm:py-8 pb-28 space-y-6 flex-1 text-xs sm:text-sm">
+
+      <!-- SECTION 0: DOWNLOAD & INSTALL WEB APP (ADD TO HOME SCREEN) -->
+      <div class="space-y-3" id="settings-download-app-section">
+        <h4 class="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Download & Mobile App</h4>
+
+        <div class="rounded-2xl border border-zinc-200 dark:border-zinc-800/80 overflow-hidden bg-zinc-50/50 dark:bg-zinc-900/40 p-4 sm:p-5 space-y-4">
+          <!-- Top Banner -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-200/70 dark:border-zinc-800/80">
+            <div class="flex items-center gap-3.5">
+              <div class="w-12 h-12 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-2 flex items-center justify-center shrink-0 shadow-sm">
+                <img src="/assets/logoUniSport.png" onerror="this.onerror=null; this.src='./assets/logoUniSport.png';" alt="UniSport App Icon" class="w-full h-full object-contain" />
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <p class="font-extrabold text-sm sm:text-base text-zinc-950 dark:text-white">Install UniSport Web App</p>
+                  <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-brand-orange/15 text-brand-orange border border-brand-orange/25">PWA</span>
+                </div>
+                <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                  Add UniSport to your phone's Home Screen for instant one-tap launch and a full-screen native app experience.
+                </p>
+              </div>
+            </div>
+
+            <button 
+              id="btn-pwa-install-trigger"
+              type="button"
+              onclick="window.triggerUniSportAppInstall && window.triggerUniSportAppInstall()"
+              class="px-4 py-2.5 rounded-xl bg-brand-orange hover:bg-brand-orange-hover text-white font-bold text-xs transition cursor-pointer self-start sm:self-auto shrink-0 flex items-center gap-2 shadow-sm"
+            >
+              <i data-lucide="download" class="w-4 h-4"></i>
+              <span>How to Install</span>
+            </button>
+          </div>
+
+          <!-- Step-by-step Instructions for iOS & Android -->
+          <div id="pwa-install-guides-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 transition-all duration-300">
+            <!-- iOS / iPhone (Safari) -->
+            <div class="p-4 rounded-xl bg-white dark:bg-zinc-900/90 border border-zinc-200/80 dark:border-zinc-800 space-y-2.5">
+              <div class="flex items-center gap-2">
+                <span class="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-900 dark:text-white">
+                  <i data-lucide="smartphone" class="w-4 h-4"></i>
+                </span>
+                <div>
+                  <p class="font-bold text-zinc-950 dark:text-white text-xs sm:text-sm">iPhone & iPad (Safari)</p>
+                  <p class="text-[11px] text-zinc-400">iOS Home Screen Installation</p>
+                </div>
+              </div>
+              <ol class="space-y-2 text-xs text-zinc-600 dark:text-zinc-300 pt-1">
+                <li class="flex items-start gap-2">
+                  <span class="w-4 h-4 rounded-full bg-brand-orange/15 text-brand-orange font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">1</span>
+                  <span>Open UniSport in <strong>Safari</strong> and tap the <strong>Share</strong> button <span class="inline-block px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-[10px] font-semibold">↑</span> in the bottom bar.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="w-4 h-4 rounded-full bg-brand-orange/15 text-brand-orange font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">2</span>
+                  <span>Scroll down the menu and tap <strong>"Add to Home Screen"</strong>.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="w-4 h-4 rounded-full bg-brand-orange/15 text-brand-orange font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">3</span>
+                  <span>Tap <strong>"Add"</strong> in the top-right corner to launch UniSport directly from your Home Screen.</span>
+                </li>
+              </ol>
+            </div>
+
+            <!-- Android (Chrome) -->
+            <div class="p-4 rounded-xl bg-white dark:bg-zinc-900/90 border border-zinc-200/80 dark:border-zinc-800 space-y-2.5">
+              <div class="flex items-center gap-2">
+                <span class="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-900 dark:text-white">
+                  <i data-lucide="download-cloud" class="w-4 h-4"></i>
+                </span>
+                <div>
+                  <p class="font-bold text-zinc-950 dark:text-white text-xs sm:text-sm">Android (Chrome)</p>
+                  <p class="text-[11px] text-zinc-400">Android App Drawer & Home Screen</p>
+                </div>
+              </div>
+              <ol class="space-y-2 text-xs text-zinc-600 dark:text-zinc-300 pt-1">
+                <li class="flex items-start gap-2">
+                  <span class="w-4 h-4 rounded-full bg-brand-orange/15 text-brand-orange font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">1</span>
+                  <span>Open UniSport in <strong>Chrome</strong> and tap the <strong>three-dot menu (⋮)</strong> in the top-right corner.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="w-4 h-4 rounded-full bg-brand-orange/15 text-brand-orange font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">2</span>
+                  <span>Tap <strong>"Install app"</strong> or <strong>"Add to Home screen"</strong>.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="w-4 h-4 rounded-full bg-brand-orange/15 text-brand-orange font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">3</span>
+                  <span>Tap <strong>"Install"</strong> to confirm and place the UniSport icon on your Home Screen.</span>
+                </li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <script>
+        (function() {
+          window.__deferredPwaPrompt = null;
+          window.addEventListener('beforeinstallprompt', function(e) {
+            e.preventDefault();
+            window.__deferredPwaPrompt = e;
+            var btn = document.getElementById('btn-pwa-install-trigger');
+            if (btn) {
+              btn.innerHTML = '<i data-lucide="download" class="w-4 h-4"></i><span>Install App Now</span>';
+              if (window.lucide) window.lucide.createIcons();
+            }
+          });
+          window.triggerUniSportAppInstall = function() {
+            if (window.__deferredPwaPrompt) {
+              window.__deferredPwaPrompt.prompt();
+              window.__deferredPwaPrompt.userChoice.finally(function() {
+                window.__deferredPwaPrompt = null;
+              });
+              return;
+            }
+            var grid = document.getElementById('pwa-install-guides-grid');
+            if (grid) {
+              grid.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+              grid.classList.add('ring-2', 'ring-brand-orange', 'rounded-xl');
+              setTimeout(function() {
+                grid.classList.remove('ring-2', 'ring-brand-orange');
+              }, 1800);
+            }
+          };
+        })();
+      </script>
       
       <!-- SECTION 1: APPEARANCE & LOCALIZATION -->
       <div class="space-y-3">
