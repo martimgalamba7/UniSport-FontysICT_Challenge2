@@ -6,8 +6,6 @@ skinparam Shadowing false
 skinparam RoundCorner 8
 skinparam MaxMessageSize 200
 skinparam SequenceMessageAlign center
-skinparam BoxPadding 15
-skinparam ParticipantPadding 20
 
 skinparam sequence {
   ArrowColor #1F2937
