@@ -655,8 +655,6 @@ export function renderFeed() {
 
   const nowAmsMs = getAmsterdamDate().getTime();
 
-  // RULE 10: Eventos passados ou a correr atualmente não aparecem no feed.
-  // Session must strictly start in the future (Amsterdam time) and not be deleted/orphaned
   let filtered = (state.activities || []).filter(a => {
     if (!a || isFakeActivity(a.id, a)) return false;
     if (!a.dateTime) return false;
