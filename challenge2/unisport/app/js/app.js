@@ -34,6 +34,23 @@ import { getAvatarById, UNISPORT_AVATARS } from "./avatars.js";
 
 export const DEMO_CAMPUS_STUDENTS = [];
 
+export function navigateToLogin() {
+  if (window.location.protocol === "file:") {
+    window.location.href = "./login.html";
+    return;
+  }
+  const p = window.location.pathname || "";
+  if (p.includes("/challenge2/app")) {
+    window.location.href = "/challenge2/app/login";
+  } else if (p.includes("/challenge2/unisport/app")) {
+    window.location.href = "/challenge2/unisport/app/login";
+  } else if (p.includes("/unisport/app")) {
+    window.location.href = "/unisport/app/login";
+  } else {
+    window.location.href = "/challenge2/unisport/app/login.html";
+  }
+}
+
 const state = {
   currentUser: null,
   userProfile: null,
@@ -112,7 +129,7 @@ export function initApp() {
 
   const session = getActiveSession();
   if (!session) {
-    window.location.href = "./login.html";
+    navigateToLogin();
     return;
   }
 
@@ -203,14 +220,14 @@ function updateAuthUI(user, profile) {
       console.warn("populateProfile error:", e);
     }
   } else {
-    window.location.href = "./login.html";
+    navigateToLogin();
   }
 }
 
 function listenToAuthChanges() {
   const activeSession = getActiveSession();
   if (!activeSession) {
-    window.location.href = "./login.html";
+    navigateToLogin();
     return;
   }
 
@@ -1151,7 +1168,7 @@ function setupCreateForm() {
     const creatorUid = state.currentUser?.uid || activeSess.uid;
     const creatorEmail = state.currentUser?.email || activeSess.email || "";
     if (!creatorUid) {
-      window.location.href = "./login.html";
+      navigateToLogin();
       return;
     }
 
@@ -1246,7 +1263,7 @@ function setupCreateForm() {
 export async function toggleJoinActivity(activityId) {
   const currentUid = state.currentUser?.uid || (getActiveSession() || {}).uid;
   if (!currentUid) {
-    window.location.href = "./login.html";
+    navigateToLogin();
     return;
   }
 
@@ -2168,11 +2185,11 @@ export async function deleteAccount() {
   try {
     await deleteStudentAccount();
     alert("Your UniSport account has been permanently deleted.");
-    window.location.href = "./login.html";
+    navigateToLogin();
   } catch (err) {
     localStorage.removeItem("unisport_active_session");
     alert("Account erased. Redirecting to login...");
-    window.location.href = "./login.html";
+    navigateToLogin();
   }
 }
 
