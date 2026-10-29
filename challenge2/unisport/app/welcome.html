@@ -10,52 +10,23 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- Tailwind CDN & Custom Config -->
+  <!-- External Styles & Theme Engine -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Plus Jakarta Sans', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-          },
-          colors: {
-            brand: {
-              orange: '#FF4D00',
-              'orange-hover': '#EA4500',
-              'orange-light': '#FFF1EB',
-              cream: '#FAFAF8',
-              warm: '#F4F2EC',
-              card: '#FFFFFF',
-              dark: '#111113',
-            }
-          }
-        }
-      }
-    }
-  </script>
   <link rel="stylesheet" href="./css/app.css" />
   <link rel="stylesheet" href="./css/cookie-notice.css" />
   <script src="./js/theme.js"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
-<body class="bg-zinc-50 text-zinc-900 dark:bg-black dark:text-zinc-100 min-h-screen flex flex-col font-sans transition-colors duration-200 relative overflow-x-hidden selection:bg-brand-orange selection:text-white">
-
-  <!-- Ambient Background Lighting -->
-  <div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
-    <div class="absolute -top-40 left-1/2 -translate-x-1/2 w-[34rem] h-[34rem] bg-gradient-to-tr from-brand-orange/20 via-amber-500/15 to-transparent blur-3xl rounded-full"></div>
-    <div class="absolute bottom-0 right-0 w-80 h-80 bg-blue-500/10 blur-3xl rounded-full dark:opacity-20"></div>
-  </div>
+<body class="bg-white text-zinc-900 dark:bg-black dark:text-zinc-100 min-h-screen flex flex-col font-sans transition-colors duration-150">
 
   <!-- Top Navigation Header -->
-  <header class="relative z-10 w-full px-6 sm:px-12 py-5 flex items-center justify-between border-b border-zinc-200/80 dark:border-zinc-900/80 bg-white/70 dark:bg-black/70 backdrop-blur-md">
-    <a href="/challenge2/unisport" class="flex items-center space-x-2.5 group">
-      <img src="/assets/logoUniSport.png" alt="UniSport" class="h-7 w-auto object-contain transition group-hover:scale-105" onerror="this.src='./assets/logoUniSport.png';" />
-      <span class="font-extrabold text-lg tracking-tight text-zinc-950 dark:text-white">UniSport</span>
+  <header class="w-full px-6 sm:px-12 py-5 flex items-center justify-between border-b border-zinc-100 dark:border-zinc-900">
+    <a href="/challenge2/unisport" class="flex items-center space-x-2.5">
+      <img src="/assets/logoUniSport.png" alt="UniSport" class="h-7 w-auto object-contain" onerror="this.src='./assets/logoUniSport.png';" />
+      <span class="font-bold text-lg tracking-tight text-zinc-950 dark:text-white">UniSport</span>
     </a>
 
     <div class="flex items-center gap-3">
@@ -63,102 +34,59 @@
         <i data-lucide="sun" class="icon-sun w-4 h-4 hidden"></i>
         <i data-lucide="moon" class="icon-moon w-4 h-4"></i>
       </button>
-
-      <button id="btn-switch-account" class="text-xs font-semibold text-zinc-500 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer">
-        Sign out
-      </button>
     </div>
   </header>
 
-  <!-- Main Content Card Stage -->
-  <main class="relative z-10 flex-grow flex items-center justify-center px-4 sm:px-6 py-12">
-    <div class="w-full max-w-md">
+  <!-- Clean Minimal Stage -->
+  <main class="flex-grow flex items-center justify-center px-6 py-12">
+    <div class="w-full max-w-sm space-y-6 text-center">
 
-      <!-- Glassmorphic Card Container -->
-      <div class="relative overflow-hidden rounded-3xl border border-zinc-200/90 dark:border-zinc-800/90 bg-white/90 dark:bg-zinc-950/80 backdrop-blur-2xl shadow-2xl shadow-zinc-200/50 dark:shadow-black/70 p-7 sm:p-9 text-center space-y-6 transition-all">
-
-        <!-- Top Orange Accent Line -->
-        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-brand-orange via-amber-500 to-orange-400"></div>
-
-        <!-- Avatar Ring Stage -->
-        <div class="relative inline-block mx-auto pt-2">
-          <div class="relative w-24 h-24 rounded-full p-1 bg-gradient-to-tr from-brand-orange via-amber-400 to-orange-500 shadow-xl shadow-brand-orange/20 flex items-center justify-center">
-            <div id="user-avatar-inner" class="w-full h-full rounded-full overflow-hidden bg-zinc-900 flex items-center justify-center text-white"></div>
-          </div>
-          <!-- Verified Online Ping Badge -->
-          <span class="absolute bottom-1 right-1 flex h-4 w-4">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-4 w-4 bg-emerald-500 border-2 border-white dark:border-zinc-950"></span>
-          </span>
-        </div>
-
-        <!-- Dynamic Header & Status Badge -->
-        <div class="space-y-2">
-          <div class="flex items-center justify-center">
-            <span id="welcome-badge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-50 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60 shadow-sm">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span id="welcome-badge-text">Authenticated</span>
-            </span>
-          </div>
-
-          <h1 id="welcome-title" class="text-2xl sm:text-3xl font-extrabold tracking-tight text-zinc-950 dark:text-white">
-            Welcome back!
-          </h1>
-          <p id="welcome-subtitle" class="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 max-w-xs mx-auto">
-            Loading your student session...
-          </p>
-        </div>
-
-        <!-- Student Profile Chips / Quick Info -->
-        <div id="student-meta-chips" class="flex flex-wrap items-center justify-center gap-2 pt-1">
-          <span id="chip-university" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-zinc-100 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 border border-zinc-200/60 dark:border-zinc-800/60">
-            <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-brand-orange"></i>
-            <span id="chip-uni-text">Fontys UAS</span>
-          </span>
-
-          <span id="chip-sport" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-zinc-100 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 border border-zinc-200/60 dark:border-zinc-800/60">
-            <i data-lucide="activity" class="w-3.5 h-3.5 text-brand-orange"></i>
-            <span id="chip-sport-text">Football</span>
-          </span>
-
-          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-zinc-100 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 border border-zinc-200/60 dark:border-zinc-800/60">
-            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-brand-orange"></i>
-            <span>Eindhoven</span>
-          </span>
-        </div>
-
-        <!-- Animated Progress Indicator -->
-        <div class="space-y-2 pt-2">
-          <div class="w-full bg-zinc-100 dark:bg-zinc-900 rounded-full h-1.5 overflow-hidden p-0.5">
-            <div id="welcome-progress-bar" class="h-full bg-gradient-to-r from-brand-orange to-amber-500 rounded-full w-0 transition-all duration-300 ease-out"></div>
-          </div>
-          <div class="flex items-center justify-between text-[11px] text-zinc-400 dark:text-zinc-500 font-medium">
-            <span id="welcome-sync-text">Connecting to student network...</span>
-            <span id="welcome-progress-pct">0%</span>
-          </div>
-        </div>
-
-        <!-- Primary Call To Action Button -->
-        <div class="pt-2">
-          <a 
-            href="/challenge2/unisport/app" 
-            id="btn-goto-app"
-            class="group w-full inline-flex items-center justify-center py-3.5 px-6 rounded-2xl bg-brand-orange hover:bg-brand-orange-hover text-white text-sm font-bold shadow-lg shadow-brand-orange/30 hover:shadow-brand-orange/40 transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] cursor-pointer"
-          >
-            <span>Open Dashboard</span>
-            <i data-lucide="arrow-right" class="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-1"></i>
-          </a>
-        </div>
-
-        <p class="text-[11px] text-zinc-400 dark:text-zinc-500">
-          Redirecting automatically to the live match feed...
-        </p>
-
+      <!-- Minimal Avatar -->
+      <div class="w-20 h-20 rounded-full overflow-hidden mx-auto bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center">
+        <div id="user-avatar-inner" class="w-full h-full flex items-center justify-center"></div>
       </div>
+
+      <!-- Typography -->
+      <div class="space-y-1.5">
+        <h1 id="welcome-title" class="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-950 dark:text-white">
+          Welcome back!
+        </h1>
+        <p id="welcome-subtitle" class="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400">
+          Loading student session...
+        </p>
+      </div>
+
+      <!-- Action & Direct Link -->
+      <div class="pt-2 space-y-3">
+        <a 
+          href="/challenge2/unisport/app" 
+          id="btn-goto-app"
+          class="w-full inline-flex items-center justify-center py-3.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 text-sm font-semibold transition cursor-pointer"
+        >
+          <span>Open Web App</span>
+          <i data-lucide="arrow-right" class="w-4 h-4 ml-2"></i>
+        </a>
+
+        <p class="text-[11px] text-zinc-400 dark:text-zinc-600">
+          Redirecting automatically in a moment...
+        </p>
+      </div>
+
+      <!-- Footer Sign-Out Link -->
+      <div class="pt-6 border-t border-zinc-100 dark:border-zinc-900 text-center">
+        <p class="text-xs text-zinc-500 dark:text-zinc-400">
+          Not your account? 
+          <button id="btn-switch-account" class="font-semibold text-zinc-950 dark:text-white hover:underline ml-1 cursor-pointer">
+            Sign out
+          </button>
+        </p>
+      </div>
+
     </div>
   </main>
 
-  <!-- Page Controller Module -->
+  <!-- Page Controller -->
+  <script src="./js/cookie-notice.js"></script>
   <script type="module" src="./js/welcome.js"></script>
 </body>
 </html>
