@@ -1,95 +1,35 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth bg-[#FAFAF8] text-zinc-900 antialiased selection:bg-[#FF4D00] selection:text-white">
 <head>
+  <!-- Document Metadata -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>UniSport • The Student Sports Community</title>
-  
-  <!-- Meta & OpenGraph -->
   <meta name="description" content="UniSport connects university students for spontaneous pick-up games, court bookings, and athletic partners. Never play alone." />
-  
   <link rel="icon" type="image/png" href="/assets/logoUniSport.png" />
   <link rel="apple-touch-icon" href="/assets/logoUniSport.png" />
 
-  <!-- Google Fonts: Plus Jakarta Sans + Syne -->
+  <!-- Fonts & Stylesheets -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
-
-  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            display: ['Syne', 'Plus Jakarta Sans', 'sans-serif'],
-            sans: ['Plus Jakarta Sans', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-          },
-          colors: {
-            brand: {
-              orange: '#FF4D00',
-              'orange-hover': '#EA4500',
-              'orange-light': '#FFF1EB',
-              cream: '#FAFAF8',
-              warm: '#F4F2EC',
-              card: '#FFFFFF',
-              dark: '#111113',
-            }
-          },
-          screens: {
-            '3xl': '1920px',
-            '4xl': '2560px',
-          }
-        }
-      }
-    }
-  </script>
-
-  <!-- External Separated Stylesheet -->
-  <link rel="stylesheet" href="/challenge2/unisport/styles.css" />
-  <link rel="stylesheet" href="./styles.css" />
-
-  <!-- Critical Inline Typography Fallback (ensures 100% resilient layout regardless of stylesheet load timing) -->
-  <style>
-    .hero-title {
-      font-size: clamp(2.75rem, 6.5vw + 1rem, 7.5rem);
-      line-height: 0.95;
-      letter-spacing: -0.04em;
-    }
-    .section-title {
-      font-size: clamp(2.25rem, 4.5vw + 0.5rem, 5.5rem);
-      line-height: 1.02;
-      letter-spacing: -0.03em;
-    }
-    @keyframes marquee {
-      0% { transform: translateX(0%); }
-      100% { transform: translateX(-50%); }
-    }
-    .animate-marquee {
-      display: flex;
-      width: 200%;
-      animation: marquee 26s linear infinite;
-    }
-  </style>
-
-  <!-- Lucide Icons -->
+  <link rel="stylesheet" href="/challenge2/unisport/css/landing.css" />
+  <link rel="stylesheet" href="./css/landing.css" />
   <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="./js/landing.js"></script>
 </head>
 
 <body class="bg-[#FAFAF8] text-zinc-900 font-sans min-h-screen flex flex-col justify-between selection:bg-brand-orange selection:text-white">
 
-  <!-- ================= TOP NAVIGATION BAR (Full-Bleed Startup Header) ================= -->
+  <!-- Top Navigation Bar -->
   <header class="sticky top-0 z-50 bg-[#FAFAF8]/90 backdrop-blur-xl border-b border-zinc-200/80 transition-all">
     <div class="w-full px-6 sm:px-10 lg:px-16 2xl:px-24 h-20 flex items-center justify-between">
-      
-      <!-- Brand Logo & Name -->
       <a href="/challenge2/unisport" class="flex items-center space-x-3.5 group focus:outline-none">
         <img src="/assets/logoUniSport.png" alt="UniSport" class="h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105" onerror="this.onerror=null; this.src='./assets/logoUniSport.png';" />
         <span class="font-display font-extrabold text-2xl tracking-tight text-zinc-950">UniSport</span>
       </a>
 
-      <!-- Desktop Navigation Links -->
       <nav class="hidden md:flex items-center space-x-8 lg:space-x-12 text-sm font-semibold text-zinc-600">
         <a href="#why" class="hover:text-zinc-950 transition-colors">Why UniSport</a>
         <a href="#features" class="hover:text-zinc-950 transition-colors">Features</a>
@@ -97,25 +37,19 @@
         <a href="#faq" class="hover:text-zinc-950 transition-colors">FAQ</a>
       </nav>
 
-      <!-- Action Button -->
       <div class="flex items-center space-x-3 sm:space-x-4">
-        <!-- Launch Web App CTA -->
         <a href="/challenge2/unisport/app/login.html" class="inline-flex items-center space-x-2 bg-zinc-950 hover:bg-zinc-800 text-white text-xs lg:text-sm font-bold py-2.5 px-6 rounded-full shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5">
           <span>Open App</span>
           <i data-lucide="arrow-right" class="w-4 h-4"></i>
         </a>
       </div>
-
     </div>
   </header>
 
-  <!-- ================= MAIN CONTENT (Ultra-Wide Full-Bleed Scaling) ================= -->
   <main class="flex-grow w-full">
 
-    <!-- ================= HERO SECTION (Full Viewport Scaled) ================= -->
+    <!-- Hero Section -->
     <section class="w-full min-h-[calc(100vh-5rem)] flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-16 sm:py-24 border-b border-zinc-200/80 relative overflow-hidden">
-      
-      <!-- Large Sports Parallax Icons in Hero -->
       <div class="sport-parallax-icon-wrapper absolute right-4 sm:right-12 lg:right-24 top-16 sm:top-20 pointer-events-none z-0" data-parallax-speed="0.22" data-parallax-rotate="0.05">
         <div class="animate-bob-1 icon-size-hero text-brand-orange drop-shadow-[0_20px_45px_rgba(255,77,0,0.35)] opacity-90">
           <i data-lucide="circle-dot" class="w-full h-full stroke-[1.6]"></i>
@@ -135,10 +69,7 @@
       </div>
 
       <div class="w-full relative z-10">
-        
-        <!-- Oversized Fluid Hero Headline with Startup Motto -->
         <div class="w-full max-w-[2200px] space-y-8">
-          
           <h1 class="hero-title font-display font-extrabold text-zinc-950 uppercase reveal-on-scroll">
             Never play alone.<br />
             <span class="text-brand-orange">Find your squad. Play any sport.</span>
@@ -157,11 +88,10 @@
             </div>
           </div>
         </div>
-
       </div>
     </section>
 
-    <!-- ================= FULL-WIDTH KINETIC MARQUEE (Clean SVG Icons) ================= -->
+    <!-- Sports Marquee Banner -->
     <div class="w-full py-5 bg-zinc-950 text-white overflow-hidden font-display font-extrabold text-lg sm:text-xl 2xl:text-2xl tracking-tight uppercase select-none">
       <div class="animate-marquee whitespace-nowrap flex items-center space-x-12">
         <span class="inline-flex items-center space-x-3">
@@ -204,8 +134,6 @@
           <span>Group Cycling</span>
         </span>
         <span class="text-zinc-700">•</span>
-
-        <!-- Duplicated items for smooth infinite loop -->
         <span class="inline-flex items-center space-x-3">
           <i data-lucide="circle-dot" class="w-5 h-5 text-brand-orange"></i>
           <span>Football 5v5</span>
@@ -239,10 +167,8 @@
       </div>
     </div>
 
-    <!-- ================= SECTION: WHY UNISPORT (Editorial Manifesto Style - ZERO BOXED CARDS) ================= -->
+    <!-- Why UniSport Section -->
     <section id="why" class="w-full min-h-screen flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-20 sm:py-28 bg-[#F4F2EC] border-b border-zinc-200 relative overflow-hidden">
-      
-      <!-- Sports Parallax Icons in Why Section -->
       <div class="sport-parallax-icon-wrapper absolute -left-4 sm:left-6 lg:left-14 top-1/4 pointer-events-none z-0 opacity-20" data-parallax-speed="0.22" data-parallax-rotate="-0.04">
         <div class="animate-bob-2 icon-size-lg text-zinc-900">
           <i data-lucide="footprints" class="w-full h-full stroke-[1.5]"></i>
@@ -256,8 +182,6 @@
       </div>
 
       <div class="w-full max-w-[2200px] mx-auto relative z-10">
-        
-        <!-- Manifesto Header -->
         <div class="max-w-4xl space-y-4 reveal-on-scroll">
           <span class="text-brand-orange font-bold text-xs sm:text-sm uppercase tracking-widest block font-display">The Vision & Movement</span>
           <h2 class="section-title font-display font-extrabold text-zinc-950 uppercase">
@@ -268,9 +192,7 @@
           </p>
         </div>
 
-        <!-- 3 Open Editorial Columns with Large Typographic Numbers -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-16 mt-16 sm:mt-24 pt-10 border-t border-zinc-300">
-          
           <div class="space-y-6 reveal-on-scroll delay-100 group">
             <div class="flex items-center justify-between pb-3 border-b border-zinc-300/80">
               <span class="font-display font-extrabold text-4xl lg:text-5xl text-zinc-300 group-hover:text-brand-orange transition-colors duration-300">01</span>
@@ -315,16 +237,12 @@
               </p>
             </div>
           </div>
-
         </div>
-
       </div>
     </section>
 
-    <!-- ================= SECTION: FEATURES (Core Features Architecture - CLEAR & COMPELLING) ================= -->
+    <!-- Core Platform Features Section -->
     <section id="features" class="w-full min-h-screen flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-20 sm:py-28 border-b border-zinc-200/80 relative overflow-hidden bg-white">
-      
-      <!-- Sports Parallax Icons in Features Section -->
       <div class="sport-parallax-icon-wrapper absolute right-4 sm:right-12 lg:right-24 top-20 pointer-events-none z-0 opacity-20" data-parallax-speed="0.2" data-parallax-rotate="0.05">
         <div class="animate-bob-3 icon-size-lg text-zinc-800">
           <i data-lucide="mountain" class="w-full h-full stroke-[1.5]"></i>
@@ -338,8 +256,6 @@
       </div>
 
       <div class="w-full max-w-[2200px] mx-auto relative z-10 space-y-16 sm:space-y-20">
-        
-        <!-- Header -->
         <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 reveal-on-scroll">
           <div class="space-y-4 max-w-3xl">
             <span class="text-brand-orange font-bold text-xs sm:text-sm uppercase tracking-widest block font-display">Core Platform Features</span>
@@ -352,13 +268,8 @@
           </p>
         </div>
 
-        <!-- 5 Core Features: Structured Architectural Grid (Zero Boxy Cards) -->
         <div class="space-y-12 sm:space-y-16">
-          
-          <!-- Row 1: Foundational Core (3 Columns) -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-14 pt-10 border-t border-zinc-200">
-            
-            <!-- Feature 1: Student-Only Community -->
             <div class="space-y-5 reveal-on-scroll delay-100 group">
               <div class="flex items-center justify-between pb-3 border-b border-zinc-200">
                 <span class="font-display font-extrabold text-4xl lg:text-5xl text-zinc-300 group-hover:text-brand-orange transition-colors duration-300">01</span>
@@ -375,7 +286,6 @@
               </div>
             </div>
 
-            <!-- Feature 2: Athletic Preferences -->
             <div class="space-y-5 reveal-on-scroll delay-150 group">
               <div class="flex items-center justify-between pb-3 border-b border-zinc-200">
                 <span class="font-display font-extrabold text-4xl lg:text-5xl text-zinc-300 group-hover:text-brand-orange transition-colors duration-300">02</span>
@@ -392,7 +302,6 @@
               </div>
             </div>
 
-            <!-- Feature 3: Geo Feed -->
             <div class="space-y-5 reveal-on-scroll delay-200 group">
               <div class="flex items-center justify-between pb-3 border-b border-zinc-200">
                 <span class="font-display font-extrabold text-4xl lg:text-5xl text-zinc-300 group-hover:text-brand-orange transition-colors duration-300">03</span>
@@ -408,13 +317,9 @@
                 </p>
               </div>
             </div>
-
           </div>
 
-          <!-- Row 2: High-Impact Action Engines (2 Wide Columns) -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-16 pt-10 border-t border-zinc-200">
-            
-            <!-- Feature 4: Activity Management & Sign-Ups -->
             <div class="space-y-5 reveal-on-scroll delay-250 group">
               <div class="flex items-center justify-between pb-3 border-b border-zinc-200">
                 <span class="font-display font-extrabold text-4xl lg:text-5xl text-zinc-300 group-hover:text-brand-orange transition-colors duration-300">04</span>
@@ -431,7 +336,6 @@
               </div>
             </div>
 
-            <!-- Feature 5: Community Interaction -->
             <div class="space-y-5 reveal-on-scroll delay-300 group">
               <div class="flex items-center justify-between pb-3 border-b border-zinc-200">
                 <span class="font-display font-extrabold text-4xl lg:text-5xl text-zinc-300 group-hover:text-brand-orange transition-colors duration-300">05</span>
@@ -447,18 +351,13 @@
                 </p>
               </div>
             </div>
-
           </div>
-
         </div>
-
       </div>
     </section>
 
-    <!-- ================= SECTION: POPULAR SPORTS (SVG Icon Badges Without Background) ================= -->
+    <!-- Popular Sports Section -->
     <section id="sports" class="w-full min-h-screen flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-20 sm:py-28 bg-[#F4F2EC] border-b border-zinc-200 relative overflow-hidden">
-      
-      <!-- Sports Parallax Icons in Sports Section -->
       <div class="sport-parallax-icon-wrapper absolute right-4 sm:right-12 lg:right-20 top-16 pointer-events-none z-0 opacity-30" data-parallax-speed="0.24" data-parallax-rotate="0.06">
         <div class="animate-bob-2 icon-size-lg text-brand-orange">
           <i data-lucide="bike" class="w-full h-full stroke-[1.5]"></i>
@@ -472,7 +371,6 @@
       </div>
 
       <div class="w-full max-w-[2200px] mx-auto relative z-10">
-        
         <div class="max-w-3xl space-y-4 mb-12 sm:mb-16 reveal-on-scroll">
           <h2 class="section-title font-display font-extrabold text-zinc-950 uppercase">
             Whatever you play, someone's in.
@@ -482,9 +380,7 @@
           </p>
         </div>
 
-        <!-- 12 Scaled Sport Cards (Pure icons without container backgrounds) -->
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6 gap-4 sm:gap-6">
-          
           <div class="sport-card bg-white p-6 rounded-3xl border border-zinc-200/80 card-hover space-y-3 reveal-on-scroll delay-100">
             <div class="sport-icon-box text-brand-orange flex items-center">
               <i data-lucide="circle-dot" class="w-7 h-7 stroke-[2]"></i>
@@ -580,16 +476,12 @@
             <h4 class="font-display font-bold text-lg text-zinc-950">Table Tennis</h4>
             <p class="text-xs text-zinc-500">Campus table tournaments and casual after-class ping pong.</p>
           </div>
-
         </div>
-
       </div>
     </section>
 
-    <!-- ================= SECTION: FAQ ACCORDION ================= -->
+    <!-- FAQ Accordion Section -->
     <section id="faq" class="w-full min-h-screen flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-20 sm:py-28 border-b border-zinc-200/80 relative overflow-hidden">
-      
-      <!-- Sports Parallax Icons in FAQ Section -->
       <div class="sport-parallax-icon-wrapper absolute left-4 sm:left-12 top-24 pointer-events-none z-0 opacity-20" data-parallax-speed="0.18" data-parallax-rotate="0.04">
         <div class="animate-bob-1 icon-size-lg text-zinc-700">
           <i data-lucide="shield" class="w-full h-full stroke-[1.5]"></i>
@@ -603,7 +495,6 @@
       </div>
 
       <div class="w-full max-w-5xl mx-auto space-y-12 relative z-10">
-        
         <div class="text-center space-y-4 reveal-on-scroll">
           <h2 class="section-title font-display font-extrabold text-zinc-950 uppercase">
             Frequently Asked Questions
@@ -614,7 +505,6 @@
         </div>
 
         <div class="space-y-4" id="faq-accordion">
-          
           <div class="bg-white p-6 sm:p-8 rounded-3xl border border-zinc-200 cursor-pointer faq-item shadow-xs reveal-on-scroll delay-100">
             <div class="flex items-center justify-between font-display font-bold text-lg sm:text-xl text-zinc-950">
               <span>Is UniSport completely free to use?</span>
@@ -654,16 +544,12 @@
               Absolutely. UniSport is built mobile-first as a Progressive Web App (PWA). You can open it on Safari or Chrome on your phone, add it to your home screen, and access everything instantly.
             </p>
           </div>
-
         </div>
-
       </div>
     </section>
 
-    <!-- ================= HIGH-IMPACT CONTRAST CLIMAX BANNER ================= -->
+    <!-- Call-to-Action & Mobile QR Section -->
     <section class="w-full min-h-[85vh] flex flex-col justify-center px-6 sm:px-10 lg:px-16 2xl:px-24 py-20 sm:py-28 bg-zinc-950 text-white text-center relative overflow-hidden">
-      
-      <!-- Glowing Giant Sports Parallax Icons in Climax Banner -->
       <div class="sport-parallax-icon-wrapper absolute left-2 sm:left-12 lg:left-24 top-1/2 -translate-y-1/2 pointer-events-none z-0" data-parallax-speed="0.25" data-parallax-rotate="0.06">
         <div class="animate-bob-1 icon-size-hero text-brand-orange opacity-40 drop-shadow-[0_0_55px_rgba(255,77,0,0.7)]">
           <i data-lucide="award" class="w-full h-full stroke-[1.2]"></i>
@@ -677,7 +563,6 @@
       </div>
 
       <div class="w-full max-w-[1900px] mx-auto space-y-10 relative z-10">
-        
         <h2 class="hero-title font-display font-extrabold text-white uppercase tracking-tight max-w-[1800px] mx-auto leading-tight reveal-on-scroll">
           Your next game is <span class="text-brand-orange inline-block">waiting for you.</span>
         </h2>
@@ -692,7 +577,6 @@
             <i data-lucide="arrow-right" class="w-6 h-6 transition-transform duration-300 group-hover:translate-x-1.5"></i>
           </a>
 
-          <!-- Open on Mobile QR Code Editorial Block -->
           <div class="pt-10 border-t border-zinc-800/80 max-w-lg w-full flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-8 text-center sm:text-left">
             <div class="p-3 bg-white rounded-2xl shadow-[0_12px_35px_rgba(0,0,0,0.5)] shrink-0 transition-transform duration-300 hover:scale-105">
               <img 
@@ -712,16 +596,14 @@
             </div>
           </div>
         </div>
-
       </div>
     </section>
 
   </main>
 
-  <!-- ================= MODERN STARTUP FOOTER (Full Bleed) ================= -->
+  <!-- Site Footer -->
   <footer class="w-full px-6 sm:px-10 lg:px-16 2xl:px-24 py-12 bg-white border-t border-zinc-200 text-zinc-600 text-xs sm:text-sm">
     <div class="w-full space-y-8">
-      
       <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-8 border-b border-zinc-100">
         <div class="flex items-center space-x-3.5">
           <img src="/assets/logoUniSport.png" alt="UniSport" class="h-8 w-auto object-contain" onerror="this.onerror=null; this.src='./assets/logoUniSport.png';" />
@@ -748,117 +630,8 @@
           <span>Eindhoven, Netherlands</span>
         </div>
       </div>
-
     </div>
   </footer>
-
-  <!-- ================= LOGIC CONTROLLER: ICONS, CONTINUOUS SCROLL PARALLAX, BI-DIRECTIONAL REVEAL & ACCORDION ================= -->
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      // 1. Initialize Lucide Icons
-      if (window.lucide) {
-        lucide.createIcons();
-      }
-
-      // Track scroll direction for bi-directional scroll animations
-      let lastScrollY = window.pageYOffset;
-      let scrollDirection = 'down';
-
-      window.addEventListener('scroll', () => {
-        const currentY = window.pageYOffset;
-        scrollDirection = currentY >= lastScrollY ? 'down' : 'up';
-        lastScrollY = currentY;
-      }, { passive: true });
-
-      // 2. Dynamic Scroll-Driven Parallax for Sports Icons and Cards
-      const parallaxWrappers = document.querySelectorAll('.sport-parallax-icon-wrapper[data-parallax-speed]');
-      const reactiveCards = document.querySelectorAll('.card-hover');
-
-      function updateScrollMotion() {
-        const vh = window.innerHeight;
-
-        // Animate floating sports icons with scroll
-        parallaxWrappers.forEach(wrap => {
-          const speed = parseFloat(wrap.dataset.parallaxSpeed) || 0.15;
-          const rotSpeed = parseFloat(wrap.dataset.parallaxRotate) || 0.04;
-          const parent = wrap.parentElement;
-          if (!parent) return;
-          const rect = parent.getBoundingClientRect();
-          
-          const distFromCenter = (rect.top + rect.height / 2) - (vh / 2);
-          const translateY = -distFromCenter * speed;
-          const rotate = -distFromCenter * rotSpeed;
-          
-          wrap.style.setProperty('--scroll-ty', `${translateY.toFixed(1)}px`);
-          wrap.style.setProperty('--scroll-rot', `${rotate.toFixed(1)}deg`);
-        });
-
-        // Subtle dynamic card drift on scroll (both up and down)
-        reactiveCards.forEach((card, idx) => {
-          const rect = card.getBoundingClientRect();
-          if (rect.top < vh && rect.bottom > 0) {
-            const dist = (rect.top + rect.height / 2) - (vh / 2);
-            const factor = (idx % 2 === 0 ? 0.025 : -0.025);
-            const driftY = -dist * factor;
-            card.style.setProperty('--scroll-drift', `${driftY.toFixed(1)}px`);
-          }
-        });
-      }
-
-      window.addEventListener('scroll', () => {
-        requestAnimationFrame(updateScrollMotion);
-      }, { passive: true });
-      updateScrollMotion();
-
-      // 3. Bi-Directional Continuous Scroll Reveal Observer (Triggers both on scroll UP and scroll DOWN)
-      const revealElements = document.querySelectorAll('.reveal-on-scroll');
-      if ('IntersectionObserver' in window) {
-        const revealObserver = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              if (scrollDirection === 'up') {
-                entry.target.classList.add('is-revealed-up');
-                entry.target.classList.remove('is-revealed');
-              } else {
-                entry.target.classList.add('is-revealed');
-                entry.target.classList.remove('is-revealed-up');
-              }
-            } else {
-              // Scrolled out of viewport: reset classes so animation replays every time you scroll up or down!
-              entry.target.classList.remove('is-revealed', 'is-revealed-up');
-            }
-          });
-        }, {
-          threshold: 0.1,
-          rootMargin: '0px 0px -30px 0px'
-        });
-
-        revealElements.forEach(el => revealObserver.observe(el));
-      } else {
-        revealElements.forEach(el => el.classList.add('is-revealed'));
-      }
-
-      // 4. Smooth FAQ Accordion Toggle
-      const faqItems = document.querySelectorAll('.faq-item');
-      faqItems.forEach(item => {
-        item.addEventListener('click', () => {
-          const answer = item.querySelector('.faq-answer');
-          const icon = item.querySelector('.faq-icon');
-          const isOpen = answer.classList.contains('is-open');
-
-          // Close all answers
-          document.querySelectorAll('.faq-answer').forEach(a => a.classList.remove('is-open'));
-          document.querySelectorAll('.faq-icon').forEach(i => i.classList.remove('is-open'));
-
-          // Toggle current
-          if (!isOpen) {
-            answer.classList.add('is-open');
-            icon.classList.add('is-open');
-          }
-        });
-      });
-    });
-  </script>
 
 </body>
 </html>

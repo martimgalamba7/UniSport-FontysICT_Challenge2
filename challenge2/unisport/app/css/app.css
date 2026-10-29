@@ -1,0 +1,156 @@
+/* ==========================================================================
+   DESKTOP HOVER-EXPANDING SIDEBAR NAVIGATION
+   ========================================================================== */
+
+@media (min-width: 768px) {
+  #desktop-sidebar {
+    width: 4.75rem;
+    transition: width 0.3s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s cubic-bezier(0.2, 0, 0, 1);
+    will-change: width;
+    overflow-x: hidden;
+  }
+
+  #desktop-sidebar:hover {
+    width: 16rem;
+    box-shadow: 16px 0 36px -10px rgba(0, 0, 0, 0.15);
+  }
+
+  .dark #desktop-sidebar:hover {
+    box-shadow: 16px 0 36px -10px rgba(0, 0, 0, 0.6);
+  }
+
+  #sidebar-logo-text {
+    opacity: 0;
+    max-width: 0;
+    transform: translateX(-10px);
+    transition: opacity 0.2s cubic-bezier(0.2, 0, 0, 1), max-width 0.3s cubic-bezier(0.2, 0, 0, 1), transform 0.25s cubic-bezier(0.2, 0, 0, 1);
+    pointer-events: none;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  #desktop-sidebar:hover #sidebar-logo-text {
+    opacity: 1;
+    max-width: 160px;
+    transform: translateX(0);
+    pointer-events: auto;
+  }
+
+  .sidebar-btn {
+    width: 3rem;
+    height: 3rem;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    border-radius: 1rem;
+    transition: width 0.3s cubic-bezier(0.2, 0, 0, 1), background-color 0.15s ease, color 0.15s ease;
+  }
+
+  #desktop-sidebar:hover .sidebar-btn {
+    width: 100%;
+    padding-right: 1rem;
+  }
+
+  .sidebar-icon-wrap {
+    width: 3rem;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .sidebar-label {
+    opacity: 0;
+    max-width: 0;
+    transform: translateX(-8px);
+    transition: opacity 0.2s cubic-bezier(0.2, 0, 0, 1), max-width 0.3s cubic-bezier(0.2, 0, 0, 1), transform 0.25s cubic-bezier(0.2, 0, 0, 1);
+    pointer-events: none;
+    white-space: nowrap;
+    overflow: hidden;
+    font-size: 0.875rem;
+  }
+
+  #desktop-sidebar:hover .sidebar-label {
+    opacity: 1;
+    max-width: 160px;
+    transform: translateX(0);
+    pointer-events: auto;
+  }
+
+  .sidebar-extra {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+    margin-left: auto;
+  }
+
+  #desktop-sidebar:hover .sidebar-extra {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  #notifications-desktop-drawer {
+    left: 4.75rem;
+  }
+
+  #app-main-container {
+    margin-left: 4.75rem;
+    width: calc(100% - 4.75rem);
+  }
+
+  #settings-modal {
+    left: 4.75rem;
+  }
+}
+
+/* ==========================================================================
+   MOBILE BOTTOM NAVIGATION & SAFE-AREA SPACING
+   ========================================================================== */
+
+#mobile-bottom-nav {
+  padding-top: 0.85rem;
+  padding-bottom: calc(1.75rem + env(safe-area-inset-bottom, 0px));
+}
+
+#mobile-bottom-nav button {
+  gap: 0.35rem !important;
+  padding: 0.2rem 0.35rem;
+}
+
+#mobile-bottom-nav button svg {
+  width: 1.35rem !important;
+  height: 1.35rem !important;
+}
+
+#mobile-bottom-nav button span {
+  font-size: 0.72rem !important;
+  line-height: 1rem !important;
+}
+
+/* ==========================================================================
+   ONBOARDING & PROFILE MULTI-SELECT CHIPS
+   ========================================================================== */
+
+.chip-select {
+  transition: all 0.12s ease;
+  user-select: none;
+}
+
+.chip-select.selected {
+  background-color: #18181b;
+  color: #ffffff;
+  border-color: #18181b;
+}
+
+.dark .chip-select.selected {
+  background-color: #ffffff;
+  color: #09090b;
+  border-color: #ffffff;
+}
+
+.avatar-btn.selected {
+  border-color: #FF4D00;
+  transform: scale(1.08);
+}

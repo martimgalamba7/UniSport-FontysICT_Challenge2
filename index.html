@@ -4,26 +4,22 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>UniSport • Challenge 2 Hub</title>
-  
-  <!-- Favicon -->
+
   <link rel="icon" type="image/png" href="./assets/logoUniSport.png" />
   <link rel="apple-touch-icon" href="./assets/logoUniSport.png" />
-  
-  <!-- Inter Font -->
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  
-  <!-- Tailwind CSS -->
+
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
 <body class="bg-white text-slate-900 min-h-screen flex flex-col justify-between font-sans select-none px-8 sm:px-16 lg:px-24 xl:px-32 py-8">
 
-  <!-- Full-Width Top Header -->
+  <!-- Top Header -->
   <header class="w-full flex items-center justify-between border-b border-slate-100 pb-6">
     <div class="flex items-center space-x-3">
-      <!-- Back to Portfolio Link -->
       <a href="https://portfolio.fontysict.martimgalamba7.xyz" class="text-xs sm:text-sm font-semibold text-slate-500 hover:text-slate-900 transition flex items-center space-x-1 mr-1 group" title="Return to Academic Portfolio">
         <span class="group-hover:-translate-x-0.5 transition-transform font-bold">&larr;</span>
         <span>Portfolio</span>
@@ -37,16 +33,16 @@
         Challenge 2: Sports Community
       </span>
     </div>
-    
+
     <a href="https://www.fontys.nl/" target="_blank" rel="noopener noreferrer" title="Fontys University of Applied Sciences" class="hover:opacity-80 transition-opacity">
       <img src="./assets/logoFontys.png" alt="Fontys" class="h-9 sm:h-11 w-auto object-contain" onerror="this.src='/project/assets/logoFontys.png';" />
     </a>
   </header>
 
-  <!-- Full Responsive Main Hub Area -->
+  <!-- Main Hub Content -->
   <main class="w-full flex-grow flex flex-col items-center justify-center py-12 md:py-16 space-y-10 md:space-y-14">
-    
-    <!-- Large Scaled UniSport Brand -->
+
+    <!-- Brand Identity -->
     <div class="space-y-5 flex flex-col items-center text-center">
       <img src="./assets/logoUniSport.png" alt="UniSport Icon" class="h-28 sm:h-36 md:h-44 lg:h-52 w-auto object-contain transition-transform duration-300 hover:scale-105" onerror="this.src='/project/assets/logoUniSport.png';" />
       <img src="./assets/lettersUniSport.png" alt="UniSport" class="h-10 sm:h-12 md:h-16 w-auto object-contain" onerror="this.src='/project/assets/lettersUniSport.png';" />
@@ -55,26 +51,22 @@
       </p>
     </div>
 
-    <!-- Responsive Action Cards (Side-by-side on desktop, stacked on mobile) -->
+    <!-- Navigation Cards -->
     <div class="w-full max-w-2xl lg:max-w-3xl grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 pt-2">
-      
-      <!-- Research Survey Card -->
       <a href="./survey/" class="w-full py-5 px-6 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-base sm:text-lg transition-all duration-200 shadow-md shadow-indigo-500/20 hover:shadow-xl hover:shadow-indigo-500/30 hover:-translate-y-0.5 flex items-center justify-between group">
         <span>Research Survey</span>
         <span class="text-indigo-200 text-xl group-hover:translate-x-1.5 transition-transform">&rarr;</span>
       </a>
 
-      <!-- UniSport App Card -->
       <a href="/challenge2/unisport" class="w-full py-5 px-6 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-900 font-bold text-base sm:text-lg border border-slate-200 transition-all duration-200 hover:border-slate-300 hover:-translate-y-0.5 flex items-center justify-between group">
         <span>UniSport Platform</span>
         <span class="text-slate-400 group-hover:text-slate-800 text-xl group-hover:translate-x-1.5 transition-transform">&rarr;</span>
       </a>
-
     </div>
 
   </main>
 
-  <!-- Full-Width Bottom Footer -->
+  <!-- Footer -->
   <footer class="w-full border-t border-slate-100 pt-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs sm:text-sm text-slate-400">
     <span class="font-medium text-slate-600">Martim Ferreira Galamba</span>
     <span class="text-slate-400">Fontys School of ICT • Semester 1, Block 2</span>

@@ -2,208 +2,28 @@
 <html lang="en" class="h-full">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>UniSport App • Eindhoven Student Sports Community</title>
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UniSport • Eindhoven Student Sessions</title>
+
   <link rel="icon" type="image/png" href="/assets/logoUniSport.png" />
   <link rel="apple-touch-icon" href="/assets/logoUniSport.png" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-title" content="UniSport" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  
+
+  <!-- External Styles & Theme Engine -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Plus Jakarta Sans', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-          },
-          colors: {
-            brand: {
-              orange: '#FF4D00',
-              'orange-hover': '#EA4500',
-            }
-          }
-        }
-      }
-    }
-  </script>
-  <script src="./theme.js"></script>
+  <link rel="stylesheet" href="./css/app.css" />
+  <script src="./js/theme.js"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
-  <script>
-    // Immediate pre-render Auth & Avatar resolution
-    (function() {
-      try {
-        var raw = localStorage.getItem("unisport_active_session");
-        if (raw) {
-          var user = JSON.parse(raw);
-          if (user && (user.email || user.uid)) {
-            window.__PRELOADED_USER__ = user;
-          }
-        }
-      } catch (e) {}
-    })();
-  </script>
-
-  <style>
-    /* Desktop Instagram-Style Hover-Expanding Sidebar */
-    @media (min-width: 768px) {
-      #desktop-sidebar {
-        width: 4.75rem; /* 76px collapsed rail */
-        transition: width 0.3s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s cubic-bezier(0.2, 0, 0, 1);
-        will-change: width;
-        overflow-x: hidden;
-      }
-      #desktop-sidebar:hover {
-        width: 16rem; /* 256px expanded */
-        box-shadow: 16px 0 36px -10px rgba(0, 0, 0, 0.15);
-      }
-      .dark #desktop-sidebar:hover {
-        box-shadow: 16px 0 36px -10px rgba(0, 0, 0, 0.6);
-      }
-
-      /* Logo wordmark */
-      #sidebar-logo-text {
-        opacity: 0;
-        max-width: 0;
-        transform: translateX(-10px);
-        transition: opacity 0.2s cubic-bezier(0.2, 0, 0, 1), max-width 0.3s cubic-bezier(0.2, 0, 0, 1), transform 0.25s cubic-bezier(0.2, 0, 0, 1);
-        pointer-events: none;
-        white-space: nowrap;
-        overflow: hidden;
-      }
-      #desktop-sidebar:hover #sidebar-logo-text {
-        opacity: 1;
-        max-width: 160px;
-        transform: translateX(0);
-        pointer-events: auto;
-      }
-
-      /* Nav button sizing: centered 48x48 rounded-2xl in collapsed mode, expands to full width on hover */
-      .sidebar-btn {
-        width: 3rem;
-        height: 3rem;
-        padding: 0;
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-        border-radius: 1rem;
-        transition: width 0.3s cubic-bezier(0.2, 0, 0, 1), background-color 0.15s ease, color 0.15s ease;
-      }
-      #desktop-sidebar:hover .sidebar-btn {
-        width: 100%;
-        padding-right: 1rem;
-      }
-
-      /* Fixed 48x48 icon container so icons are ALWAYS mathematically centered */
-      .sidebar-icon-wrap {
-        width: 3rem;
-        height: 3rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-      }
-
-      /* Nav label text hidden by default, slides and fades in smoothly on hover */
-      .sidebar-label {
-        opacity: 0;
-        max-width: 0;
-        transform: translateX(-8px);
-        transition: opacity 0.2s cubic-bezier(0.2, 0, 0, 1), max-width 0.3s cubic-bezier(0.2, 0, 0, 1), transform 0.25s cubic-bezier(0.2, 0, 0, 1);
-        pointer-events: none;
-        white-space: nowrap;
-        overflow: hidden;
-        font-size: 0.875rem;
-      }
-      #desktop-sidebar:hover .sidebar-label {
-        opacity: 1;
-        max-width: 160px;
-        transform: translateX(0);
-        pointer-events: auto;
-      }
-
-      /* Notification count badge */
-      .sidebar-extra {
-        opacity: 0;
-        transition: opacity 0.2s ease;
-        pointer-events: none;
-        margin-left: auto;
-      }
-      #desktop-sidebar:hover .sidebar-extra {
-        opacity: 1;
-        pointer-events: auto;
-      }
-
-      /* Adjust notifications drawer, main container & settings modal to start strictly to the right of the 4.75rem (76px) collapsed sidebar */
-      #notifications-desktop-drawer {
-        left: 4.75rem;
-      }
-      #app-main-container {
-        margin-left: 4.75rem;
-        width: calc(100% - 4.75rem);
-      }
-      #settings-modal {
-        left: 4.75rem;
-      }
-    }
-
-    /* Mobile bottom navbar sizing & iPhone Home Indicator safe-area spacing */
-    #mobile-bottom-nav {
-      padding-top: 0.85rem;
-      padding-bottom: calc(1.75rem + env(safe-area-inset-bottom, 0px));
-    }
-    #mobile-bottom-nav button {
-      gap: 0.35rem !important;
-      padding: 0.2rem 0.35rem;
-    }
-    #mobile-bottom-nav button svg {
-      width: 1.35rem !important;
-      height: 1.35rem !important;
-    }
-    #mobile-bottom-nav button span {
-      font-size: 0.72rem !important;
-      line-height: 1rem !important;
-    }
-  </style>
-  <script>
-    // Immediate fallback helper for filter drawer
-    window.UniSport = window.UniSport || {};
-    window.openFilterDrawer = function() {
-      var d = document.getElementById("feed-filter-drawer");
-      if (d) {
-        d.classList.remove("hidden");
-        d.style.display = "flex";
-        document.body.style.overflow = "hidden";
-      }
-    };
-    window.closeFilterDrawer = function() {
-      var d = document.getElementById("feed-filter-drawer");
-      if (d) {
-        d.classList.add("hidden");
-        d.style.display = "none";
-        document.body.style.overflow = "";
-      }
-    };
-    window.UniSport.openFilterDrawer = window.openFilterDrawer;
-    window.UniSport.closeFilterDrawer = window.closeFilterDrawer;
-  </script>
 </head>
 
 <body class="bg-white text-zinc-900 dark:bg-black dark:text-zinc-100 min-h-screen flex flex-col font-sans transition-colors duration-150 pb-28 md:pb-8">
 
-  <!-- Desktop Icon-First Hover-Sliding Sidebar Navigation (Hidden on Mobile) -->
+  <!-- Desktop Collapsible Sidebar Navigation -->
   <aside id="desktop-sidebar" class="hidden md:flex fixed top-0 bottom-0 left-0 z-40 bg-white dark:bg-black border-r border-zinc-200 dark:border-zinc-800 flex-col justify-between p-3 select-none transition-colors">
-    <!-- Top: Brand Logo + Main Nav Links -->
     <div class="space-y-6">
-      <!-- UniSport Brand Logo (Navigates to Feed) -->
       <button onclick="window.switchTabGlobal('feed')" class="sidebar-btn flex items-center group overflow-hidden cursor-pointer text-left" title="UniSport Feed">
         <div class="sidebar-icon-wrap">
           <img src="/assets/logoUniSport.png" alt="UniSport" class="h-8 w-auto object-contain transition group-hover:scale-105" onerror="this.src='./assets/logoUniSport.png';" />
@@ -211,9 +31,7 @@
         <span id="sidebar-logo-text" class="font-black text-xl tracking-tight text-zinc-950 dark:text-white">UNISPORT</span>
       </button>
 
-      <!-- Icon-First Vertical Navigation List -->
       <nav class="space-y-2">
-        <!-- Feed / Home -->
         <button 
           id="tab-btn-feed" 
           onclick="window.switchTabGlobal('feed')" 
@@ -226,7 +44,6 @@
           <span class="sidebar-label">Feed</span>
         </button>
 
-        <!-- Campus Students / Community -->
         <button 
           id="tab-btn-community" 
           onclick="window.switchTabGlobal('community')" 
@@ -239,7 +56,6 @@
           <span class="sidebar-label">Students</span>
         </button>
 
-        <!-- Host Match / Create -->
         <button 
           id="tab-btn-create" 
           onclick="window.switchTabGlobal('create')" 
@@ -252,7 +68,6 @@
           <span class="sidebar-label">Host Match</span>
         </button>
 
-        <!-- My Sessions / Spots -->
         <button 
           id="tab-btn-my-activities" 
           onclick="window.switchTabGlobal('my-activities')" 
@@ -265,7 +80,6 @@
           <span class="sidebar-label">My Sessions</span>
         </button>
 
-        <!-- Notifications Bell -->
         <button 
           id="sidebar-notif-btn" 
           onclick="window.toggleNotificationsGlobal(event)" 
@@ -280,7 +94,6 @@
           <span id="sidebar-notif-count" class="sidebar-extra text-xs font-bold text-zinc-400 dark:text-zinc-500 pr-2"></span>
         </button>
 
-        <!-- Profile -->
         <button 
           id="tab-btn-profile" 
           onclick="window.switchTabGlobal('profile')" 
@@ -299,9 +112,7 @@
       </nav>
     </div>
 
-    <!-- Bottom: Theme Toggle, Settings & User Menu -->
     <div class="space-y-1.5 pt-4 border-t border-zinc-200 dark:border-zinc-800">
-      <!-- Theme Switcher -->
       <button class="sidebar-btn theme-toggle-btn text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-950 dark:hover:text-white cursor-pointer overflow-hidden" title="Switch Theme">
         <div class="sidebar-icon-wrap">
           <i data-lucide="sun" class="icon-sun w-4 h-4 hidden"></i>
@@ -310,7 +121,6 @@
         <span class="sidebar-label">Switch Theme</span>
       </button>
 
-      <!-- Settings Button -->
       <button id="sidebar-btn-settings" onclick="window.openSettingsGlobal()" class="sidebar-btn text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-950 dark:hover:text-white cursor-pointer overflow-hidden" title="Settings">
         <div class="sidebar-icon-wrap">
           <i data-lucide="settings" class="w-4 h-4"></i>
@@ -318,7 +128,6 @@
         <span class="sidebar-label">Settings</span>
       </button>
 
-      <!-- Sign Out Button -->
       <button onclick="window.handleSignOutGlobal()" class="sidebar-btn text-xs font-bold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 cursor-pointer overflow-hidden" title="Sign out">
         <div class="sidebar-icon-wrap">
           <i data-lucide="log-out" class="w-4 h-4"></i>
@@ -328,17 +137,14 @@
     </div>
   </aside>
 
-  <!-- Mobile Top Header (Visible on Mobile only) -->
+  <!-- Mobile Top Header -->
   <header class="md:hidden sticky top-0 z-40 w-full backdrop-blur-md bg-white/90 dark:bg-black/90 border-b border-zinc-100 dark:border-zinc-900 px-4 py-3 flex items-center justify-between">
-    <!-- Brand Logo (Navigates to Feed) -->
     <button onclick="window.switchTabGlobal('feed')" class="flex items-center gap-2 group cursor-pointer text-left" title="UniSport Feed">
       <img src="/assets/logoUniSport.png" alt="UniSport" class="h-6 w-auto object-contain" onerror="this.src='./assets/logoUniSport.png';" />
       <span class="font-extrabold text-lg tracking-tight text-zinc-950 dark:text-white">UNISPORT</span>
     </button>
 
-    <!-- Mobile Top Right Controls -->
     <div class="flex items-center gap-1.5 relative">
-      <!-- Notifications Bell Button with Live Badge -->
       <button 
         id="notif-bell-btn" 
         onclick="window.toggleNotificationsGlobal(event)" 
@@ -349,26 +155,23 @@
         <span id="notif-badge" class="hidden absolute top-1 right-1 w-2.5 h-2.5 bg-brand-orange rounded-full ring-2 ring-white dark:ring-black"></span>
       </button>
 
-      <!-- Theme Switcher -->
       <button class="theme-toggle-btn p-2 text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer" aria-label="Toggle Theme">
         <i data-lucide="sun" class="icon-sun w-4 h-4 hidden"></i>
         <i data-lucide="moon" class="icon-moon w-4 h-4"></i>
       </button>
 
-      <!-- Sign In Button (Shown if logged out) -->
       <a href="./login.html" id="nav-auth-btn" class="px-3 py-1.5 rounded-xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 text-xs font-semibold">
         Sign in
       </a>
     </div>
   </header>
 
-  <!-- Instagram-Style Desktop Notifications Slide-Out Side Menu (Width: 384px, Fixed left-64) -->
+  <!-- Desktop Slide-Out Notifications Drawer -->
   <aside 
     id="notifications-desktop-drawer" 
     class="hidden md:flex flex-col fixed top-0 bottom-0 left-64 w-96 bg-white dark:bg-black border-r border-zinc-200 dark:border-zinc-800 z-30 shadow-2xl transition-transform duration-300 ease-in-out -translate-x-full"
     aria-label="Notifications Drawer"
   >
-    <!-- Drawer Header (Instagram style) -->
     <div class="p-6 border-b border-zinc-100 dark:border-zinc-900 flex items-center justify-between">
       <div>
         <h2 class="text-2xl font-black tracking-tight text-zinc-950 dark:text-white">Notifications</h2>
@@ -384,9 +187,7 @@
       </div>
     </div>
 
-    <!-- Scrollable Drawer Body -->
     <div class="p-6 space-y-6 overflow-y-auto flex-grow text-xs">
-      <!-- Section 1: Campus Friend Requests -->
       <div class="space-y-3">
         <div class="flex items-center justify-between">
           <span class="text-xs font-bold text-zinc-400 uppercase tracking-wider">Friend Requests</span>
@@ -396,7 +197,6 @@
         </div>
       </div>
 
-      <!-- Section 2: Activity & Match Alerts -->
       <div class="space-y-3 pt-4 border-t border-zinc-100 dark:border-zinc-900">
         <span class="text-xs font-bold text-zinc-400 uppercase tracking-wider">Activity & Match Alerts</span>
         <div id="notif-general-list" class="space-y-2.5">
@@ -406,2057 +206,630 @@
     </div>
   </aside>
 
-  <script>
-    // Immediate synchronous avatar and UI render to avoid ANY flash or delay
-    (function() {
-      try {
-        var user = window.__PRELOADED_USER__;
-        if (!user) {
-          var raw = localStorage.getItem("unisport_active_session");
-          if (raw) user = JSON.parse(raw);
-        }
-        if (user && (user.email || user.uid)) {
-          var navAuthBtn = document.getElementById("nav-auth-btn");
-          var googleAvatarBtn = document.getElementById("google-avatar-btn");
-          var avatarInner = document.getElementById("google-avatar-inner");
-          var dropName = document.getElementById("dropdown-name");
-          var dropEmail = document.getElementById("dropdown-email");
-          var dropSchoolBadge = document.getElementById("dropdown-school-badge");
-          var dropSchoolFull = document.getElementById("dropdown-school-full");
-
-          if (navAuthBtn) {
-            navAuthBtn.style.setProperty("display", "none", "important");
-            navAuthBtn.classList.add("hidden");
-          }
-          var avId = user.avatarId || "footballer";
-          if (avId === "bolt" || avId === "flame" || avId === "cyber") avId = "footballer";
-          var avSrc = "./assets/avatars/" + avId + ".png";
-          var uni = user.university || (user.email && user.email.includes("tue.nl") ? "TU Eindhoven" : "Fontys UAS");
-          var isTue = uni.indexOf("TU") !== -1 || (user.email && user.email.includes("tue.nl"));
-          if (dropName) dropName.textContent = user.displayName || user.email || "Student";
-          if (dropEmail) dropEmail.textContent = user.email || "";
-          if (dropSchoolFull) dropSchoolFull.textContent = isTue ? "TU Eindhoven" : "Fontys UAS";
-
-          // Immediate hydration for Instagram Sidebar Profile button
-          var sidebarAvatar = document.getElementById("sidebar-profile-avatar-inner");
-          var sidebarName = document.getElementById("sidebar-profile-name");
-          if (sidebarAvatar) {
-            sidebarAvatar.innerHTML = '<img src="' + avSrc + '" alt="Avatar" class="w-full h-full object-cover rounded-full" onerror="this.src=\'./assets/avatars/footballer.png\'" />';
-          }
-          if (sidebarName) {
-            sidebarName.textContent = user.displayName || (user.email ? user.email.split("@")[0] : "Profile");
-          }
-        }
-      } catch (err) {}
-    })();
-
-    // Synchronous resilient tab switcher for instant profile / sessions / notifications navigation
-    window.switchTabGlobal = function(tabId) {
-      // Auto-close settings if navigating via tabs
-      var settModal = document.getElementById("settings-modal");
-      if (settModal && !settModal.classList.contains("hidden")) {
-        settModal.classList.add("hidden");
-        settModal.classList.remove("flex");
-        document.body.style.overflow = "";
-      }
-      var settTab = document.getElementById("mobile-tab-settings");
-      if (settTab) {
-        settTab.className = "flex flex-col items-center gap-1 text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer";
-      }
-      var deskSettBtn = document.getElementById("sidebar-btn-settings");
-      if (deskSettBtn) {
-        deskSettBtn.classList.remove("bg-zinc-100", "dark:bg-zinc-900", "text-zinc-950", "dark:text-white");
-      }
-
-      var drawer = document.getElementById("notifications-desktop-drawer");
-      if (drawer && tabId !== "notifications") {
-        drawer.classList.add("-translate-x-full");
-      }
-
-      // Switch section visibility
-      var tabs = ["feed", "community", "create", "my-activities", "profile", "notifications", "student-profile"];
-      for (var i = 0; i < tabs.length; i++) {
-        var t = tabs[i];
-        var sec = document.getElementById("section-" + t);
-        var deskBtn = document.getElementById("tab-btn-" + t);
-        var mobBtn = document.getElementById("mobile-tab-" + t);
-
-        if (t === tabId) {
-          if (sec) sec.classList.remove("hidden");
-          if (deskBtn) {
-            deskBtn.className = "sidebar-btn nav-sidebar-btn font-bold bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 cursor-pointer group overflow-hidden";
-          }
-          if (mobBtn) {
-            mobBtn.className = "flex flex-col items-center gap-1 text-zinc-950 dark:text-white transition cursor-pointer";
-          }
-        } else {
-          if (sec) sec.classList.add("hidden");
-          if (deskBtn) {
-            deskBtn.className = "sidebar-btn nav-sidebar-btn font-semibold text-zinc-700 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-950 dark:hover:text-white cursor-pointer group overflow-hidden";
-          }
-          if (mobBtn) {
-            mobBtn.className = "flex flex-col items-center gap-1 text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer";
-          }
-        }
-      }
-      // Keep "Students" nav highlighted when viewing another student's profile
-      if (tabId === "student-profile") {
-        var commDeskBtn = document.getElementById("tab-btn-community");
-        var commMobBtn = document.getElementById("mobile-tab-community");
-        if (commDeskBtn) {
-          commDeskBtn.className = "sidebar-btn nav-sidebar-btn font-bold bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 cursor-pointer group overflow-hidden";
-        }
-        if (commMobBtn) {
-          commMobBtn.className = "flex flex-col items-center gap-1 text-zinc-950 dark:text-white transition cursor-pointer";
-        }
-      }
-
-      // If switching to profile, hydrate immediately from active session
-      if (tabId === "profile") {
-        try {
-          var raw = localStorage.getItem("unisport_active_session");
-          if (raw) {
-            var u = JSON.parse(raw);
-            var hName = document.getElementById("profile-hero-name");
-            var hEmail = document.getElementById("profile-hero-email");
-            var hSchool = document.getElementById("profile-hero-school");
-            var hBadge = document.getElementById("profile-hero-badge");
-            var hInner = document.getElementById("profile-hero-avatar-inner");
-            var pName = document.getElementById("profile-name");
-            var pEmail = document.getElementById("profile-email");
-            var pUni = document.getElementById("profile-university");
-            var pSport = document.getElementById("profile-sport");
-
-            var dName = u.displayName || (u.email ? u.email.split("@")[0] : "Student");
-            var isTue = (u.university && u.university.indexOf("TU") !== -1) || (u.email && u.email.indexOf("tue.nl") !== -1);
-            var avId = u.avatarId || "footballer";
-
-            var prefs = JSON.parse(localStorage.getItem("unisport_app_preferences") || "{}");
-            var showU = prefs.showUni !== undefined ? prefs.showUni : (u.showUniBadge !== undefined ? u.showUniBadge : true);
-
-            if (hName) hName.textContent = dName;
-            if (hEmail) hEmail.textContent = u.email || "";
-            if (hSchool) hSchool.textContent = isTue ? "TU Eindhoven" : "Fontys UAS";
-            if (hBadge) {
-              if (showU) hBadge.classList.remove("hidden");
-              else hBadge.classList.add("hidden");
-            }
-            if (hInner) hInner.innerHTML = '<img src="./assets/avatars/' + avId + '.png" class="w-full h-full object-cover rounded-full" onerror="this.src=\'./assets/avatars/footballer.png\'" />';
-            if (pName) pName.value = dName;
-            if (pEmail) pEmail.value = u.email || "";
-            if (pUni) pUni.value = isTue ? "TU Eindhoven" : "Fontys UAS";
-            if (pSport && u.sport) pSport.value = u.sport;
-          }
-        } catch(e) {}
-      }
-
-      // If switching to community or notifications, render immediately
-      if (tabId === "community") {
-        if (typeof window.renderCommunityInstant === "function") {
-          window.renderCommunityInstant();
-        }
-        if (typeof window.fetchStudentsDirectFromFirestore === "function") {
-          window.fetchStudentsDirectFromFirestore();
-        }
-        if (window.UniSport && typeof window.UniSport.fetchCampusStudents === "function") {
-          window.UniSport.fetchCampusStudents();
-        } else if (window.UniSport && typeof window.UniSport.renderCommunity === "function") {
-          window.UniSport.renderCommunity();
-        }
-      }
-      if (tabId === "notifications" && window.UniSport && typeof window.UniSport.renderNotifications === "function") {
-        window.UniSport.renderNotifications();
-      }
-
-      if (window.UniSport && typeof window.UniSport.switchTab === "function") {
-        window.UniSport.switchTab(tabId);
-      }
-      if (window.lucide && typeof window.lucide.createIcons === "function") {
-        window.lucide.createIcons();
-      }
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    };
-
-    // Instagram-style notifications drawer on desktop, dedicated page on mobile
-    window.toggleNotificationsGlobal = function(e) {
-      if (e) e.stopPropagation();
-      var userDd = document.getElementById("user-dropdown");
-      if (userDd) userDd.classList.add("hidden");
-
-      if (window.innerWidth < 768) {
-        // Mobile: Open dedicated notifications page
-        window.switchTabGlobal('notifications');
-      } else {
-        // Laptop / Desktop: Open Instagram-style side drawer next to sidebar
-        var drawer = document.getElementById("notifications-desktop-drawer");
-        if (drawer) {
-          drawer.classList.toggle("-translate-x-full");
-        }
-      }
-
-      if (window.UniSport && typeof window.UniSport.renderNotifications === "function") {
-        window.UniSport.renderNotifications();
-      }
-    };
-
-    window.closeNotificationsDrawer = function() {
-      var drawer = document.getElementById("notifications-desktop-drawer");
-      if (drawer) {
-        drawer.classList.add("-translate-x-full");
-      }
-    };
-
-    window.closeStudentProfileModal = function() {
-      var m = document.getElementById("student-profile-modal");
-      if (m) m.classList.add("hidden");
-    };
-
-    // Purge any old cached fake demo accounts & fake social data from local storage immediately
-    try {
-      var rawCacheCheck = localStorage.getItem("unisport_students_cache");
-      if (rawCacheCheck) {
-        var parsedCacheCheck = JSON.parse(rawCacheCheck);
-        if (Array.isArray(parsedCacheCheck)) {
-          var cleanCache = parsedCacheCheck.filter(function(cs) {
-            return cs && cs.uid && !cs.uid.startsWith("demo-") && !cs.uid.includes("-rep") && cs.uid !== "climb-lover" && cs.uid !== "gym-bro";
-          });
-          localStorage.setItem("unisport_students_cache", JSON.stringify(cleanCache));
-        }
-      }
-      var rawFr = localStorage.getItem("unisport_friends");
-      if (rawFr) {
-        var parsedFr = JSON.parse(rawFr);
-        if (Array.isArray(parsedFr)) {
-          localStorage.setItem("unisport_friends", JSON.stringify(parsedFr.filter(function(id) {
-            return id && !String(id).startsWith("demo-") && !String(id).includes("-rep");
-          })));
-        }
-      }
-      var rawReq = localStorage.getItem("unisport_friend_requests");
-      if (rawReq) {
-        var parsedReq = JSON.parse(rawReq);
-        if (Array.isArray(parsedReq)) {
-          localStorage.setItem("unisport_friend_requests", JSON.stringify(parsedReq.filter(function(r) {
-            return r && r.id !== "req-1" && r.id !== "req-2" && r.fromUid && !String(r.fromUid).startsWith("demo-");
-          })));
-        }
-      }
-      var rawNotif = localStorage.getItem("unisport_notifications");
-      if (rawNotif) {
-        var parsedNotif = JSON.parse(rawNotif);
-        if (Array.isArray(parsedNotif)) {
-          localStorage.setItem("unisport_notifications", JSON.stringify(parsedNotif.filter(function(n) {
-            return n && n.id !== "notif-1" && n.id !== "notif-2" && !String(n.id).startsWith("demo-");
-          })));
-        }
-      }
-    } catch(e) {}
-
-    // Empty seed list - Only real Firestore users are displayed
-    window.CAMPUS_STUDENTS_SEED = [];
-    window.__FIRESTORE_STUDENTS__ = [];
-    window.__ACTIVE_VIEWED_STUDENT_UID__ = null;
-
-    window.communityStateInline = {
-      searchQuery: "",
-      uniFilter: "all",
-      view: "all"
-    };
-
-    // Helper to parse Firestore REST string array field
-    function parseFirestoreStringArray(fieldObj) {
-      if (!fieldObj || !fieldObj.arrayValue || !Array.isArray(fieldObj.arrayValue.values)) return [];
-      var out = [];
-      for (var i = 0; i < fieldObj.arrayValue.values.length; i++) {
-        var v = fieldObj.arrayValue.values[i];
-        if (v && typeof v.stringValue === "string" && v.stringValue) {
-          out.push(v.stringValue);
-        }
-      }
-      return out;
-    }
-
-    // Derive mutual friendships, sent requests (Pending), and incoming friend requests from Firestore student records
-    window.syncSocialFromFirestoreStudents = function(remoteStudents) {
-      if (!Array.isArray(remoteStudents) || remoteStudents.length === 0) return;
-      var currentUid = null;
-      try {
-        var rawSess = localStorage.getItem("unisport_active_session");
-        if (rawSess) currentUid = JSON.parse(rawSess).uid;
-      } catch(e) {}
-      if (!currentUid) return;
-
-      var meDoc = null;
-      for (var i = 0; i < remoteStudents.length; i++) {
-        if (remoteStudents[i].uid === currentUid) {
-          meDoc = remoteStudents[i];
-          break;
-        }
-      }
-
-      var localFriends = [];
-      var localSent = [];
-      var localDeclined = [];
-      try {
-        localFriends = JSON.parse(localStorage.getItem("unisport_friends") || "[]").filter(function(x) { return x && !String(x).startsWith("demo-"); });
-        localSent = JSON.parse(localStorage.getItem("unisport_sent_requests") || "[]").filter(function(x) { return x && !String(x).startsWith("demo-"); });
-        localDeclined = JSON.parse(localStorage.getItem("unisport_declined_requests") || "[]");
-      } catch(e) {}
-
-      // Merge remote arrays from my Firestore doc if present
-      var myRemoteFriends = (meDoc && Array.isArray(meDoc.friends)) ? meDoc.friends : [];
-      var myRemoteSent = (meDoc && Array.isArray(meDoc.sentRequests)) ? meDoc.sentRequests : [];
-      var myRemoteDeclined = (meDoc && Array.isArray(meDoc.declinedRequests)) ? meDoc.declinedRequests : [];
-
-      var mergedSentSet = {};
-      myRemoteSent.concat(localSent).forEach(function(id) { if (id && id !== currentUid) mergedSentSet[id] = true; });
-      var mergedDeclinedSet = {};
-      myRemoteDeclined.concat(localDeclined).forEach(function(id) { if (id) mergedDeclinedSet[id] = true; });
-      var mergedFriendsSet = {};
-      myRemoteFriends.concat(localFriends).forEach(function(id) { if (id && id !== currentUid && !String(id).startsWith("demo-")) mergedFriendsSet[id] = true; });
-
-      var incomingRequests = [];
-
-      for (var j = 0; j < remoteStudents.length; j++) {
-        var other = remoteStudents[j];
-        if (!other || !other.uid || other.uid === currentUid) continue;
-        var otherFriends = Array.isArray(other.friends) ? other.friends : [];
-        var otherSent = Array.isArray(other.sentRequests) ? other.sentRequests : [];
-        var otherDeclined = Array.isArray(other.declinedRequests) ? other.declinedRequests : [];
-
-        // If other student declined our request, remove from our pending sentRequests
-        if (otherDeclined.indexOf(currentUid) !== -1 && mergedSentSet[other.uid]) {
-          delete mergedSentSet[other.uid];
-        }
-
-        // Rule: Mutual friend request (User 1 requests User 2 AND User 2 requests User 1 = Friends)
-        // Or if other student accepted our request (other.friends has currentUid while we had sent them a request or are friends)
-        var iRequestedOther = !!mergedSentSet[other.uid];
-        var otherRequestedMe = otherSent.indexOf(currentUid) !== -1;
-        var otherHasMeAsFriend = otherFriends.indexOf(currentUid) !== -1;
-
-        if ((iRequestedOther && otherRequestedMe) || (iRequestedOther && otherHasMeAsFriend) || (mergedFriendsSet[other.uid] && otherHasMeAsFriend)) {
-          mergedFriendsSet[other.uid] = true;
-          delete mergedSentSet[other.uid];
-          delete mergedDeclinedSet[other.uid];
-        } else if (otherRequestedMe && !mergedFriendsSet[other.uid] && !mergedDeclinedSet[other.uid]) {
-          // Incoming Friend Request from other student to currentUid
-          incomingRequests.push({
-            id: "req-" + other.uid,
-            fromUid: other.uid,
-            displayName: other.displayName || "Student",
-            university: other.university || "Fontys UAS",
-            sport: other.sport || "Football",
-            avatarId: other.avatarId || "footballer",
-            timeAgo: "Pending request"
-          });
-        }
-      }
-
-      // Clean any confirmed friends out of sentRequests
-      Object.keys(mergedFriendsSet).forEach(function(fUid) {
-        delete mergedSentSet[fUid];
-      });
-
-      var finalFriends = Object.keys(mergedFriendsSet);
-      var finalSent = Object.keys(mergedSentSet);
-      var finalDeclined = Object.keys(mergedDeclinedSet);
-
-      try {
-        localStorage.setItem("unisport_friends", JSON.stringify(finalFriends));
-        localStorage.setItem("unisport_sent_requests", JSON.stringify(finalSent));
-        localStorage.setItem("unisport_declined_requests", JSON.stringify(finalDeclined));
-        localStorage.setItem("unisport_friend_requests", JSON.stringify(incomingRequests));
-      } catch(e) {}
-
-      if (window.UniSport && typeof window.UniSport.syncSocialStateFromStorage === "function") {
-        try { window.UniSport.syncSocialStateFromStorage(); } catch(e) {}
-      }
-    };
-
-    // Direct, zero-dependency REST fetch from Cloud Firestore (fontys-unisport)
-    window.fetchStudentsDirectFromFirestore = async function() {
-      try {
-        var url = "https://firestore.googleapis.com/v1/projects/fontys-unisport/databases/(default)/documents/users?pageSize=100&_t=" + Date.now();
-        var res = await fetch(url, { cache: "no-store" });
-        if (!res.ok) return;
-        var data = await res.json();
-        if (!data || !Array.isArray(data.documents)) return;
-
-        var currentUid = null;
-        try {
-          var rawSess = localStorage.getItem("unisport_active_session");
-          if (rawSess) currentUid = JSON.parse(rawSess).uid;
-        } catch(e) {}
-
-        var remoteStudents = [];
-        for (var i = 0; i < data.documents.length; i++) {
-          var doc = data.documents[i];
-          var uid = (doc.name || "").split("/").pop();
-          if (!uid || uid.startsWith("demo-") || uid.includes("-rep") || uid === "climb-lover" || uid === "gym-bro") continue;
-
-          var f = doc.fields || {};
-          var email = (f.email && f.email.stringValue) ? f.email.stringValue : "";
-          var displayName = (f.displayName && f.displayName.stringValue) ? f.displayName.stringValue : (email ? email.split("@")[0] : "Student");
-          var university = (f.university && f.university.stringValue) ? f.university.stringValue : (email.indexOf("tue.nl") !== -1 ? "TU Eindhoven" : "Fontys UAS");
-          var avId = (f.avatarId && f.avatarId.stringValue) ? f.avatarId.stringValue : "footballer";
-          if (avId !== "bodybuilder" && avId !== "footballer" && avId !== "runner") {
-            avId = "footballer";
-          }
-          var sport = (f.sport && f.sport.stringValue) ? f.sport.stringValue : "Football";
-          var location = (f.location && f.location.stringValue) ? f.location.stringValue : "Eindhoven Campus";
-          var sessionsCount = (f.sessionsCount && f.sessionsCount.integerValue) ? parseInt(f.sessionsCount.integerValue, 10) : 0;
-
-          var friendsArr = parseFirestoreStringArray(f.friends);
-          var sentRequestsArr = parseFirestoreStringArray(f.sentRequests);
-          var declinedRequestsArr = parseFirestoreStringArray(f.declinedRequests);
-
-          var isPublic = true;
-          if (f.isPublic && f.isPublic.booleanValue !== undefined) {
-            isPublic = f.isPublic.booleanValue;
-          } else if (f.isPublicProfile && f.isPublicProfile.booleanValue !== undefined) {
-            isPublic = f.isPublicProfile.booleanValue;
-          }
-
-          var showUniBadge = true;
-          if (f.showUniBadge && f.showUniBadge.booleanValue !== undefined) {
-            showUniBadge = f.showUniBadge.booleanValue;
-          }
-
-          remoteStudents.push({
-            uid: uid,
-            isSelf: uid === currentUid,
-            displayName: displayName,
-            email: email,
-            university: university,
-            avatarId: avId,
-            sport: sport,
-            location: location,
-            sports: [sport],
-            sessionsCount: sessionsCount,
-            friends: friendsArr,
-            sentRequests: sentRequestsArr,
-            declinedRequests: declinedRequestsArr,
-            isPublic: isPublic,
-            showUniBadge: showUniBadge
-          });
-        }
-
-        if (remoteStudents.length > 0) {
-          window.__FIRESTORE_STUDENTS__ = remoteStudents;
-          try {
-            localStorage.setItem("unisport_students_cache", JSON.stringify(remoteStudents));
-          } catch(e) {}
-          window.syncSocialFromFirestoreStudents(remoteStudents);
-          if (typeof window.renderCommunityInstant === "function") {
-            window.renderCommunityInstant();
-          }
-          if (window.__ACTIVE_VIEWED_STUDENT_UID__ && typeof window.renderOtherStudentProfilePage === "function") {
-            window.renderOtherStudentProfilePage(window.__ACTIVE_VIEWED_STUDENT_UID__, true);
-          }
-          if (window.UniSport && typeof window.UniSport.renderCommunity === "function") {
-            try { window.UniSport.renderCommunity(); } catch(e) {}
-          }
-          if (window.UniSport && typeof window.UniSport.renderNotifications === "function") {
-            try { window.UniSport.renderNotifications(); } catch(e) {}
-          }
-        }
-      } catch(err) {
-        console.warn("Direct Firestore student fetch error:", err);
-      }
-    };
-
-    // Helper to resolve all known students (live Firestore + cache + current session)
-    window.getAllKnownStudentsList = function() {
-      var currentUid = null;
-      var currentSession = null;
-      try {
-        var rawSess = localStorage.getItem("unisport_active_session");
-        if (rawSess) {
-          currentSession = JSON.parse(rawSess);
-          currentUid = currentSession.uid;
-        }
-      } catch(e) {}
-
-      var myPrefs = {};
-      try { myPrefs = JSON.parse(localStorage.getItem("unisport_app_preferences") || "{}"); } catch(e) {}
-      var myIsPublic = myPrefs.privacyPublic !== undefined ? myPrefs.privacyPublic : (currentSession && currentSession.isPublic !== undefined ? currentSession.isPublic : true);
-      var myShowUni = myPrefs.showUni !== undefined ? myPrefs.showUni : (currentSession && currentSession.showUniBadge !== undefined ? currentSession.showUniBadge : true);
-
-      var list = [];
-      var seenUids = {};
-
-      if (Array.isArray(window.__FIRESTORE_STUDENTS__)) {
-        window.__FIRESTORE_STUDENTS__.forEach(function(cs) {
-          if (cs && cs.uid && !seenUids[cs.uid] && !cs.uid.startsWith("demo-") && !cs.uid.includes("-rep") && cs.uid !== "climb-lover" && cs.uid !== "gym-bro") {
-            var itemSelf = cs.uid === currentUid;
-            list.push(Object.assign({}, cs, {
-              isSelf: itemSelf,
-              isPublic: itemSelf ? myIsPublic : (cs.isPublic !== undefined ? cs.isPublic : true),
-              showUniBadge: itemSelf ? myShowUni : (cs.showUniBadge !== undefined ? cs.showUniBadge : true)
-            }));
-            seenUids[cs.uid] = true;
-          }
-        });
-      }
-
-      try {
-        var rawCache = localStorage.getItem("unisport_students_cache");
-        if (rawCache) {
-          var parsedCache = JSON.parse(rawCache);
-          if (Array.isArray(parsedCache)) {
-            parsedCache.forEach(function(cs) {
-              if (cs && cs.uid && !seenUids[cs.uid] && !cs.uid.startsWith("demo-") && !cs.uid.includes("-rep") && cs.uid !== "climb-lover" && cs.uid !== "gym-bro") {
-                var itemSelf = cs.uid === currentUid;
-                list.push(Object.assign({}, cs, {
-                  isSelf: itemSelf,
-                  isPublic: itemSelf ? myIsPublic : (cs.isPublic !== undefined ? cs.isPublic : true),
-                  showUniBadge: itemSelf ? myShowUni : (cs.showUniBadge !== undefined ? cs.showUniBadge : true)
-                }));
-                seenUids[cs.uid] = true;
-              }
-            });
-          }
-        }
-      } catch(e) {}
-
-      if (currentSession && currentSession.uid) {
-        var sessAv = currentSession.avatarId || "footballer";
-        if (sessAv !== "bodybuilder" && sessAv !== "footballer" && sessAv !== "runner") sessAv = "footballer";
-        if (!seenUids[currentSession.uid]) {
-          list.push({
-            uid: currentSession.uid,
-            isSelf: true,
-            displayName: currentSession.displayName || "Student",
-            email: currentSession.email || "",
-            university: currentSession.university || "Fontys UAS",
-            avatarId: sessAv,
-            sport: currentSession.sport || "Football",
-            location: "Eindhoven Campus",
-            sports: [currentSession.sport || "Football"],
-            sessionsCount: 0,
-            isPublic: myIsPublic,
-            showUniBadge: myShowUni
-          });
-          seenUids[currentSession.uid] = true;
-        } else {
-          list.forEach(function(item) {
-            if (item.uid === currentSession.uid) {
-              if (currentSession.email) item.email = currentSession.email;
-              if (currentSession.displayName) item.displayName = currentSession.displayName;
-              if (currentSession.university) item.university = currentSession.university;
-              if (currentSession.avatarId) item.avatarId = sessAv;
-              item.isPublic = myIsPublic;
-              item.showUniBadge = myShowUni;
-            }
-          });
-        }
-      }
-      return list;
-    };
-
-    // Instant standalone community renderer that NEVER relies on external module timing
-    window.renderCommunityInstant = function() {
-      var container = document.getElementById("students-grid");
-      if (!container) return;
-
-      var currentUid = null;
-      try {
-        var rawSess = localStorage.getItem("unisport_active_session");
-        if (rawSess) currentUid = JSON.parse(rawSess).uid;
-      } catch(e) {}
-
-      var myPrefs = {};
-      try { myPrefs = JSON.parse(localStorage.getItem("unisport_app_preferences") || "{}"); } catch(e) {}
-
-      var friends = [];
-      var sentRequests = [];
-      var incomingRequests = [];
-      try {
-        var rawFriends = localStorage.getItem("unisport_friends");
-        if (rawFriends) friends = JSON.parse(rawFriends);
-        var rawSent = localStorage.getItem("unisport_sent_requests");
-        if (rawSent) sentRequests = JSON.parse(rawSent);
-        var rawInc = localStorage.getItem("unisport_friend_requests");
-        if (rawInc) incomingRequests = JSON.parse(rawInc);
-      } catch(e) {}
-
-      var countFriends = document.getElementById("community-friends-count");
-      if (countFriends) countFriends.textContent = friends.length;
-
-      var list = window.getAllKnownStudentsList();
-
-      // Update total student counter before filtering
-      var statStudents = document.getElementById("community-stat-students");
-      if (statStudents) statStudents.textContent = list.length + "+";
-
-      // Filter by view
-      if (window.communityStateInline.view === "friends") {
-        list = list.filter(function(s) { return friends.indexOf(s.uid) !== -1; });
-      }
-
-      // Filter by university (Robust matching for Fontys and TU Eindhoven / TU/e)
-      if (window.communityStateInline.uniFilter && window.communityStateInline.uniFilter !== "all") {
-        var targetUni = window.communityStateInline.uniFilter.toLowerCase();
-        list = list.filter(function(s) {
-          var u = (s.university || "").toLowerCase();
-          var em = (s.email || "").toLowerCase();
-          if (targetUni.indexOf("tu") !== -1) {
-            return u.indexOf("tu") !== -1 || u.indexOf("eindhoven") !== -1 || em.indexOf("tue.nl") !== -1;
-          }
-          if (targetUni.indexOf("fontys") !== -1) {
-            return u.indexOf("fontys") !== -1 || em.indexOf("fontys.nl") !== -1;
-          }
-          return u.indexOf(targetUni) !== -1;
-        });
-      }
-
-      // Filter by search query
-      if (window.communityStateInline.searchQuery) {
-        var q = window.communityStateInline.searchQuery.toLowerCase();
-        list = list.filter(function(s) {
-          var nameMatch = (s.displayName || "").toLowerCase().indexOf(q) !== -1;
-          var emailMatch = (s.email || "").toLowerCase().indexOf(q) !== -1;
-          var uniMatch = (s.university || "").toLowerCase().indexOf(q) !== -1;
-          var sportMatch = (s.sport || "").toLowerCase().indexOf(q) !== -1;
-          var sportsMatch = (s.sports || []).some(function(sp) { return sp.toLowerCase().indexOf(q) !== -1; });
-          return nameMatch || emailMatch || uniMatch || sportMatch || sportsMatch;
-        });
-      }
-
-      if (list.length === 0) {
-        container.innerHTML = '<div class="col-span-full py-12 px-6 text-center rounded-3xl bg-zinc-50/80 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 flex flex-col items-center justify-center">' +
-          '<img src="./assets/mascot-students.png" onerror="this.src=\'/challenge2/unisport/app/assets/mascot-students.png\'" alt="UniSport Mascot" class="w-36 h-36 sm:w-44 sm:h-44 object-contain drop-shadow-md mb-2 select-none" />' +
-          '<h3 class="text-base sm:text-lg font-extrabold text-zinc-950 dark:text-white mb-1">No campus students found</h3>' +
-          '<p class="text-zinc-500 dark:text-zinc-400 text-xs max-w-sm mx-auto mb-5 leading-relaxed">' +
-            (window.communityStateInline.view === 'friends' ? "You haven't connected with any teammates yet. Explore all Fontys & TU/e students to build your squad!" : "Try searching for a different student name, university campus, or sport.") +
-          '</p>' +
-          (window.communityStateInline.view === 'friends' ? '<button onclick="window.setCommunityView(\'all\')" class="px-5 py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 text-xs font-bold shadow-sm transition cursor-pointer">Explore All Students</button>' : '') +
-        '</div>';
-        return;
-      }
-
-      var html = "";
-      for (var i = 0; i < list.length; i++) {
-        var student = list[i];
-        var isSelf = student.isSelf || student.uid === currentUid;
-        var isFriend = friends.indexOf(student.uid) !== -1;
-        var isPending = !isFriend && sentRequests.indexOf(student.uid) !== -1;
-        var incomingReqObj = null;
-        if (!isFriend) {
-          for (var rIdx = 0; rIdx < incomingRequests.length; rIdx++) {
-            if (incomingRequests[rIdx] && incomingRequests[rIdx].fromUid === student.uid) {
-              incomingReqObj = incomingRequests[rIdx];
-              break;
-            }
-          }
-        }
-        var isTue = (student.university || "").indexOf("TU") !== -1 || (student.email || "").indexOf("tue.nl") !== -1;
-        var sports = student.sports || [student.sport || "Football"];
-        var avId = student.avatarId || "footballer";
-        if (avId !== "bodybuilder" && avId !== "footballer" && avId !== "runner") {
-          avId = "footballer";
-        }
-
-        // Privacy rules:
-        // 1. isPublic: if false, other users cannot view this profile (no "Profile" button, name/avatar not clickable)
-        var isProfilePublic = isSelf ? true : (student.isPublic !== undefined ? student.isPublic : true);
-        // 2. showUniBadge: if false, university badge ("TU Eindhoven" / "Fontys UAS") does not appear
-        var showBadge = isSelf
-          ? (myPrefs.showUni !== undefined ? myPrefs.showUni : (student.showUniBadge !== undefined ? student.showUniBadge : true))
-          : (student.showUniBadge !== undefined ? student.showUniBadge : true);
-
-        var actionButtonsHtml = '';
-        if (isSelf) {
-          actionButtonsHtml = '<button onclick="window.switchTabGlobal(\'profile\')" class="px-4 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 font-bold text-xs transition cursor-pointer shadow-sm">Edit</button>';
-        } else if (isFriend) {
-          actionButtonsHtml = '<button onclick="window.removeFriend(\'' + student.uid + '\')" class="px-3.5 py-2 rounded-xl bg-red-50 hover:bg-red-100 dark:bg-red-950/40 dark:hover:bg-red-900/60 text-xs font-bold text-red-600 dark:text-red-400 transition cursor-pointer" title="Remove Friend">Remove</button>';
-        } else if (incomingReqObj) {
-          actionButtonsHtml =
-            '<button onclick="window.acceptFriendRequest(\'' + incomingReqObj.id + '\', \'' + student.uid + '\')" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition cursor-pointer shadow-sm">Accept</button>' +
-            '<button onclick="window.declineFriendRequest(\'' + incomingReqObj.id + '\', \'' + student.uid + '\')" class="px-3 py-2 rounded-xl bg-zinc-100 hover:bg-red-50 dark:bg-zinc-800 dark:hover:bg-red-950/40 text-zinc-600 hover:text-red-600 dark:text-zinc-300 dark:hover:text-red-400 font-bold text-xs transition cursor-pointer">Decline</button>';
-        } else if (isPending) {
-          actionButtonsHtml = '<button onclick="window.cancelFriendRequest(\'' + student.uid + '\')" class="px-4 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-700 dark:text-amber-300 font-bold text-xs transition cursor-pointer flex items-center gap-1.5" title="Click to cancel request"><i data-lucide="clock" class="w-3.5 h-3.5"></i><span>Pending</span></button>';
-        } else {
-          actionButtonsHtml = '<button onclick="window.toggleFriendship(\'' + student.uid + '\')" class="px-4 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 font-bold text-xs transition cursor-pointer shadow-sm">Connect</button>';
-        }
-
-        var avatarContainerHtml = '';
-        if (isProfilePublic) {
-          avatarContainerHtml = '<div class="relative shrink-0 cursor-pointer" onclick="window.openStudentProfileModal(\'' + student.uid + '\')">';
-        } else {
-          avatarContainerHtml = '<div class="relative shrink-0">';
-        }
-        avatarContainerHtml += '<div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl overflow-hidden border border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-white shadow-sm">' +
-          '<img src="./assets/avatars/' + avId + '.png" class="w-full h-full object-cover" onerror="this.onerror=null;this.src=\'/challenge2/unisport/app/assets/avatars/' + avId + '.png\'" />' +
-        '</div>' +
-        '<span class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white dark:border-zinc-900 shadow-sm" title="Active Verified Student"></span>' +
-        '</div>';
-
-        var nameHeadingHtml = '';
-        if (isProfilePublic) {
-          nameHeadingHtml = '<h3 class="font-extrabold text-sm sm:text-base text-zinc-950 dark:text-white truncate cursor-pointer hover:underline" onclick="window.openStudentProfileModal(\'' + student.uid + '\')">' + student.displayName + '</h3>';
-        } else {
-          nameHeadingHtml = '<h3 class="font-extrabold text-sm sm:text-base text-zinc-950 dark:text-white truncate">' + student.displayName + '</h3>';
-        }
-
-        var uniBadgeHtml = '';
-        if (showBadge) {
-          uniBadgeHtml = '<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ' + (isTue ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20' : 'bg-orange-500/10 text-brand-orange border border-orange-500/20') + '">' +
-            '<i data-lucide="graduation-cap" class="w-3 h-3"></i>' +
-            (isTue ? 'TU Eindhoven' : 'Fontys UAS') +
-          '</span>';
-        }
-
-        var profileBtnHtml = '';
-        if (isProfilePublic && !isSelf) {
-          profileBtnHtml = '<button onclick="window.openStudentProfileModal(\'' + student.uid + '\')" class="px-4 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-xs font-bold text-zinc-900 dark:text-white transition cursor-pointer">Profile</button>';
-        }
-
-        html += '<div class="p-4 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-5 transition hover:bg-zinc-50/70 dark:hover:bg-zinc-800/40">' +
-          '<div class="flex items-center gap-4 min-w-0">' +
-            avatarContainerHtml +
-            '<div class="min-w-0 flex-grow space-y-1">' +
-              '<div class="flex items-center gap-2 flex-wrap">' +
-                nameHeadingHtml +
-                (isSelf ? '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-950 text-white dark:bg-white dark:text-zinc-950">You</span>' : '') +
-                uniBadgeHtml +
-                (isFriend ? '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"><i data-lucide="check" class="w-3 h-3"></i>Friend</span>' : '') +
-                (isPending ? '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20"><i data-lucide="clock" class="w-3 h-3"></i>Request Pending</span>' : '') +
-                (incomingReqObj ? '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-brand-orange/15 text-brand-orange border border-brand-orange/30">Sent you a request</span>' : '') +
-              '</div>' +
-
-              '<div class="flex items-center gap-3 text-xs text-zinc-500 dark:text-zinc-400 truncate">' +
-                '<span class="font-medium truncate text-zinc-700 dark:text-zinc-300">' + (student.email || 'campus.student@fontys.nl') + '</span>' +
-                '<span>•</span>' +
-                '<span class="truncate">' + (student.location || 'Eindhoven Campus') + '</span>' +
-              '</div>' +
-            '</div>' +
-          '</div>' +
-
-          '<div class="hidden lg:flex items-center gap-1.5 shrink-0">';
-          for (var sIdx = 0; sIdx < Math.min(sports.length, 3); sIdx++) {
-            html += '<span class="px-3 py-1 rounded-xl text-xs font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200/50 dark:border-zinc-700/50">' + sports[sIdx] + '</span>';
-          }
-          if (sports.length > 3) {
-            html += '<span class="px-2 py-1 rounded-xl text-xs font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-400">+' + (sports.length - 3) + '</span>';
-          }
-          html += '</div>' +
-
-          '<div class="flex items-center justify-between md:justify-end gap-3 shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-zinc-100 dark:border-zinc-800/60">' +
-            '<div class="text-left md:text-right pr-2">' +
-              '<span class="block text-xs font-extrabold text-zinc-950 dark:text-white">' + (student.sessionsCount || 0) + ' matches</span>' +
-              '<span class="block text-[10px] text-zinc-400 uppercase font-semibold">Attendance</span>' +
-            '</div>' +
-
-            '<div class="flex items-center gap-2">' +
-              profileBtnHtml +
-              actionButtonsHtml +
-            '</div>' +
-          '</div>' +
-        '</div>';
-      }
-
-      container.innerHTML = html;
-      if (window.lucide && typeof window.lucide.createIcons === "function") {
-        window.lucide.createIcons();
-      }
-    };
-
-    // Full-page Student Profile Renderer (replaces modal, displays top orange banner + clean athlete hero card only)
-    window.renderOtherStudentProfilePage = function(uid, skipTabSwitch) {
-      var modal = document.getElementById("student-profile-modal");
-      if (modal) modal.classList.add("hidden");
-
-      var currentUid = null;
-      try {
-        var rawSess = localStorage.getItem("unisport_active_session");
-        if (rawSess) currentUid = JSON.parse(rawSess).uid;
-      } catch(e) {}
-
-      if (uid && currentUid && uid === currentUid) {
-        window.switchTabGlobal("profile");
-        return;
-      }
-
-      var list = window.getAllKnownStudentsList();
-      var student = null;
-      for (var i = 0; i < list.length; i++) {
-        if (list[i] && list[i].uid === uid) {
-          student = list[i];
-          break;
-        }
-      }
-      if (!student) return;
-
-      // Privacy: If student disabled public profile, do not show their profile
-      if (student.isPublic === false) {
-        return;
-      }
-
-      window.__ACTIVE_VIEWED_STUDENT_UID__ = uid;
-
-      var avId = student.avatarId || "footballer";
-      if (avId !== "bodybuilder" && avId !== "footballer" && avId !== "runner") avId = "footballer";
-      var isTue = (student.university || "").indexOf("TU") !== -1 || (student.email || "").indexOf("tue.nl") !== -1;
-      var uniLabel = isTue ? "TU Eindhoven" : "Fontys UAS";
-      var sportLabel = student.sport || (student.sports && student.sports[0]) || "Football";
-      var dName = student.displayName || "Student";
-      var showBadge = student.showUniBadge !== undefined ? student.showUniBadge : true;
-
-      var bannerName = document.getElementById("other-profile-banner-name");
-      var heroName = document.getElementById("other-profile-hero-name");
-      var heroEmail = document.getElementById("other-profile-hero-email");
-      var heroLoc = document.getElementById("other-profile-hero-location");
-      var heroSchool = document.getElementById("other-profile-hero-school");
-      var heroBadge = document.getElementById("other-profile-hero-badge");
-      var heroAvatarInner = document.getElementById("other-profile-hero-avatar-inner");
-      var statActivities = document.getElementById("other-profile-stat-activities");
-      var statSport = document.getElementById("other-profile-stat-sport");
-
-      if (bannerName) bannerName.textContent = dName;
-      if (heroName) heroName.textContent = dName;
-      if (heroEmail) heroEmail.textContent = student.email || "campus.student@fontys.nl";
-      if (heroLoc) heroLoc.textContent = student.location || "Eindhoven Campus";
-      if (heroSchool) heroSchool.textContent = uniLabel;
-      if (heroBadge) {
-        if (showBadge) {
-          heroBadge.classList.remove("hidden");
-          heroBadge.style.display = "";
-        } else {
-          heroBadge.classList.add("hidden");
-          heroBadge.style.display = "none";
-        }
-      }
-      if (heroAvatarInner) {
-        heroAvatarInner.innerHTML = '<img src="./assets/avatars/' + avId + '.png" class="w-full h-full object-cover rounded-full" onerror="this.onerror=null;this.src=\'/challenge2/unisport/app/assets/avatars/' + avId + '.png\'" />';
-      }
-      if (statActivities) statActivities.textContent = String(student.sessionsCount || 0);
-      if (statSport) statSport.textContent = sportLabel;
-
-      // Render relationship action buttons in hero card
-      var actionsEl = document.getElementById("other-profile-social-actions");
-      if (actionsEl) {
-        var friends = [];
-        var sentRequests = [];
-        var incomingRequests = [];
-        try {
-          friends = JSON.parse(localStorage.getItem("unisport_friends") || "[]");
-          sentRequests = JSON.parse(localStorage.getItem("unisport_sent_requests") || "[]");
-          incomingRequests = JSON.parse(localStorage.getItem("unisport_friend_requests") || "[]");
-        } catch(e) {}
-
-        var isFriend = friends.indexOf(uid) !== -1;
-        var isPending = !isFriend && sentRequests.indexOf(uid) !== -1;
-        var incomingReqObj = null;
-        if (!isFriend) {
-          for (var rIdx = 0; rIdx < incomingRequests.length; rIdx++) {
-            if (incomingRequests[rIdx] && incomingRequests[rIdx].fromUid === uid) {
-              incomingReqObj = incomingRequests[rIdx];
-              break;
-            }
-          }
-        }
-
-        if (isFriend) {
-          actionsEl.innerHTML =
-            '<span class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 font-bold text-xs">' +
-              '<i data-lucide="user-check" class="w-4 h-4"></i><span>Friends</span>' +
-            '</span>' +
-            '<button onclick="window.removeFriend(\'' + uid + '\')" class="px-4 py-2.5 rounded-xl bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 text-red-300 font-bold text-xs transition cursor-pointer">' +
-              'Remove Friend' +
-            '</button>';
-        } else if (incomingReqObj) {
-          actionsEl.innerHTML =
-            '<button onclick="window.acceptFriendRequest(\'' + incomingReqObj.id + '\', \'' + uid + '\')" class="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-bold text-xs transition cursor-pointer shadow-sm flex items-center gap-2">' +
-              '<i data-lucide="check" class="w-4 h-4"></i><span>Accept Friend Request</span>' +
-            '</button>' +
-            '<button onclick="window.declineFriendRequest(\'' + incomingReqObj.id + '\', \'' + uid + '\')" class="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-red-500/30 border border-white/15 text-white font-bold text-xs transition cursor-pointer">' +
-              'Decline' +
-            '</button>';
-        } else if (isPending) {
-          actionsEl.innerHTML =
-            '<button onclick="window.cancelFriendRequest(\'' + uid + '\')" class="px-5 py-2.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/40 text-amber-300 font-bold text-xs transition cursor-pointer flex items-center gap-2" title="Click to cancel request">' +
-              '<i data-lucide="clock" class="w-4 h-4"></i><span>Pending</span>' +
-            '</button>';
-        } else {
-          actionsEl.innerHTML =
-            '<button onclick="window.toggleFriendship(\'' + uid + '\')" class="px-5 py-2.5 rounded-xl bg-brand-orange hover:bg-orange-500 text-white font-bold text-xs transition cursor-pointer shadow-sm flex items-center gap-2">' +
-              '<i data-lucide="user-plus" class="w-4 h-4"></i><span>Connect</span>' +
-            '</button>';
-        }
-      }
-
-      if (!skipTabSwitch) {
-        window.switchTabGlobal("student-profile");
-      } else if (window.lucide && typeof window.lucide.createIcons === "function") {
-        window.lucide.createIcons();
-      }
-    };
-
-    // Trigger immediate direct Firestore fetch on page load
-    window.fetchStudentsDirectFromFirestore();
-
-    // Open full-page student profile (never modal)
-    window.openStudentProfileModal = function(uid) {
-      var currentUid = null;
-      try {
-        var rawSess = localStorage.getItem("unisport_active_session");
-        if (rawSess) currentUid = JSON.parse(rawSess).uid;
-      } catch(e) {}
-      if (uid && currentUid && uid === currentUid) {
-        window.switchTabGlobal("profile");
-        return;
-      }
-
-      var list = window.getAllKnownStudentsList();
-      var student = null;
-      for (var i = 0; i < list.length; i++) {
-        if (list[i] && list[i].uid === uid) {
-          student = list[i];
-          break;
-        }
-      }
-      if (student && student.isPublic === false) {
-        return;
-      }
-
-      if (window.UniSport && typeof window.UniSport.openStudentProfileModal === "function") {
-        window.UniSport.openStudentProfileModal(uid);
-        return;
-      }
-      window.renderOtherStudentProfilePage(uid, false);
-    };
-
-    // Privacy Settings Live Toggle Handler
-    window.onPrivacySettingChanged = async function() {
-      var pubInp = document.getElementById("settings-privacy-public");
-      var uniInp = document.getElementById("settings-show-uni");
-      var isPub = pubInp ? pubInp.checked : true;
-      var showU = uniInp ? uniInp.checked : true;
-
-      // 1. Update localStorage preferences
-      var prefs = {};
-      try { prefs = JSON.parse(localStorage.getItem("unisport_app_preferences") || "{}"); } catch(e) {}
-      prefs.privacyPublic = isPub;
-      prefs.showUni = showU;
-      localStorage.setItem("unisport_app_preferences", JSON.stringify(prefs));
-
-      // 2. Update active session
-      var rawSess = localStorage.getItem("unisport_active_session");
-      var sess = null;
-      if (rawSess) {
-        try {
-          sess = JSON.parse(rawSess);
-          sess.isPublic = isPub;
-          sess.showUniBadge = showU;
-          localStorage.setItem("unisport_active_session", JSON.stringify(sess));
-        } catch(e) {}
-      }
-
-      // 3. Update current user entry in memory and cached list
-      if (window.__FIRESTORE_STUDENTS__ && sess && sess.uid) {
-        window.__FIRESTORE_STUDENTS__.forEach(function(s) {
-          if (s.uid === sess.uid) {
-            s.isPublic = isPub;
-            s.showUniBadge = showU;
-          }
-        });
-        try { localStorage.setItem("unisport_students_cache", JSON.stringify(window.__FIRESTORE_STUDENTS__)); } catch(e) {}
-      }
-
-      // 4. Update own profile and dropdown badge visibility immediately
-      var heroBadge = document.getElementById("profile-hero-badge");
-      if (heroBadge) {
-        if (showU) heroBadge.classList.remove("hidden");
-        else heroBadge.classList.add("hidden");
-      }
-      var dropBadge = document.getElementById("dropdown-school-container");
-      if (dropBadge) {
-        if (showU) dropBadge.classList.remove("hidden");
-        else dropBadge.classList.add("hidden");
-      }
-
-      // 5. Re-render directory
-      if (typeof window.renderCommunityInstant === "function") {
-        window.renderCommunityInstant();
-      }
-
-      // 6. Persist to Firestore
-      if (sess && sess.uid && window.UniSport && typeof window.UniSport.savePrivacySettingsToFirestore === "function") {
-        await window.UniSport.savePrivacySettingsToFirestore(isPub, showU);
-      }
-    };
-
-    window.toggleFriendship = function(uid) {
-      if (window.UniSport && typeof window.UniSport.toggleFriendship === "function") {
-        window.UniSport.toggleFriendship(uid);
-        return;
-      }
-      try {
-        var friends = JSON.parse(localStorage.getItem("unisport_friends") || "[]");
-        var sentRequests = JSON.parse(localStorage.getItem("unisport_sent_requests") || "[]");
-        var incomingRequests = JSON.parse(localStorage.getItem("unisport_friend_requests") || "[]");
-
-        // Check if other user already sent us a request -> mutual = Friends!
-        var hadIncoming = false;
-        for (var i = 0; i < incomingRequests.length; i++) {
-          if (incomingRequests[i] && incomingRequests[i].fromUid === uid) {
-            hadIncoming = true;
-            break;
-          }
-        }
-        if (hadIncoming) {
-          if (friends.indexOf(uid) === -1) friends.push(uid);
-          incomingRequests = incomingRequests.filter(function(r) { return r && r.fromUid !== uid; });
-          sentRequests = sentRequests.filter(function(id) { return id !== uid; });
-          localStorage.setItem("unisport_friends", JSON.stringify(friends));
-          localStorage.setItem("unisport_friend_requests", JSON.stringify(incomingRequests));
-          localStorage.setItem("unisport_sent_requests", JSON.stringify(sentRequests));
-        } else {
-          if (friends.indexOf(uid) === -1 && sentRequests.indexOf(uid) === -1) {
-            sentRequests.push(uid);
-            localStorage.setItem("unisport_sent_requests", JSON.stringify(sentRequests));
-          }
-        }
-        window.renderCommunityInstant();
-        if (window.__ACTIVE_VIEWED_STUDENT_UID__ === uid) {
-          window.renderOtherStudentProfilePage(uid, true);
-        }
-      } catch(e) {}
-    };
-
-    window.cancelFriendRequest = function(uid) {
-      if (window.UniSport && typeof window.UniSport.cancelFriendRequest === "function") {
-        window.UniSport.cancelFriendRequest(uid);
-        return;
-      }
-      try {
-        var sentRequests = JSON.parse(localStorage.getItem("unisport_sent_requests") || "[]");
-        sentRequests = sentRequests.filter(function(id) { return id !== uid; });
-        localStorage.setItem("unisport_sent_requests", JSON.stringify(sentRequests));
-        window.renderCommunityInstant();
-        if (window.__ACTIVE_VIEWED_STUDENT_UID__ === uid) {
-          window.renderOtherStudentProfilePage(uid, true);
-        }
-      } catch(e) {}
-    };
-
-    window.acceptFriendRequest = function(reqId, fromUid) {
-      if (window.UniSport && typeof window.UniSport.acceptFriendRequest === "function") {
-        window.UniSport.acceptFriendRequest(reqId, fromUid);
-        return;
-      }
-      try {
-        var friends = JSON.parse(localStorage.getItem("unisport_friends") || "[]");
-        var sentRequests = JSON.parse(localStorage.getItem("unisport_sent_requests") || "[]");
-        var incomingRequests = JSON.parse(localStorage.getItem("unisport_friend_requests") || "[]");
-        if (fromUid && friends.indexOf(fromUid) === -1) friends.push(fromUid);
-        sentRequests = sentRequests.filter(function(id) { return id !== fromUid; });
-        incomingRequests = incomingRequests.filter(function(r) { return r && r.id !== reqId && r.fromUid !== fromUid; });
-        localStorage.setItem("unisport_friends", JSON.stringify(friends));
-        localStorage.setItem("unisport_sent_requests", JSON.stringify(sentRequests));
-        localStorage.setItem("unisport_friend_requests", JSON.stringify(incomingRequests));
-        window.renderCommunityInstant();
-        if (window.__ACTIVE_VIEWED_STUDENT_UID__ === fromUid) {
-          window.renderOtherStudentProfilePage(fromUid, true);
-        }
-      } catch(e) {}
-    };
-
-    window.declineFriendRequest = function(reqId, fromUid) {
-      if (window.UniSport && typeof window.UniSport.declineFriendRequest === "function") {
-        window.UniSport.declineFriendRequest(reqId, fromUid);
-        return;
-      }
-      try {
-        var incomingRequests = JSON.parse(localStorage.getItem("unisport_friend_requests") || "[]");
-        var declined = JSON.parse(localStorage.getItem("unisport_declined_requests") || "[]");
-        var targetUid = fromUid;
-        incomingRequests.forEach(function(r) {
-          if (r && r.id === reqId && !targetUid) targetUid = r.fromUid;
-        });
-        if (targetUid && declined.indexOf(targetUid) === -1) declined.push(targetUid);
-        incomingRequests = incomingRequests.filter(function(r) { return r && r.id !== reqId && (!targetUid || r.fromUid !== targetUid); });
-        localStorage.setItem("unisport_friend_requests", JSON.stringify(incomingRequests));
-        localStorage.setItem("unisport_declined_requests", JSON.stringify(declined));
-        window.renderCommunityInstant();
-        if (targetUid && window.__ACTIVE_VIEWED_STUDENT_UID__ === targetUid) {
-          window.renderOtherStudentProfilePage(targetUid, true);
-        }
-      } catch(e) {}
-    };
-
-    window.removeFriend = function(uid) {
-      if (window.UniSport && typeof window.UniSport.removeFriend === "function") {
-        window.UniSport.removeFriend(uid);
-        return;
-      }
-      try {
-        var friends = JSON.parse(localStorage.getItem("unisport_friends") || "[]");
-        var sentRequests = JSON.parse(localStorage.getItem("unisport_sent_requests") || "[]");
-        friends = friends.filter(function(f) { return f !== uid; });
-        sentRequests = sentRequests.filter(function(s) { return s !== uid; });
-        localStorage.setItem("unisport_friends", JSON.stringify(friends));
-        localStorage.setItem("unisport_sent_requests", JSON.stringify(sentRequests));
-        window.renderCommunityInstant();
-        if (window.__ACTIVE_VIEWED_STUDENT_UID__ === uid) {
-          window.renderOtherStudentProfilePage(uid, true);
-        }
-      } catch(e) {}
-    };
-
-    // Instant filter & search implementations wired directly to renderCommunityInstant
-    window.filterStudentsGlobal = function(val) {
-      window.communityStateInline.searchQuery = (val || "").trim();
-      window.renderCommunityInstant();
-      if (window.UniSport && typeof window.UniSport.renderCommunity === "function") {
-        try { window.UniSport.renderCommunity(); } catch(e) {}
-      }
-    };
-
-    window.executeStudentSearch = function() {
-      var inp = document.getElementById("search-students");
-      var val = inp ? inp.value : "";
-      window.filterStudentsGlobal(val);
-      if (typeof window.fetchStudentsDirectFromFirestore === "function") {
-        window.fetchStudentsDirectFromFirestore();
-      }
-      if (window.UniSport && typeof window.UniSport.fetchCampusStudents === "function") {
-        try { window.UniSport.fetchCampusStudents(); } catch(e) {}
-      }
-    };
-
-    window.filterStudentsByUni = function(uni) {
-      window.communityStateInline.uniFilter = uni;
-      document.querySelectorAll(".student-uni-chip").forEach(function(chip) {
-        var chipVal = chip.getAttribute("data-uni-filter");
-        var isMatch = chipVal === uni || (uni === "TU Eindhoven" && (chipVal === "TU/e" || chipVal === "TU Eindhoven")) || (uni === "TU/e" && (chipVal === "TU/e" || chipVal === "TU Eindhoven"));
-        if (isMatch) {
-          chip.className = "student-uni-chip px-3.5 py-2 rounded-xl bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 text-xs font-bold whitespace-nowrap transition cursor-pointer";
-        } else {
-          chip.className = "student-uni-chip px-3.5 py-2 rounded-xl bg-white dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs font-semibold whitespace-nowrap hover:text-zinc-950 dark:hover:text-white transition cursor-pointer";
-        }
-      });
-      window.renderCommunityInstant();
-      if (window.UniSport && typeof window.UniSport.renderCommunity === "function") {
-        try { window.UniSport.renderCommunity(); } catch(e) {}
-      }
-    };
-
-    window.setCommunityView = function(view) {
-      window.communityStateInline.view = view;
-      var btnAll = document.getElementById("community-tab-all");
-      var btnFriends = document.getElementById("community-tab-friends");
-      var activeCls = "px-4 py-2 rounded-lg text-xs font-bold bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 transition cursor-pointer flex items-center gap-2";
-      var inactiveCls = "px-4 py-2 rounded-lg text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer flex items-center gap-2";
-      if (view === "all") {
-        if (btnAll) btnAll.className = activeCls;
-        if (btnFriends) btnFriends.className = inactiveCls;
-      } else {
-        if (btnFriends) btnFriends.className = activeCls;
-        if (btnAll) btnAll.className = inactiveCls;
-      }
-      window.renderCommunityInstant();
-      if (window.UniSport && typeof window.UniSport.renderCommunity === "function") {
-        try { window.UniSport.renderCommunity(); } catch(e) {}
-      }
-    };
-
-    // Close notifications panel on click outside
-    document.addEventListener("click", function(e) {
-      var notifDd = document.getElementById("notifications-dropdown");
-      var notifBtn = document.getElementById("notif-bell-btn");
-      var sidebarNotifBtn = document.getElementById("sidebar-notif-btn");
-      if (notifDd && !notifDd.classList.contains("hidden")) {
-        if (!notifDd.contains(e.target) && (!notifBtn || !notifBtn.contains(e.target)) && (!sidebarNotifBtn || !sidebarNotifBtn.contains(e.target))) {
-          notifDd.classList.add("hidden");
-        }
-      }
-    });
-
-    window.openSettingsGlobal = function() {
-      var notifDd = document.getElementById("notifications-dropdown");
-      if (notifDd) notifDd.classList.add("hidden");
-
-      var modal = document.getElementById("settings-modal");
-      if (modal) {
-        modal.classList.remove("hidden");
-        modal.classList.add("flex");
-        document.body.style.overflow = "hidden";
-      }
-
-      // Update mobile bottom tab highlighting for settings
-      var settTab = document.getElementById("mobile-tab-settings");
-      if (settTab) {
-        settTab.className = "flex flex-col items-center gap-1 text-zinc-950 dark:text-white transition cursor-pointer font-bold";
-      }
-      var deskSettBtn = document.getElementById("sidebar-btn-settings");
-      if (deskSettBtn) {
-        deskSettBtn.classList.add("bg-zinc-100", "dark:bg-zinc-900", "text-zinc-950", "dark:text-white");
-      }
-      var tabs = ["feed", "community", "create", "my-activities", "profile"];
-      for (var i = 0; i < tabs.length; i++) {
-        var tb = document.getElementById("mobile-tab-" + tabs[i]);
-        if (tb) tb.className = "flex flex-col items-center gap-1 text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer";
-      }
-
-      // Hydrate privacy and preference toggles from stored settings and session
-      try {
-        var prefs = JSON.parse(localStorage.getItem("unisport_app_preferences") || "{}");
-        var rawSess = localStorage.getItem("unisport_active_session");
-        var sess = rawSess ? JSON.parse(rawSess) : {};
-        var isPub = prefs.privacyPublic !== undefined ? prefs.privacyPublic : (sess.isPublic !== undefined ? sess.isPublic : true);
-        var showU = prefs.showUni !== undefined ? prefs.showUni : (sess.showUniBadge !== undefined ? sess.showUniBadge : true);
-
-        var pubInp = document.getElementById("settings-privacy-public");
-        var uniInp = document.getElementById("settings-show-uni");
-        if (pubInp) pubInp.checked = isPub;
-        if (uniInp) uniInp.checked = showU;
-      } catch(e) {}
-
-      if (window.UniSport && typeof window.UniSport.openSettingsModal === "function") {
-        window.UniSport.openSettingsModal();
-      }
-      if (window.lucide && typeof window.lucide.createIcons === "function") {
-        window.lucide.createIcons();
-      }
-    };
-
-    window.closeSettingsGlobal = function() {
-      var modal = document.getElementById("settings-modal");
-      if (modal) {
-        modal.classList.add("hidden");
-        modal.classList.remove("flex");
-      }
-      document.body.style.overflow = "";
-
-      // Reset mobile settings tab styling
-      var settTab = document.getElementById("mobile-tab-settings");
-      if (settTab) {
-        settTab.className = "flex flex-col items-center gap-1 text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer";
-      }
-      var deskSettBtn = document.getElementById("sidebar-btn-settings");
-      if (deskSettBtn) {
-        deskSettBtn.classList.remove("bg-zinc-100", "dark:bg-zinc-900", "text-zinc-950", "dark:text-white");
-      }
-    };
-
-    window.handleSignOutGlobal = async function() {
-      try {
-        localStorage.removeItem("unisport_active_session");
-        if (window.UniSport && typeof window.UniSport.signOut === "function") {
-          await window.UniSport.signOut();
-        }
-      } catch(e) {
-        console.warn("Sign out fallback:", e);
-      }
-      window.location.href = "./login.html";
-    };
-
-    window.clearCacheGlobal = async function() {
-      if (window.UniSport && typeof window.UniSport.clearCache === "function") {
-        window.UniSport.clearCache();
-        return;
-      }
-      try {
-        localStorage.removeItem("unisport_students_cache");
-        localStorage.removeItem("unisport_friends");
-        localStorage.removeItem("unisport_friend_requests");
-        localStorage.removeItem("unisport_notifications");
-
-        if ("caches" in window) {
-          try {
-            var keys = await caches.keys();
-            await Promise.all(keys.map(function(k) { return caches.delete(k); }));
-          } catch(e) {}
-        }
-
-        var btn = document.getElementById("settings-clear-cache-btn");
-        if (btn) {
-          btn.disabled = true;
-          btn.textContent = "Updating...";
-        }
-
-        setTimeout(function() {
-          if (btn) {
-            btn.textContent = "Cleared & Updated!";
-          }
-          setTimeout(function() {
-            window.location.reload(true);
-          }, 600);
-        }, 500);
-      } catch(e) {
-        console.error("clearCache error:", e);
-      }
-    };
-
-    window.deleteAccountGlobal = function() {
-      if (window.UniSport && typeof window.UniSport.deleteAccount === "function") {
-        window.UniSport.deleteAccount();
-        return;
-      }
-      var confirmed = window.confirm(
-        "Are you absolutely sure you want to delete your UniSport account?\n\nThis will permanently delete your student profile, mascot preferences, and match attendance. This cannot be undone."
-      );
-      if (!confirmed) return;
-
-      var finalWord = window.prompt("To permanently confirm deletion, please type DELETE below:");
-      if (finalWord !== "DELETE") {
-        alert("Account deletion canceled.");
-        return;
-      }
-
-      var btn = document.getElementById("settings-delete-account-btn");
-      if (btn) {
-        btn.disabled = true;
-        btn.textContent = "Deleting...";
-      }
-
-      localStorage.removeItem("unisport_active_session");
-      localStorage.removeItem("unisport_app_preferences");
-      alert("Your UniSport account has been permanently deleted.");
-      window.location.href = "./login.html";
-    };
-
-    // Instant Mascot Selection Helper that works globally
-    window.selectAvatarOption = function(avatarId) {
-      if (window.UniSport && typeof window.UniSport.selectAvatar === "function") {
-        window.UniSport.selectAvatar(avatarId);
-        return;
-      }
-      try {
-        var raw = localStorage.getItem("unisport_active_session");
-        var user = raw ? JSON.parse(raw) : null;
-        if (user) {
-          user.avatarId = avatarId;
-          localStorage.setItem("unisport_active_session", JSON.stringify(user));
-          
-          // Update hero avatar
-          var hInner = document.getElementById("profile-hero-avatar-inner");
-          if (hInner) hInner.innerHTML = '<img src="./assets/avatars/' + avatarId + '.png" class="w-full h-full object-cover rounded-full" onerror="this.src=\'./assets/avatars/footballer.png\'" />';
-          
-          // Update top right avatar
-          var gInner = document.getElementById("google-avatar-inner");
-          if (gInner) gInner.innerHTML = '<img src="./assets/avatars/' + avatarId + '.png" class="w-full h-full object-cover rounded-full" onerror="this.src=\'./assets/avatars/footballer.png\'" />';
-          
-          // Update card borders and badges
-          var picker = document.getElementById("profile-avatar-picker");
-          if (picker) {
-            var btns = picker.querySelectorAll(".profile-avatar-option");
-            btns.forEach(function(b) {
-              var isThis = b.dataset.avatarId === avatarId;
-              var pill = b.querySelector(".avatar-status-pill");
-              if (isThis) {
-                b.className = "profile-avatar-option group relative flex flex-col items-center gap-3 p-4 sm:p-6 rounded-2xl border-2 border-brand-orange bg-orange-500/10 transition-all cursor-pointer shadow-sm hover:scale-[1.01]";
-                if (pill) {
-                  pill.className = "avatar-status-pill text-xs uppercase font-bold text-brand-orange";
-                  pill.textContent = "Selected";
-                }
-              } else {
-                b.className = "profile-avatar-option group relative flex flex-col items-center gap-3 p-4 sm:p-6 rounded-2xl border-2 border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600 transition-all cursor-pointer hover:scale-[1.01]";
-                if (pill) {
-                  pill.className = "avatar-status-pill text-xs text-zinc-400 group-hover:text-zinc-600";
-                  pill.textContent = "Select";
-                }
-              }
-            });
-          }
-        }
-      } catch(e) {}
-    };
-  </script>
-
-  <!-- Main Container (Responsive Full Desktop Viewport with Icon-Rail Sidebar offset) -->
+  <!-- Main Application Viewport -->
   <main id="app-main-container" class="flex-grow w-full">
     <div class="w-full max-w-7xl 2xl:max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-10 xl:px-12 py-8">
 
-    <!-- ================= SECTION 1: GEO FEED ================= -->
-    <section id="section-feed" class="space-y-6">
-      
-      <!-- Top Minimal Banner -->
-      <div class="border-b border-zinc-100 dark:border-zinc-900 pb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 class="text-2xl sm:text-3xl font-bold text-zinc-950 dark:text-white tracking-tight">
-            Eindhoven Student Sessions
-          </h1>
-          <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
-            Pick-up matches and workout partners from Fontys & TU/e.
-          </p>
-        </div>
-
-        <button onclick="window.UniSport.switchTab('create')" class="self-start sm:self-auto px-4 py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 text-xs font-semibold transition">
-          + Host Session
-        </button>
-      </div>
-
-      <!-- Filters & Search -->
-      <div class="space-y-3">
-        <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
-          <div class="relative flex-grow max-w-sm">
-            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400">
-              <i data-lucide="search" class="w-4 h-4"></i>
-            </span>
-            <input 
-              type="text" 
-              id="search-activities" 
-              placeholder="Search matches or venues (SSC, Strijp-S)..." 
-              class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 border-0 text-xs text-zinc-950 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition"
-            />
+      <!-- Section 1: Eindhoven Sessions Geo Feed -->
+      <section id="section-feed" class="space-y-6">
+        <div class="border-b border-zinc-100 dark:border-zinc-900 pb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 class="text-2xl sm:text-3xl font-bold text-zinc-950 dark:text-white tracking-tight">
+              Eindhoven Student Sessions
+            </h1>
+            <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
+              Pick-up matches and workout partners from Fontys & TU/e.
+            </p>
           </div>
 
-          <div id="activity-count-badge" class="text-xs text-zinc-400 font-medium">
-            Loading...
-          </div>
-        </div>
-
-        <!-- Filter Trigger & Active Filter Summary -->
-        <div class="flex items-center justify-between gap-2">
-          <div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none flex-grow">
-            <button id="btn-open-feed-filters" onclick="(window.UniSport && window.UniSport.openFilterDrawer) ? window.UniSport.openFilterDrawer() : window.openFilterDrawer()" class="px-3.5 py-2 rounded-xl bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 text-xs font-bold whitespace-nowrap transition cursor-pointer flex items-center gap-2 shadow-sm">
-              <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i>
-              <span>Filters</span>
-              <span id="feed-filter-count-badge" class="hidden px-1.5 py-0.2 rounded-full text-[10px] font-black bg-orange-500 text-white">0</span>
-            </button>
-            <div id="feed-active-chips-summary" class="flex items-center gap-1.5 overflow-x-auto scrollbar-none">
-              <!-- Active filter tags rendered by JS -->
-            </div>
-          </div>
-          <button id="btn-reset-feed-filters" onclick="window.UniSport.resetFeedFilters()" class="hidden text-xs text-zinc-500 hover:text-zinc-950 dark:hover:text-white whitespace-nowrap font-medium transition cursor-pointer">
-            Reset
+          <button onclick="window.UniSport.switchTab('create')" class="self-start sm:self-auto px-4 py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 text-xs font-semibold transition">
+            + Host Session
           </button>
         </div>
-      </div>
 
-      <!-- Feed Grid -->
-      <div id="activities-feed" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <!-- Rendered by app.js -->
-      </div>
+        <div class="space-y-3">
+          <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
+            <div class="relative flex-grow max-w-sm">
+              <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400">
+                <i data-lucide="search" class="w-4 h-4"></i>
+              </span>
+              <input 
+                type="text" 
+                id="search-activities" 
+                placeholder="Search matches or venues (SSC, Strijp-S)..." 
+                class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 border-0 text-xs text-zinc-950 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition"
+              />
+            </div>
 
-      <!-- Feed Pagination and Load More Bar (3x3 -> 3x10 -> Pages) -->
-      <div id="feed-pagination-container" class="pt-4 pb-8 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-zinc-100 dark:border-zinc-800/80">
-        <!-- Dynamic pagination info and buttons rendered by app.js -->
-      </div>
-    </section>
+            <div id="activity-count-badge" class="text-xs text-zinc-400 font-medium">
+              Loading...
+            </div>
+          </div>
 
-    <!-- ================= SECTION 2: CREATE ACTIVITY ================= -->
-    <section id="section-create" class="hidden max-w-xl mx-auto space-y-6">
-      <div>
-        <h2 class="text-2xl font-bold text-zinc-950 dark:text-white">Host a Session</h2>
-        <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">Set up a game in 30 seconds for local students.</p>
-      </div>
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none flex-grow">
+              <button id="btn-open-feed-filters" onclick="(window.UniSport && window.UniSport.openFilterDrawer) ? window.UniSport.openFilterDrawer() : window.openFilterDrawer()" class="px-3.5 py-2 rounded-xl bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 text-xs font-bold whitespace-nowrap transition cursor-pointer flex items-center gap-2 shadow-sm">
+                <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i>
+                <span>Filters</span>
+                <span id="feed-filter-count-badge" class="hidden px-1.5 py-0.2 rounded-full text-[10px] font-black bg-orange-500 text-white">0</span>
+              </button>
+              <div id="feed-active-chips-summary" class="flex items-center gap-1.5 overflow-x-auto scrollbar-none"></div>
+            </div>
+            <button id="btn-reset-feed-filters" onclick="window.UniSport.resetFeedFilters()" class="hidden text-xs text-zinc-500 hover:text-zinc-950 dark:hover:text-white whitespace-nowrap font-medium transition cursor-pointer">
+              Reset
+            </button>
+          </div>
+        </div>
 
-      <form id="create-activity-form" class="space-y-4">
+        <div id="activities-feed" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+
+        <div id="feed-pagination-container" class="pt-4 pb-8 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-zinc-100 dark:border-zinc-800/80"></div>
+      </section>
+
+      <!-- Section 2: Host a New Session Form -->
+      <section id="section-create" class="hidden max-w-xl mx-auto space-y-6">
         <div>
-          <label class="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Activity Title *</label>
-          <input 
-            type="text" 
-            id="create-title" 
-            required 
-            placeholder="e.g. 5v5 Casual Football, 5km Dommel Run, Gym Push Day" 
-            class="w-full px-4 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-900 border-0 text-sm text-zinc-950 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition"
-          />
+          <h2 class="text-2xl font-bold text-zinc-950 dark:text-white">Host a Session</h2>
+          <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">Set up a game in 30 seconds for local students.</p>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <form id="create-activity-form" class="space-y-4">
           <div>
-            <label class="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Sport *</label>
-            <select id="create-sport" required onchange="document.getElementById('create-sport-other-container').classList.toggle('hidden', this.value !== 'Other');" class="w-full px-4 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-900 border-0 text-sm text-zinc-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition">
-              <option value="Football">Football</option>
-              <option value="Gym & Fitness">Gym & Fitness</option>
-              <option value="Running">Running</option>
-              <option value="Basketball">Basketball</option>
-              <option value="Bouldering">Bouldering</option>
-              <option value="Padel / Tennis">Padel / Tennis</option>
-              <option value="Volleyball">Volleyball</option>
-              <option value="Swimming">Swimming</option>
-              <option value="Cycling">Cycling</option>
-              <option value="Other">Other</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Spots Available *</label>
-            <input 
-              type="number" 
-              id="create-max" 
-              min="2" 
-              max="50" 
-              value="10" 
-              required 
-              class="w-full px-4 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-900 border-0 text-sm text-zinc-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition"
-            />
-          </div>
-        </div>
-
-        <!-- Custom Sport Input (Shown when Other is selected) -->
-        <div id="create-sport-other-container" class="hidden">
-          <label class="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Specify Sport *</label>
-          <input 
-            type="text" 
-            id="create-sport-other" 
-            placeholder="e.g. Badminton, Boxing, Calisthenics, Table Tennis..." 
-            class="w-full px-4 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-900 border-0 text-sm text-zinc-950 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition"
-          />
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Location in Eindhoven *</label>
+            <label class="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Activity Title *</label>
             <input 
               type="text" 
-              id="create-location" 
+              id="create-title" 
               required 
-              placeholder="e.g. SSC Field 2, Monk Strijp-S, Genneper Parken" 
+              placeholder="e.g. 5v5 Casual Football, 5km Dommel Run, Gym Push Day" 
               class="w-full px-4 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-900 border-0 text-sm text-zinc-950 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition"
             />
           </div>
 
-          <div>
-            <label class="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Date & Time *</label>
-            <input 
-              type="datetime-local" 
-              id="create-datetime" 
-              required 
-              class="w-full px-4 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-900 border-0 text-sm text-zinc-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition"
-            />
-            <p id="create-datetime-error" class="hidden text-xs text-red-500 font-semibold mt-1">Sessions must be scheduled at least 1 hour in advance (Amsterdam time).</p>
-          </div>
-        </div>
-
-        <!-- Duration & Pricing Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Session Duration *</label>
-            <div class="grid grid-cols-2 gap-2">
-              <div class="relative">
-                <input 
-                  type="number" 
-                  id="create-duration-hours" 
-                  min="0" 
-                  max="12" 
-                  value="1" 
-                  required 
-                  class="w-full px-3 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-900 border-0 text-sm text-zinc-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition"
-                />
-                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-zinc-400">hrs</span>
-              </div>
-              <div class="relative">
-                <select id="create-duration-mins" class="w-full px-3 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-900 border-0 text-sm text-zinc-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition">
-                  <option value="0">00 mins</option>
-                  <option value="15">15 mins</option>
-                  <option value="30" selected>30 mins</option>
-                  <option value="45">45 mins</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Pricing / Admission *</label>
-            <div class="grid grid-cols-2 gap-2">
-              <select id="create-pricing-type" onchange="document.getElementById('create-price-wrapper').classList.toggle('hidden', this.value === 'free');" class="w-full px-3 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-900 border-0 text-sm text-zinc-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition">
-                <option value="free" selected>Free</option>
-                <option value="paid">Paid (€)</option>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Sport *</label>
+              <select id="create-sport" required onchange="document.getElementById('create-sport-other-container').classList.toggle('hidden', this.value !== 'Other');" class="w-full px-4 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-900 border-0 text-sm text-zinc-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition">
+                <option value="Football">Football</option>
+                <option value="Gym & Fitness">Gym & Fitness</option>
+                <option value="Running">Running</option>
+                <option value="Basketball">Basketball</option>
+                <option value="Bouldering">Bouldering</option>
+                <option value="Padel / Tennis">Padel / Tennis</option>
+                <option value="Volleyball">Volleyball</option>
+                <option value="Swimming">Swimming</option>
+                <option value="Cycling">Cycling</option>
+                <option value="Other">Other</option>
               </select>
-              <div id="create-price-wrapper" class="hidden relative">
-                <input 
-                  type="number" 
-                  id="create-price" 
-                  min="0.50" 
-                  step="0.50" 
-                  value="5.00" 
-                  placeholder="0.00" 
-                  class="w-full pl-7 pr-3 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-900 border-0 text-sm text-zinc-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition"
-                />
-                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-400">€</span>
-              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Spots Available *</label>
+              <input 
+                type="number" 
+                id="create-max" 
+                min="2" 
+                max="50" 
+                value="10" 
+                required 
+                class="w-full px-4 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-900 border-0 text-sm text-zinc-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition"
+              />
             </div>
           </div>
-        </div>
 
-        <div>
-          <label class="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Notes (Optional)</label>
-          <textarea 
-            id="create-desc" 
-            rows="3" 
-            placeholder="Equipment to bring, rules, fitness level expectations..."
-            class="w-full px-4 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-900 border-0 text-sm text-zinc-950 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition resize-none"
-          ></textarea>
-        </div>
-
-        <div class="pt-2 flex items-center gap-2">
-          <button type="button" onclick="window.UniSport.switchTab('feed')" class="w-1/3 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 text-xs font-semibold transition">
-            Cancel
-          </button>
-          <button type="submit" id="create-submit-btn" class="w-2/3 py-3 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 text-xs font-semibold transition">
-            Publish Activity
-          </button>
-        </div>
-      </form>
-    </section>
-
-    <!-- ================= SECTION 3: MY SESSIONS ================= -->
-    <section id="section-my-activities" class="hidden max-w-2xl mx-auto space-y-5">
-      <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-900 pb-4">
-        <div>
-          <h2 class="text-2xl font-bold text-zinc-950 dark:text-white">My Active Sessions</h2>
-          <p class="text-xs text-zinc-500">Activities you created or joined.</p>
-        </div>
-        <button onclick="window.UniSport.switchTab('create')" class="px-3.5 py-1.5 rounded-xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 text-xs font-semibold">
-          + New
-        </button>
-      </div>
-
-      <div id="my-activities-list" class="space-y-3">
-        <!-- Rendered by app.js -->
-      </div>
-    </section>
-
-    <!-- ================= SECTION 5: CAMPUS ATHLETE DIRECTORY & SOCIAL NETWORK ================= -->
-    <section id="section-community" class="hidden w-full max-w-7xl mx-auto space-y-6">
-      
-      <!-- Minimalist Header (Title & Subtitle only) -->
-      <div class="border-b border-zinc-100 dark:border-zinc-900 pb-5">
-        <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-zinc-950 dark:text-white">
-          Campus Students & Social
-        </h1>
-        <p class="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-1">
-          Discover athletes, workout partners, and connect with friends across Fontys & TU/e.
-        </p>
-      </div>
-
-      <!-- Enterprise Navigation & Search Command Bar -->
-      <div class="p-4 sm:p-5 rounded-2xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 space-y-4">
-        
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          <!-- View Modes: Explore All vs My Connected Friends -->
-          <div class="flex items-center gap-2 p-1 rounded-xl bg-zinc-200/60 dark:bg-zinc-800/60 border border-zinc-300/40 dark:border-zinc-700/40 self-start sm:self-auto">
-            <button id="community-tab-all" onclick="window.setCommunityView('all')" class="px-4 py-2 rounded-lg text-xs font-bold bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 transition cursor-pointer flex items-center gap-2">
-              <i data-lucide="compass" class="w-3.5 h-3.5"></i>
-              <span>All Students</span>
-            </button>
-            <button id="community-tab-friends" onclick="window.setCommunityView('friends')" class="px-4 py-2 rounded-lg text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer flex items-center gap-2">
-              <i data-lucide="users" class="w-3.5 h-3.5"></i>
-              <span>My Friends (<span id="community-friends-count">0</span>)</span>
-            </button>
-          </div>
-
-          <!-- University Filters -->
-          <div class="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
-            <button data-uni-filter="all" onclick="window.filterStudentsByUni('all')" class="student-uni-chip px-3.5 py-2 rounded-xl bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 text-xs font-bold whitespace-nowrap transition cursor-pointer">
-              All Campuses
-            </button>
-            <button data-uni-filter="Fontys" onclick="window.filterStudentsByUni('Fontys')" class="student-uni-chip px-3.5 py-2 rounded-xl bg-white dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs font-semibold whitespace-nowrap hover:text-zinc-950 dark:hover:text-white transition cursor-pointer">
-              Fontys UAS
-            </button>
-            <button data-uni-filter="TU Eindhoven" onclick="window.filterStudentsByUni('TU Eindhoven')" class="student-uni-chip px-3.5 py-2 rounded-xl bg-white dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs font-semibold whitespace-nowrap hover:text-zinc-950 dark:hover:text-white transition cursor-pointer">
-              TU Eindhoven
-            </button>
-          </div>
-        </div>
-
-        <!-- Advanced Search Command Line: Instant match on Name or Email -->
-        <div class="flex flex-col sm:flex-row items-center gap-2.5 w-full">
-          <div class="relative w-full flex-grow">
-            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400">
-              <i data-lucide="search" class="w-4 h-4"></i>
-            </span>
+          <div id="create-sport-other-container" class="hidden">
+            <label class="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Specify Sport *</label>
             <input 
               type="text" 
-              id="search-students" 
-              oninput="window.filterStudentsGlobal(this.value)" 
-              onkeydown="if(event.key === 'Enter') { event.preventDefault(); window.executeStudentSearch(); }"
-              placeholder="Search by student name, student email (@student.fontys.nl, @student.tue.nl), or sport..." 
-              class="w-full pl-11 pr-14 py-3.5 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-xs sm:text-sm text-zinc-950 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition shadow-sm"
+              id="create-sport-other" 
+              placeholder="e.g. Badminton, Boxing, Calisthenics, Table Tennis..." 
+              class="w-full px-4 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-900 border-0 text-sm text-zinc-950 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition"
             />
-            <button 
-              type="button" 
-              onclick="var inp = document.getElementById('search-students'); if(inp){ inp.value=''; window.filterStudentsGlobal(''); }"
-              class="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-900 dark:hover:text-white text-xs font-medium cursor-pointer"
-              title="Clear search"
-            >
-              Clear
-            </button>
-          </div>
-          <button 
-            type="button"
-            id="btn-search-students-submit"
-            onclick="window.executeStudentSearch()" 
-            class="w-full sm:w-auto px-5 py-3.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 shrink-0 shadow-sm cursor-pointer"
-          >
-            <i data-lucide="search" class="w-4 h-4"></i>
-            <span>Search</span>
-          </button>
-        </div>
-
-      </div>
-
-      <!-- Students Enterprise Directory View -->
-      <div id="students-grid" class="divide-y divide-zinc-100 dark:divide-zinc-800/80 rounded-3xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-hidden shadow-sm">
-        <!-- Rendered dynamically as high-tech directory items -->
-      </div>
-    </section>
-
-    <!-- ================= SECTION 4: ATHLETE PROFILE (UBER MINIMALIST & FULL WIDTH RESPONSIVE) ================= -->
-    <section id="section-profile" class="hidden w-full max-w-7xl mx-auto space-y-6">
-      
-      <!-- Athlete Hero Card (Clean Uber UI) -->
-      <div class="p-6 sm:p-10 lg:p-12 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm relative overflow-hidden">
-        <div class="flex flex-col md:flex-row items-center md:items-start gap-8 relative z-10 text-center md:text-left">
-          
-          <!-- Avatar Hero Circle with Minimalist Ring & Online Pulse -->
-          <div class="relative shrink-0">
-            <div id="profile-hero-avatar" class="w-28 h-28 sm:w-36 sm:h-36 rounded-full p-1 bg-white dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-800 shadow-sm flex items-center justify-center">
-              <div id="profile-hero-avatar-inner" class="w-full h-full rounded-full overflow-hidden bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-white">
-                <img src="./assets/avatars/footballer.png" alt="Avatar" class="w-full h-full object-cover rounded-full" />
-              </div>
-            </div>
-            <span class="absolute bottom-2 right-2 w-6 h-6 rounded-full bg-emerald-500 border-2 border-white dark:border-zinc-900 shadow-sm" title="Active Campus Student"></span>
           </div>
 
-          <!-- Hero Identity & Location -->
-          <div class="flex-grow space-y-4 w-full">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div>
-                <h2 id="profile-hero-name" class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-zinc-950 dark:text-white tracking-tight">Student</h2>
-                <div class="flex items-center justify-center md:justify-start gap-2.5 text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-2">
-                  <span id="profile-hero-email">student@fontys.nl</span>
-                  <span>•</span>
-                  <span class="flex items-center gap-1 font-medium text-zinc-700 dark:text-zinc-300">
-                    <i data-lucide="map-pin" class="w-4 h-4 text-brand-orange"></i>
-                    <span>Eindhoven, Netherlands</span>
-                  </span>
-                </div>
-              </div>
-
-              <!-- University Pill -->
-              <span id="profile-hero-badge" class="self-center sm:self-start inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider bg-orange-500/10 text-brand-orange border border-orange-500/20">
-                <i data-lucide="graduation-cap" class="w-4 h-4"></i>
-                <span id="profile-hero-school">Fontys UAS</span>
-              </span>
-            </div>
-
-            <!-- Key Metrics: Total Sessions & Primary Sport only -->
-            <div class="pt-4 grid grid-cols-2 gap-4 text-center">
-              <div class="p-5 sm:p-6 rounded-2xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800">
-                <p id="profile-stat-activities" class="text-3xl sm:text-4xl lg:text-5xl font-black text-zinc-950 dark:text-white">0</p>
-                <p class="text-xs text-zinc-400 font-bold uppercase tracking-wider mt-1.5">Total Sessions</p>
-              </div>
-              <div class="p-5 sm:p-6 rounded-2xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800">
-                <p id="profile-stat-sport" class="text-3xl sm:text-4xl lg:text-5xl font-black text-brand-orange truncate">Football</p>
-                <p class="text-xs text-zinc-400 font-bold uppercase tracking-wider mt-1.5">Primary Sport</p>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- Mascot Avatar Switcher (Always Responsive & Ultra-wide Grid) -->
-      <div class="p-6 sm:p-10 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 space-y-5">
-        <div>
-          <h3 class="text-base sm:text-lg font-bold text-zinc-950 dark:text-white">Switch Mascot Avatar</h3>
-          <p class="text-xs sm:text-sm text-zinc-500">Pick your 3D mascot character for match rosters across Eindhoven campus.</p>
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6" id="profile-avatar-picker">
-          <button 
-            type="button" 
-            data-avatar-id="footballer"
-            onclick="window.selectAvatarOption('footballer')"
-            class="profile-avatar-option group relative flex flex-col items-center gap-3 p-4 sm:p-6 rounded-2xl border-2 border-brand-orange bg-orange-500/10 transition-all cursor-pointer shadow-sm hover:scale-[1.01]"
-          >
-            <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border-2 border-zinc-200 dark:border-zinc-700 p-0.5 flex items-center justify-center">
-              <div class="w-full h-full rounded-full overflow-hidden bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
-                <img src="./assets/avatars/footballer.png" alt="Striker" class="w-full h-full object-cover rounded-full" />
-              </div>
-            </div>
-            <span class="text-sm sm:text-base font-bold text-zinc-950 dark:text-white truncate w-full text-center">Striker</span>
-            <span class="avatar-status-pill text-xs uppercase font-bold text-brand-orange">Selected</span>
-          </button>
-
-          <button 
-            type="button" 
-            data-avatar-id="bodybuilder"
-            onclick="window.selectAvatarOption('bodybuilder')"
-            class="profile-avatar-option group relative flex flex-col items-center gap-3 p-4 sm:p-6 rounded-2xl border-2 border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600 transition-all cursor-pointer hover:scale-[1.01]"
-          >
-            <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border-2 border-zinc-200 dark:border-zinc-700 p-0.5 flex items-center justify-center">
-              <div class="w-full h-full rounded-full overflow-hidden bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
-                <img src="./assets/avatars/bodybuilder.png" alt="Bodybuilder" class="w-full h-full object-cover rounded-full" />
-              </div>
-            </div>
-            <span class="text-sm sm:text-base font-bold text-zinc-950 dark:text-white truncate w-full text-center">Bodybuilder</span>
-            <span class="avatar-status-pill text-xs text-zinc-400 group-hover:text-zinc-600">Select</span>
-          </button>
-
-          <button 
-            type="button" 
-            data-avatar-id="runner"
-            onclick="window.selectAvatarOption('runner')"
-            class="profile-avatar-option group relative flex flex-col items-center gap-3 p-4 sm:p-6 rounded-2xl border-2 border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600 transition-all cursor-pointer hover:scale-[1.01]"
-          >
-            <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border-2 border-zinc-200 dark:border-zinc-700 p-0.5 flex items-center justify-center">
-              <div class="w-full h-full rounded-full overflow-hidden bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
-                <img src="./assets/avatars/runner.png" alt="Speed Runner" class="w-full h-full object-cover rounded-full" />
-              </div>
-            </div>
-            <span class="text-sm sm:text-base font-bold text-zinc-950 dark:text-white truncate w-full text-center">Speed Runner</span>
-            <span class="avatar-status-pill text-xs text-zinc-400 group-hover:text-zinc-600">Select</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Profile Settings & Form -->
-      <div class="p-6 sm:p-10 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
-        <form id="profile-form" class="space-y-6">
-          <div>
-            <h3 class="text-base sm:text-lg font-bold text-zinc-950 dark:text-white mb-1">Athlete Account Settings</h3>
-            <p class="text-xs sm:text-sm text-zinc-500">Update your display information and preferences across the Eindhoven campus network.</p>
-          </div>
-
-          <div class="space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label class="block text-xs sm:text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">Full Name</label>
+              <label class="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Location in Eindhoven *</label>
               <input 
                 type="text" 
-                id="profile-name" 
+                id="create-location" 
                 required 
-                class="w-full px-5 py-3.5 rounded-xl bg-zinc-100 dark:bg-zinc-800/80 border-0 text-sm sm:text-base text-zinc-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition"
+                placeholder="e.g. SSC Field 2, Monk Strijp-S, Genneper Parken" 
+                class="w-full px-4 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-900 border-0 text-sm text-zinc-950 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition"
               />
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label class="block text-xs sm:text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">Student Email (Locked)</label>
-                <input 
-                  type="email" 
-                  id="profile-email" 
-                  disabled 
-                  class="w-full px-5 py-3.5 rounded-xl bg-zinc-100/60 dark:bg-zinc-800/40 border-0 text-sm sm:text-base text-zinc-400 cursor-not-allowed"
-                />
-              </div>
+            <div>
+              <label class="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Date & Time *</label>
+              <input 
+                type="datetime-local" 
+                id="create-datetime" 
+                required 
+                class="w-full px-4 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-900 border-0 text-sm text-zinc-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition"
+              />
+              <p id="create-datetime-error" class="hidden text-xs text-red-500 font-semibold mt-1">Sessions must be scheduled at least 1 hour in advance (Amsterdam time).</p>
+            </div>
+          </div>
 
-              <div>
-                <label class="block text-xs sm:text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">Campus / School</label>
-                <input 
-                  type="text" 
-                  id="profile-university" 
-                  disabled 
-                  class="w-full px-5 py-3.5 rounded-xl bg-zinc-100/60 dark:bg-zinc-800/40 border-0 text-sm sm:text-base text-zinc-400 cursor-not-allowed"
-                />
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Session Duration *</label>
+              <div class="grid grid-cols-2 gap-2">
+                <div class="relative">
+                  <input 
+                    type="number" 
+                    id="create-duration-hours" 
+                    min="0" 
+                    max="12" 
+                    value="1" 
+                    required 
+                    class="w-full px-3 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-900 border-0 text-sm text-zinc-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition"
+                  />
+                  <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-zinc-400">hrs</span>
+                </div>
+                <div class="relative">
+                  <select id="create-duration-mins" class="w-full px-3 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-900 border-0 text-sm text-zinc-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition">
+                    <option value="0">00 mins</option>
+                    <option value="15">15 mins</option>
+                    <option value="30" selected>30 mins</option>
+                    <option value="45">45 mins</option>
+                  </select>
+                </div>
               </div>
             </div>
 
             <div>
-              <label class="block text-xs sm:text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">Primary Sport</label>
-              <select 
-                id="profile-sport" 
-                class="w-full px-5 py-3.5 rounded-xl bg-zinc-100 dark:bg-zinc-800/80 border-0 text-sm sm:text-base text-zinc-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition"
-              >
-                <!-- Ball & Team Sports -->
-                <optgroup label="Ball & Team Sports">
-                  <option value="Football">Football</option>
-                  <option value="Futsal">Futsal</option>
-                  <option value="Basketball">Basketball</option>
-                  <option value="Volleyball">Volleyball</option>
-                  <option value="Handball">Handball</option>
-                  <option value="Rugby">Rugby</option>
-                  <option value="Field Hockey">Field Hockey</option>
-                </optgroup>
-
-                <!-- Racket Sports -->
-                <optgroup label="Racket Sports">
-                  <option value="Padel">Padel</option>
-                  <option value="Tennis">Tennis</option>
-                  <option value="Badminton">Badminton</option>
-                  <option value="Table Tennis">Table Tennis</option>
-                  <option value="Squash">Squash</option>
-                </optgroup>
-
-                <!-- Fitness & Strength -->
-                <optgroup label="Fitness & Strength">
-                  <option value="Gym & Fitness">Gym & Fitness</option>
-                  <option value="Powerlifting">Powerlifting</option>
-                  <option value="Calisthenics">Calisthenics</option>
-                  <option value="CrossFit">CrossFit</option>
-                  <option value="Bouldering">Bouldering / Climbing</option>
-                  <option value="Yoga & Pilates">Yoga & Pilates</option>
-                </optgroup>
-
-                <!-- Endurance & Athletics -->
-                <optgroup label="Endurance & Outdoor">
-                  <option value="Running">Running</option>
-                  <option value="Cycling">Cycling / Road Bike</option>
-                  <option value="Swimming">Swimming</option>
-                  <option value="Triathlon">Triathlon</option>
-                  <option value="Rowing">Rowing</option>
-                  <option value="Skateboarding">Skateboarding</option>
-                </optgroup>
-
-                <!-- Combat & Martial Arts -->
-                <optgroup label="Combat Sports & Martial Arts">
-                  <option value="Boxing">Boxing</option>
-                  <option value="Kickboxing / Muay Thai">Kickboxing / Muay Thai</option>
-                  <option value="Brazilian Jiu-Jitsu">Brazilian Jiu-Jitsu (BJJ)</option>
-                  <option value="Judo">Judo</option>
-                  <option value="MMA">Mixed Martial Arts (MMA)</option>
-                  <option value="Karate">Karate</option>
-                </optgroup>
-
-                <!-- Winter & Snow Sports -->
-                <optgroup label="Winter & Snow Sports">
-                  <option value="Snowboarding">Snowboarding</option>
-                  <option value="Skiing">Skiing (Alpine / Freestyle)</option>
-                  <option value="Ice Hockey">Ice Hockey</option>
-                  <option value="Ice Skating">Ice Skating</option>
-                </optgroup>
-
-                <!-- Other -->
-                <optgroup label="Other">
-                  <option value="Other">Other Sports</option>
-                </optgroup>
-              </select>
+              <label class="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Pricing / Admission *</label>
+              <div class="grid grid-cols-2 gap-2">
+                <select id="create-pricing-type" onchange="document.getElementById('create-price-wrapper').classList.toggle('hidden', this.value === 'free');" class="w-full px-3 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-900 border-0 text-sm text-zinc-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition">
+                  <option value="free" selected>Free</option>
+                  <option value="paid">Paid (€)</option>
+                </select>
+                <div id="create-price-wrapper" class="hidden relative">
+                  <input 
+                    type="number" 
+                    id="create-price" 
+                    min="0.50" 
+                    step="0.50" 
+                    value="5.00" 
+                    placeholder="0.00" 
+                    class="w-full pl-7 pr-3 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-900 border-0 text-sm text-zinc-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition"
+                  />
+                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-400">€</span>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div class="pt-5 flex items-center justify-between gap-3 border-t border-zinc-100 dark:border-zinc-800">
-            <button type="button" id="profile-signout-btn" onclick="window.handleSignOutGlobal()" class="px-4 py-2.5 rounded-xl bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 text-xs font-bold transition hover:bg-red-100 cursor-pointer">
-              Sign out
+          <div>
+            <label class="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Notes (Optional)</label>
+            <textarea 
+              id="create-desc" 
+              rows="3" 
+              placeholder="Equipment to bring, rules, fitness level expectations..."
+              class="w-full px-4 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-900 border-0 text-sm text-zinc-950 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition resize-none"
+            ></textarea>
+          </div>
+
+          <div class="pt-2 flex items-center gap-2">
+            <button type="button" onclick="window.UniSport.switchTab('feed')" class="w-1/3 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 text-xs font-semibold transition">
+              Cancel
             </button>
-            <button type="submit" id="profile-save-btn" class="px-6 py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 text-xs font-semibold transition cursor-pointer">
-              Save Profile
+            <button type="submit" id="create-submit-btn" class="w-2/3 py-3 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 text-xs font-semibold transition">
+              Publish Activity
             </button>
           </div>
         </form>
-      </div>
+      </section>
 
-    </section>
-
-    <!-- ================= SECTION 4B: VIEWING ANOTHER STUDENT'S FULL PROFILE PAGE ================= -->
-    <section id="section-student-profile" class="hidden w-full max-w-7xl mx-auto space-y-6">
-
-      <!-- Top Orange Information Bar -->
-      <div class="w-full px-5 py-3.5 rounded-2xl bg-brand-orange text-white shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div class="flex items-center gap-2.5 text-xs sm:text-sm font-bold">
-          <i data-lucide="eye" class="w-4 h-4 shrink-0"></i>
-          <span>You are currently viewing the profile of <strong id="other-profile-banner-name" class="underline font-black">Student</strong></span>
-        </div>
-        <div class="flex items-center gap-2 shrink-0">
-          <button type="button" onclick="window.switchTabGlobal('community')" class="px-3.5 py-1.5 rounded-xl bg-white/20 hover:bg-white/30 text-white text-xs font-bold transition cursor-pointer">
-            &larr; Back to Students
-          </button>
-          <button type="button" onclick="window.switchTabGlobal('profile')" class="px-3.5 py-1.5 rounded-xl bg-white text-brand-orange hover:bg-zinc-100 text-xs font-extrabold transition cursor-pointer shadow-sm">
-            My Profile
+      <!-- Section 3: My Active Sessions -->
+      <section id="section-my-activities" class="hidden max-w-2xl mx-auto space-y-5">
+        <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-900 pb-4">
+          <div>
+            <h2 class="text-2xl font-bold text-zinc-950 dark:text-white">My Active Sessions</h2>
+            <p class="text-xs text-zinc-500">Activities you created or joined.</p>
+          </div>
+          <button onclick="window.UniSport.switchTab('create')" class="px-3.5 py-1.5 rounded-xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 text-xs font-semibold">
+            + New
           </button>
         </div>
-      </div>
 
-      <!-- Athlete Hero Card (Identical to Own Profile Hero Card) -->
-      <div class="p-6 sm:p-10 lg:p-12 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm relative overflow-hidden">
-        <div class="flex flex-col md:flex-row items-center md:items-start gap-8 relative z-10 text-center md:text-left">
+        <div id="my-activities-list" class="space-y-3"></div>
+      </section>
 
-          <!-- Avatar Hero Circle with Minimalist Ring & Online Pulse -->
-          <div class="relative shrink-0">
-            <div id="other-profile-hero-avatar" class="w-28 h-28 sm:w-36 sm:h-36 rounded-full p-1 bg-white dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-800 shadow-sm flex items-center justify-center">
-              <div id="other-profile-hero-avatar-inner" class="w-full h-full rounded-full overflow-hidden bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-white">
-                <img src="./assets/avatars/footballer.png" alt="Avatar" class="w-full h-full object-cover rounded-full" />
-              </div>
+      <!-- Section 4: Campus Student Directory & Social Network -->
+      <section id="section-community" class="hidden w-full max-w-7xl mx-auto space-y-6">
+        <div class="border-b border-zinc-100 dark:border-zinc-900 pb-5">
+          <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-zinc-950 dark:text-white">
+            Campus Students & Social
+          </h1>
+          <p class="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+            Discover athletes, workout partners, and connect with friends across Fontys & TU/e.
+          </p>
+        </div>
+
+        <div class="p-4 sm:p-5 rounded-2xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 space-y-4">
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+            <div class="flex items-center gap-2 p-1 rounded-xl bg-zinc-200/60 dark:bg-zinc-800/60 border border-zinc-300/40 dark:border-zinc-700/40 self-start sm:self-auto">
+              <button id="community-tab-all" onclick="window.setCommunityView('all')" class="px-4 py-2 rounded-lg text-xs font-bold bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 transition cursor-pointer flex items-center gap-2">
+                <i data-lucide="compass" class="w-3.5 h-3.5"></i>
+                <span>All Students</span>
+              </button>
+              <button id="community-tab-friends" onclick="window.setCommunityView('friends')" class="px-4 py-2 rounded-lg text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer flex items-center gap-2">
+                <i data-lucide="users" class="w-3.5 h-3.5"></i>
+                <span>My Friends (<span id="community-friends-count">0</span>)</span>
+              </button>
             </div>
-            <span class="absolute bottom-2 right-2 w-6 h-6 rounded-full bg-emerald-500 border-2 border-white dark:border-zinc-900 shadow-sm" title="Active Campus Student"></span>
+
+            <div class="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+              <button data-uni-filter="all" onclick="window.filterStudentsByUni('all')" class="student-uni-chip px-3.5 py-2 rounded-xl bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 text-xs font-bold whitespace-nowrap transition cursor-pointer">
+                All Campuses
+              </button>
+              <button data-uni-filter="Fontys" onclick="window.filterStudentsByUni('Fontys')" class="student-uni-chip px-3.5 py-2 rounded-xl bg-white dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs font-semibold whitespace-nowrap hover:text-zinc-950 dark:hover:text-white transition cursor-pointer">
+                Fontys UAS
+              </button>
+              <button data-uni-filter="TU Eindhoven" onclick="window.filterStudentsByUni('TU Eindhoven')" class="student-uni-chip px-3.5 py-2 rounded-xl bg-white dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs font-semibold whitespace-nowrap hover:text-zinc-950 dark:hover:text-white transition cursor-pointer">
+                TU Eindhoven
+              </button>
+            </div>
           </div>
 
-          <!-- Hero Identity & Location -->
-          <div class="flex-grow space-y-4 w-full">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="flex flex-col sm:flex-row items-center gap-2.5 w-full">
+            <div class="relative w-full flex-grow">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400">
+                <i data-lucide="search" class="w-4 h-4"></i>
+              </span>
+              <input 
+                type="text" 
+                id="search-students" 
+                oninput="window.filterStudentsGlobal(this.value)" 
+                onkeydown="if(event.key === 'Enter') { event.preventDefault(); window.executeStudentSearch(); }"
+                placeholder="Search by student name, student email (@student.fontys.nl, @student.tue.nl), or sport..." 
+                class="w-full pl-11 pr-14 py-3.5 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-xs sm:text-sm text-zinc-950 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition shadow-sm"
+              />
+              <button 
+                type="button" 
+                onclick="var inp = document.getElementById('search-students'); if(inp){ inp.value=''; window.filterStudentsGlobal(''); }"
+                class="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-900 dark:hover:text-white text-xs font-medium cursor-pointer"
+                title="Clear search"
+              >
+                Clear
+              </button>
+            </div>
+            <button 
+              type="button"
+              id="btn-search-students-submit"
+              onclick="window.executeStudentSearch()" 
+              class="w-full sm:w-auto px-5 py-3.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 shrink-0 shadow-sm cursor-pointer"
+            >
+              <i data-lucide="search" class="w-4 h-4"></i>
+              <span>Search</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="students-grid" class="divide-y divide-zinc-100 dark:divide-zinc-800/80 rounded-3xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-hidden shadow-sm"></div>
+      </section>
+
+      <!-- Section 5: Current Student Profile & Mascot Customization -->
+      <section id="section-profile" class="hidden w-full max-w-7xl mx-auto space-y-6">
+        <div class="p-6 sm:p-10 lg:p-12 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm relative overflow-hidden">
+          <div class="flex flex-col md:flex-row items-center md:items-start gap-8 relative z-10 text-center md:text-left">
+            <div class="relative shrink-0">
+              <div id="profile-hero-avatar" class="w-28 h-28 sm:w-36 sm:h-36 rounded-full p-1 bg-white dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-800 shadow-sm flex items-center justify-center">
+                <div id="profile-hero-avatar-inner" class="w-full h-full rounded-full overflow-hidden bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-white">
+                  <img src="./assets/avatars/footballer.png" alt="Avatar" class="w-full h-full object-cover rounded-full" />
+                </div>
+              </div>
+              <span class="absolute bottom-2 right-2 w-6 h-6 rounded-full bg-emerald-500 border-2 border-white dark:border-zinc-900 shadow-sm" title="Active Campus Student"></span>
+            </div>
+
+            <div class="flex-grow space-y-4 w-full">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h2 id="profile-hero-name" class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-zinc-950 dark:text-white tracking-tight">Student</h2>
+                  <div class="flex items-center justify-center md:justify-start gap-2.5 text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-2">
+                    <span id="profile-hero-email">student@fontys.nl</span>
+                    <span>•</span>
+                    <span class="flex items-center gap-1 font-medium text-zinc-700 dark:text-zinc-300">
+                      <i data-lucide="map-pin" class="w-4 h-4 text-brand-orange"></i>
+                      <span>Eindhoven, Netherlands</span>
+                    </span>
+                  </div>
+                </div>
+
+                <span id="profile-hero-badge" class="self-center sm:self-start inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider bg-orange-500/10 text-brand-orange border border-orange-500/20">
+                  <i data-lucide="graduation-cap" class="w-4 h-4"></i>
+                  <span id="profile-hero-school">Fontys UAS</span>
+                </span>
+              </div>
+
+              <div class="pt-4 grid grid-cols-2 gap-4 text-center">
+                <div class="p-5 sm:p-6 rounded-2xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800">
+                  <p id="profile-stat-activities" class="text-3xl sm:text-4xl lg:text-5xl font-black text-zinc-950 dark:text-white">0</p>
+                  <p class="text-xs text-zinc-400 font-bold uppercase tracking-wider mt-1.5">Total Sessions</p>
+                </div>
+                <div class="p-5 sm:p-6 rounded-2xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800">
+                  <p id="profile-stat-sport" class="text-3xl sm:text-4xl lg:text-5xl font-black text-brand-orange truncate">Football</p>
+                  <p class="text-xs text-zinc-400 font-bold uppercase tracking-wider mt-1.5">Primary Sport</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-6 sm:p-10 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 space-y-5">
+          <div>
+            <h3 class="text-base sm:text-lg font-bold text-zinc-950 dark:text-white">Switch Mascot Avatar</h3>
+            <p class="text-xs sm:text-sm text-zinc-500">Pick your 3D mascot character for match rosters across Eindhoven campus.</p>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6" id="profile-avatar-picker">
+            <button 
+              type="button" 
+              data-avatar-id="footballer"
+              onclick="window.selectAvatarOption('footballer')"
+              class="profile-avatar-option group relative flex flex-col items-center gap-3 p-4 sm:p-6 rounded-2xl border-2 border-brand-orange bg-orange-500/10 transition-all cursor-pointer shadow-sm hover:scale-[1.01]"
+            >
+              <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border-2 border-zinc-200 dark:border-zinc-700 p-0.5 flex items-center justify-center">
+                <div class="w-full h-full rounded-full overflow-hidden bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+                  <img src="./assets/avatars/footballer.png" alt="Striker" class="w-full h-full object-cover rounded-full" />
+                </div>
+              </div>
+              <span class="text-sm sm:text-base font-bold text-zinc-950 dark:text-white truncate w-full text-center">Striker</span>
+              <span class="avatar-status-pill text-xs uppercase font-bold text-brand-orange">Selected</span>
+            </button>
+
+            <button 
+              type="button" 
+              data-avatar-id="bodybuilder"
+              onclick="window.selectAvatarOption('bodybuilder')"
+              class="profile-avatar-option group relative flex flex-col items-center gap-3 p-4 sm:p-6 rounded-2xl border-2 border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600 transition-all cursor-pointer hover:scale-[1.01]"
+            >
+              <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border-2 border-zinc-200 dark:border-zinc-700 p-0.5 flex items-center justify-center">
+                <div class="w-full h-full rounded-full overflow-hidden bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+                  <img src="./assets/avatars/bodybuilder.png" alt="Bodybuilder" class="w-full h-full object-cover rounded-full" />
+                </div>
+              </div>
+              <span class="text-sm sm:text-base font-bold text-zinc-950 dark:text-white truncate w-full text-center">Bodybuilder</span>
+              <span class="avatar-status-pill text-xs text-zinc-400 group-hover:text-zinc-600">Select</span>
+            </button>
+
+            <button 
+              type="button" 
+              data-avatar-id="runner"
+              onclick="window.selectAvatarOption('runner')"
+              class="profile-avatar-option group relative flex flex-col items-center gap-3 p-4 sm:p-6 rounded-2xl border-2 border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600 transition-all cursor-pointer hover:scale-[1.01]"
+            >
+              <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border-2 border-zinc-200 dark:border-zinc-700 p-0.5 flex items-center justify-center">
+                <div class="w-full h-full rounded-full overflow-hidden bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+                  <img src="./assets/avatars/runner.png" alt="Speed Runner" class="w-full h-full object-cover rounded-full" />
+                </div>
+              </div>
+              <span class="text-sm sm:text-base font-bold text-zinc-950 dark:text-white truncate w-full text-center">Speed Runner</span>
+              <span class="avatar-status-pill text-xs text-zinc-400 group-hover:text-zinc-600">Select</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="p-6 sm:p-10 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
+          <form id="profile-form" class="space-y-6">
+            <div>
+              <h3 class="text-base sm:text-lg font-bold text-zinc-950 dark:text-white mb-1">Athlete Account Settings</h3>
+              <p class="text-xs sm:text-sm text-zinc-500">Update your display information and preferences across the Eindhoven campus network.</p>
+            </div>
+
+            <div class="space-y-4">
               <div>
-                <h2 id="other-profile-hero-name" class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-zinc-950 dark:text-white tracking-tight">Student</h2>
-                <div class="flex items-center justify-center md:justify-start gap-2.5 text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-2">
-                  <span id="other-profile-hero-email">student@fontys.nl</span>
-                  <span>•</span>
-                  <span class="flex items-center gap-1 font-medium text-zinc-700 dark:text-zinc-300">
-                    <i data-lucide="map-pin" class="w-4 h-4 text-brand-orange"></i>
-                    <span id="other-profile-hero-location">Eindhoven, Netherlands</span>
-                  </span>
+                <label class="block text-xs sm:text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">Full Name</label>
+                <input 
+                  type="text" 
+                  id="profile-name" 
+                  required 
+                  class="w-full px-5 py-3.5 rounded-xl bg-zinc-100 dark:bg-zinc-800/80 border-0 text-sm sm:text-base text-zinc-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition"
+                />
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs sm:text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">Student Email (Locked)</label>
+                  <input 
+                    type="email" 
+                    id="profile-email" 
+                    disabled 
+                    class="w-full px-5 py-3.5 rounded-xl bg-zinc-100/60 dark:bg-zinc-800/40 border-0 text-sm sm:text-base text-zinc-400 cursor-not-allowed"
+                  />
+                </div>
+
+                <div>
+                  <label class="block text-xs sm:text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">Campus / School</label>
+                  <input 
+                    type="text" 
+                    id="profile-university" 
+                    disabled 
+                    class="w-full px-5 py-3.5 rounded-xl bg-zinc-100/60 dark:bg-zinc-800/40 border-0 text-sm sm:text-base text-zinc-400 cursor-not-allowed"
+                  />
                 </div>
               </div>
 
-              <!-- University Pill & Connect/Friend Action -->
-              <div class="flex flex-wrap items-center justify-center sm:justify-end gap-2.5 self-center sm:self-start">
-                <span id="other-profile-hero-badge" class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider bg-orange-500/10 text-brand-orange border border-orange-500/20">
-                  <i data-lucide="graduation-cap" class="w-4 h-4"></i>
-                  <span id="other-profile-hero-school">Fontys UAS</span>
-                </span>
-                <div id="other-profile-social-actions" class="flex items-center gap-2"></div>
+              <div>
+                <label class="block text-xs sm:text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">Primary Sport</label>
+                <select 
+                  id="profile-sport" 
+                  class="w-full px-5 py-3.5 rounded-xl bg-zinc-100 dark:bg-zinc-800/80 border-0 text-sm sm:text-base text-zinc-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition"
+                >
+                  <optgroup label="Ball & Team Sports">
+                    <option value="Football">Football</option>
+                    <option value="Futsal">Futsal</option>
+                    <option value="Basketball">Basketball</option>
+                    <option value="Volleyball">Volleyball</option>
+                    <option value="Handball">Handball</option>
+                    <option value="Rugby">Rugby</option>
+                    <option value="Field Hockey">Field Hockey</option>
+                  </optgroup>
+                  <optgroup label="Racket Sports">
+                    <option value="Padel">Padel</option>
+                    <option value="Tennis">Tennis</option>
+                    <option value="Badminton">Badminton</option>
+                    <option value="Table Tennis">Table Tennis</option>
+                    <option value="Squash">Squash</option>
+                  </optgroup>
+                  <optgroup label="Fitness & Strength">
+                    <option value="Gym & Fitness">Gym & Fitness</option>
+                    <option value="Powerlifting">Powerlifting</option>
+                    <option value="Calisthenics">Calisthenics</option>
+                    <option value="CrossFit">CrossFit</option>
+                    <option value="Bouldering">Bouldering / Climbing</option>
+                    <option value="Yoga & Pilates">Yoga & Pilates</option>
+                  </optgroup>
+                  <optgroup label="Endurance & Outdoor">
+                    <option value="Running">Running</option>
+                    <option value="Cycling">Cycling / Road Bike</option>
+                    <option value="Swimming">Swimming</option>
+                    <option value="Triathlon">Triathlon</option>
+                    <option value="Rowing">Rowing</option>
+                    <option value="Skateboarding">Skateboarding</option>
+                  </optgroup>
+                  <optgroup label="Combat Sports & Martial Arts">
+                    <option value="Boxing">Boxing</option>
+                    <option value="Kickboxing / Muay Thai">Kickboxing / Muay Thai</option>
+                    <option value="Brazilian Jiu-Jitsu">Brazilian Jiu-Jitsu (BJJ)</option>
+                    <option value="Judo">Judo</option>
+                    <option value="MMA">Mixed Martial Arts (MMA)</option>
+                    <option value="Karate">Karate</option>
+                  </optgroup>
+                  <optgroup label="Winter & Snow Sports">
+                    <option value="Snowboarding">Snowboarding</option>
+                    <option value="Skiing">Skiing (Alpine / Freestyle)</option>
+                    <option value="Ice Hockey">Ice Hockey</option>
+                    <option value="Ice Skating">Ice Skating</option>
+                  </optgroup>
+                  <optgroup label="Other">
+                    <option value="Other">Other Sports</option>
+                  </optgroup>
+                </select>
               </div>
             </div>
 
-            <!-- Key Metrics: Total Sessions & Primary Sport -->
-            <div class="pt-4 grid grid-cols-2 gap-4 text-center">
-              <div class="p-5 sm:p-6 rounded-2xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800">
-                <p id="other-profile-stat-activities" class="text-3xl sm:text-4xl lg:text-5xl font-black text-zinc-950 dark:text-white">0</p>
-                <p class="text-xs text-zinc-400 font-bold uppercase tracking-wider mt-1.5">Total Sessions</p>
+            <div class="pt-5 flex items-center justify-between gap-3 border-t border-zinc-100 dark:border-zinc-800">
+              <button type="button" id="profile-signout-btn" onclick="window.handleSignOutGlobal()" class="px-4 py-2.5 rounded-xl bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 text-xs font-bold transition hover:bg-red-100 cursor-pointer">
+                Sign out
+              </button>
+              <button type="submit" id="profile-save-btn" class="px-6 py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 text-xs font-semibold transition cursor-pointer">
+                Save Profile
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- Section 6: Viewing Another Student's Profile -->
+      <section id="section-student-profile" class="hidden w-full max-w-7xl mx-auto space-y-6">
+        <div class="w-full px-5 py-3.5 rounded-2xl bg-brand-orange text-white shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="flex items-center gap-2.5 text-xs sm:text-sm font-bold">
+            <i data-lucide="eye" class="w-4 h-4 shrink-0"></i>
+            <span>You are currently viewing the profile of <strong id="other-profile-banner-name" class="underline font-black">Student</strong></span>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <button type="button" onclick="window.switchTabGlobal('community')" class="px-3.5 py-1.5 rounded-xl bg-white/20 hover:bg-white/30 text-white text-xs font-bold transition cursor-pointer">
+              &larr; Back to Students
+            </button>
+            <button type="button" onclick="window.switchTabGlobal('profile')" class="px-3.5 py-1.5 rounded-xl bg-white text-brand-orange hover:bg-zinc-100 text-xs font-extrabold transition cursor-pointer shadow-sm">
+              My Profile
+            </button>
+          </div>
+        </div>
+
+        <div class="p-6 sm:p-10 lg:p-12 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm relative overflow-hidden">
+          <div class="flex flex-col md:flex-row items-center md:items-start gap-8 relative z-10 text-center md:text-left">
+            <div class="relative shrink-0">
+              <div id="other-profile-hero-avatar" class="w-28 h-28 sm:w-36 sm:h-36 rounded-full p-1 bg-white dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-800 shadow-sm flex items-center justify-center">
+                <div id="other-profile-hero-avatar-inner" class="w-full h-full rounded-full overflow-hidden bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-white">
+                  <img src="./assets/avatars/footballer.png" alt="Avatar" class="w-full h-full object-cover rounded-full" />
+                </div>
               </div>
-              <div class="p-5 sm:p-6 rounded-2xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800">
-                <p id="other-profile-stat-sport" class="text-3xl sm:text-4xl lg:text-5xl font-black text-brand-orange truncate">Football</p>
-                <p class="text-xs text-zinc-400 font-bold uppercase tracking-wider mt-1.5">Primary Sport</p>
+              <span class="absolute bottom-2 right-2 w-6 h-6 rounded-full bg-emerald-500 border-2 border-white dark:border-zinc-900 shadow-sm" title="Active Campus Student"></span>
+            </div>
+
+            <div class="flex-grow space-y-4 w-full">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h2 id="other-profile-hero-name" class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-zinc-950 dark:text-white tracking-tight">Student</h2>
+                  <div class="flex items-center justify-center md:justify-start gap-2.5 text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-2">
+                    <span id="other-profile-hero-email">student@fontys.nl</span>
+                    <span>•</span>
+                    <span class="flex items-center gap-1 font-medium text-zinc-700 dark:text-zinc-300">
+                      <i data-lucide="map-pin" class="w-4 h-4 text-brand-orange"></i>
+                      <span id="other-profile-hero-location">Eindhoven, Netherlands</span>
+                    </span>
+                  </div>
+                </div>
+
+                <div class="flex flex-wrap items-center justify-center sm:justify-end gap-2.5 self-center sm:self-start">
+                  <span id="other-profile-hero-badge" class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider bg-orange-500/10 text-brand-orange border border-orange-500/20">
+                    <i data-lucide="graduation-cap" class="w-4 h-4"></i>
+                    <span id="other-profile-hero-school">Fontys UAS</span>
+                  </span>
+                  <div id="other-profile-social-actions" class="flex items-center gap-2"></div>
+                </div>
+              </div>
+
+              <div class="pt-4 grid grid-cols-2 gap-4 text-center">
+                <div class="p-5 sm:p-6 rounded-2xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800">
+                  <p id="other-profile-stat-activities" class="text-3xl sm:text-4xl lg:text-5xl font-black text-zinc-950 dark:text-white">0</p>
+                  <p class="text-xs text-zinc-400 font-bold uppercase tracking-wider mt-1.5">Total Sessions</p>
+                </div>
+                <div class="p-5 sm:p-6 rounded-2xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800">
+                  <p id="other-profile-stat-sport" class="text-3xl sm:text-4xl lg:text-5xl font-black text-brand-orange truncate">Football</p>
+                  <p class="text-xs text-zinc-400 font-bold uppercase tracking-wider mt-1.5">Primary Sport</p>
+                </div>
               </div>
             </div>
           </div>
-
         </div>
-      </div>
+      </section>
 
-    </section>
-
-    <!-- ================= SECTION 6: DEDICATED NOTIFICATIONS PAGE (MOBILE FULL VIEW) ================= -->
-    <section id="section-notifications" class="hidden w-full max-w-4xl mx-auto space-y-6">
-      
-      <!-- Minimalist Header -->
-      <div class="flex items-center justify-between pb-4 border-b border-zinc-100 dark:border-zinc-900">
-        <div>
-          <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-zinc-950 dark:text-white">
-            Notifications
-          </h1>
-          <p class="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-1">
-            Stay updated with friend requests, campus session invites, and match alerts.
-          </p>
+      <!-- Section 7: Mobile Full-Screen Notifications Page -->
+      <section id="section-notifications" class="hidden w-full max-w-4xl mx-auto space-y-6">
+        <div class="flex items-center justify-between pb-4 border-b border-zinc-100 dark:border-zinc-900">
+          <div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-zinc-950 dark:text-white">
+              Notifications
+            </h1>
+            <p class="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+              Stay updated with friend requests, campus session invites, and match alerts.
+            </p>
+          </div>
+          <button onclick="window.clearAllNotifsGlobal()" class="px-3.5 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition">
+            Clear all
+          </button>
         </div>
-        <button onclick="window.clearAllNotifsGlobal()" class="px-3.5 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition">
-          Clear all
-        </button>
-      </div>
 
-      <!-- Friend Requests Section -->
-      <div class="p-5 sm:p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 space-y-4">
-        <div class="flex items-center justify-between">
+        <div class="p-5 sm:p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 space-y-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <i data-lucide="user-plus" class="w-4 h-4 text-brand-orange"></i>
+              <h2 class="text-sm font-bold text-zinc-950 dark:text-white">Friend Requests</h2>
+            </div>
+          </div>
+          <div id="mobile-notif-requests-list" class="space-y-3">
+            <div class="py-4 px-3 text-center flex flex-col items-center justify-center"><img src="./assets/mascot-students.png" onerror="this.src='/challenge2/unisport/app/assets/mascot-students.png'" alt="No pending friend requests" class="w-20 h-20 object-contain drop-shadow-sm mb-1.5 select-none" /><p class="text-zinc-500 dark:text-zinc-400 font-semibold text-xs">No pending friend requests</p></div>
+          </div>
+        </div>
+
+        <div class="p-5 sm:p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 space-y-4">
           <div class="flex items-center gap-2">
-            <i data-lucide="user-plus" class="w-4 h-4 text-brand-orange"></i>
-            <h2 class="text-sm font-bold text-zinc-950 dark:text-white">Friend Requests</h2>
+            <i data-lucide="bell" class="w-4 h-4 text-zinc-400"></i>
+            <h2 class="text-sm font-bold text-zinc-950 dark:text-white">Activity & Match Alerts</h2>
+          </div>
+          <div id="mobile-notif-general-list" class="space-y-3">
+            <div class="py-5 px-3 text-center flex flex-col items-center justify-center"><img src="./assets/mascot-notifs.png" onerror="this.src='/challenge2/unisport/app/assets/mascot-notifs.png'" alt="All caught up" class="w-24 h-24 object-contain drop-shadow-sm mb-1.5 select-none" /><p class="text-zinc-700 dark:text-zinc-300 font-bold text-xs">All caught up!</p><p class="text-zinc-400 dark:text-zinc-500 text-[11px]">No recent session or match alerts.</p></div>
           </div>
         </div>
-        <div id="mobile-notif-requests-list" class="space-y-3">
-          <div class="py-4 px-3 text-center flex flex-col items-center justify-center"><img src="./assets/mascot-students.png" onerror="this.src='/challenge2/unisport/app/assets/mascot-students.png'" alt="No pending friend requests" class="w-20 h-20 object-contain drop-shadow-sm mb-1.5 select-none" /><p class="text-zinc-500 dark:text-zinc-400 font-semibold text-xs">No pending friend requests</p></div>
-        </div>
-      </div>
-
-      <!-- Campus Alerts Section -->
-      <div class="p-5 sm:p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 space-y-4">
-        <div class="flex items-center gap-2">
-          <i data-lucide="bell" class="w-4 h-4 text-zinc-400"></i>
-          <h2 class="text-sm font-bold text-zinc-950 dark:text-white">Activity & Match Alerts</h2>
-        </div>
-        <div id="mobile-notif-general-list" class="space-y-3">
-          <div class="py-5 px-3 text-center flex flex-col items-center justify-center"><img src="./assets/mascot-notifs.png" onerror="this.src='/challenge2/unisport/app/assets/mascot-notifs.png'" alt="All caught up" class="w-24 h-24 object-contain drop-shadow-sm mb-1.5 select-none" /><p class="text-zinc-700 dark:text-zinc-300 font-bold text-xs">All caught up!</p><p class="text-zinc-400 dark:text-zinc-500 text-[11px]">No recent session or match alerts.</p></div>
-        </div>
-      </div>
-
-    </section>
+      </section>
 
     </div>
   </main>
 
-  <!-- Mobile Bottom Nav -->
+  <!-- Mobile Bottom Navigation Bar -->
   <nav id="mobile-bottom-nav" class="md:hidden fixed bottom-0 left-0 right-0 z-[60] bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md border-t border-zinc-200/80 dark:border-zinc-900 px-3 pt-3.5 pb-7 flex items-center justify-around text-xs shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
     <button id="mobile-tab-feed" onclick="window.switchTabGlobal('feed')" class="flex flex-col items-center gap-1.5 text-zinc-950 dark:text-white transition cursor-pointer">
       <i data-lucide="compass" class="w-5 h-5"></i>
@@ -2484,7 +857,7 @@
     </button>
   </nav>
 
-  <!-- Full-Screen Settings Menu (App, Privacy & Account Preferences) -->
+  <!-- Application Settings Modal -->
   <div 
     id="settings-modal" 
     class="hidden fixed inset-0 md:left-20 pb-28 md:pb-0 z-40 md:z-30 bg-white dark:bg-zinc-950 flex flex-col overflow-y-auto animate-in fade-in duration-150"
@@ -2492,7 +865,6 @@
     aria-modal="true"
     aria-label="Settings"
   >
-    <!-- Full-Screen Sticky Header -->
     <header class="sticky top-0 z-20 px-6 py-4 border-b border-zinc-100 dark:border-zinc-800/80 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md flex items-center justify-between shrink-0">
       <div>
         <h2 class="text-xl sm:text-2xl font-black tracking-tight text-zinc-950 dark:text-white">Settings</h2>
@@ -2508,10 +880,8 @@
       </button>
     </header>
 
-    <!-- Scrollable Full-Screen Settings Content -->
     <div class="max-w-3xl w-full mx-auto px-6 py-6 sm:py-8 pb-28 space-y-6 flex-1 text-xs sm:text-sm">
 
-      <!-- SECTION 0: DOWNLOAD & INSTALL WEB APP (ADD TO HOME SCREEN) -->
       <div class="space-y-3" id="settings-download-app-section">
         <h4 class="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Download App</h4>
 
@@ -2536,11 +906,10 @@
           </div>
         </div>
       </div>
-      
-      <!-- SECTION 1: APPEARANCE & LOCALIZATION -->
+
       <div class="space-y-3">
         <h4 class="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Appearance & Experience</h4>
-        
+
         <div class="divide-y divide-zinc-100 dark:divide-zinc-800/80 rounded-2xl border border-zinc-100 dark:border-zinc-800/80 overflow-hidden bg-zinc-50/50 dark:bg-zinc-900/40">
           <div class="p-4 flex items-center justify-between">
             <div>
@@ -2576,10 +945,9 @@
         </div>
       </div>
 
-      <!-- SECTION 2: NOTIFICATIONS -->
       <div class="space-y-3">
         <h4 class="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Push & Notifications</h4>
-        
+
         <div class="divide-y divide-zinc-100 dark:divide-zinc-800/80 rounded-2xl border border-zinc-100 dark:border-zinc-800/80 overflow-hidden bg-zinc-50/50 dark:bg-zinc-900/40">
           <div class="p-4 flex items-center justify-between">
             <div>
@@ -2616,10 +984,9 @@
         </div>
       </div>
 
-      <!-- SECTION 3: PRIVACY & CAMPUS VISIBILITY -->
       <div class="space-y-3">
         <h4 class="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Privacy & Roster Visibility</h4>
-        
+
         <div class="divide-y divide-zinc-100 dark:divide-zinc-800/80 rounded-2xl border border-zinc-100 dark:border-zinc-800/80 overflow-hidden bg-zinc-50/50 dark:bg-zinc-900/40">
           <div class="p-4 flex items-center justify-between">
             <div>
@@ -2656,10 +1023,9 @@
         </div>
       </div>
 
-      <!-- SECTION 4: DATA & STORAGE -->
       <div class="space-y-3">
         <h4 class="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Data & Cache Management</h4>
-        
+
         <div class="p-4 rounded-2xl border border-zinc-100 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <p class="font-bold text-zinc-950 dark:text-white">Clear Offline Cache</p>
@@ -2671,9 +1037,7 @@
         </div>
       </div>
 
-      <!-- SECTION 5: ACCOUNT ACTIONS & DANGER ZONE -->
       <div class="space-y-4 pt-2">
-        <!-- Sign Out Button (Above Delete Account) -->
         <div class="p-4 sm:p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <p class="font-bold text-zinc-950 dark:text-white">Session & Sign Out</p>
@@ -2690,7 +1054,7 @@
 
         <div class="space-y-3">
           <h4 class="text-xs font-bold text-red-500 uppercase tracking-wider">Danger Zone</h4>
-          
+
           <div class="p-4 sm:p-5 rounded-2xl border border-red-200 dark:border-red-950/60 bg-red-50/40 dark:bg-red-950/10 space-y-4">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
@@ -2708,11 +1072,9 @@
     </div>
   </div>
 
-  <!-- Feed Deep Filter Drawer (Slide-in on Desktop, Full-Screen Modal on Mobile) -->
+  <!-- Feed Advanced Filter Drawer -->
   <div id="feed-filter-drawer" class="hidden fixed inset-0 z-[100] flex justify-end bg-black/60 backdrop-blur-sm transition-opacity duration-200" onclick="if(event.target===this) window.UniSport.closeFilterDrawer();">
     <div class="relative w-full max-w-md h-full bg-white dark:bg-zinc-950 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col overflow-y-auto animate-in slide-in-from-right duration-200">
-      
-      <!-- Drawer Header -->
       <header class="sticky top-0 z-10 px-6 py-4 border-b border-zinc-100 dark:border-zinc-800/80 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md flex items-center justify-between">
         <div>
           <h3 class="text-lg font-extrabold text-zinc-950 dark:text-white">Filters</h3>
@@ -2723,10 +1085,7 @@
         </button>
       </header>
 
-      <!-- Drawer Body -->
       <div class="p-6 space-y-6 flex-1 text-xs">
-        
-        <!-- Sport Filter -->
         <div class="space-y-2">
           <label class="block font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider text-[11px]">Sport</label>
           <select id="filter-drawer-sport" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 border-0 text-xs text-zinc-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition">
@@ -2744,7 +1103,6 @@
           </select>
         </div>
 
-        <!-- Date Timing Filter -->
         <div class="space-y-2">
           <label class="block font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider text-[11px]">When / Date</label>
           <div class="grid grid-cols-2 gap-2" id="filter-drawer-date-chips">
@@ -2758,7 +1116,6 @@
           </div>
         </div>
 
-        <!-- University Campus Filter -->
         <div class="space-y-2">
           <label class="block font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider text-[11px]">Host Campus</label>
           <select id="filter-drawer-university" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 border-0 text-xs text-zinc-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition">
@@ -2768,7 +1125,6 @@
           </select>
         </div>
 
-        <!-- Price Filter -->
         <div class="space-y-2">
           <label class="block font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider text-[11px]">Admission / Price</label>
           <div class="grid grid-cols-3 gap-2" id="filter-drawer-price-chips">
@@ -2778,7 +1134,6 @@
           </div>
         </div>
 
-        <!-- Location Filter -->
         <div class="space-y-2">
           <label class="block font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider text-[11px]">Venue Location</label>
           <input 
@@ -2788,10 +1143,8 @@
             class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 border-0 text-xs text-zinc-950 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition"
           />
         </div>
-
       </div>
 
-      <!-- Drawer Footer Actions -->
       <footer class="sticky bottom-0 z-10 px-6 py-4 border-t border-zinc-100 dark:border-zinc-800 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md flex items-center gap-3">
         <button type="button" onclick="window.UniSport.resetFeedFilters()" class="w-1/3 py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 font-semibold text-xs transition cursor-pointer">
           Reset
@@ -2803,7 +1156,7 @@
     </div>
   </div>
 
-  <!-- Edit Activity Modal (Host only) -->
+  <!-- Host Edit Session Modal -->
   <div id="edit-activity-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md overflow-y-auto" onclick="if(event.target===this) window.UniSport.closeEditActivityModal();">
     <div class="relative w-full max-w-lg rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-2xl p-6 sm:p-7 space-y-4 my-auto">
       <div class="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800">
@@ -2913,7 +1266,7 @@
     </div>
   </div>
 
-  <!-- Roster Modal (Clean Uber Style) -->
+  <!-- Session Participant Roster Modal -->
   <div id="roster-modal" onclick="if (event.target === this) this.classList.add('hidden')" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md">
     <div class="relative w-full max-w-md rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-2xl p-6 space-y-4">
       <div class="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800">
@@ -2925,17 +1278,13 @@
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
-      <div id="roster-modal-list" class="space-y-2 max-h-80 overflow-y-auto">
-        <!-- Rendered dynamically -->
-      </div>
+      <div id="roster-modal-list" class="space-y-2 max-h-80 overflow-y-auto"></div>
     </div>
   </div>
 
-  <!-- Student Profile View Modal (View Other Student Profiles & Social Connect) -->
+  <!-- Student Quick-View Modal -->
   <div id="student-profile-modal" onclick="if (event.target === this) window.closeStudentProfileModal();" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md overflow-y-auto">
     <div class="relative w-full max-w-lg rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-2xl overflow-hidden my-auto">
-      
-      <!-- Modal Header -->
       <div class="p-4 sm:p-5 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between bg-white dark:bg-zinc-900">
         <span class="text-xs font-bold text-zinc-400 uppercase tracking-wider">Campus Athlete Profile</span>
         <button onclick="window.closeStudentProfileModal();" class="p-2 text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition cursor-pointer">
@@ -2943,10 +1292,7 @@
         </button>
       </div>
 
-      <!-- Profile View Content -->
       <div class="p-6 sm:p-8 space-y-6">
-        
-        <!-- Hero Card -->
         <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5 text-center sm:text-left">
           <div class="relative shrink-0">
             <div id="view-profile-avatar" class="w-24 h-24 rounded-full p-1 bg-white dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-800 shadow-sm flex items-center justify-center">
@@ -2972,12 +1318,8 @@
           </div>
         </div>
 
-        <!-- Social Relationship Action Button -->
-        <div id="view-profile-social-actions" class="pt-2">
-          <!-- Dynamic Friendship Action: Add Friend, Pending, Friends, Self -->
-        </div>
+        <div id="view-profile-social-actions" class="pt-2"></div>
 
-        <!-- Student Preferences & Info Grid -->
         <div class="grid grid-cols-2 gap-3 pt-2">
           <div class="p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800">
             <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Campus Location</span>
@@ -2989,7 +1331,6 @@
           </div>
         </div>
 
-        <!-- Bio or Sports Interest Tags -->
         <div class="space-y-2">
           <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Sports & Activities</span>
           <div id="view-profile-sports-tags" class="flex flex-wrap gap-1.5">
@@ -2997,34 +1338,12 @@
             <span class="px-2.5 py-1 rounded-lg text-xs bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">Running</span>
           </div>
         </div>
-
       </div>
-
     </div>
   </div>
 
-  <script>
-    if (typeof lucide !== "undefined" && typeof lucide.createIcons === "function") {
-      lucide.createIcons();
-    }
-    if (typeof window.renderCommunityInstant === "function") {
-      window.renderCommunityInstant();
-    }
-    if (typeof window.fetchStudentsDirectFromFirestore === "function") {
-      window.fetchStudentsDirectFromFirestore();
-    }
-    document.addEventListener("DOMContentLoaded", function() {
-      if (typeof window.renderCommunityInstant === "function") {
-        window.renderCommunityInstant();
-      }
-      if (typeof window.fetchStudentsDirectFromFirestore === "function") {
-        window.fetchStudentsDirectFromFirestore();
-      }
-    });
-  </script>
-
-  <!-- Application script entry with path-resilient fallback -->
-  <script type="module" src="./app.js?v=20261026_05" onerror="var s=document.createElement('script');s.type='module';s.src='/challenge2/unisport/app/app.js?v=20261026_05';document.body.appendChild(s);"></script>
-
+  <!-- External Application Scripts -->
+  <script src="./js/ui-controller.js"></script>
+  <script type="module" src="./js/app.js"></script>
 </body>
 </html>

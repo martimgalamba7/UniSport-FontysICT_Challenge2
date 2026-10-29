@@ -8,6 +8,14 @@
       "destination": "/assets/$1"
     },
     {
+      "source": "/css/(.*)",
+      "destination": "/css/$1"
+    },
+    {
+      "source": "/js/(.*)",
+      "destination": "/js/$1"
+    },
+    {
       "source": "/challenge2/survey",
       "destination": "/index.html"
     },

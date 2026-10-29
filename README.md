@@ -69,7 +69,7 @@ UML diagrams and source specifications are available in the repository:
 | Layer | Technology | Purpose |
 | :--- | :--- | :--- |
 | **Frontend Framework** | **HTML5 & Vanilla JavaScript (ES6 Modules)** | Modular, lightweight client logic without framework/bundler overhead |
-| **Styling & Theme** | **Tailwind CSS + Custom CSS (`theme.js`)** | Responsive multi-breakpoint layouts with dark/light mode persistence |
+| **Styling & Theme** | **Tailwind CSS + Custom CSS (`css/`, `js/theme.js`)** | Responsive multi-breakpoint layouts with dark/light mode persistence |
 | **Authentication** | **Google Firebase Authentication** | Secure Email/Password management with campus domain validation |
 | **Database & Real-Time** | **Google Cloud Firestore (NoSQL)** | WebSocket delta synchronization via `onSnapshot` listeners ($\le 1.5\text{s}$) |
 | **Security** | **Firestore Security Rules (`firestore.rules`)** | Role-based access control locking host permissions (`uid == hostId`) |
@@ -84,21 +84,46 @@ UML diagrams and source specifications are available in the repository:
 ├── 404.html                          # Branded 404 error page with 3D mascot
 ├── index.html                        # Project Hub index
 ├── vercel.json                       # Vercel edge routing & rewrite rules
+├── css/
+│   └── 404.css                       # Styles for the custom 404 error page
+├── js/
+│   └── 404.js                        # Dynamic path display for the 404 error page
 ├── challenge2/                       # Challenge 2 deployment root
 │   └── unisport/
 │       ├── index.html                # Marketing Landing Page with QR code handoff
-│       ├── styles.css                # Landing page custom styles & animations
+│       ├── css/
+│       │   └── landing.css           # Landing page custom styles & animations
+│       ├── js/
+│       │   └── landing.js            # Landing page interactive logic & theme toggle
 │       ├── assets/                   # Shared image assets & 3D mascots
 │       └── app/                      # UniSport Web Application (SPA)
 │           ├── index.html            # Main App shell (Feed, My Spots, Profile, Settings)
 │           ├── login.html            # Campus login portal
-│           ├── register.html         # Two-step registration flow
-│           ├── app.js                # Core state controller (window.UniSport)
-│           ├── auth.js               # Campus domain guard & session handling
-│           ├── firebase-config.js    # Firebase v10.12 SDK initialization
-│           ├── theme.js              # Theme engine & color mode switcher
+│           ├── register.html         # Multi-step registration flow
+│           ├── welcome.html          # Authenticated welcome confirmation screen
+│           ├── css/
+│           │   └── app.css           # Application layout, sidebar, mobile nav & chip styles
+│           ├── js/
+│           │   ├── app.js            # Core state controller (window.UniSport)
+│           │   ├── ui-controller.js  # UI hydration, navigation, community & profile logic
+│           │   ├── auth.js           # Campus domain guard & session handling
+│           │   ├── login.js          # Student sign-in form controller
+│           │   ├── register.js       # Multi-step onboarding controller
+│           │   ├── welcome.js        # Welcome confirmation controller
+│           │   ├── avatars.js        # Mascot avatar helper functions
+│           │   ├── avatar-data.js    # Avatar SVG/image dataset
+│           │   ├── firebase-config.js# Firebase v10.12 SDK initialization
+│           │   └── theme.js          # Tailwind config & color mode manager
 │           └── assets/               # 3D character avatars & mascot illustrations
 ├── survey/                           # Research Survey web app (Challenge 2)
+│   ├── index.html                    # Survey markup
+│   ├── schema.sql                    # PostgreSQL survey schema
+│   ├── vercel.json                   # Standalone survey routing config
+│   ├── css/
+│   │   └── survey.css                # Survey custom styles & animations
+│   └── js/
+│       ├── survey.js                 # Survey validation, progress & submission logic
+│       └── google_apps_script.js     # Google Sheets Apps Script webhook
 └── uml/                              # UML architectural diagrams (.puml)
 ```
 

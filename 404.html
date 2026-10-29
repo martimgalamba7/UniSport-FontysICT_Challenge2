@@ -4,41 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>404 — Page Not Found | UniSport Eindhoven</title>
+
   <link rel="icon" type="image/png" href="/challenge2/unisport/app/assets/favicon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', 'sans-serif'],
-          }
-        }
-      }
-    };
-    (function() {
-      try {
-        var saved = localStorage.getItem('unisport-theme');
-        if (saved === 'dark') {
-          document.documentElement.classList.add('dark');
-        }
-      } catch (e) {}
-    })();
-  </script>
-  <style>
-    @keyframes floatSlow {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-10px); }
-    }
-    .mascot-float {
-      animation: floatSlow 4s ease-in-out infinite;
-    }
-  </style>
+  <script src="/js/404.js"></script>
+  <link rel="stylesheet" href="/css/404.css" />
 </head>
+
 <body class="bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 min-h-screen flex flex-col font-sans antialiased selection:bg-blue-600 selection:text-white transition-colors duration-200">
 
   <!-- Top Navigation Bar -->
@@ -47,7 +23,7 @@
       <a href="/challenge2/unisport/app" class="flex items-center gap-2.5 group">
         <img 
           src="/challenge2/unisport/app/assets/logoUniSport.png" 
-          onerror="this.src='/unisport/app/assets/logoUniSport.png'"
+          onerror="this.src='/assets/logoUniSport.png'"
           alt="UniSport Logo" 
           class="w-9 h-9 object-contain transition-transform duration-200 group-hover:scale-105" 
         />
@@ -67,11 +43,11 @@
     </div>
   </header>
 
-  <!-- Main 404 Content -->
+  <!-- Main 404 Error Content -->
   <main class="flex-1 flex items-center justify-center px-6 py-12 sm:py-20">
     <div class="max-w-5xl w-full mx-auto grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-8 items-center">
-      
-      <!-- Left Column: Error Message & CTA -->
+
+      <!-- Error Message & Navigation Actions -->
       <div class="md:col-span-7 space-y-5 text-center md:text-left order-2 md:order-1">
         <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
           <span class="text-[#0038FF] dark:text-[#3b82f6]">404.</span>
@@ -104,13 +80,12 @@
         </div>
       </div>
 
-      <!-- Right Column: 3D UniSport Mascot Illustration -->
+      <!-- 3D Mascot Illustration -->
       <div class="md:col-span-5 flex items-center justify-center order-1 md:order-2">
         <div class="relative w-64 h-64 sm:w-80 sm:h-80 lg:w-96 lg:h-96 flex items-center justify-center">
           <div class="absolute inset-6 rounded-full bg-gradient-to-tr from-blue-500/10 via-orange-500/10 to-transparent blur-2xl pointer-events-none"></div>
           <img 
             src="/challenge2/unisport/app/assets/mascot-404.png" 
-            onerror="this.src='/unisport/app/assets/mascot-404.png'"
             alt="UniSport Mascot 404" 
             class="relative w-full h-full object-contain drop-shadow-xl mascot-float select-none"
           />
@@ -120,13 +95,5 @@
     </div>
   </main>
 
-  <script>
-    (function() {
-      var pill = document.getElementById('requested-url-pill');
-      if (pill && window.location && window.location.pathname) {
-        pill.textContent = window.location.pathname + (window.location.search || '');
-      }
-    })();
-  </script>
 </body>
 </html>

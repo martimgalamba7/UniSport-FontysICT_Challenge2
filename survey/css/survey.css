@@ -1,0 +1,88 @@
+/* ==========================================================================
+   UniSport Research Survey Stylesheet
+   ========================================================================== */
+
+/* --- Step Screen Transitions --- */
+.step-screen {
+  display: none;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.step-screen.active {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* --- Interactive Option Cards & Rating Buttons --- */
+.option-card {
+  transition: all 0.15s ease;
+}
+
+.option-card.selected {
+  border-color: #4F46E5;
+  background-color: #F5F3FF;
+  color: #312E81;
+}
+
+.option-card.selected .card-check {
+  border-color: #4F46E5;
+  background-color: #4F46E5;
+  color: #FFFFFF;
+}
+
+.option-card.selected .card-icon {
+  color: #4F46E5;
+}
+
+.rating-btn.selected {
+  background-color: #4F46E5;
+  border-color: #4F46E5;
+  color: #FFFFFF;
+}
+
+/* --- Language Selector Dropdown --- */
+.lang-dropdown-menu {
+  opacity: 0;
+  transform: translateY(-8px) scale(0.96);
+  pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.lang-dropdown-menu.open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.lang-option {
+  transition: all 0.12s ease;
+}
+
+.lang-option.active {
+  background-color: #2563EB !important;
+  color: #FFFFFF !important;
+}
+
+.lang-option.active span {
+  color: #FFFFFF !important;
+}
+
+/* --- Google Translate UI Overrides --- */
+.goog-te-banner-frame,
+.skiptranslate,
+#goog-gt-tt,
+.goog-te-balloon-frame {
+  display: none !important;
+}
+
+body {
+  top: 0px !important;
+}
+
+.goog-text-highlight {
+  background: none !important;
+  box-shadow: none !important;
+}
