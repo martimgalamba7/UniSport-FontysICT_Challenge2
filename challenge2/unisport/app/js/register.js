@@ -194,7 +194,7 @@ document.getElementById("btn-finish").addEventListener("click", async () => {
     });
 
     if (res.success) {
-      window.location.href = "./welcome.html";
+      window.location.href = "./welcome.html?mode=new";
     } else {
       showError(res.error || "Unable to create account.");
       btn.disabled = false;
