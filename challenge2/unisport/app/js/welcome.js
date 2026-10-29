@@ -15,19 +15,36 @@ const subtitleEl = document.getElementById("welcome-subtitle");
 const avatarInner = document.getElementById("user-avatar-inner");
 const switchAccountBtn = document.getElementById("btn-switch-account");
 
+function navigateToLogin() {
+  if (window.location.protocol === "file:") {
+    window.location.href = "./login.html";
+    return;
+  }
+  const p = window.location.pathname || "";
+  if (p.includes("/challenge2/app")) {
+    window.location.href = "/challenge2/app/login";
+  } else if (p.includes("/challenge2/unisport/app")) {
+    window.location.href = "/challenge2/unisport/app/login";
+  } else if (p.includes("/unisport/app")) {
+    window.location.href = "/unisport/app/login";
+  } else {
+    window.location.href = "/challenge2/app/login";
+  }
+}
+
 if (switchAccountBtn) {
   switchAccountBtn.addEventListener("click", async () => {
     try {
       await signOutStudent();
     } catch {}
-    window.location.href = "./login.html";
+    navigateToLogin();
   });
 }
 
 const session = getActiveSession();
 
 if (!session || !session.email) {
-  window.location.href = "./login.html";
+  navigateToLogin();
 } else {
   const urlParams = new URLSearchParams(window.location.search);
   const isNewRegistration = urlParams.get("mode") === "new";
