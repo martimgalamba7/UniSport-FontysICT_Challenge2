@@ -194,7 +194,19 @@ document.getElementById("btn-finish").addEventListener("click", async () => {
     });
 
     if (res.success) {
-      window.location.href = "./welcome.html?mode=new";
+      try {
+        sessionStorage.setItem("unisport_just_registered", "true");
+      } catch (e) {}
+      const p = window.location.pathname || "";
+      if (p.includes("/challenge2/app")) {
+        window.location.href = "/challenge2/app/welcome?mode=new";
+      } else if (p.includes("/challenge2/unisport/app")) {
+        window.location.href = "/challenge2/unisport/app/welcome?mode=new";
+      } else if (p.includes("/unisport/app")) {
+        window.location.href = "/unisport/app/welcome?mode=new";
+      } else {
+        window.location.href = "./welcome.html?mode=new";
+      }
     } else {
       showError(res.error || "Unable to create account.");
       btn.disabled = false;
