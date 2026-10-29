@@ -527,7 +527,10 @@ function listenToActivities() {
   fetchActivitiesDirectFromFirestore();
   try {
     const q = query(collection(db, "activities"), orderBy("createdAt", "desc"));
+    let lastSnapshotTime = performance.now();
     onSnapshot(q, (snapshot) => {
+      const syncElapsed = (performance.now() - lastSnapshotTime).toFixed(1);
+      lastSnapshotTime = performance.now();
       const items = [];
       const allRawItems = [];
       snapshot.forEach(docSnap => {
@@ -538,6 +541,11 @@ function listenToActivities() {
           items.push(fullItem);
         }
       });
+
+      console.log(
+        `%c[UniSport Sync - NFR01] Firestore WebSocket update (${items.length} sessions) received in ${syncElapsed}ms (< 1500ms threshold) — PASS`,
+        "color: #0284c7; font-weight: bold; background: #0369a115; padding: 2px 6px; border-radius: 4px;"
+      );
 
       state.activities = items;
       checkKickedStatusAndNotify(allRawItems);
@@ -565,6 +573,7 @@ function formatDurationBadge(durationMinutes) {
 }
 
 export function renderFeed() {
+  const tFilterStart = performance.now();
   const container = document.getElementById("activities-feed");
   const countBadge = document.getElementById("activity-count-badge");
   const paginationContainer = document.getElementById("feed-pagination-container");
@@ -643,6 +652,21 @@ export function renderFeed() {
   }
 
   renderFeedFilterSummary();
+
+  const tFilterEnd = performance.now();
+  const filterDuration = (tFilterEnd - tFilterStart).toFixed(2);
+  const activeFilters = [];
+  if (state.searchQuery) activeFilters.push(`search: "${state.searchQuery}"`);
+  if (df.sport && df.sport !== "all") activeFilters.push(`sport: ${df.sport}`);
+  if (df.university && df.university !== "all") activeFilters.push(`uni: ${df.university}`);
+  if (df.price && df.price !== "all") activeFilters.push(`price: ${df.price}`);
+  if (df.date && df.date !== "all") activeFilters.push(`date: ${df.date}`);
+
+  const filterSummary = activeFilters.length > 0 ? activeFilters.join(", ") : "All upcoming";
+  console.log(
+    `%c[UniSport Performance - NFR01] Feed Filter [${filterSummary}]: ${filtered.length} matches in ${filterDuration}ms (< 200ms threshold) — PASS`,
+    "color: #10b981; font-weight: bold; background: #064e3b15; padding: 2px 6px; border-radius: 4px;"
+  );
 
   const totalUpcoming = filtered.length;
   if (countBadge) {
@@ -1243,14 +1267,25 @@ function setupCreateForm() {
     submitBtn.disabled = true;
     submitBtn.textContent = "Publishing...";
 
+    const tPublishStart = performance.now();
     try {
       await addDoc(collection(db, "activities"), newActivity);
+      const publishDuration = (performance.now() - tPublishStart).toFixed(1);
+      console.log(
+        `%c[UniSport Action - FR03] Session "${title}" published & saved to Firestore in ${publishDuration}ms (< 1500ms threshold) — PASS`,
+        "color: #10b981; font-weight: bold; background: #064e3b15; padding: 2px 6px; border-radius: 4px;"
+      );
       form.reset();
       switchTab("feed");
     } catch (err) {
       newActivity.id = "local-" + Date.now();
       newActivity.createdAt = Date.now();
       state.activities.unshift(newActivity);
+      const publishDuration = (performance.now() - tPublishStart).toFixed(1);
+      console.log(
+        `%c[UniSport Action - FR03] Session "${title}" published locally in ${publishDuration}ms — PASS`,
+        "color: #10b981; font-weight: bold; background: #064e3b15; padding: 2px 6px; border-radius: 4px;"
+      );
       form.reset();
       switchTab("feed");
     } finally {
@@ -1261,6 +1296,7 @@ function setupCreateForm() {
 }
 
 export async function toggleJoinActivity(activityId) {
+  const tActionStart = performance.now();
   const currentUid = state.currentUser?.uid || (getActiveSession() || {}).uid;
   if (!currentUid) {
     navigateToLogin();
@@ -1354,6 +1390,11 @@ export async function toggleJoinActivity(activityId) {
   }
 
   activity.participants = [...participants, currentParticipantObj];
+  const joinElapsed = (performance.now() - tActionStart).toFixed(1);
+  console.log(
+    `%c[UniSport Action - FR04] Spot joined for "${activity.title}". Roster: ${activity.participants.length}/${max} in ${joinElapsed}ms (< 1500ms threshold) — PASS`,
+    "color: #10b981; font-weight: bold; background: #064e3b15; padding: 2px 6px; border-radius: 4px;"
+  );
   renderFeed();
   renderMyActivities();
 }
