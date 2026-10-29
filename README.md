@@ -85,15 +85,19 @@ UML diagrams and source specifications are available in the repository:
 ├── index.html                        # Project Hub index
 ├── vercel.json                       # Vercel edge routing & rewrite rules
 ├── css/
-│   └── 404.css                       # Styles for the custom 404 error page
+│   ├── 404.css                       # Styles for the custom 404 error page
+│   └── cookie-notice.css             # Floating privacy & cookie consent styles
 ├── js/
-│   └── 404.js                        # Dynamic path display for the 404 error page
+│   ├── 404.js                        # Dynamic path display for the 404 error page
+│   └── cookie-notice.js              # Cookie & storage consent manager
 ├── challenge2/                       # Challenge 2 deployment root
 │   └── unisport/
 │       ├── index.html                # Marketing Landing Page with QR code handoff
 │       ├── css/
+│       │   ├── cookie-notice.css     # Floating privacy & cookie consent styles
 │       │   └── landing.css           # Landing page custom styles & animations
 │       ├── js/
+│       │   ├── cookie-notice.js      # Cookie & storage consent manager
 │       │   └── landing.js            # Landing page interactive logic & theme toggle
 │       ├── assets/                   # Shared image assets & 3D mascots
 │       └── app/                      # UniSport Web Application (SPA)
@@ -102,9 +106,11 @@ UML diagrams and source specifications are available in the repository:
 │           ├── register.html         # Multi-step registration flow
 │           ├── welcome.html          # Authenticated welcome confirmation screen
 │           ├── css/
-│           │   └── app.css           # Application layout, sidebar, mobile nav & chip styles
+│           │   ├── app.css           # Application layout, sidebar, mobile nav & chip styles
+│           │   └── cookie-notice.css # Floating privacy & cookie consent styles
 │           ├── js/
 │           │   ├── app.js            # Core state controller (window.UniSport)
+│           │   ├── cookie-notice.js  # Cookie & storage consent manager
 │           │   ├── ui-controller.js  # UI hydration, navigation, community & profile logic
 │           │   ├── auth.js           # Campus domain guard & session handling
 │           │   ├── login.js          # Student sign-in form controller

@@ -16,8 +16,10 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="/challenge2/unisport/css/landing.css" />
   <link rel="stylesheet" href="./css/landing.css" />
+  <link rel="stylesheet" href="./css/cookie-notice.css" />
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="./js/landing.js"></script>
+  <script src="./js/cookie-notice.js"></script>
 </head>
 
 <body class="bg-[#FAFAF8] text-zinc-900 font-sans min-h-screen flex flex-col justify-between selection:bg-brand-orange selection:text-white">
@@ -623,6 +625,8 @@
           &copy; 2026 UniSport. All rights reserved.
         </div>
         <div class="flex items-center space-x-6">
+          <button type="button" onclick="window.openCookieNotice()" class="hover:text-zinc-600 transition cursor-pointer">Cookie Preferences</button>
+          <span>•</span>
           <a href="#" class="hover:text-zinc-600 transition">Privacy Policy</a>
           <span>•</span>
           <a href="#" class="hover:text-zinc-600 transition">Terms of Service</a>

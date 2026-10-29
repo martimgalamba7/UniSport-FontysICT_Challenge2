@@ -14,6 +14,8 @@
     { "source": "/challenge2", "destination": "/index.html" },
     { "source": "/challenge2/unisport", "destination": "/challenge2/unisport/index.html" },
     { "source": "/challenge2/unisport/app", "destination": "/challenge2/unisport/app/index.html" },
+    { "source": "/css/cookie-notice.css", "destination": "/css/cookie-notice.css" },
+    { "source": "/js/cookie-notice.js", "destination": "/js/cookie-notice.js" },
     { "source": "/challenge2/css/landing.css", "destination": "/challenge2/unisport/css/landing.css" },
     { "source": "/challenge2/js/landing.js", "destination": "/challenge2/unisport/js/landing.js" },
     { "source": "/challenge2/unisport/css/app.css", "destination": "/challenge2/unisport/app/css/app.css" },

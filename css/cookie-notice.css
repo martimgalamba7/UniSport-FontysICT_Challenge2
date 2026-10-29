@@ -1,0 +1,94 @@
+/* ==========================================================================
+   COOKIE & PRIVACY NOTICE BANNER & MODAL STYLES
+   ========================================================================== */
+
+#unisport-cookie-notice {
+  position: fixed;
+  bottom: 1.25rem;
+  right: 1.25rem;
+  left: 1.25rem;
+  z-index: 120;
+  max-width: 26rem;
+  margin-left: auto;
+  opacity: 0;
+  transform: translateY(20px) scale(0.97);
+  pointer-events: none;
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#unisport-cookie-notice.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+#unisport-cookie-details {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+}
+
+#unisport-cookie-details.is-open {
+  max-height: 28rem;
+  opacity: 1;
+  overflow-y: auto;
+}
+
+/* ==========================================================================
+   CUSTOM TOGGLE SWITCHES
+   ========================================================================== */
+
+.cookie-switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.cookie-switch input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.cookie-slider {
+  width: 2.25rem;
+  height: 1.25rem;
+  background-color: #E4E4E7;
+  border-radius: 9999px;
+  transition: background-color 0.2s ease;
+  position: relative;
+}
+
+.dark .cookie-slider {
+  background-color: #27272A;
+}
+
+.cookie-slider::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 1rem;
+  height: 1rem;
+  background-color: #FFFFFF;
+  border-radius: 9999px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cookie-switch input:checked + .cookie-slider {
+  background-color: #FF4D00;
+}
+
+.cookie-switch input:checked + .cookie-slider::after {
+  transform: translateX(1rem);
+}
+
+.cookie-switch input:disabled + .cookie-slider {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
