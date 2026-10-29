@@ -1,24 +1,23 @@
 /* ==========================================================================
-   COOKIE & PRIVACY NOTICE BANNER & MODAL STYLES
+   COOKIE & PRIVACY NOTICE BANNER - CENTERED HORIZONTAL RECTANGLE
    ========================================================================== */
 
 #unisport-cookie-notice {
   position: fixed;
-  bottom: 1.25rem;
-  right: 1.25rem;
-  left: 1.25rem;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translate(-50%, 24px) scale(0.98);
+  width: calc(100% - 1.5rem);
+  max-width: 52rem;
   z-index: 120;
-  max-width: 26rem;
-  margin-left: auto;
   opacity: 0;
-  transform: translateY(20px) scale(0.97);
   pointer-events: none;
   transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 #unisport-cookie-notice.is-visible {
   opacity: 1;
-  transform: translateY(0) scale(1);
+  transform: translate(-50%, 0) scale(1);
   pointer-events: auto;
 }
 
@@ -26,12 +25,13 @@
   max-height: 0;
   opacity: 0;
   overflow: hidden;
-  transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+  transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease, margin-top 0.25s ease;
 }
 
 #unisport-cookie-details.is-open {
-  max-height: 28rem;
+  max-height: 32rem;
   opacity: 1;
+  margin-top: 1rem;
   overflow-y: auto;
 }
 
@@ -55,7 +55,7 @@
 }
 
 .cookie-slider {
-  width: 2.25rem;
+  width: 2.125rem;
   height: 1.25rem;
   background-color: #E4E4E7;
   border-radius: 9999px;
@@ -85,7 +85,7 @@
 }
 
 .cookie-switch input:checked + .cookie-slider::after {
-  transform: translateX(1rem);
+  transform: translateX(0.875rem);
 }
 
 .cookie-switch input:disabled + .cookie-slider {
